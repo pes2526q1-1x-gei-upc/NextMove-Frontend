@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
+
 
 class PaginaRegistro extends StatelessWidget {
-  const PaginaRegistro({Key? key}) : super(key: key);
+  const PaginaRegistro({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registro'),
+        title: Text(AppLocalizations.of(context)!.helloWorld),
         centerTitle: true,
       ),
       body: Padding(
