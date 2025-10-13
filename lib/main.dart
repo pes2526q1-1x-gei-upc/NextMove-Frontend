@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/presentacion/PaginaResgitro.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/PaginaRegistro.dart';
 
 void main() {
   runApp(const MyApp());
