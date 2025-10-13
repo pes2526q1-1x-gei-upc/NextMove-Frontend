@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/PaginaResgitro.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: PaginaRegistro(), //TODO: afegir condicional segons si l'usuari ha iniciat sessió o no
     );
   }
 }
