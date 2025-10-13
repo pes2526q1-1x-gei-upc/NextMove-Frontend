@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/main.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 
 
-class PaginaRegistro extends StatelessWidget {
-  const PaginaRegistro({super.key});
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,7 @@ class PaginaRegistro extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                // Acción de registro
+                appKey.currentState?.setLoggedIn(true);
               },
               child: const Text('Registrarse'),
             ),
