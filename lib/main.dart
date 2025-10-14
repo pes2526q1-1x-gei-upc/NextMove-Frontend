@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 import 'l10n/app_localizations.dart';
@@ -5,7 +8,11 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/RegisterP
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(NextMoveApp(key: appKey));
 }
 
@@ -17,8 +24,7 @@ class NextMoveApp extends StatefulWidget {
 }
 
 class _NextMoveAppState extends State<NextMoveApp> {
-  bool isLoggedIn = false;
-
+  bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
   void setLoggedIn(bool value) {
     setState(() {
       isLoggedIn = value;
@@ -41,7 +47,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         return const Locale('en');
       },
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
       home: isLoggedIn ? MapHomePage() : RegisterPage(),
     );
