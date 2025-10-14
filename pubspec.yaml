@@ -37,6 +37,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
+  google_sign_in: ^7.2.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -91,3 +95,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  
+flutter_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "518328761715",
+    "project_id": "nextmove-69c37",
+    "storage_bucket": "nextmove-69c37.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518328761715:android:7ea08f3c9140c21332d906",
+        "android_client_info": {
+          "package_name": "com.bemotion.nextmove"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOvmnYT6rtx95olUoj5loSbE-Oqht_bdg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -100,11 +100,23 @@ abstract class AppLocalizations {
     Locale('es'),
   ];
 
-  /// test of hello world
+  /// No description provided for @register.
   ///
   /// In en, this message translates to:
-  /// **'Hello World!'**
-  String get helloWorld;
+  /// **'Sign up'**
+  String get register;
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailAddress;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
 }
 
 class _AppLocalizationsDelegate

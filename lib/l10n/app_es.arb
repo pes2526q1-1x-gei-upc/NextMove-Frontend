@@ -1,6 +1,5 @@
 {
-    "helloWorld": "Hola mundo!",
-    "@helloWorld": {
-        "description": "test de hello world"
-    }
+    "register": "Registrarse",
+    "emailAddress": "Dirección de correo electrónico",
+    "password": "Contraseña"
 }

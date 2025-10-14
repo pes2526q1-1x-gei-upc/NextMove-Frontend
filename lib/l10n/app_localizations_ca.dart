@@ -9,5 +9,11 @@ class AppLocalizationsCa extends AppLocalizations {
   AppLocalizationsCa([String locale = 'ca']) : super(locale);
 
   @override
-  String get helloWorld => 'Hola, món!';
+  String get register => 'Registrar-se';
+
+  @override
+  String get emailAddress => 'Adreça de correu electrònic';
+
+  @override
+  String get password => 'Contrasenya';
 }
