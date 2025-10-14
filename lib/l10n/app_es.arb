@@ -12,5 +12,17 @@
         }
     },
     "signInWithGoogle": "Iniciar sesión con Google",
-    "useEmail": "Utilizar el correo electrónico"
+    "useEmail": "Utilizar el correo electrónico",
+    "whatIsYourEmailAddress": "¿Cuál es tu dirección de correo electrónico?",
+    "continue_": "Continuar",
+    "needsToRegister": "No hemos encontrado un usuario con ese correo electrónico. Ahora necesitarás registrarte con una nueva contraseña.",
+    "invalidEmail": "El formato de la dirección de correo electrónico es inválido.",
+    "passwordRequirements": "La contraseña debe tener al menos 8 caracteres con 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial.",
+    "signIn": "Iniciar sesión",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+    "passwordNeedsLowercase": "La contraseña debe tener al menos 1 letra minúscula.",
+    "passwordNeedsUppercase": "La contraseña debe tener al menos 1 letra mayúscula.",
+    "passwordNeedsNumber": "La contraseña debe tener al menos 1 número.",
+    "passwordNeedsSpecialCharacter": "La contraseña debe tener al menos 1 carácter especial.",
+    "wrongPassword": "La contraseña es incorrecta."
 }

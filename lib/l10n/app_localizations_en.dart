@@ -27,4 +27,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get useEmail => 'Use email';
+
+  @override
+  String get whatIsYourEmailAddress => 'What is your email address?';
+
+  @override
+  String get continue_ => 'Continue';
+
+  @override
+  String get needsToRegister =>
+      'We haven\'t found a user with that email. You will now need to sign up with a new password.';
+
+  @override
+  String get invalidEmail => 'The email address format is invalid.';
+
+  @override
+  String get passwordRequirements =>
+      'The password must be at least 8 characters long with 1 lowercase, 1 uppercase, 1 number, and 1 special character.';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get passwordTooShort =>
+      'The password must be at least 8 characters long.';
+
+  @override
+  String get passwordNeedsLowercase =>
+      'The password must contain at least 1 lowercase letter.';
+
+  @override
+  String get passwordNeedsUppercase =>
+      'The password must contain at least 1 uppercase letter.';
+
+  @override
+  String get passwordNeedsNumber =>
+      'The password must contain at least 1 number.';
+
+  @override
+  String get passwordNeedsSpecialCharacter =>
+      'The password must contain at least 1 special character.';
+
+  @override
+  String get wrongPassword => 'The password is incorrect.';
 }

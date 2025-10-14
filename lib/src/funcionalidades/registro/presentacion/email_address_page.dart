@@ -1,0 +1,193 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/main.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
+
+
+class EmailAddressPage extends StatefulWidget {
+  const EmailAddressPage({super.key});
+
+  @override
+  State<EmailAddressPage> createState() => _EmailAddressPageState();
+}
+
+class _EmailAddressPageState extends State<EmailAddressPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool emailChecked = false;
+  bool needsToRegister = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.whatIsYourEmailAddress,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.emailAddress,
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              readOnly: emailChecked,
+              style: emailChecked ? TextStyle(color: Theme.of(context).disabledColor) : null,
+            ),
+            if (emailChecked) ...[
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.password,
+                  border: const OutlineInputBorder(),
+                ),
+                obscureText: true,
+              ),
+              if (needsToRegister) ...[
+                Text(
+                  AppLocalizations.of(context)!.passwordRequirements,
+                  style: TextStyle(fontSize: 14),
+                )
+              ],
+            ],
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                final emailAddress = _emailController.text.trim();
+                final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                if (!emailChecked) {
+                  if (!emailRegex.hasMatch(emailAddress)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmail)),
+                    );
+                    return;
+                  }
+                  try {
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: emailAddress,
+                      password: "1111111",
+                    );
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'user-not-found') {
+                      print('No user found for that email.');
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(AppLocalizations.of(context)!.register),
+                          content: Text(AppLocalizations.of(context)!.needsToRegister),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                      setState(() {
+                        needsToRegister = true;
+                      });
+                    } else if (e.code == 'wrong-password') {}
+                    } catch (e) {
+                    print(e);
+                  }
+                  setState(() {
+                      emailChecked = true;
+                    });
+                }
+                else {
+                  if (needsToRegister) {
+                    final password = _passwordController.text;
+                    if (password.length < 8) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordTooShort)),
+                      );
+                      return;
+                    }
+                    if (!RegExp(r'[a-z]').hasMatch(password)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsLowercase)),
+                      );
+                      return;
+                    }
+                    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsUppercase)),
+                      );
+                      return;
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(password)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsNumber)),
+                      );
+                      return;
+                    }
+                    if (!RegExp(r'[!@#\$&*~%^(),.?":{}|<>]').hasMatch(password)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsSpecialCharacter)),
+                      );
+                      return;
+                    }
+                    try {
+                      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                        email: emailAddress,
+                        password: password,
+                      );
+                      appKey.currentState?.setLoggedIn(true);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => MapHomePage()),
+                      );
+                    } catch (e) {
+                      print(e);
+                    }
+                  } else {
+                    final password = _passwordController.text;
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: emailAddress,
+                        password: password,
+                      );
+                      appKey.currentState?.setLoggedIn(true);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => MapHomePage()),
+                        (route) => false,
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'wrong-password') {
+                        print('Wrong password provided for that user.');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(AppLocalizations.of(context)!.wrongPassword)),
+                        );
+                      }
+                    }
+                  }
+                }
+              },
+              child: emailChecked ?
+                      (needsToRegister ? Text(AppLocalizations.of(context)!.register) :
+                                         Text(AppLocalizations.of(context)!.signIn)) :
+                        Text(AppLocalizations.of(context)!.continue_)
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

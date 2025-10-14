@@ -3,7 +3,7 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/presentacion/register_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -31,7 +31,7 @@ class WelcomePage extends StatelessWidget {
                 text: AppLocalizations.of(context)!.useEmail,
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
+                    MaterialPageRoute(builder: (context) => EmailAddressPage()),
                   );
                 }
               ),

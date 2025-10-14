@@ -12,5 +12,17 @@
         }
     },
     "signInWithGoogle": "Iniciar sessió amb Google",
-    "useEmail": "Utilitzar el correu electrònic"
+    "useEmail": "Utilitzar el correu electrònic",
+    "whatIsYourEmailAddress": "Quina és la teva adreça de correu electrònic?",
+    "continue_": "Continuar",
+    "needsToRegister": "No hem trobat cap usuari amb aquest correu electrònic. Ara hauràs de registrar-te amb una nova contrasenya.",
+    "invalidEmail": "El format de l'adreça de correu electrònic és invàlid.",
+    "passwordRequirements": "La contrasenya ha de tenir almenys 8 caràcters amb 1 minúscula, 1 majúscula, 1 nombre i 1 caràcter especial.",
+    "signIn": "Iniciar sessió",
+    "passwordTooShort": "La contrasenya ha de tenir almenys 8 caràcters.",
+    "passwordNeedsLowercase": "La contrasenya ha de tenir almenys 1 lletra minúscula.",
+    "passwordNeedsUppercase": "La contrasenya ha de tenir almenys 1 lletra majúscula.",
+    "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
+    "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
+    "wrongPassword": "La contrasenya és incorrecta."
 }
