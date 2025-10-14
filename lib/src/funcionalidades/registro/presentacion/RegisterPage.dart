@@ -4,6 +4,8 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 
+import 'package:nextmove_app/graphql/queries.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -23,6 +25,34 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  Future<void> _testQuery() async {
+    final GraphQLClient client = GraphQLProvider.of(context).value;
+
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getUserQuery),
+      variables: {
+        'id': '1', // ID hardcodeado para probar
+      },
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      print('Error en query: ${result.exception.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${result.exception.toString()}')),
+      );
+    } else {
+      print('Resultado: ${result.data}');
+      final userData = result.data?['User'];
+      if (userData != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuario: ${userData['nombre']}')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +70,15 @@ class _RegisterPageState extends State<RegisterPage> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
+
+            // Button to test GraphQL query
+            ElevatedButton(
+              onPressed: _testQuery,
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: Text('Probar Query GraphQL'),
+            ),
+
+            const SizedBox(height: 16),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
