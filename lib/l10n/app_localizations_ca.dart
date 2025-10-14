@@ -16,4 +16,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get password => 'Contrasenya';
+
+  @override
+  String welcomeTo(String appName) {
+    return 'Benvingut a $appName!';
+  }
+
+  @override
+  String get signInWithGoogle => 'Iniciar sessió amb Google';
 }

@@ -1,5 +1,15 @@
 {
     "register": "Registrar-se",
     "emailAddress": "Adreça de correu electrònic",
-    "password": "Contrasenya"
+    "password": "Contrasenya",
+    "welcomeTo": "Benvingut a {appName}!",
+    "@welcomeTo": {
+        "placeholders": {
+            "appName": {
+                "type": "String",
+                "example": "NextMove"
+            }
+        }
+    },
+    "signInWithGoogle": "Iniciar sessió amb Google"
 }

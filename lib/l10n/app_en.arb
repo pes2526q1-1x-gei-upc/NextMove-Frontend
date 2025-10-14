@@ -1,5 +1,15 @@
 {
     "register": "Sign up",
     "emailAddress": "Email address",
-    "password": "Password"
+    "password": "Password",
+    "welcomeTo": "Welcome to {appName}!",
+    "@welcomeTo": {
+        "placeholders": {
+            "appName": {
+                "type": "String",
+                "example": "NextMove"
+            }
+        }
+    },
+    "signInWithGoogle": "Sign in with Google"
 }

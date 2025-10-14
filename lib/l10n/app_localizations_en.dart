@@ -16,4 +16,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get password => 'Password';
+
+  @override
+  String welcomeTo(String appName) {
+    return 'Welcome to $appName!';
+  }
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
 }
