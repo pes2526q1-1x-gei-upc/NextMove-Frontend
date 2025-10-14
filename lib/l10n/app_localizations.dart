@@ -129,6 +129,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in with Google'**
   String get signInWithGoogle;
+
+  /// No description provided for @useEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use email'**
+  String get useEmail;
 }
 
 class _AppLocalizationsDelegate

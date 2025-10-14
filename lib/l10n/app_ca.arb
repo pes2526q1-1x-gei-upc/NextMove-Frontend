@@ -11,5 +11,6 @@
             }
         }
     },
-    "signInWithGoogle": "Iniciar sessió amb Google"
+    "signInWithGoogle": "Iniciar sessió amb Google",
+    "useEmail": "Utilitzar el correu electrònic"
 }

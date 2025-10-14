@@ -24,4 +24,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get signInWithGoogle => 'Iniciar sessió amb Google';
+
+  @override
+  String get useEmail => 'Utilitzar el correu electrònic';
 }
