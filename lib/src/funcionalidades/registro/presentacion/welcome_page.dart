@@ -3,6 +3,7 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -39,8 +40,11 @@ class WelcomePage extends StatelessWidget {
                 Buttons.Google,
                 width: signInButtonsWidth,
                 text: AppLocalizations.of(context)!.signInWithGoogle,
-                onPressed: () {
-                  signInWithGoogle();
+                onPressed: () async {
+                  await signInWithGoogle();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const MapHomePage()),
+                  );
                 }
               ),
             ],
