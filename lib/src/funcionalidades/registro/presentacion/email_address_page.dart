@@ -108,47 +108,55 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
             ElevatedButton(
               onPressed: () async {
                 final emailAddress = _emailController.text.trim();
-                final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                 if (!emailChecked) {
-                  if (!emailRegex.hasMatch(emailAddress)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmail)),
-                    );
-                    return;
-                  }
                   try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
                       email: emailAddress,
                       password: "1111111",
                     );
-                  } on FirebaseAuthException catch (e) {
-                    if (e.code == 'user-not-found') {
-                      print('No user found for that email.');
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(AppLocalizations.of(context)!.register),
-                          content: Text(AppLocalizations.of(context)!.needsToRegister),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('OK'),
-                            ),
-                          ],
-                        ),
-                      );
-                      setState(() {
-                        needsToRegister = true;
-                      });
-                    } else if (e.code == 'wrong-password') {}
-                    } catch (e) {
-                    print(e);
-                  }
-                  setState(() {
+                    await credential.user?.delete();
+                    setState(() {
+                      needsToRegister = true;
                       emailChecked = true;
                     });
+                    await showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(AppLocalizations.of(context)!.register),
+                        content: Text(AppLocalizations.of(context)!.needsToRegister),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'email-already-in-use') {
+                      setState(() {
+                        needsToRegister = false;
+                        emailChecked = true;
+                      });
+                    } else if (e.code == 'invalid-email') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmail)),
+                      );
+                      return;
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(AppLocalizations.of(context)!.errorOccurred(e.message ?? AppLocalizations.of(context)!.unknownError))),
+                      );
+                      return;
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppLocalizations.of(context)!.errorOccurred(e.toString()))),
+                    );
+                    return;
+                  }
                 }
                 else {
                   if (needsToRegister) {

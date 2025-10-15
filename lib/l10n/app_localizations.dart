@@ -207,6 +207,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The password is incorrect.'**
   String get wrongPassword;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An error has occurred: {error}'**
+  String errorOccurred(String error);
+
+  /// No description provided for @unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownError;
 }
 
 class _AppLocalizationsDelegate

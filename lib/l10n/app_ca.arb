@@ -24,5 +24,15 @@
     "passwordNeedsUppercase": "La contrasenya ha de tenir almenys 1 lletra majúscula.",
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
-    "wrongPassword": "La contrasenya és incorrecta."
+    "wrongPassword": "La contrasenya és incorrecta.",
+    "errorOccurred": "Ha ocorregut un error: {error}",
+    "@errorOccurred": {
+        "placeholders": {
+            "error": {
+                "type": "String",
+                "example": "Error de xarxa"
+            }
+        }
+    },
+    "unknownError": "Error desconegut"
 }
