@@ -24,5 +24,6 @@
     "passwordNeedsUppercase": "La contrasenya ha de tenir almenys 1 lletra majúscula.",
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
-    "wrongPassword": "La contrasenya és incorrecta."
+    "wrongPassword": "La contrasenya és incorrecta.",
+    "userDataPreferences": "Preferències de l'usuari"
 }

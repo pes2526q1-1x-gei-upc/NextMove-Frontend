@@ -72,4 +72,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get wrongPassword => 'La contraseña es incorrecta.';
+
+  @override
+  String get userDataPreferences => 'Preferencias del usuario';
 }

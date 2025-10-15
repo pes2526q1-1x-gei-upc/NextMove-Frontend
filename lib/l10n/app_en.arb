@@ -24,5 +24,6 @@
     "passwordNeedsUppercase": "The password must contain at least 1 uppercase letter.",
     "passwordNeedsNumber": "The password must contain at least 1 number.",
     "passwordNeedsSpecialCharacter": "The password must contain at least 1 special character.",
-    "wrongPassword": "The password is incorrect."
+    "wrongPassword": "The password is incorrect.",
+    "userDataPreferences": "User preferences"
 }

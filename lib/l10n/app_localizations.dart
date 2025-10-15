@@ -207,6 +207,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The password is incorrect.'**
   String get wrongPassword;
+
+  /// No description provided for @userDataPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'User preferences'**
+  String get userDataPreferences;
 }
 
 class _AppLocalizationsDelegate
