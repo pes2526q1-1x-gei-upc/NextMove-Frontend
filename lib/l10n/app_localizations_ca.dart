@@ -72,4 +72,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get wrongPassword => 'La contrasenya és incorrecta.';
+
+  @override
+  String errorOccurred(String error) {
+    return 'Ha ocorregut un error: $error';
+  }
+
+  @override
+  String get unknownError => 'Error desconegut';
 }

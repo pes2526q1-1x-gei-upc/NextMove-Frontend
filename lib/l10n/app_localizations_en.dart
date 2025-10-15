@@ -70,4 +70,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wrongPassword => 'The password is incorrect.';
+
+  @override
+  String errorOccurred(String error) {
+    return 'An error has occurred: $error';
+  }
+
+  @override
+  String get unknownError => 'Unknown error';
 }

@@ -72,4 +72,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get wrongPassword => 'La contraseña es incorrecta.';
+
+  @override
+  String errorOccurred(String error) {
+    return 'Ha ocurrido un error: $error';
+  }
+
+  @override
+  String get unknownError => 'Error desconocido';
 }
