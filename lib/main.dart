@@ -18,7 +18,7 @@ void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+  await GoogleSignIn.instance.initialize();
   runApp(NextMoveApp(key: appKey));
 }
 
@@ -84,7 +84,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: isLoggedIn ? MapHomePage() : EmailAddressPage(),
+        home: isLoggedIn ? MapHomePage() : WelcomePage(),
       ),
     );
   }
