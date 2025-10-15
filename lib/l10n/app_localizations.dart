@@ -117,6 +117,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
+
+  /// No description provided for @welcomeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to {appName}!'**
+  String welcomeTo(String appName);
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @useEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use email'**
+  String get useEmail;
+
+  /// No description provided for @whatIsYourEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your email address?'**
+  String get whatIsYourEmailAddress;
+
+  /// No description provided for @continue_.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continue_;
+
+  /// No description provided for @needsToRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'We haven\'t found a user with that email. You will now need to sign up with a new password.'**
+  String get needsToRegister;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'The email address format is invalid.'**
+  String get invalidEmail;
+
+  /// No description provided for @passwordRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must be at least 8 characters long with 1 lowercase, 1 uppercase, 1 number, and 1 special character.'**
+  String get passwordRequirements;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must be at least 8 characters long.'**
+  String get passwordTooShort;
+
+  /// No description provided for @passwordNeedsLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must contain at least 1 lowercase letter.'**
+  String get passwordNeedsLowercase;
+
+  /// No description provided for @passwordNeedsUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must contain at least 1 uppercase letter.'**
+  String get passwordNeedsUppercase;
+
+  /// No description provided for @passwordNeedsNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must contain at least 1 number.'**
+  String get passwordNeedsNumber;
+
+  /// No description provided for @passwordNeedsSpecialCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must contain at least 1 special character.'**
+  String get passwordNeedsSpecialCharacter;
+
+  /// No description provided for @wrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'The password is incorrect.'**
+  String get wrongPassword;
 }
 
 class _AppLocalizationsDelegate

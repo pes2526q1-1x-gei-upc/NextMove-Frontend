@@ -1,5 +1,28 @@
 {
     "register": "Sign up",
     "emailAddress": "Email address",
-    "password": "Password"
+    "password": "Password",
+    "welcomeTo": "Welcome to {appName}!",
+    "@welcomeTo": {
+        "placeholders": {
+            "appName": {
+                "type": "String",
+                "example": "NextMove"
+            }
+        }
+    },
+    "signInWithGoogle": "Sign in with Google",
+    "useEmail": "Use email",
+    "whatIsYourEmailAddress": "What is your email address?",
+    "continue_": "Continue",
+    "needsToRegister": "We haven't found a user with that email. You will now need to sign up with a new password.",
+    "invalidEmail": "The email address format is invalid.",
+    "passwordRequirements": "The password must be at least 8 characters long with 1 lowercase, 1 uppercase, 1 number, and 1 special character.",
+    "signIn": "Sign in",
+    "passwordTooShort": "The password must be at least 8 characters long.",
+    "passwordNeedsLowercase": "The password must contain at least 1 lowercase letter.",
+    "passwordNeedsUppercase": "The password must contain at least 1 uppercase letter.",
+    "passwordNeedsNumber": "The password must contain at least 1 number.",
+    "passwordNeedsSpecialCharacter": "The password must contain at least 1 special character.",
+    "wrongPassword": "The password is incorrect."
 }

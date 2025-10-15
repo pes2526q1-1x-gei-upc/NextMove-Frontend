@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/StationList.dart';
 
 class MapHomePage extends StatefulWidget {
