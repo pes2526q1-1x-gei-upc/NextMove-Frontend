@@ -6,6 +6,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.d
 
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -110,15 +112,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                 final emailAddress = _emailController.text.trim();
                 if (!emailChecked) {
                   try {
-                    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: emailAddress,
-                      password: "1111111",
-                    );
-                    await credential.user?.delete();
-                    setState(() {
-                      needsToRegister = true;
-                      emailChecked = true;
-                    });
+                    needsToRegister = !(await isEmailRegistered(emailAddress));
+                    if (needsToRegister) {
                     await showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -134,13 +129,13 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                         ],
                       ),
                     );
+                  }
+                  setState(() {
+                    needsToRegister = needsToRegister;
+                    emailChecked = true;
+                  });
                   } on FirebaseAuthException catch (e) {
-                    if (e.code == 'email-already-in-use') {
-                      setState(() {
-                        needsToRegister = false;
-                        emailChecked = true;
-                      });
-                    } else if (e.code == 'invalid-email') {
+                      if (e.code == 'invalid-email') {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(AppLocalizations.of(context)!.invalidEmail)),
                       );
@@ -156,45 +151,35 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       SnackBar(content: Text(AppLocalizations.of(context)!.errorOccurred(e.toString()))),
                     );
                     return;
-                  }
+                  } 
                 }
                 else {
                   if (needsToRegister) {
                     final password = _passwordController.text;
-                    if (password.length < 8) {
+                    final passwordValidationResult = isPasswordValid(password);
+                    if (passwordValidationResult != PasswordValidationError.valid) {
+                      String errorMessage = switch (passwordValidationResult) {
+                        PasswordValidationError.tooShort =>
+                          AppLocalizations.of(context)!.passwordTooShort,
+                        PasswordValidationError.needsLowercase =>
+                          AppLocalizations.of(context)!.passwordNeedsLowercase,
+                        PasswordValidationError.needsUppercase =>
+                          AppLocalizations.of(context)!.passwordNeedsUppercase,
+                        PasswordValidationError.needsNumber =>
+                          AppLocalizations.of(context)!.passwordNeedsNumber,
+                        PasswordValidationError.needsSpecialCharacter =>
+                          AppLocalizations.of(context)!.passwordNeedsSpecialCharacter,
+                        _ => ''
+                        };
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordTooShort)),
-                      );
-                      return;
-                    }
-                    if (!RegExp(r'[a-z]').hasMatch(password)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsLowercase)),
-                      );
-                      return;
-                    }
-                    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsUppercase)),
-                      );
-                      return;
-                    }
-                    if (!RegExp(r'[0-9]').hasMatch(password)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsNumber)),
-                      );
-                      return;
-                    }
-                    if (!RegExp(r'[!@#\$&*~%^(),.?":{}|<>]').hasMatch(password)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppLocalizations.of(context)!.passwordNeedsSpecialCharacter)),
+                        SnackBar(content: Text(errorMessage)),
                       );
                       return;
                     }
                     try {
-                      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      createUserWithEmailAndPassword(
                         email: emailAddress,
-                        password: password,
+                        password: password
                       );
                       appKey.currentState?.setLoggedIn(true);
                       Navigator.of(context).pushReplacement(
@@ -206,7 +191,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   } else {
                     final password = _passwordController.text;
                     try {
-                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      await signInWithEmailAndPassword(
                         email: emailAddress,
                         password: password,
                       );
@@ -217,9 +202,13 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       );
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'wrong-password') {
-                        print('Wrong password provided for that user.');
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(AppLocalizations.of(context)!.wrongPassword)),
+                        );
+                      }
+                      else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(AppLocalizations.of(context)!.errorOccurred(e.message ?? AppLocalizations.of(context)!.unknownError))),
                         );
                       }
                     }
