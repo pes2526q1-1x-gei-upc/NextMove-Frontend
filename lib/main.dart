@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 
@@ -84,7 +85,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: isLoggedIn ? MapHomePage() : EmailAddressPage(),
+        home: UserDataPreferences(),
       ),
     );
   }

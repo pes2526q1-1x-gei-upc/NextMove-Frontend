@@ -10,9 +10,13 @@ class UserDataPreferences extends StatefulWidget {
 
 class _UserDataPreferencesState extends State<UserDataPreferences> {
   final TextEditingController _apodoController = TextEditingController();
+  final TextEditingController _telefonoController = TextEditingController();
+  final TextEditingController _fechaNacimientoController = TextEditingController();
 
+  String _fechaNacimiento = '1990-01-01'; // Hay que pillar la fecha de naciomiento de Google si no, será null y tendra que añadirla manualmente
   @override
   Widget build(BuildContext context) {
+  
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -39,7 +43,42 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 border: OutlineInputBorder(),
               ),
               readOnly: true,
-            )
+            ),
+            SizedBox(height: 16),
+
+            // Fecha de nacimiento (editable con teclado de fechas)
+              TextFormField(
+                controller: _fechaNacimientoController,
+                decoration: InputDecoration(
+                  labelText: 'Fecha de nacimiento (YYYY-MM-DD)', //Pasar a diferentes idiomas
+                  border: OutlineInputBorder(),
+                  hintText: 'Ej: 1990-01-01', //Pasar a diferentes idiomas
+                ),
+                keyboardType: TextInputType.datetime, // Teclado exclusivo para fechas
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'La fecha de nacimiento es obligatoria'; //Pasar a diferentes idiomas
+                  }
+                  try {
+                    DateTime.parse(value); // Valida formato YYYY-MM-DD
+                    return null;
+                  } catch (e) {
+                    return 'Formato de fecha inválido. Usa YYYY-MM-DD';   //Pasar a diferentes idiomas
+                  }
+                },
+              ),
+              SizedBox(height: 16),
+              
+            //Teléfono
+            TextFormField(
+                controller: _telefonoController,
+                decoration: InputDecoration(
+                  labelText: 'Teléfono', //Pasar a diferentes idiomas
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 16),
           ],
         ),
       ),
