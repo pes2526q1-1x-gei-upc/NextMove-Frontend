@@ -25,5 +25,27 @@
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
     "wrongPassword": "La contrasenya és incorrecta.",
-    "userDataPreferences": "Preferències de l'usuari"
+    "userDataPreferences": "Preferències de l'usuari",
+    "nickname": "Sobrenom *",
+    "nicknameHint": "Introdueix el teu sobrenom",
+    "birthdate": "Data de naixement",
+    "bithdateHint": "Ex: 1990-01-01",
+    "mandatoryBirthDate": "La data de naixement és obligatòria",
+    "invalidBirthDateFormat": "Format de data invàlid. Utilitza YYYY-MM-DD",
+    "telephoneNumber": "Número de telèfon",
+    "preferredLanguage": "Idioma preferit",
+    "userDescription": "Descripció",
+    "userDescriptionHint": "Introdueix una breu descripció sobre tu",
+    "preferredMode": "Mode preferit *",
+    "saveChanges": "Desa els canvis",
+    "camera": "Càmera",
+    "gallery": "Galeria",
+    "imagePickerError": "S'ha produït un error en seleccionar la imatge.",
+    "saveChangesFeedback": "Canvis desats correctament.",
+    "formError": "Si us plau, corregeix els errors abans de desar.",
+    "mandatoryNickname": "El sobrenom és obligatori",
+    "mandatoryPhoneNumber": "El número de telèfon és obligatori",
+    "invalidPhoneNumber": "Format de número de telèfon invàlid",
+    "mandatoryPreferredMode": "El mode preferit és obligatori"
+    
 }
