@@ -78,4 +78,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownError => 'Unknown error';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get totalAnchors => 'Total anchors';
+
+  @override
+  String get totalChargers => 'Total chargers';
+
+  @override
+  String get availableAnchors => 'Available anchors';
+
+  @override
+  String get availableChargers => 'Available chargers';
+
+  @override
+  String get rating => 'Rating';
 }

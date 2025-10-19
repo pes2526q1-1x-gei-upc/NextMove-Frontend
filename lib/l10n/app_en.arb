@@ -34,5 +34,11 @@
             }
         }
     },
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "address": "Address",
+    "totalAnchors": "Total anchors",
+    "totalChargers": "Total chargers",
+    "availableAnchors": "Available anchors",
+    "availableChargers": "Available chargers",
+    "rating": "Rating"
 }

@@ -34,5 +34,11 @@
             }
         }
     },
-    "unknownError": "Error desconegut"
+    "unknownError": "Error desconegut",
+    "address": "Adreça",
+    "totalAnchors": "Total d'ancoratges",
+    "totalChargers": "Total de carregadors",
+    "availableAnchors": "Ancoratges disponibles",
+    "availableChargers": "Carregadors disponibles",
+    "rating": "Valoració"
 }

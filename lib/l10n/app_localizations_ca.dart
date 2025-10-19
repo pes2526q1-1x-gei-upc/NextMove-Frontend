@@ -80,4 +80,22 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get unknownError => 'Error desconegut';
+
+  @override
+  String get address => 'Adreça';
+
+  @override
+  String get totalAnchors => 'Total d\'ancoratges';
+
+  @override
+  String get totalChargers => 'Total de carregadors';
+
+  @override
+  String get availableAnchors => 'Ancoratges disponibles';
+
+  @override
+  String get availableChargers => 'Carregadors disponibles';
+
+  @override
+  String get rating => 'Valoració';
 }

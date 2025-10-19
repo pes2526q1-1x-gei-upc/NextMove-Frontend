@@ -80,4 +80,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unknownError => 'Error desconocido';
+
+  @override
+  String get address => 'Dirección';
+
+  @override
+  String get totalAnchors => 'Total de anclajes';
+
+  @override
+  String get totalChargers => 'Total de cargadores';
+
+  @override
+  String get availableAnchors => 'Anclajes disponibles';
+
+  @override
+  String get availableChargers => 'Cargadores disponibles';
+
+  @override
+  String get rating => 'Valoración';
 }

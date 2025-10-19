@@ -34,5 +34,11 @@
             }
         }
     },
-    "unknownError": "Error desconocido"
+    "unknownError": "Error desconocido",
+    "address": "Dirección",
+    "totalAnchors": "Total de anclajes",
+    "totalChargers": "Total de cargadores",
+    "availableAnchors": "Anclajes disponibles",
+    "availableChargers": "Cargadores disponibles",
+    "rating": "Valoración"
 }

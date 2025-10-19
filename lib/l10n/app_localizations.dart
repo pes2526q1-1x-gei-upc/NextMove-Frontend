@@ -219,6 +219,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown error'**
   String get unknownError;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @totalAnchors.
+  ///
+  /// In en, this message translates to:
+  /// **'Total anchors'**
+  String get totalAnchors;
+
+  /// No description provided for @totalChargers.
+  ///
+  /// In en, this message translates to:
+  /// **'Total chargers'**
+  String get totalChargers;
+
+  /// No description provided for @availableAnchors.
+  ///
+  /// In en, this message translates to:
+  /// **'Available anchors'**
+  String get availableAnchors;
+
+  /// No description provided for @availableChargers.
+  ///
+  /// In en, this message translates to:
+  /// **'Available chargers'**
+  String get availableChargers;
+
+  /// No description provided for @rating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get rating;
 }
 
 class _AppLocalizationsDelegate
