@@ -79,7 +79,7 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
     }
     catch (e) {
         setState(() {
-            error = 'Error'; //TODO: capturar error GraphQL
+            error = e.toString();
             isLoading = false;
         });
         }
@@ -94,8 +94,8 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
         }
         if (error != null) {
             return Scaffold(
-                appBar: AppBar(title: const Text('Error')),
-                body: Center(child: Text(AppLocalizations.of(context)!.unknownError)),
+                appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
+                body: Center(child: Text(error!)),
             );
         }
 
@@ -204,7 +204,14 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                 Icon(icon),
                 SizedBox(width: 4),
                 Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                Text(value, style: Theme.of(context).textTheme.bodyLarge),
+                Expanded(
+                  child: Text(
+                  value,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  overflow: TextOverflow.visible,
+                  softWrap: true,
+                  ),
+                ),
             ],
         );
     }

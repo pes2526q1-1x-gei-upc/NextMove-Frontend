@@ -180,4 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessType => 'Access type';
+
+  @override
+  String get error => 'Error';
 }

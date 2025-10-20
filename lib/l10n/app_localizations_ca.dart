@@ -182,4 +182,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get accessType => 'Tipus d\'accés';
+
+  @override
+  String get error => 'Error';
 }

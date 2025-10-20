@@ -8,28 +8,28 @@ enum StationType {
 }
 
 class StationDetails {
-  final String name;
-  final String address;
-  final int totalSlots;
-  final int availableSlots;
-  final int rating;
+    final String name;
+    final String address;
+    final int totalSlots;
+    final int availableSlots;
+    final int rating;
 
-  StationDetails({
+    StationDetails({
     required this.name,
     required this.address,
     required this.totalSlots,
     required this.availableSlots,
     required this.rating,
-  });
+    });
 }
 
 Future<StationDetails?> getStationDetails(StationType stationType, String stationID) async {
-  switch (stationType) {
-    case StationType.bicycle:
-      return await getBicycleStationDetails(stationID);
-    case StationType.electricVehicle:
-      return await getEVStationDetails(stationID);
-  }
+    switch (stationType) {
+        case StationType.bicycle:
+            return await getBicycleStationDetails(stationID);
+        case StationType.electricVehicle:
+            return await getEVStationDetails(stationID);
+    }
 }
 
 Future<BicycleStationDetails?> getBicycleStationDetails(String stationID) async {

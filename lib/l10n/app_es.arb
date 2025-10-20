@@ -68,5 +68,6 @@
     "occupied": "Ocupado",
     "unavailable": "No disponible",
     "connectors": "Conectores",
-    "accessType": "Tipo de acceso"
+    "accessType": "Tipo de acceso",
+    "error": "Error"
 }

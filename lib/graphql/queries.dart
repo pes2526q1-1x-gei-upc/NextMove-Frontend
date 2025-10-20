@@ -11,4 +11,27 @@ class GraphQLQueries {
       }
     }
   ''';
+  static const String getBicycleStationDetailsQuery = r'''
+    query getBicycleStationDetails($stationID: ID!) {
+      station(id: $stationID) {
+        name
+        address
+      }
+    }
+  '''; //TODO: afegir altres camps
+  static const String getEVStationDetailsQuery = r'''
+    query getEVStationDetails($stationID: ID!) {
+      station(id: $stationID) {
+        name
+        address
+        connectors {
+          type
+          powerKw
+          status
+        }
+        accessType
+        isSuperFast
+      }
+    }
+  ''';
 }

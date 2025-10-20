@@ -182,4 +182,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get accessType => 'Tipo de acceso';
+
+  @override
+  String get error => 'Error';
 }

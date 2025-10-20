@@ -423,6 +423,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Access type'**
   String get accessType;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
 }
 
 class _AppLocalizationsDelegate
