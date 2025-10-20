@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/datos/user_data_preferences.dart';
 
 enum ModoPreferido {
@@ -18,11 +19,11 @@ class UserData{
   final DateTime fechaNacimiento;
   //final String password;
   final DateTime fechaRegistro;
-  final int numeroTelefono;
-  final String idiomaPreferido;
-  final String descripcion;
-  final String modoPreferido;
-  final String fotoPerfilUrl;
+  late final int numeroTelefono;
+  late final String idiomaPreferido;
+  late final String descripcion;
+  late final String modoPreferido;
+  late final String fotoPerfilUrl;
 
   UserData({
     required this.apodo,
@@ -47,4 +48,35 @@ void sendUserDataPreferences(UserData preferences) {
 UserData fetchUserDataPreferences() {
   // Lógica para obtener los datos del usuario desde la capa de datos
   return DBfetchUserDataPreferences();
+}
+
+void updateUserDataPreferences(UserData preferences) {
+  // Lógica para actualizar los datos del usuario en la capa de datos
+  UserData currentData = DBfetchUserDataPreferences();
+  UserData finalData = currentData;
+
+  // Comprobar que datos han cambiado y actualizar solo esos
+  if(preferences.numeroTelefono != currentData.numeroTelefono) {
+    // Actualizar número de teléfono
+    finalData.numeroTelefono = preferences.numeroTelefono;
+  }
+  if(preferences.descripcion != currentData.descripcion) {
+    // Actualizar descripción
+    finalData.descripcion = preferences.descripcion;
+  }
+  if(preferences.fotoPerfilUrl != currentData.fotoPerfilUrl) {
+    // Actualizar foto de perfil
+    finalData.fotoPerfilUrl = preferences.fotoPerfilUrl;
+  }
+  if(preferences.modoPreferido != currentData.modoPreferido) {
+    // Actualizar modo preferido
+    finalData.modoPreferido = preferences.modoPreferido;
+  }
+  if(preferences.idiomaPreferido != currentData.idiomaPreferido) {
+    // Actualizar idioma preferido
+    finalData.idiomaPreferido = preferences.idiomaPreferido;
+  }
+
+  // Enviar datos actualizados a la capa de datos
+  pushUserDataPreferences(finalData);
 }

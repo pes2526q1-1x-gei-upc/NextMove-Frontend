@@ -32,5 +32,5 @@ UserData DBfetchUserDataPreferences(){
     idiomaPreferido: "Español",
     descripcion: "Esta es una descripción de ejemplo.",
     modoPreferido: "Coche",
-    fotoPerfilUrl: "https://example.com/profile.jpg",));
+    fotoPerfilUrl: "assets/Profile",));
 }

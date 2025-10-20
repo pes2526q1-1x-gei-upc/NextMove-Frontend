@@ -20,6 +20,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _fechaNacimientoController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
+  final TextEditingController _nombreCompletoController = TextEditingController();
 
   // Estado para la imagen 
   final ImagePicker _picker = ImagePicker();
@@ -131,7 +132,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       //print('Datos a guardar: $userData');
       UserData preferences = UserData(
         apodo: _apodoController.text,
-        nombreCompleto: '', // Completar según sea necesario
+        nombreCompleto: _nombreCompletoController.text, // Completar según sea necesario
         email: '', // Completar según sea necesario
         fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
         //password: '', // Completar según sea necesario
@@ -227,6 +228,16 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 ),
                 SizedBox(height: 16),
 
+                //Nombre Completo no editable
+                TextFormField(
+                  controller: _nombreCompletoController,
+                  decoration: InputDecoration(
+                    labelText: l10n.fullName,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+
                 // Fecha de nacimiento
                 TextFormField(
                   controller: _fechaNacimientoController,
@@ -275,61 +286,97 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 ),
                 SizedBox(height: 16),
 
-                //Modo preferido (bici/coche)
-                DropdownButtonFormField<String>(
-                  value: _selectedModo,
-                  decoration: InputDecoration(
-                    labelText: l10n.preferredMode,
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryPreferredMode;
-                    }
-                    return null;
-                  },
-                  items: _modos.map((String modo) {
-                    return DropdownMenuItem<String>(
-                      value: modo,
-                      child: Text(modo),
-                    );
-                  }).toList(),
-                  onChanged: (String? nuevoValor) {
-                    setState(() {
-                      _selectedModo = nuevoValor;
-                    });
-                  },
+              // Modo e Idioma preferidos en la misma fila
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedModo,
+                        decoration: InputDecoration(
+                          labelText: l10n.preferredMode,
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        dropdownColor: Theme.of(context).cardColor,
+                        menuMaxHeight: 200,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return l10n.mandatoryPreferredMode;
+                          }
+                          return null;
+                        },
+                        items: _modos.map((String modo) {
+                          IconData icon = modo == 'Bici' ? Icons.directions_bike : Icons.electric_car;
+                          return DropdownMenuItem<String>(
+                            value: modo,
+                            child: Row(
+                              children: [
+                                Icon(icon, color: Theme.of(context).primaryColor),
+                                const SizedBox(width: 12),
+                                Text(
+                                  modo,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? nuevoValor) {
+                          setState(() {
+                            _selectedModo = nuevoValor;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedIdioma,
+                        decoration: InputDecoration(
+                          labelText: l10n.preferredLanguage,
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        dropdownColor: Theme.of(context).cardColor,
+                        menuMaxHeight: 200,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                        items: _idiomas.map((String idioma) {
+                          return DropdownMenuItem<String>(
+                            value: idioma,
+                            child: Row(
+                              children: [
+                                
+                                const SizedBox(width: 12),
+                                Text(
+                                  idioma,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? nuevoValor) {
+                          setState(() {
+                            _selectedIdioma = nuevoValor;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16),
-
-                //Idioma preferido
-                DropdownButtonFormField<String>(
-                  value: _selectedIdioma,
-                  decoration: InputDecoration(
-                    labelText: l10n.preferredLanguage,
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _idiomas.map((String idioma) {
-                    return DropdownMenuItem<String>(
-                      value: idioma,
-                      child: Text(idioma),
-                    );
-                  }).toList(),
-                  onChanged: (String? nuevoValor) {
-                    setState(() {
-                      _selectedIdioma = nuevoValor;
-                    });
-                  },
-                ),
+                const SizedBox(height: 16),
 
                 // Guardar cambios
-                SizedBox(height: 32),
+                //SizedBox(height: 32),
                 Center(
                   child: ElevatedButton(
                     onPressed: _guardarCambios,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      textStyle: TextStyle(fontSize: 16)
+                      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     child: Text(l10n.saveChanges),
                   ),

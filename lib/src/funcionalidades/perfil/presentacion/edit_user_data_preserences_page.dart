@@ -27,7 +27,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
   File? _selectedImageFile; // Guardará la imagen seleccionada por el usuario
   
   // Imagen por defecto, obtener la de google si existe, futura implementación
-  final AssetImage _avatarImage = AssetImage('assets/Profile_avatar_placeholder_large.png');
+  late AssetImage _avatarImage;
 
   // Estado para los Dropdowns
   String? _selectedIdioma;
@@ -48,6 +48,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
     _descripcionController.text = data.descripcion;
     _selectedIdioma = data.idiomaPreferido;  
     _selectedModo = data.modoPreferido;     
+    _avatarImage = AssetImage(data.fotoPerfilUrl);
   }
 
   @override
@@ -143,14 +144,14 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
         email: '', // Completar según sea necesario
         fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
         //password: '', // Completar según sea necesario
-        fechaRegistro: DateTime.now(), // Completar según sea necesario
+        fechaRegistro: DateTime.now(), //No se le hará caso pero debe inicializarse
         numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
         idiomaPreferido: _selectedIdioma ?? '',
         descripcion: _descripcionController.text,
         modoPreferido: _selectedModo ?? '',
         fotoPerfilUrl: '', // Completar según sea necesario
       );
-      sendUserDataPreferences(preferences);
+      updateUserDataPreferences(preferences);
 
 
       // Damos feedback al usuario
@@ -174,7 +175,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-return Scaffold(
+  return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
