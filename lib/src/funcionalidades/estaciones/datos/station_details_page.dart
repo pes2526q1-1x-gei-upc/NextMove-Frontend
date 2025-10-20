@@ -29,12 +29,25 @@ Future<EVStationDetails?> DBgetEVStationDetails(String stationID) async {
         address: '456 EV Ave',
         availableSlots: 3,
         totalSlots: 8,
-        power: 50,
-        vehicleType: EVType.electric,
-        powerType: PowerType.DC,
-        speedType: SpeedType.fast,
-        connectionType: ConnectionType.css2,
-        chargerType: 'Fast',
+        isSuperFast: true,
+        connectors: [
+          Connector(
+            connectionType: ConnectionType.css2,
+            powerKw: 50,
+            status: ConnectorStatus.available,
+          ),
+          Connector(
+            connectionType: ConnectionType.chademo,
+            powerKw: 100,
+            status: ConnectorStatus.occupied,
+          ),
+          Connector(
+            connectionType: ConnectionType.mennekes,
+            powerKw: 22,
+            status: ConnectorStatus.unavailable,
+          ),
+        ],
         rating: 8,
+        accessType: 'Public',
     );
 }

@@ -4,6 +4,46 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/bicycle_stat
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/ev_station_details.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
 
+
+extension ConnectionTypeLocalization on ConnectionType {
+  String localized(BuildContext context) {
+    switch (this) {
+      case ConnectionType.css2:
+        return AppLocalizations.of(context)!.css2;
+      case ConnectionType.chademo:
+        return AppLocalizations.of(context)!.chademo;
+      case ConnectionType.mennekes:
+        return AppLocalizations.of(context)!.mennekes;
+      case ConnectionType.shucko:
+        return AppLocalizations.of(context)!.shucko;
+    }
+  }
+}
+
+extension ConnectorStatusLocalization on ConnectorStatus {
+    String localized(BuildContext context) {
+        switch (this) {
+            case ConnectorStatus.available:
+                return AppLocalizations.of(context)!.available;
+            case ConnectorStatus.occupied:
+                return AppLocalizations.of(context)!.occupied;
+            case ConnectorStatus.unavailable:
+                return AppLocalizations.of(context)!.unavailable;
+        }
+    }
+}
+
+extension BicycleStationStateLocalization on BicycleStationState {
+    String localized(BuildContext context) {
+        switch (this) {
+            case BicycleStationState.operational:
+                return AppLocalizations.of(context)!.operational;
+            case BicycleStationState.closed:
+                return AppLocalizations.of(context)!.closed;
+        }
+    }
+}
+
 class StationDetailsPage extends StatefulWidget {
     final StationType stationType;
     final String stationID;
@@ -78,50 +118,76 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
+                            createDetailRow(context, Icons.location_on_sharp, AppLocalizations.of(context)!.address, stationDetails!.address),
+                            const SizedBox(height: 8),
+                            createDetailRow(context, Icons.event_seat, totalSlotsLabel, stationDetails!.totalSlots.toString()),
+                            const SizedBox(height: 8),
+                            createDetailRow(context, Icons.check_circle_outline, availableSlotsLabel, stationDetails!.availableSlots.toString()),
+                            const SizedBox(height: 8),
                             Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                    Icon(Icons.location_on_sharp),
+                                    Icon(Icons.star),
                                     SizedBox(width: 4),
-                                    Text('${AppLocalizations.of(context)!.address}: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                    Text(stationDetails!.address, style: Theme.of(context).textTheme.bodyLarge),
+                                    Text('${AppLocalizations.of(context)!.rating}: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                                    createStarRatingRow(stationDetails!.rating),
+                                    Text(
+                                        '(${stationDetails!.rating % 2 == 0 ? (stationDetails!.rating ~/ 2) : (stationDetails!.rating / 2)}/5)',
+                                        style: Theme.of(context).textTheme.bodyLarge,
+                                    ),
                                 ],
                             ),
-                            const SizedBox(height: 8),
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                        Icon(Icons.event_seat),
-                                        SizedBox(width: 4),
-                                        Text('$totalSlotsLabel: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                        Text('${stationDetails!.totalSlots}', style: Theme.of(context).textTheme.bodyLarge),
-                                    ],
-                                ),
-                          const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(Icons.check_circle_outline),
-                                SizedBox(width: 4),
-                                Text('$availableSlotsLabel: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                Text('${stationDetails!.availableSlots}', style: Theme.of(context).textTheme.bodyLarge),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                        Icon(Icons.star),
-                                        SizedBox(width: 4),
-                                        Text('${AppLocalizations.of(context)!.rating}: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                        getRowRatingStars(stationDetails!.rating),
-                                        Text(
-                                            '(${stationDetails!.rating % 2 == 0 ? (stationDetails!.rating ~/ 2) : (stationDetails!.rating / 2)}/5)',
-                                            style: Theme.of(context).textTheme.bodyLarge,
-                                        ),
-                                    ],
-                                ),
                             const SizedBox(height: 16),
+                            if (widget.stationType == StationType.bicycle) ...[
+                                createDetailRow(context, Icons.pedal_bike, AppLocalizations.of(context)!.availableBikes, (stationDetails as BicycleStationDetails).availableBikes.toString()),
+                                const SizedBox(height: 8),
+                                createDetailRowBool(context, Icons.electric_bike, AppLocalizations.of(context)!.electricRecharge, (stationDetails as BicycleStationDetails).electricRechargeStation),
+                                const SizedBox(height: 8),
+                                createDetailRowBool(context, Icons.anchor, AppLocalizations.of(context)!.canAnchorBikes, (stationDetails as BicycleStationDetails).canAnchorBikes),
+                                const SizedBox(height: 8),
+                                createDetailRowBool(context, Icons.directions_bike, AppLocalizations.of(context)!.canRentBikes, (stationDetails as BicycleStationDetails).canRentBikes),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.info_outline, AppLocalizations.of(context)!.state, (stationDetails as BicycleStationDetails).state.localized(context)),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.anchor, AppLocalizations.of(context)!.availableAnchors, (stationDetails as BicycleStationDetails).availableAnchors.toString()),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, (stationDetails as BicycleStationDetails).availableMechanicalBikes.toString()),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, (stationDetails as BicycleStationDetails).availableElectricBikes.toString()),
+                            ],
+                            if (widget.stationType == StationType.electricVehicle) ...[
+                                createDetailRowBool(context, Icons.bolt, AppLocalizations.of(context)!.superFast, (stationDetails as EVStationDetails).isSuperFast),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.lock_open, AppLocalizations.of(context)!.accessType, (stationDetails as EVStationDetails).accessType),
+                                const SizedBox(height: 16),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    AppLocalizations.of(context)!.connectors,
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ...((stationDetails as EVStationDetails).connectors.map((connector) => Card(
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  child: ListTile(
+                                    leading: Icon(Icons.cable),
+                                    title: Text(connector.connectionType.localized(context)),
+                                    subtitle: Text('${connector.powerKw} kW'),
+                                    trailing: Text(connector.status.localized(context),
+                                      style: TextStyle(
+                                        color: switch (connector.status) {
+                                          ConnectorStatus.available => Colors.green,
+                                          ConnectorStatus.occupied => Colors.orange,
+                                          ConnectorStatus.unavailable => Colors.red,
+                                        },
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ))),
+                            ]
+
                             // WidgetCard(stationDetails: stationDetails),
                           ],
                         ),
@@ -130,29 +196,56 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
             ),
         );
     }
-}
 
-Row getRowRatingStars(int rating) {
-    List<Widget> stars = [];
-    int fullStars = rating ~/ 2;
-    bool hasHalfStar = rating % 2 == 1;
-
-    for (int i = 0; i < fullStars; i++) {
-        stars.add(const Icon(Icons.star, color: Colors.amber));
+    Row createDetailRow(BuildContext context, IconData icon, String label, String value) {
+        return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+                Icon(icon),
+                SizedBox(width: 4),
+                Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Text(value, style: Theme.of(context).textTheme.bodyLarge),
+            ],
+        );
     }
 
-    if (hasHalfStar) {
-        stars.add(const Icon(Icons.star_half, color: Colors.amber));
-    }
-    
-    while (stars.length < 5) {
-        stars.add(const Icon(Icons.star_border, color: Colors.amber));
+    Row createDetailRowBool(BuildContext context, IconData icon, String label, bool value) {
+        return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+                Icon(icon),
+                SizedBox(width: 4),
+                Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Icon(
+                    value ? Icons.check : Icons.close,
+                    color: value ? Colors.green : Colors.red,
+                ),
+            ],
+        );
     }
 
-    return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: stars,
-    );
+    Row createStarRatingRow(int rating) {
+        List<Widget> stars = [];
+        int fullStars = rating ~/ 2;
+        bool hasHalfStar = rating % 2 == 1;
+
+        for (int i = 0; i < fullStars; i++) {
+            stars.add(const Icon(Icons.star, color: Colors.amber));
+        }
+
+        if (hasHalfStar) {
+            stars.add(const Icon(Icons.star_half, color: Colors.amber));
+        }
+        
+        while (stars.length < 5) {
+            stars.add(const Icon(Icons.star_border, color: Colors.amber));
+        }
+
+        return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: stars,
+        );
+    }
 }
 
 class WidgetCard extends StatelessWidget {
@@ -256,39 +349,18 @@ class WidgetCard extends StatelessWidget {
                             trailing: Text('${(stationDetails as BicycleStationDetails).availableElectricBikes}'),
                         ),
                     ],
-                    if (stationDetails is EVStationDetails) ...[
-                        const Divider(),
-                        ListTile(
-                            leading: const Icon(Icons.bolt),
-                            title: Text('Power'),
-                            trailing: Text('${(stationDetails as EVStationDetails).power} kW'),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.directions_car),
-                            title: Text('Vehicle type'),
-                            trailing: Text((stationDetails as EVStationDetails).vehicleType.name),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.power),
-                            title: Text('Power type'),
-                            trailing: Text((stationDetails as EVStationDetails).powerType.name),
-                        ),
                         ListTile(
                             leading: const Icon(Icons.speed),
-                            title: Text('Speed type'),
-                            trailing: Text((stationDetails as EVStationDetails).speedType.name),
+                            title: Text('Is super fast'),
+                            trailing: Icon(
+                                (stationDetails as EVStationDetails).isSuperFast
+                                    ? Icons.check
+                                    : Icons.close,
+                                color: (stationDetails as EVStationDetails).isSuperFast
+                                    ? Colors.green
+                                    : Colors.red,
+                            ),
                         ),
-                        ListTile(
-                            leading: const Icon(Icons.cable),
-                            title: Text('Connection type'),
-                            trailing: Text((stationDetails as EVStationDetails).connectionType.name),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.charging_station),
-                            title: Text('Charger type'),
-                            trailing: Text((stationDetails as EVStationDetails).chargerType),
-                        ),
-                    ],
                 ],
             ),
         ),

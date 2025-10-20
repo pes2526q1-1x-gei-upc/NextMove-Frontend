@@ -255,6 +255,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rating'**
   String get rating;
+
+  /// No description provided for @power.
+  ///
+  /// In en, this message translates to:
+  /// **'Power'**
+  String get power;
+
+  /// No description provided for @powerType.
+  ///
+  /// In en, this message translates to:
+  /// **'Power type'**
+  String get powerType;
+
+  /// No description provided for @ac.
+  ///
+  /// In en, this message translates to:
+  /// **'AC'**
+  String get ac;
+
+  /// No description provided for @dc.
+  ///
+  /// In en, this message translates to:
+  /// **'DC'**
+  String get dc;
+
+  /// No description provided for @speedType.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed type'**
+  String get speedType;
+
+  /// No description provided for @superFast.
+  ///
+  /// In en, this message translates to:
+  /// **'Super fast'**
+  String get superFast;
+
+  /// No description provided for @fast.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast'**
+  String get fast;
+
+  /// No description provided for @semiFast.
+  ///
+  /// In en, this message translates to:
+  /// **'Semi-fast'**
+  String get semiFast;
+
+  /// No description provided for @connectionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection type'**
+  String get connectionType;
+
+  /// No description provided for @chargerType.
+  ///
+  /// In en, this message translates to:
+  /// **'Charger type'**
+  String get chargerType;
+
+  /// No description provided for @css2.
+  ///
+  /// In en, this message translates to:
+  /// **'CSS2'**
+  String get css2;
+
+  /// No description provided for @chademo.
+  ///
+  /// In en, this message translates to:
+  /// **'CHAdeMO'**
+  String get chademo;
+
+  /// No description provided for @mennekes.
+  ///
+  /// In en, this message translates to:
+  /// **'Mennekes'**
+  String get mennekes;
+
+  /// No description provided for @shucko.
+  ///
+  /// In en, this message translates to:
+  /// **'Shucko'**
+  String get shucko;
+
+  /// No description provided for @availableBikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Available bikes'**
+  String get availableBikes;
+
+  /// No description provided for @electricRecharge.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric recharge'**
+  String get electricRecharge;
+
+  /// No description provided for @canAnchorBikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Can anchor bikes'**
+  String get canAnchorBikes;
+
+  /// No description provided for @canRentBikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Can rent bikes'**
+  String get canRentBikes;
+
+  /// No description provided for @state.
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get state;
+
+  /// No description provided for @availableMechanicalBikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Available mechanical bikes'**
+  String get availableMechanicalBikes;
+
+  /// No description provided for @availableElectricBikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Available electric bikes'**
+  String get availableElectricBikes;
+
+  /// No description provided for @operational.
+  ///
+  /// In en, this message translates to:
+  /// **'Operational'**
+  String get operational;
+
+  /// No description provided for @closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get closed;
+
+  /// No description provided for @available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// No description provided for @occupied.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupied'**
+  String get occupied;
+
+  /// No description provided for @unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get unavailable;
+
+  /// No description provided for @connectors.
+  ///
+  /// In en, this message translates to:
+  /// **'Connectors'**
+  String get connectors;
+
+  /// No description provided for @accessType.
+  ///
+  /// In en, this message translates to:
+  /// **'Access type'**
+  String get accessType;
 }
 
 class _AppLocalizationsDelegate

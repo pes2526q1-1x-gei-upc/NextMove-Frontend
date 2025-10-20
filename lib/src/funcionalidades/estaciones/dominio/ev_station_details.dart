@@ -1,19 +1,8 @@
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
 
-enum EVType {
-  electric,
-  hybridPlugin,
-}
-
 enum PowerType {
-  AC,
-  DC,
-}
-
-enum SpeedType {
-  superFast,
-  fast,
-  semiFast,
+  ac,
+  dc,
 }
 
 enum ConnectionType {
@@ -23,13 +12,16 @@ enum ConnectionType {
   shucko,
 }
 
+enum ConnectorStatus {
+    available,
+    occupied,
+    unavailable,
+}
+
 class EVStationDetails extends StationDetails {
-  final int power;
-  final EVType vehicleType;
-  final PowerType powerType;
-  final SpeedType speedType;
-  final ConnectionType connectionType;
-  final String chargerType;
+  final List<Connector> connectors;
+  final String accessType;
+  final bool isSuperFast;
 
   EVStationDetails({
     required super.name,
@@ -37,11 +29,20 @@ class EVStationDetails extends StationDetails {
     required super.availableSlots,
     required super.totalSlots,
     required super.rating,
-    required this.power,
-    required this.vehicleType,
-    required this.powerType,
-    required this.speedType,
-    required this.connectionType,
-    required this.chargerType,
+    required this.isSuperFast,
+    required this.connectors,
+    required this.accessType,
   });
+}
+
+class Connector {
+    final ConnectionType connectionType;
+    final double powerKw;
+    final ConnectorStatus status;
+
+    Connector({
+        required this.connectionType,
+        required this.powerKw,
+        required this.status,
+    });
 }
