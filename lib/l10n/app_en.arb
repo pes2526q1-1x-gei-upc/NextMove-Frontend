@@ -69,5 +69,7 @@
     "unavailable": "Unavailable",
     "connectors": "Connectors",
     "accessType": "Access type",
-    "error": "Error"
+    "error": "Error",
+    "unknownPower": "Unknown power",
+    "unknown": "Unknown"
 }

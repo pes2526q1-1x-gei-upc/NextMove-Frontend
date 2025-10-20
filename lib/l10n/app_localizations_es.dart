@@ -185,4 +185,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get error => 'Error';
+
+  @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
+  String get unknown => 'Desconegut';
 }

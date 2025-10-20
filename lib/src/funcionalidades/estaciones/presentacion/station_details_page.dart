@@ -173,7 +173,7 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                                   child: ListTile(
                                     leading: Icon(Icons.cable),
                                     title: Text(connector.connectionType.localized(context)),
-                                    subtitle: Text('${connector.powerKw} kW'),
+                                    subtitle: Text(connector.powerKw == 0 ? AppLocalizations.of(context)!.unknownPower : '${connector.powerKw} kW'),
                                     trailing: Text(connector.status.localized(context),
                                       style: TextStyle(
                                         color: switch (connector.status) {
@@ -206,7 +206,7 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                 Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
                 Expanded(
                   child: Text(
-                  value,
+                  (value == '' ? AppLocalizations.of(context)!.unknown : value),
                   style: Theme.of(context).textTheme.bodyLarge,
                   overflow: TextOverflow.visible,
                   softWrap: true,

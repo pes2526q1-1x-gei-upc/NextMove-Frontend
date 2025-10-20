@@ -52,14 +52,14 @@ class EVStationDetails extends StationDetails {
       }
     }
     return EVStationDetails(
-      name: data['name'],
-      address: data['address'],
+      name: data['name'] ?? '',
+      address: data['address'] ?? '',
       availableSlots: connectors.where((c) => c.status == ConnectorStatus.available).length,
       totalSlots: connectors.length,
       rating: 5, //TODO: rating real des de la BD
       isSuperFast: data['isSuperFast'],
       connectors: connectors,
-      accessType: data['accessType'],
+      accessType: data['accessType'] ?? '',
     );
   }
 }

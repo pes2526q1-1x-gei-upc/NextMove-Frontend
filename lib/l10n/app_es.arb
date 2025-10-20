@@ -69,5 +69,7 @@
     "unavailable": "No disponible",
     "connectors": "Conectores",
     "accessType": "Tipo de acceso",
-    "error": "Error"
+    "error": "Error",
+    "unknownPower": "Potència desconeguda",
+    "unknown": "Desconegut"
 }

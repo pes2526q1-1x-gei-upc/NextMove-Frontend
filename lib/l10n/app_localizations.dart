@@ -429,6 +429,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
+
+  /// No description provided for @unknownPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown power'**
+  String get unknownPower;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
 }
 
 class _AppLocalizationsDelegate
