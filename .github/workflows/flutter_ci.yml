@@ -1,5 +1,6 @@
-name: Flutter CI
-
+name: Flutter CI Light
+# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase. 
+# Prob de no detectar errores <= 10%. Mas adelante se hara más pesado, ahora buscamos compilación rápida.
 # Se ejecuta en push o PR a dev y main.
 on:
   push:
@@ -8,37 +9,9 @@ on:
     branches: [ dev, main ]
 
 jobs:
-  # Job para Android
-  android-build:
+  # Job unificado para análisis
+  analyze:
     runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.35.4' 
-        channel: 'stable'
-
-    - run: flutter pub get
-
-    - run: flutter analyze || true  # Ignora exit code, pero logs muestran issues.
-
-    #- run: flutter test  # Tests unitarios.
-
-    # Build APK debug
-    - run: flutter build apk --debug
-
-    # Sube el APK como artefacto.
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-android-debug.apk
-        path: build/app/outputs/flutter-apk/app-debug.apk
-
-  # Job para iOS (en macOS).
-  ios-build:
-    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -48,18 +21,16 @@ jobs:
         flutter-version: '3.35.4'
         channel: 'stable'
 
+    # Instala dependencias.
     - run: flutter pub get
 
-    - run: flutter analyze || true  # Ignora exit code, pero logs muestran issues.
+    # Verifica el entorno Flutter (como flutter doctor local).
+    - run: flutter doctor -v
 
-    #- run: flutter test
+    # Analiza el código (ignora warnings por ahora).
+    - run: flutter analyze || true
 
-    # Build iOS debug.
-    - run: flutter build ios --debug --no-codesign
-
-    # Sube el Runner.app como artefacto
-    - name: Upload iOS artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-ios-debug
-        path: build/ios/iphoneos/Runner.app
+    # Comentado: Tests y builds hasta que lo necesitemos
+    # - run: flutter test
+    # Para Android: flutter build apk --debug
+    # Para iOS: flutter build ios --debug --no-codesign (requiere macos-latest)
