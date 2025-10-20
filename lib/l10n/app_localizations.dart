@@ -211,7 +211,7 @@ abstract class AppLocalizations {
   /// No description provided for @userDataPreferences.
   ///
   /// In en, this message translates to:
-  /// **'User preferences'**
+  /// **'Finish your profile'**
   String get userDataPreferences;
 
   /// No description provided for @nickname.
@@ -339,6 +339,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preferred mode is mandatory'**
   String get mandatoryPreferredMode;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// No description provided for @nicknameNonEditable.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get nicknameNonEditable;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullName;
 }
 
 class _AppLocalizationsDelegate

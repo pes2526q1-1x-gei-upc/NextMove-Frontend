@@ -72,7 +72,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wrongPassword => 'The password is incorrect.';
 
   @override
-  String get userDataPreferences => 'User preferences';
+  String get userDataPreferences => 'Finish your profile';
 
   @override
   String get nickname => 'Nickname *';
@@ -136,4 +136,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mandatoryPreferredMode => 'Preferred mode is mandatory';
+
+  @override
+  String get editProfile => 'Edit profile';
+
+  @override
+  String get nicknameNonEditable => 'Nickname';
+
+  @override
+  String get fullName => 'Full name';
 }

@@ -3,22 +3,24 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
 
-class UserDataPreferences extends StatefulWidget {
-  const UserDataPreferences({super.key});
+class EditUserDataPreferences extends StatefulWidget {
+  const EditUserDataPreferences({super.key});
 
   @override
-  State<UserDataPreferences> createState() => _UserDataPreferencesState();
+  State<EditUserDataPreferences> createState() => _UserDataPreferencesState();
 }
 
-class _UserDataPreferencesState extends State<UserDataPreferences> {
+class _UserDataPreferencesState extends State<EditUserDataPreferences> {
   final _formKey = GlobalKey<FormState>();
-
+  
   // Controladores
   final TextEditingController _apodoController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _fechaNacimientoController = TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
+  final TextEditingController _nombreCompletoController = TextEditingController();
 
   // Estado para la imagen 
   final ImagePicker _picker = ImagePicker();
@@ -37,8 +39,15 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
   @override
   void initState() {
     super.initState();
+    UserData data = fetchUserDataPreferences();
     //Se pueden cargar datos iniciales haciendo por ejemplo los datos de google
-    //_apodoController.text = "UsuarioEjemplo";
+    _apodoController.text = data.apodo;
+    _nombreCompletoController.text = data.nombreCompleto;
+    _telefonoController.text = data.numeroTelefono.toString();
+    _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(data.fechaNacimiento);
+    _descripcionController.text = data.descripcion;
+    _selectedIdioma = data.idiomaPreferido;  
+    _selectedModo = data.modoPreferido;     
   }
 
   @override
@@ -126,40 +135,53 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     // Primero, validamos que el formulario esté correcto
     if (_formKey.currentState!.validate()) {
       // Si es válido, recopilamos todos los datos
-      final userData = {
-        'nickname': _apodoController.text,
-        'birthdate': _fechaNacimientoController.text,
-        'phone': _telefonoController.text,
-        'description': _descripcionController.text,
-        'language': _selectedIdioma,
-        'mode': _selectedModo,
-        'imageFile': _selectedImageFile, // El archivo de imagen (o null)
-      };
-
       // Implementar la lógica para guardar los datos en el backend
-      print('Datos a guardar: $userData');
+      //print('Datos a guardar: $userData');
+      UserData preferences = UserData(
+        apodo: _apodoController.text,
+        nombreCompleto: '', // Completar según sea necesario
+        email: '', // Completar según sea necesario
+        fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+        //password: '', // Completar según sea necesario
+        fechaRegistro: DateTime.now(), // Completar según sea necesario
+        numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
+        idiomaPreferido: _selectedIdioma ?? '',
+        descripcion: _descripcionController.text,
+        modoPreferido: _selectedModo ?? '',
+        fotoPerfilUrl: '', // Completar según sea necesario
+      );
+      sendUserDataPreferences(preferences);
+
 
       // Damos feedback al usuario
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback ?? 'Cambios guardados')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback)),
       );
     } else {
       // Si el formulario no es válido, mostramos un error
        ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.formError ?? 'Por favor, corrige los errores')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
       );
     }
   }
 
+  void _goBack() {
+    // Al volver atrás, se descartan los cambios sin guardar (comportamiento por defecto al hacer pop)
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
+return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _goBack,
+        ),
         title: Text(
-          l10n.userDataPreferences,
+          l10n.editProfile,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
@@ -204,43 +226,41 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 ),
                 const SizedBox(height: 32),
 
-                // Apodo
+                // Apodo no editable
                 TextFormField(
                   controller: _apodoController,
+                  enabled: false, // No editable ni interactivo
+                  style: const TextStyle(color: Colors.grey),
                   decoration: InputDecoration(
-                    labelText: l10n.nickname,
+                    labelText: l10n.nicknameNonEditable,
                     border: OutlineInputBorder(),
-                    hintText: l10n.nicknameHint,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryNickname;
-                    }
-                    return null;
-                  },
+                  )
                 ),
                 SizedBox(height: 16),
 
-                // Fecha de nacimiento
+                //Nombre Completo no editable
+                TextFormField(
+                  controller: _nombreCompletoController,
+                  enabled: false, // No editable ni interactivo
+                  style: const TextStyle(color: Colors.grey),
+                  decoration: InputDecoration(
+                    labelText: l10n.fullName,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Fecha de nacimiento no editable
                 TextFormField(
                   controller: _fechaNacimientoController,
+                  enabled: false, // No editable ni interactivo
+                  style: const TextStyle(color: Colors.grey),
                   decoration: InputDecoration(
                     labelText: l10n.birthdate,
                     border: OutlineInputBorder(),
                     hintText: l10n.bithdateHint,
-                    suffixIcon: Icon(Icons.calendar_today),
+                    suffixIcon: Icon(Icons.calendar_today, color: Colors.grey),
                   ),
-                  readOnly: true, 
-                  onTap: () {
-                    _selectDate(context); // Muestra el DatePicker
-                  },
-                  /* La fecha no es obligatoria
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryBirthDate;
-                    }
-                    return null;
-                  },*/
                 ),
                 SizedBox(height: 16),
 
@@ -276,61 +296,97 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 ),
                 SizedBox(height: 16),
 
-                //Modo preferido (bici/coche)
-                DropdownButtonFormField<String>(
-                  value: _selectedModo,
-                  decoration: InputDecoration(
-                    labelText: l10n.preferredMode,
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryPreferredMode;
-                    }
-                    return null;
-                  },
-                  items: _modos.map((String modo) {
-                    return DropdownMenuItem<String>(
-                      value: modo,
-                      child: Text(modo),
-                    );
-                  }).toList(),
-                  onChanged: (String? nuevoValor) {
-                    setState(() {
-                      _selectedModo = nuevoValor;
-                    });
-                  },
+// Modo e Idioma preferidos en la misma fila
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedModo,
+                        decoration: InputDecoration(
+                          labelText: l10n.preferredMode,
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        dropdownColor: Theme.of(context).cardColor,
+                        menuMaxHeight: 200,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return l10n.mandatoryPreferredMode;
+                          }
+                          return null;
+                        },
+                        items: _modos.map((String modo) {
+                          IconData icon = modo == 'Bici' ? Icons.directions_bike : Icons.electric_car;
+                          return DropdownMenuItem<String>(
+                            value: modo,
+                            child: Row(
+                              children: [
+                                Icon(icon, color: Theme.of(context).primaryColor),
+                                const SizedBox(width: 12),
+                                Text(
+                                  modo,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? nuevoValor) {
+                          setState(() {
+                            _selectedModo = nuevoValor;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedIdioma,
+                        decoration: InputDecoration(
+                          labelText: l10n.preferredLanguage,
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                        ),
+                        dropdownColor: Theme.of(context).cardColor,
+                        menuMaxHeight: 200,
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                        items: _idiomas.map((String idioma) {
+                          return DropdownMenuItem<String>(
+                            value: idioma,
+                            child: Row(
+                              children: [
+                                
+                                const SizedBox(width: 12),
+                                Text(
+                                  idioma,
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? nuevoValor) {
+                          setState(() {
+                            _selectedIdioma = nuevoValor;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16),
-
-                //Idioma preferido
-                DropdownButtonFormField<String>(
-                  value: _selectedIdioma,
-                  decoration: InputDecoration(
-                    labelText: l10n.preferredLanguage,
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _idiomas.map((String idioma) {
-                    return DropdownMenuItem<String>(
-                      value: idioma,
-                      child: Text(idioma),
-                    );
-                  }).toList(),
-                  onChanged: (String? nuevoValor) {
-                    setState(() {
-                      _selectedIdioma = nuevoValor;
-                    });
-                  },
-                ),
+                const SizedBox(height: 16),
 
                 // Guardar cambios
-                SizedBox(height: 32),
+                //SizedBox(height: 32),
                 Center(
                   child: ElevatedButton(
                     onPressed: _guardarCambios,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      textStyle: TextStyle(fontSize: 16)
+                      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     child: Text(l10n.saveChanges),
                   ),

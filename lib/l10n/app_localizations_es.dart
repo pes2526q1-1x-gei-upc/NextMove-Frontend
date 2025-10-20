@@ -74,7 +74,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get wrongPassword => 'La contraseña es incorrecta.';
 
   @override
-  String get userDataPreferences => 'Preferencias del usuario';
+  String get userDataPreferences => 'Acaba de completar tu perfil';
 
   @override
   String get nickname => 'Apodo *';
@@ -140,4 +140,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get mandatoryPreferredMode => 'El modo preferido es obligatorio';
+
+  @override
+  String get editProfile => 'Editar perfil';
+
+  @override
+  String get nicknameNonEditable => 'Apodo';
+
+  @override
+  String get fullName => 'Nombre completo';
 }

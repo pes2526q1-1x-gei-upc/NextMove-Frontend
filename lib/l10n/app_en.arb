@@ -25,7 +25,7 @@
     "passwordNeedsNumber": "The password must contain at least 1 number.",
     "passwordNeedsSpecialCharacter": "The password must contain at least 1 special character.",
     "wrongPassword": "The password is incorrect.",
-    "userDataPreferences": "User preferences",
+    "userDataPreferences": "Finish your profile",
     "nickname": "Nickname *",
     "nicknameHint": "Enter your nickname",
     "birthdate": "Birthdate",
@@ -46,5 +46,8 @@
     "mandatoryNickname": "Nickname is mandatory",
     "mandatoryPhoneNumber": "Telephone number is mandatory",
     "invalidPhoneNumber": "Invalid telephone number format",
-    "mandatoryPreferredMode": "Preferred mode is mandatory"
+    "mandatoryPreferredMode": "Preferred mode is mandatory",
+    "editProfile": "Edit profile",
+    "nicknameNonEditable": "Nickname",
+    "fullName": "Full name"
 }

@@ -25,7 +25,7 @@
     "passwordNeedsNumber": "La contraseña debe tener al menos 1 número.",
     "passwordNeedsSpecialCharacter": "La contraseña debe tener al menos 1 carácter especial.",
     "wrongPassword": "La contraseña es incorrecta.",
-    "userDataPreferences": "Preferencias del usuario",
+    "userDataPreferences": "Acaba de completar tu perfil",
     "nickname": "Apodo *",
     "nicknameHint": "Introduce tu apodo",
     "birthdate": "Fecha de nacimiento",
@@ -46,5 +46,8 @@
     "mandatoryNickname": "El apodo es obligatorio",
     "mandatoryPhoneNumber": "El número de teléfono es obligatorio",
     "invalidPhoneNumber": "Formato de número de teléfono inválido",
-    "mandatoryPreferredMode": "El modo preferido es obligatorio"
+    "mandatoryPreferredMode": "El modo preferido es obligatorio",
+    "editProfile": "Editar perfil",
+    "nicknameNonEditable": "Apodo",
+    "fullName": "Nombre completo"
 }
