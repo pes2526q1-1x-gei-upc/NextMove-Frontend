@@ -27,7 +27,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
   File? _selectedImageFile; // Guardará la imagen seleccionada por el usuario
   
   // Imagen por defecto, obtener la de google si existe, futura implementación
-  late AssetImage _avatarImage;
+  final AssetImage _avatarImage = const AssetImage('assets/Profile_avatar_placeholder_large.png');
 
   // Estado para los Dropdowns
   String? _selectedIdioma;
@@ -39,16 +39,22 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
   @override
   void initState() {
     super.initState();
+    //Cargamos los datos del usuario existentes
     UserData data = fetchUserDataPreferences();
-    //Se pueden cargar datos iniciales haciendo por ejemplo los datos de google
+
+    if(data.numeroTelefono == 0){
+      _telefonoController.text = ''; // Valor por defecto si no hay número
+    }
+    else{
+      _telefonoController.text = data.numeroTelefono.toString();
+    }
+    _selectedIdioma ??= 'Español';
     _apodoController.text = data.apodo;
     _nombreCompletoController.text = data.nombreCompleto;
-    _telefonoController.text = data.numeroTelefono.toString();
     _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(data.fechaNacimiento);
     _descripcionController.text = data.descripcion;
-    _selectedIdioma = data.idiomaPreferido;  
     _selectedModo = data.modoPreferido;     
-    _avatarImage = AssetImage(data.fotoPerfilUrl);
+    //_avatarImage = AssetImage(data.fotoPerfilUrl);
   }
 
   @override
@@ -141,7 +147,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
       UserData preferences = UserData(
         apodo: _apodoController.text,
         nombreCompleto: '', // Completar según sea necesario
-        email: '', // Completar según sea necesario
+        //email: '', // Completar según sea necesario
         fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
         //password: '', // Completar según sea necesario
         fechaRegistro: DateTime.now(), //No se le hará caso pero debe inicializarse
@@ -149,7 +155,7 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
         idiomaPreferido: _selectedIdioma ?? '',
         descripcion: _descripcionController.text,
         modoPreferido: _selectedModo ?? '',
-        fotoPerfilUrl: '', // Completar según sea necesario
+        //fotoPerfilUrl: '', // Completar según sea necesario
       );
       updateUserDataPreferences(preferences);
 
@@ -306,8 +312,6 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
                         decoration: InputDecoration(
                           labelText: l10n.preferredMode,
                           border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
                         dropdownColor: Theme.of(context).cardColor,
                         menuMaxHeight: 200,
@@ -348,8 +352,6 @@ class _UserDataPreferencesState extends State<EditUserDataPreferences> {
                         decoration: InputDecoration(
                           labelText: l10n.preferredLanguage,
                           border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
                         dropdownColor: Theme.of(context).cardColor,
                         menuMaxHeight: 200,

@@ -77,7 +77,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get userDataPreferences => 'Acaba de completar el teu perfil';
 
   @override
-  String get nickname => 'Sobrenom *';
+  String get nickname => 'Sobrenom';
 
   @override
   String get nicknameHint => 'Introdueix el teu sobrenom';
@@ -108,7 +108,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get userDescriptionHint => 'Introdueix una breu descripció sobre tu';
 
   @override
-  String get preferredMode => 'Mode preferit *';
+  String get preferredMode => 'Mode preferit';
 
   @override
   String get saveChanges => 'Desa els canvis';
@@ -149,4 +149,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get fullName => 'Nom complet';
+
+  @override
+  String get mandatoryFullName => 'El nom complet és obligatori';
 }

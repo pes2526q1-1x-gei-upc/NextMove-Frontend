@@ -6,6 +6,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.d
 
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
 
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -190,7 +191,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       );
                       appKey.currentState?.setLoggedIn(true);
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MapHomePage()),
+                        MaterialPageRoute(builder: (context) => UserDataPreferences()),
                       );
                     } catch (e) {
                       print(e);

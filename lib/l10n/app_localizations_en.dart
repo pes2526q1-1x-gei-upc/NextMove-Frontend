@@ -75,7 +75,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userDataPreferences => 'Finish your profile';
 
   @override
-  String get nickname => 'Nickname *';
+  String get nickname => 'Nickname';
 
   @override
   String get nicknameHint => 'Enter your nickname';
@@ -105,7 +105,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userDescriptionHint => 'Enter a brief description about yourself';
 
   @override
-  String get preferredMode => 'Preferred mode *';
+  String get preferredMode => 'Preferred mode';
 
   @override
   String get saveChanges => 'Save changes';
@@ -145,4 +145,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fullName => 'Full name';
+
+  @override
+  String get mandatoryFullName => 'Full name is mandatory';
 }

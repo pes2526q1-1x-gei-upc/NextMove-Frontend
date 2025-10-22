@@ -77,7 +77,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get userDataPreferences => 'Acaba de completar tu perfil';
 
   @override
-  String get nickname => 'Apodo *';
+  String get nickname => 'Apodo';
 
   @override
   String get nicknameHint => 'Introduce tu apodo';
@@ -108,7 +108,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get userDescriptionHint => 'Introduce una breve descripción sobre ti';
 
   @override
-  String get preferredMode => 'Modo preferido *';
+  String get preferredMode => 'Modo preferido';
 
   @override
   String get saveChanges => 'Guardar cambios';
@@ -149,4 +149,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get fullName => 'Nombre completo';
+
+  @override
+  String get mandatoryFullName => 'El nombre completo es obligatorio';
 }

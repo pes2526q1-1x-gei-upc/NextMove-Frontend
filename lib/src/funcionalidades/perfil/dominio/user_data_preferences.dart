@@ -15,20 +15,20 @@ enum IdiomaPreferido {
 class UserData{
   final String apodo;
   final String nombreCompleto;
-  final String email;
+  //final String email;
   final DateTime fechaNacimiento;
   //final String password;
   final DateTime fechaRegistro;
-  late final int numeroTelefono;
-  late final String idiomaPreferido;
-  late final String descripcion;
-  late final String modoPreferido;
-  late final String fotoPerfilUrl;
+  int numeroTelefono;
+  late String idiomaPreferido;
+  late String descripcion;
+  late String modoPreferido;
+  //late final String fotoPerfilUrl;
 
   UserData({
     required this.apodo,
     required this.nombreCompleto,
-    required this.email,
+    //required this.email,
     required this.fechaNacimiento,
     //required this.password,
     required this.fechaRegistro,
@@ -36,7 +36,7 @@ class UserData{
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
-    required this.fotoPerfilUrl,
+    //required this.fotoPerfilUrl,
   });
 }
 
@@ -63,11 +63,11 @@ void updateUserDataPreferences(UserData preferences) {
   if(preferences.descripcion != currentData.descripcion) {
     // Actualizar descripción
     finalData.descripcion = preferences.descripcion;
-  }
+  }/*
   if(preferences.fotoPerfilUrl != currentData.fotoPerfilUrl) {
     // Actualizar foto de perfil
     finalData.fotoPerfilUrl = preferences.fotoPerfilUrl;
-  }
+  }*/
   if(preferences.modoPreferido != currentData.modoPreferido) {
     // Actualizar modo preferido
     finalData.modoPreferido = preferences.modoPreferido;

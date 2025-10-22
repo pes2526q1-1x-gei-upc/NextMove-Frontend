@@ -26,7 +26,7 @@
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
     "wrongPassword": "La contrasenya és incorrecta.",
     "userDataPreferences": "Acaba de completar el teu perfil",
-    "nickname": "Sobrenom *",
+    "nickname": "Sobrenom",
     "nicknameHint": "Introdueix el teu sobrenom",
     "birthdate": "Data de naixement",
     "bithdateHint": "Ex: 1990-01-01",
@@ -36,7 +36,7 @@
     "preferredLanguage": "Idioma preferit",
     "userDescription": "Descripció",
     "userDescriptionHint": "Introdueix una breu descripció sobre tu",
-    "preferredMode": "Mode preferit *",
+    "preferredMode": "Mode preferit",
     "saveChanges": "Desa els canvis",
     "camera": "Càmera",
     "gallery": "Galeria",
@@ -49,6 +49,7 @@
     "mandatoryPreferredMode": "El mode preferit és obligatori",
     "editProfile": "Edita el perfil",
     "nicknameNonEditable": "Sobrenom",
-    "fullName": "Nom complet"
+    "fullName": "Nom complet",
+    "mandatoryFullName": "El nom complet és obligatori"
     
 }

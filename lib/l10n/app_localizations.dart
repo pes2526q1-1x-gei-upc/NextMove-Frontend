@@ -217,7 +217,7 @@ abstract class AppLocalizations {
   /// No description provided for @nickname.
   ///
   /// In en, this message translates to:
-  /// **'Nickname *'**
+  /// **'Nickname'**
   String get nickname;
 
   /// No description provided for @nicknameHint.
@@ -277,7 +277,7 @@ abstract class AppLocalizations {
   /// No description provided for @preferredMode.
   ///
   /// In en, this message translates to:
-  /// **'Preferred mode *'**
+  /// **'Preferred mode'**
   String get preferredMode;
 
   /// No description provided for @saveChanges.
@@ -357,6 +357,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full name'**
   String get fullName;
+
+  /// No description provided for @mandatoryFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is mandatory'**
+  String get mandatoryFullName;
 }
 
 class _AppLocalizationsDelegate

@@ -26,7 +26,7 @@
     "passwordNeedsSpecialCharacter": "The password must contain at least 1 special character.",
     "wrongPassword": "The password is incorrect.",
     "userDataPreferences": "Finish your profile",
-    "nickname": "Nickname *",
+    "nickname": "Nickname",
     "nicknameHint": "Enter your nickname",
     "birthdate": "Birthdate",
     "bithdateHint": "Ex: 1990-01-01",
@@ -36,7 +36,7 @@
     "preferredLanguage": "Preferred language",
     "userDescription": "Description",
     "userDescriptionHint": "Enter a brief description about yourself",
-    "preferredMode": "Preferred mode *",
+    "preferredMode": "Preferred mode",
     "saveChanges": "Save changes",
     "camera": "Camera",
     "gallery": "Gallery",
@@ -49,5 +49,6 @@
     "mandatoryPreferredMode": "Preferred mode is mandatory",
     "editProfile": "Edit profile",
     "nicknameNonEditable": "Nickname",
-    "fullName": "Full name"
+    "fullName": "Full name",
+    "mandatoryFullName": "Full name is mandatory"
 }

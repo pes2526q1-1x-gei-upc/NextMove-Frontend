@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preserences_page.dart';
 
 class UserDataPreferences extends StatefulWidget {
   const UserDataPreferences({super.key});
@@ -132,16 +133,15 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       //print('Datos a guardar: $userData');
       UserData preferences = UserData(
         apodo: _apodoController.text,
-        nombreCompleto: _nombreCompletoController.text, // Completar según sea necesario
-        email: '', // Completar según sea necesario
+        nombreCompleto: _nombreCompletoController.text, 
+        //email: '', // NO sera necesario
         fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-        //password: '', // Completar según sea necesario
-        fechaRegistro: DateTime.now(), // Completar según sea necesario
+        fechaRegistro: DateTime.now(), 
         numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-        idiomaPreferido: _selectedIdioma ?? '',
+        idiomaPreferido: _selectedIdioma ?? 'none',
         descripcion: _descripcionController.text,
         modoPreferido: _selectedModo ?? '',
-        fotoPerfilUrl: '', // Completar según sea necesario
+        //fotoPerfilUrl: '',
       );
       sendUserDataPreferences(preferences);
 
@@ -150,6 +150,13 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback)),
       );
+
+      //TEMPORAL, PARA PROBAR
+      Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditUserDataPreferences(),  // Pasa datos si necesitas, ej: EditUserDataPreferences(userData: preferences)
+      ),
+    );
     } else {
       // Si el formulario no es válido, mostramos un error
        ScaffoldMessenger.of(context).showSnackBar(
@@ -228,13 +235,19 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                 ),
                 SizedBox(height: 16),
 
-                //Nombre Completo no editable
+                //Nombre Completo
                 TextFormField(
                   controller: _nombreCompletoController,
                   decoration: InputDecoration(
                     labelText: l10n.fullName,
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.mandatoryFullName;
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 16),
 
@@ -247,6 +260,12 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                     hintText: l10n.bithdateHint,
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.mandatoryBirthDate;
+                    }
+                    return null;
+                  },
                   readOnly: true, 
                   onTap: () {
                     _selectDate(context); // Muestra el DatePicker
@@ -295,8 +314,6 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                         decoration: InputDecoration(
                           labelText: l10n.preferredMode,
                           border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
                         dropdownColor: Theme.of(context).cardColor,
                         menuMaxHeight: 200,
@@ -337,8 +354,6 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                         decoration: InputDecoration(
                           labelText: l10n.preferredLanguage,
                           border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
                         dropdownColor: Theme.of(context).cardColor,
                         menuMaxHeight: 200,

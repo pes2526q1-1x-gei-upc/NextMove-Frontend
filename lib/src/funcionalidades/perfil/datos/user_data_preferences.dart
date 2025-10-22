@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
 
 Future<UserData> pushUserDataPreferences(UserData preferences) async {
@@ -5,7 +6,7 @@ Future<UserData> pushUserDataPreferences(UserData preferences) async {
   print("Enviando preferencias de usuario desde capa de datos:");
   print("Apodo: ${preferences.apodo}");
   print("Nombre Completo: ${preferences.nombreCompleto}");
-  print("Email: ${preferences.email}");
+  //print("Email: ${preferences.email}");
   print("Fecha de Nacimiento: ${preferences.fechaNacimiento}");
   //print("Password: ${preferences.password}");
   print("Fecha de Registro: ${preferences.fechaRegistro}");
@@ -13,7 +14,7 @@ Future<UserData> pushUserDataPreferences(UserData preferences) async {
   print("Idioma Preferido: ${preferences.idiomaPreferido}");
   print("Descripción: ${preferences.descripcion}");
   print("Modo Preferido: ${preferences.modoPreferido}");
-  print("Foto Perfil URL: ${preferences.fotoPerfilUrl}"); 
+  //print("Foto Perfil URL: ${preferences.fotoPerfilUrl}"); 
   return Future.value(preferences);
 
 }
@@ -24,13 +25,14 @@ UserData DBfetchUserDataPreferences(){
   return (UserData(
     apodo: "Abeet",
     nombreCompleto: "Albert González Braojos",
-    email: "albert",
+    //email: "albert",
     fechaNacimiento: DateTime(1990, 1, 1),
     //password: "password123",
     fechaRegistro: DateTime(2022, 1, 1),
-    numeroTelefono: 123456789,
-    idiomaPreferido: "Español",
-    descripcion: "Esta es una descripción de ejemplo.",
+    numeroTelefono: 0,
+    idiomaPreferido: "",
+    descripcion: "",
     modoPreferido: "Coche",
-    fotoPerfilUrl: "assets/Profile",));
+    //fotoPerfilUrl: "assets/Profile_avatar_placeholder_large.png",
+    ));
 }

@@ -26,7 +26,7 @@
     "passwordNeedsSpecialCharacter": "La contraseña debe tener al menos 1 carácter especial.",
     "wrongPassword": "La contraseña es incorrecta.",
     "userDataPreferences": "Acaba de completar tu perfil",
-    "nickname": "Apodo *",
+    "nickname": "Apodo",
     "nicknameHint": "Introduce tu apodo",
     "birthdate": "Fecha de nacimiento",
     "bithdateHint": "Ej: 1990-01-01",
@@ -36,7 +36,7 @@
     "preferredLanguage": "Idioma preferido",
     "userDescription": "Descripción",
     "userDescriptionHint": "Introduce una breve descripción sobre ti",
-    "preferredMode": "Modo preferido *",
+    "preferredMode": "Modo preferido",
     "saveChanges": "Guardar cambios",
     "camera": "Cámara",
     "gallery": "Galería",
@@ -49,5 +49,6 @@
     "mandatoryPreferredMode": "El modo preferido es obligatorio",
     "editProfile": "Editar perfil",
     "nicknameNonEditable": "Apodo",
-    "fullName": "Nombre completo"
+    "fullName": "Nombre completo",
+    "mandatoryFullName": "El nombre completo es obligatorio"
 }

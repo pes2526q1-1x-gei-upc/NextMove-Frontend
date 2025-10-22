@@ -86,7 +86,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: EditUserDataPreferences(),
+        home: UserDataPreferences(),
       ),
     );
   }
