@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/StationList.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:geolocator/geolocator.dart';
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
   @override
@@ -12,6 +12,19 @@ class _MapHomePageState extends State<MapHomePage> {
   late GoogleMapController mapController;
 
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
+
+   @override
+  void initState() {
+    super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -39,7 +52,14 @@ class _MapHomePageState extends State<MapHomePage> {
             ),
           )
         },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
       ),
     );
+  }
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
   }
 }
