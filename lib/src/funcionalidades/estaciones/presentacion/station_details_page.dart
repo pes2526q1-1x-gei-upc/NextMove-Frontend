@@ -124,7 +124,7 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                             const SizedBox(height: 8),
                             createDetailRow(context, Icons.check_circle_outline, availableSlotsLabel, stationDetails!.availableSlots.toString()),
                             const SizedBox(height: 8),
-                            Row(
+                            Row( // rating
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                     Icon(Icons.star),
@@ -141,6 +141,10 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                             if (widget.stationType == StationType.bicycle) ...[
                                 createDetailRow(context, Icons.pedal_bike, AppLocalizations.of(context)!.availableBikes, (stationDetails as BicycleStationDetails).availableBikes.toString()),
                                 const SizedBox(height: 8),
+                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, (stationDetails as BicycleStationDetails).availableMechanicalBikes.toString()),
+                                const SizedBox(height: 8),
+                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, (stationDetails as BicycleStationDetails).availableElectricBikes.toString()),
+                                const SizedBox(height: 8),
                                 createDetailRowBool(context, Icons.electric_bike, AppLocalizations.of(context)!.electricRecharge, (stationDetails as BicycleStationDetails).electricRechargeStation),
                                 const SizedBox(height: 8),
                                 createDetailRowBool(context, Icons.anchor, AppLocalizations.of(context)!.canAnchorBikes, (stationDetails as BicycleStationDetails).canAnchorBikes),
@@ -148,12 +152,6 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                                 createDetailRowBool(context, Icons.directions_bike, AppLocalizations.of(context)!.canRentBikes, (stationDetails as BicycleStationDetails).canRentBikes),
                                 const SizedBox(height: 8),
                                 createDetailRow(context, Icons.info_outline, AppLocalizations.of(context)!.state, (stationDetails as BicycleStationDetails).state.localized(context)),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.anchor, AppLocalizations.of(context)!.availableAnchors, (stationDetails as BicycleStationDetails).availableAnchors.toString()),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, (stationDetails as BicycleStationDetails).availableMechanicalBikes.toString()),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, (stationDetails as BicycleStationDetails).availableElectricBikes.toString()),
                             ],
                             if (widget.stationType == StationType.electricVehicle) ...[
                                 createDetailRowBool(context, Icons.bolt, AppLocalizations.of(context)!.superFast, (stationDetails as EVStationDetails).isSuperFast),
@@ -187,8 +185,6 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                                   ),
                                 ))),
                             ]
-
-                            // WidgetCard(stationDetails: stationDetails),
                           ],
                         ),
                     ),
@@ -253,126 +249,6 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
             children: stars,
         );
     }
-}
-
-class WidgetCard extends StatelessWidget {
-  const WidgetCard({
-    super.key,
-    required this.stationDetails,
-  });
-
-  final StationDetails? stationDetails;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                    ListTile(
-                        leading: const Icon(Icons.location_on),
-                        title: Text(stationDetails!.name, style: Theme.of(context).textTheme.headlineSmall),
-                        subtitle: Text(stationDetails!.address),
-                    ),
-                    const Divider(),
-                    ListTile(
-                        leading: const Icon(Icons.event_seat),
-                        title: Text('Total slots'),
-                        trailing: Text('${stationDetails!.totalSlots}'),
-                    ),
-                    ListTile(
-                        leading: const Icon(Icons.check_circle_outline),
-                        title: Text('Available slots'),
-                        trailing: Text('${stationDetails!.availableSlots}'),
-                    ),
-                    if (stationDetails is BicycleStationDetails) ...[
-                        const Divider(),
-                        ListTile(
-                            leading: const Icon(Icons.pedal_bike),
-                            title: Text('Available bikes'),
-                            trailing: Text('${(stationDetails as BicycleStationDetails).availableBikes}'),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.electric_bike),
-                            title: Text('Electric recharge station'),
-                            trailing: Icon(
-                                (stationDetails as BicycleStationDetails).electricRechargeStation
-                                    ? Icons.check
-                                    : Icons.close,
-                                color: (stationDetails as BicycleStationDetails).electricRechargeStation
-                                    ? Colors.green
-                                    : Colors.red,
-                            ),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.anchor),
-                            title: Text('Can anchor bikes'),
-                            trailing: Icon(
-                                (stationDetails as BicycleStationDetails).canAnchorBikes
-                                    ? Icons.check
-                                    : Icons.close,
-                                color: (stationDetails as BicycleStationDetails).canAnchorBikes
-                                    ? Colors.green
-                                    : Colors.red,
-                            ),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.directions_bike),
-                            title: Text('Can rent bikes'),
-                            trailing: Icon(
-                                (stationDetails as BicycleStationDetails).canRentBikes
-                                    ? Icons.check
-                                    : Icons.close,
-                                color: (stationDetails as BicycleStationDetails).canRentBikes
-                                    ? Colors.green
-                                    : Colors.red,
-                            ),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.info_outline),
-                            title: Text('State'),
-                            trailing: Text((stationDetails as BicycleStationDetails).state.name),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.anchor),
-                            title: Text('Available anchors'),
-                            trailing: Text('${(stationDetails as BicycleStationDetails).availableAnchors}'),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.directions_bike),
-                            title: Text('Available mechanical bikes'),
-                            trailing: Text('${(stationDetails as BicycleStationDetails).availableMechanicalBikes}'),
-                        ),
-                        ListTile(
-                            leading: const Icon(Icons.electric_bike),
-                            title: Text('Available electric bikes'),
-                            trailing: Text('${(stationDetails as BicycleStationDetails).availableElectricBikes}'),
-                        ),
-                    ],
-                        ListTile(
-                            leading: const Icon(Icons.speed),
-                            title: Text('Is super fast'),
-                            trailing: Icon(
-                                (stationDetails as EVStationDetails).isSuperFast
-                                    ? Icons.check
-                                    : Icons.close,
-                                color: (stationDetails as EVStationDetails).isSuperFast
-                                    ? Colors.green
-                                    : Colors.red,
-                            ),
-                        ),
-                ],
-            ),
-        ),
-    );
-  }
 }
 
 

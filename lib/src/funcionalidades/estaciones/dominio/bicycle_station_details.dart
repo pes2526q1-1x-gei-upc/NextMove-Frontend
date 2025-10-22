@@ -11,7 +11,6 @@ class BicycleStationDetails extends StationDetails {
   final bool canAnchorBikes;
   final bool canRentBikes;
   final BicycleStationState state;
-  final int availableAnchors;
   final int availableMechanicalBikes;
   final int availableElectricBikes;
 
@@ -26,8 +25,24 @@ class BicycleStationDetails extends StationDetails {
     required this.canAnchorBikes,
     required this.canRentBikes,
     required this.state,
-    required this.availableAnchors,
     required this.availableMechanicalBikes,
     required this.availableElectricBikes,
   });
+
+  factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
+    return BicycleStationDetails(
+      name: data['nombre'],
+      address: data['direccion'],
+      totalSlots: data['plazasTotales'],
+      availableSlots: data['anclajesDisponibles'],
+      rating: 5, // TODO: obtenir valoració de la BD
+      availableBikes: (data['bicisMecanicasDisponibles']) + (data['bicisElectricasDisponibles']),
+      electricRechargeStation: data['estacionCargaElectrica'],
+      canAnchorBikes: data['sePuedeAnclarBicis'],
+      canRentBikes: data['sePuedenAlquilarBicis'],
+      state: data['estado'] == "OPERATIVA" ? BicycleStationState.operational : BicycleStationState.closed,
+      availableMechanicalBikes: data['bicisMecanicasDisponibles'],
+      availableElectricBikes: data['bicisElectricasDisponibles'],
+    );
+  }
 }
