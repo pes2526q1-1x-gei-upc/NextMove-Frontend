@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/StationList.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
@@ -8,71 +9,36 @@ class MapHomePage extends StatefulWidget {
 }
 
 class _MapHomePageState extends State<MapHomePage> {
+  late GoogleMapController mapController;
+
+  final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-      children: [
-        Positioned.fill(
-        child: Placeholder(),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 32,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: 80,
-                height: 64,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Placeholder(),
-                ),
-              ),
-              SizedBox(
-                width: 80,
-                height: 64,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Placeholder(),
-                ),
-              ),
-              SizedBox(
-                width: 80,
-                height: 64,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Placeholder(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      Positioned(
-        left: 32,
-        right: 32,
-        top: 48,
-        child: SizedBox(
-          height: 48,
-          child: Placeholder(),
-        ),
+      appBar: AppBar(
+        title: const Text('Mapa de Estaciones'),
+        backgroundColor: Colors.green[700],
       ),
-      Positioned(
-        top: 104, // 48 (search bar top) + 48 (search bar height) + 8 (spacing)
-        right: 32,
-        child: IconButton(
-          icon: Icon(Icons.list),
-          iconSize: 48,
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => StationList()),
-            );
-          },
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _bcnCenter,
+          zoom: 12,
         ),
-      ),
-      ],
+        markers: {
+          const Marker(
+            markerId: MarkerId('Gran Via de les Corts Catalanes, 642'),
+            position: LatLng(41.3979779, 2.1801069),
+            infoWindow: InfoWindow(
+              title: 'Estación Gran Via de les Corts Catalanes, 642',
+              snippet: 'Bicicletas',
+            ),
+          )
+        },
       ),
     );
   }
