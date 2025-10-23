@@ -78,4 +78,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownError => 'Unknown error';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get totalAnchors => 'Total anchors';
+
+  @override
+  String get totalChargers => 'Total chargers';
+
+  @override
+  String get availableAnchors => 'Available anchors';
+
+  @override
+  String get availableChargers => 'Available chargers';
+
+  @override
+  String get rating => 'Rating';
+
+  @override
+  String get power => 'Power';
+
+  @override
+  String get powerType => 'Power type';
+
+  @override
+  String get ac => 'AC';
+
+  @override
+  String get dc => 'DC';
+
+  @override
+  String get speedType => 'Speed type';
+
+  @override
+  String get superFast => 'Super fast';
+
+  @override
+  String get fast => 'Fast';
+
+  @override
+  String get semiFast => 'Semi-fast';
+
+  @override
+  String get connectionType => 'Connection type';
+
+  @override
+  String get chargerType => 'Charger type';
+
+  @override
+  String get css2 => 'CSS2';
+
+  @override
+  String get chademo => 'CHAdeMO';
+
+  @override
+  String get mennekes => 'Mennekes';
+
+  @override
+  String get shucko => 'Shucko';
+
+  @override
+  String get availableBikes => 'Available bikes';
+
+  @override
+  String get electricRecharge => 'Electric recharge';
+
+  @override
+  String get canAnchorBikes => 'Can anchor bikes';
+
+  @override
+  String get canRentBikes => 'Can rent bikes';
+
+  @override
+  String get state => 'State';
+
+  @override
+  String get availableMechanicalBikes => 'Available mechanical bikes';
+
+  @override
+  String get availableElectricBikes => 'Available electric bikes';
+
+  @override
+  String get operational => 'Operational';
+
+  @override
+  String get closed => 'Closed';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String get occupied => 'Occupied';
+
+  @override
+  String get unavailable => 'Unavailable';
+
+  @override
+  String get connectors => 'Connectors';
+
+  @override
+  String get accessType => 'Access type';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get unknownPower => 'Unknown power';
+
+  @override
+  String get unknown => 'Unknown';
 }

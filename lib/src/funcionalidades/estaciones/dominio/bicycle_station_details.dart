@@ -1,0 +1,48 @@
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
+
+enum BicycleStationState {
+  operational,
+  closed,
+}
+
+class BicycleStationDetails extends StationDetails {
+  final int availableBikes;
+  final bool electricRechargeStation;
+  final bool canAnchorBikes;
+  final bool canRentBikes;
+  final BicycleStationState state;
+  final int availableMechanicalBikes;
+  final int availableElectricBikes;
+
+  BicycleStationDetails({
+    required super.name,
+    required super.address,
+    required super.totalSlots,
+    required super.availableSlots,
+    required super.rating,
+    required this.availableBikes,
+    required this.electricRechargeStation,
+    required this.canAnchorBikes,
+    required this.canRentBikes,
+    required this.state,
+    required this.availableMechanicalBikes,
+    required this.availableElectricBikes,
+  });
+
+  factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
+    return BicycleStationDetails(
+      name: data['nombre'],
+      address: data['direccion'],
+      totalSlots: data['plazasTotales'],
+      availableSlots: data['anclajesDisponibles'],
+      rating: 5, // TODO: obtenir valoració de la BD
+      availableBikes: (data['bicisMecanicasDisponibles']) + (data['bicisElectricasDisponibles']),
+      electricRechargeStation: data['estacionCargaElectrica'],
+      canAnchorBikes: data['sePuedeAnclarBicis'],
+      canRentBikes: data['sePuedenAlquilarBicis'],
+      state: data['estado'] == "OPERATIVA" ? BicycleStationState.operational : BicycleStationState.closed,
+      availableMechanicalBikes: data['bicisMecanicasDisponibles'],
+      availableElectricBikes: data['bicisElectricasDisponibles'],
+    );
+  }
+}

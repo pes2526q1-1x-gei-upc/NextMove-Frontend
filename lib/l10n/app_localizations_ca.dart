@@ -80,4 +80,115 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get unknownError => 'Error desconegut';
+
+  @override
+  String get address => 'Adreça';
+
+  @override
+  String get totalAnchors => 'Total d\'ancoratges';
+
+  @override
+  String get totalChargers => 'Total de carregadors';
+
+  @override
+  String get availableAnchors => 'Ancoratges disponibles';
+
+  @override
+  String get availableChargers => 'Carregadors disponibles';
+
+  @override
+  String get rating => 'Valoració';
+
+  @override
+  String get power => 'Potència';
+
+  @override
+  String get powerType => 'Tipus de corrent';
+
+  @override
+  String get ac => 'CA';
+
+  @override
+  String get dc => 'CC';
+
+  @override
+  String get speedType => 'Tipus de velocitat';
+
+  @override
+  String get superFast => 'Superràpid';
+
+  @override
+  String get fast => 'Ràpid';
+
+  @override
+  String get semiFast => 'Semi-ràpid';
+
+  @override
+  String get connectionType => 'Tipus de connexió';
+
+  @override
+  String get chargerType => 'Tipus de carregador';
+
+  @override
+  String get css2 => 'CSS2';
+
+  @override
+  String get chademo => 'CHAdeMO';
+
+  @override
+  String get mennekes => 'Mennekes';
+
+  @override
+  String get shucko => 'Shucko';
+
+  @override
+  String get availableBikes => 'Bicicletes disponibles';
+
+  @override
+  String get electricRecharge => 'Recàrrega elèctrica';
+
+  @override
+  String get canAnchorBikes => 'Es poden ancorar bicicletes';
+
+  @override
+  String get canRentBikes => 'Es poden llogar bicicletes';
+
+  @override
+  String get state => 'Estat';
+
+  @override
+  String get availableMechanicalBikes => 'Bicicletes mecàniques disponibles';
+
+  @override
+  String get availableElectricBikes => 'Bicicletes elèctriques disponibles';
+
+  @override
+  String get operational => 'En funcionament';
+
+  @override
+  String get closed => 'Tancat';
+
+  @override
+  String get available => 'Disponible';
+
+  @override
+  String get occupied => 'Ocupat';
+
+  @override
+  String get unavailable => 'No disponible';
+
+  @override
+  String get connectors => 'Connectors';
+
+  @override
+  String get accessType => 'Tipus d\'accés';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
+  String get unknown => 'Desconegut';
 }
