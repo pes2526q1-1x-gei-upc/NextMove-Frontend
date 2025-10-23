@@ -36,4 +36,20 @@ class GraphQLQueries {
 
   ''';
 
+  static const String getAllStationsCoordinatesQuery = r'''
+    query getAllStationsCoordinates {
+      stations {
+        stations{
+          id
+          name
+          coordinates{
+            latitude
+            longitude
+          }
+        }
+      }
+    }
+
+  ''';
+
 }

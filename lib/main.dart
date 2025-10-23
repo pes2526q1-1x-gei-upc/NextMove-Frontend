@@ -4,7 +4,7 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 import 'l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/presentacion/Welcome_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 

@@ -1,18 +1,25 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/dominio/station_model.dart';
 
-class StationsDataSource {
-  final GraphQLClient graphqlClient;
+Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
+  GraphQLClient client = GraphQLConfig.getClient();
+  final QueryResult result = await client.query(options);
 
-  StationsDataSource({required this.graphqlClient});
+  if (result.hasException) {
+    throw Exception('Error en query: ${result.exception.toString()}');
+  }
 
-  Future<List<StationModel>> getAllStations() async {
+  return result;
+}
+
+Future<List<StationModel>> DBgetAllStations() async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getAllStationsQuery),
     );
 
-    final QueryResult result = await graphqlClient.query(options);
+    final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllStationsCoordinatesQuery, options);
 
     if (result.hasException) {
       throw Exception('Failed to load stations: ${result.exception.toString()}');
@@ -28,4 +35,3 @@ class StationsDataSource {
     return stations;
     */
   }
-}

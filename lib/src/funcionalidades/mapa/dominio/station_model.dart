@@ -13,10 +13,6 @@ class StationModel {
     required this.longitude,
   });
 
-  Future<List<StationModel>?> ReqgetAllStations() async {
-    return await getAllStations();
-  }
-
   factory StationModel.fromJson(Map<String, dynamic> json) {
     return StationModel(
       id: json['id'] as String,
@@ -37,4 +33,8 @@ class StationModel {
     };
   }
 
+}
+
+Future<List<StationModel>?> getAllStations() async {
+    return await DBgetAllStations();
 }
