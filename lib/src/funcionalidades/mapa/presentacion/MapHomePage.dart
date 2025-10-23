@@ -13,7 +13,7 @@ class _MapHomePageState extends State<MapHomePage> {
 
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
 
-   @override
+   /*@override
   void initState() {
     super.initState();
     _checkLocationPermission();
@@ -24,7 +24,7 @@ class _MapHomePageState extends State<MapHomePage> {
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
-  }
+  }*/ //USER LOCATION, DE MOMENTO LO QUITO
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -42,24 +42,10 @@ class _MapHomePageState extends State<MapHomePage> {
           target: _bcnCenter,
           zoom: 12,
         ),
-        markers: {
-          const Marker(
-            markerId: MarkerId('Gran Via de les Corts Catalanes, 642'),
-            position: LatLng(41.3979779, 2.1801069),
-            infoWindow: InfoWindow(
-              title: 'Estación Gran Via de les Corts Catalanes, 642',
-              snippet: 'Bicicletas',
-            ),
-          )
-        },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
+        //myLocationEnabled: true,
+        //myLocationButtonEnabled: true, USER LOCATION DE MOMENTO FUERA
       ),
     );
   }
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
-  }
+ 
 }

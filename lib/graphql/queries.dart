@@ -11,4 +11,29 @@ class GraphQLQueries {
       }
     }
   ''';
+
+    static const String getAllStationsQuery = r'''
+    query getAllStations {
+      stations {
+        stations{
+          id
+          name
+          city
+          coordinates{
+            latitude
+            longitude
+          }
+          connectors{
+            type
+            powerKw
+            status
+          }
+          isSuperfast
+          }
+          total
+      }
+    }
+
+  ''';
+
 }
