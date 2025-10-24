@@ -36,6 +36,5 @@ class StationModel {
 }
 
 Future<List<StationModel>?> getAllStations() async {
-    print("entra en getAllStations");
     return await DBgetAllStations();
 }
