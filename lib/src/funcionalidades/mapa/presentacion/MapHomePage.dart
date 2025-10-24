@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
+
+
+import '../../../../graphql/queries.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});

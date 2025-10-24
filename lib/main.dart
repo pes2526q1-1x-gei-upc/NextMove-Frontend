@@ -35,7 +35,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
   late final ValueNotifier<GraphQLClient> client;
 
   bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
-  
+
   @override
   void initState() {
     super.initState();
