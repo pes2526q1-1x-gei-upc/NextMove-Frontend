@@ -6,7 +6,7 @@ class GraphQLConfig {
   // static String get baseUrl => dotenv.env['API_BASE_URL']!;
   static String get baseUrl {
     final url =
-        dotenv.env['API_BASE_URL'] ?? 'http://10.192.115.104:3000/graphql';
+        dotenv.env['API_BASE_URL'] ?? 'http://192.168.1.199:3000/graphql';
     print('GraphQL URL: $url'); // Log para debug
     return url;
   }

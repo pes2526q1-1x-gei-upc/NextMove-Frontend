@@ -22,14 +22,13 @@ class _MapHomePageState extends State<MapHomePage> {
 
   Future<void> _loadStations() async {
     try {
-      print("iniciada");
+      
       final stationsToLoad = await getAllStations();
-      print("finalizada");
       setState(() {
         stations = stationsToLoad;
       });
     } catch (e) {
-      print('Error loading stations: $e');
+      throw Exception('Error loading stations: $e');
     }
   }
 
