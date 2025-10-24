@@ -34,7 +34,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
   late final ValueNotifier<GraphQLClient> client;
 
   bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
-  
+
   @override
   void initState() {
     super.initState();
@@ -66,7 +66,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: StationDetailsPage(stationID: "125", stationType: StationType.bicycle)/*isLoggedIn ? MapHomePage() : WelcomePage()*/,
+        home: isLoggedIn ? MapHomePage() : WelcomePage(),
       ),
     );
   }
