@@ -40,7 +40,7 @@ class BicycleStationDetails extends StationDetails {
       totalSlots: data['plazasTotales'],
       availableSlots: data['anclajesDisponibles'],
       rating: 5, // TODO: obtenir valoració de la BD
-      distanceKm: data['distanceKm'] != null ? (data['distanceKm'] as num).toDouble() : null,
+      distanceKm: data['distanciaKm'] != null ? (data['distanciaKm'] as num).toDouble() : null,
       availableBikes: (data['bicisMecanicasDisponibles']) + (data['bicisElectricasDisponibles']),
       electricRechargeStation: data['estacionCargaElectrica'],
       canAnchorBikes: data['sePuedeAnclarBicis'],

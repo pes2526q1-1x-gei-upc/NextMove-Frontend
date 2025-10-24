@@ -67,7 +67,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: StationList(stationType: StationType.electricVehicle),
+        home: StationList(stationType: StationType.bicycle),
         //StationDetailsPage(stationID: "125", stationType: StationType.bicycle)/*isLoggedIn ? MapHomePage() : WelcomePage()*/,
       ),
     );

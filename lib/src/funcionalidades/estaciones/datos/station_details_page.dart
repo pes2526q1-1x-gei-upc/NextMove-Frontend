@@ -79,7 +79,7 @@ Future<List<BicycleStationDetails>?> DBgetAllNearbyBicycleStationDetails(double 
     throw Exception('Error en query: ${result.exception.toString()}');
   }
 
-  final data = result.data?['nearbyStations'];
+  final data = result.data?['getEstacionesDeBicingCercanas'];
   if (data != null) {
     return (data as List)
         .map((item) => BicycleStationDetails.fromJson(item))

@@ -68,12 +68,15 @@ class GraphQLQueries {
         id
         estado
         direccion
+        nombre
         plazasTotales
         plazasOcupadas
         sePuedenAlquilarBicis
         sePuedeAnclarBicis
         bicisMecanicasDisponibles
         bicisElectricasDisponibles
+        anclajesDisponibles
+        estacionCargaElectrica
         coordenadas {
           lat
           lon
