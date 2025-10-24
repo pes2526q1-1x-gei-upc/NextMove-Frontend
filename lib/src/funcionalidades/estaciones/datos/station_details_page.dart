@@ -98,10 +98,13 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
   }
 
   final data = result.data?['stations']['stations'];
-  
   if (data != null) {
     return (data as List)
-        .map((item) => EVStationDetails.fromJson(item))
+        .map((item) {
+          final station = EVStationDetails.fromJson(item);
+          print('Raw EV station item: $station');
+          return station;
+        })
         .toList();
   }
   

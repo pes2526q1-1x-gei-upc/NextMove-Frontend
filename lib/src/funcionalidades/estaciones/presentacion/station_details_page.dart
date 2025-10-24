@@ -47,11 +47,13 @@ extension BicycleStationStateLocalization on BicycleStationState {
 class StationDetailsPage extends StatefulWidget {
     final StationType stationType;
     final String stationID;
+    final StationDetails? stationDetails;
 
     const StationDetailsPage({
         super.key,
         required this.stationType,
         required this.stationID,
+        this.stationDetails,
     });
 
     @override
@@ -67,6 +69,11 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
     @override
     void initState() {
         super.initState();
+        if (widget.stationDetails != null) {
+            stationDetails = widget.stationDetails;
+            isLoading = false;
+            return;
+        }
         _loadStationDetails();
     }
 

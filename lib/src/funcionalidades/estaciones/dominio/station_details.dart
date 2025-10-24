@@ -8,6 +8,7 @@ enum StationType {
 }
 
 class StationDetails {
+    final String id;
     final String name;
     final String address;
     final int totalSlots;
@@ -15,6 +16,7 @@ class StationDetails {
     final int rating;
 
     StationDetails({
+    required this.id,
     required this.name,
     required this.address,
     required this.totalSlots,

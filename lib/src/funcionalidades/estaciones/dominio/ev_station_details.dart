@@ -24,6 +24,7 @@ class EVStationDetails extends StationDetails {
   final bool isSuperFast;
 
   EVStationDetails({
+    required super.id,
     required super.name,
     required super.address,
     required super.availableSlots,
@@ -51,7 +52,9 @@ class EVStationDetails extends StationDetails {
         ));
       }
     }
+    print('Parsing EV station: id=${data['id']}, name=${data['name']}');
     return EVStationDetails(
+      id: data['id'],
       name: data['name'] ?? '',
       address: data['address'] ?? '',
       availableSlots: connectors.where((c) => c.status == ConnectorStatus.available).length,

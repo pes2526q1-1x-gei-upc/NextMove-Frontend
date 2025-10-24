@@ -15,6 +15,7 @@ class BicycleStationDetails extends StationDetails {
   final int availableElectricBikes;
 
   BicycleStationDetails({
+    required super.id,
     required super.name,
     required super.address,
     required super.totalSlots,
@@ -30,7 +31,9 @@ class BicycleStationDetails extends StationDetails {
   });
 
   factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
+    print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
     return BicycleStationDetails(
+      id: data['id'],
       name: data['nombre'],
       address: data['direccion'],
       totalSlots: data['plazasTotales'],

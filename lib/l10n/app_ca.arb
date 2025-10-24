@@ -71,5 +71,6 @@
     "accessType": "Tipus d'accés",
     "error": "Error",
     "unknownPower": "Potència desconeguda",
-    "unknown": "Desconegut"
+    "unknown": "Desconegut",
+    "stations": "Estacions"
 }
