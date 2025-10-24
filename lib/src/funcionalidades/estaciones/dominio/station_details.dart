@@ -23,6 +23,23 @@ class StationDetails {
     });
 }
 
+Future<List<StationDetails>?> getAllStationDetails(StationType stationType) async {
+  switch (stationType) {
+    case StationType.bicycle:
+      return await getAllBicycleStationDetails();
+    case StationType.electricVehicle:
+      return await getAllEVStationDetails();
+  }
+}
+
+Future<List<BicycleStationDetails>?> getAllBicycleStationDetails() async {
+  return await DBgetAllBicycleStationDetails();
+}
+
+Future<List<EVStationDetails>?> getAllEVStationDetails() async {
+  return await DBgetAllEVStationDetails();
+}
+
 Future<StationDetails?> getStationDetails(StationType stationType, String stationID) async {
     switch (stationType) {
         case StationType.bicycle:

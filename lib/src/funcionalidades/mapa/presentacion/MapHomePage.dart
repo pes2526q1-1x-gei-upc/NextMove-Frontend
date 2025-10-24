@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/StationList.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
@@ -67,7 +68,7 @@ class _MapHomePageState extends State<MapHomePage> {
           iconSize: 48,
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => StationList()),
+              MaterialPageRoute(builder: (context) => StationList(stationType: StationType.bicycle)),
             );
           },
         ),

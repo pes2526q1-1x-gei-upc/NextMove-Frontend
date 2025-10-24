@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
 import 'firebase_options.dart';
@@ -66,7 +67,8 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: StationDetailsPage(stationID: "125", stationType: StationType.bicycle)/*isLoggedIn ? MapHomePage() : WelcomePage()*/,
+        home: StationList(stationType: StationType.bicycle),
+        //StationDetailsPage(stationID: "125", stationType: StationType.bicycle)/*isLoggedIn ? MapHomePage() : WelcomePage()*/,
       ),
     );
   }
