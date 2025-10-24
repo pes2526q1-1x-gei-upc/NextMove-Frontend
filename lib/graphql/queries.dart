@@ -52,4 +52,20 @@ class GraphQLQueries {
 
   ''';
 
+  static const String getBikeStationsQuery = r'''
+    query getBikeStations {
+      getEstacionesDeBicing {
+        
+          id
+          nombre
+          GPS {
+            latitud
+            longitud
+          }
+        
+        
+      }
+    }
+  ''';
+
 }
