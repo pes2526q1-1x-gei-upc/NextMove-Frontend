@@ -1,18 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 import 'l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
+
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  GraphQLConfig.initializeClient();
   runApp(NextMoveApp(key: appKey));
 }
 

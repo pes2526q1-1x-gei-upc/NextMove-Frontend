@@ -28,9 +28,9 @@ class GraphQLQueries {
             powerKw
             status
           }
-          isSuperfast
-          }
-          total
+          isSuperFast
+        }
+        total
       }
     }
 
