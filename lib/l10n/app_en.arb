@@ -71,5 +71,6 @@
     "accessType": "Access type",
     "error": "Error",
     "unknownPower": "Unknown power",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "stations": "Stations"
 }

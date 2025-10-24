@@ -191,4 +191,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unknown => 'Desconegut';
+
+  @override
+  String get stations => 'Estaciones';
 }

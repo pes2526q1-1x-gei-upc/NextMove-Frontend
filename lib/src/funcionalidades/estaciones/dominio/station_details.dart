@@ -8,6 +8,7 @@ enum StationType {
 }
 
 class StationDetails {
+    final String id;
     final String name;
     final String address;
     final int totalSlots;
@@ -15,12 +16,30 @@ class StationDetails {
     final int rating;
 
     StationDetails({
+    required this.id,
     required this.name,
     required this.address,
     required this.totalSlots,
     required this.availableSlots,
     required this.rating,
     });
+}
+
+Future<List<StationDetails>?> getAllStationDetails(StationType stationType) async {
+  switch (stationType) {
+    case StationType.bicycle:
+      return await getAllBicycleStationDetails();
+    case StationType.electricVehicle:
+      return await getAllEVStationDetails();
+  }
+}
+
+Future<List<BicycleStationDetails>?> getAllBicycleStationDetails() async {
+  return await DBgetAllBicycleStationDetails();
+}
+
+Future<List<EVStationDetails>?> getAllEVStationDetails() async {
+  return await DBgetAllEVStationDetails();
 }
 
 Future<StationDetails?> getStationDetails(StationType stationType, String stationID) async {

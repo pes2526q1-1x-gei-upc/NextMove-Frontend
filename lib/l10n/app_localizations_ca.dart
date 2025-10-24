@@ -191,4 +191,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get unknown => 'Desconegut';
+
+  @override
+  String get stations => 'Estacions';
 }
