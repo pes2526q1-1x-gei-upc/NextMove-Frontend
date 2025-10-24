@@ -52,8 +52,8 @@ Future<List<BicycleStationDetails>?> DBgetAllBicycleStationDetails() async {
     throw Exception('Error en query: ${result.exception.toString()}');
   }
 
-  final data = result.data?['getAllEstacionesDeBicing'];
-  print('getAllEstacionesDeBicing data: $data');
+  final data = result.data?['getEstacionesDeBicing'];
+  print('getEstacionesDeBicing data: $data');
 
   if (data != null) {
     return (data as List)
@@ -97,7 +97,7 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
     throw Exception('Error en query: ${result.exception.toString()}');
   }
 
-  final data = result.data?['getAllEVStations'];
+  final data = result.data?['stations']['stations'];
   
   if (data != null) {
     return (data as List)

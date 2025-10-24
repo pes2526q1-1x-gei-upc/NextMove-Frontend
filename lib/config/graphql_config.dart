@@ -18,7 +18,7 @@ class GraphQLConfig {
 
   static ValueNotifier<GraphQLClient> initializeClient() {
     final HttpLink httpLink = HttpLink(
-      dotenv.env['GRAPHQL_ENDPOINT'] ?? 'http://192.168.1.42:3000/graphql',
+      dotenv.env['GRAPHQL_ENDPOINT'] ?? 'http://192.168.1.136:3000/graphql',
     );
 
     final AuthLink authLink = AuthLink(
