@@ -2,7 +2,6 @@
 // Go to /api/gql/playground to test your queries before using them :)
 
 class GraphQLQueries {
-
   static const String getMeQuery = r'''
     query Me {
       me {
@@ -63,6 +62,29 @@ class GraphQLQueries {
       }
     }''';
 
+  static const String getAllNearbyBicycleStationsQuery = r'''
+  query getAllNearbyBicycleStations($latitude: Float!, $longitude: Float!) {
+    getEstacionesDeBicingCercanas(location: {lat: $latitude, lon: $longitude}) {
+        id
+        estado
+        direccion
+        nombre
+        plazasTotales
+        plazasOcupadas
+        sePuedenAlquilarBicis
+        sePuedeAnclarBicis
+        bicisMecanicasDisponibles
+        bicisElectricasDisponibles
+        anclajesDisponibles
+        estacionCargaElectrica
+        coordenadas {
+          lat
+          lon
+        }
+        distanciaKm
+      }
+    }''';
+
   static const String getEVStationDetailsQuery = r'''
     query getEVStationDetails($stationID: ID!) {
       station(id: $stationID) {
@@ -104,5 +126,25 @@ class GraphQLQueries {
         }
       }
     }''';
-}
 
+  static const String getAllNearbyEVStationsQuery = r'''
+  query getAllNearbyEVStations ($location: LocationInput!) {
+    nearbyStations(location: $location) {
+      id
+      name
+      address
+      city
+      coordinates {
+        longitude
+        latitude
+      }
+      distance
+      connectors {
+        type
+        powerKw
+        status
+      }
+      isSuperFast
+    }
+  }''';
+}

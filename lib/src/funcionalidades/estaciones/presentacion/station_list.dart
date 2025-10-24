@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
@@ -10,8 +12,8 @@ class StationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<List<StationDetails>?> allStationDetailsFuture = switch (stationType) {
-      StationType.bicycle => getAllBicycleStationDetails(),
-      StationType.electricVehicle => getAllEVStationDetails(),
+      StationType.bicycle => getAllNearbyBicycleStationDetails(41.3801751, 2.1399754),
+      StationType.electricVehicle => getAllNearbyEVStationDetails(41.3801751, 2.1399754),
     };
 
     return FutureBuilder<List<StationDetails>?>(
@@ -42,8 +44,8 @@ class StationList extends StatelessWidget {
               itemBuilder: (context, i) {
                 final stationDetails = allStationDetails[i];
                 return ListTile(
-                  title: Text(stationDetails.name),
-                  trailing: Text('2,3 km'),
+                  title: Text(stationDetails.address),
+                  trailing: Text('${stationDetails.distanceKm!.toStringAsFixed(2)} km'),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(

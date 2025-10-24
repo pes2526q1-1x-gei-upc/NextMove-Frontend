@@ -64,6 +64,31 @@ Future<List<BicycleStationDetails>?> DBgetAllBicycleStationDetails() async {
   return null;
 }
 
+Future<List<BicycleStationDetails>?> DBgetAllNearbyBicycleStationDetails(double latitude, double longitude) async {
+  final QueryOptions options = QueryOptions(
+    document: gql(GraphQLQueries.getAllNearbyBicycleStationsQuery),
+    variables: {
+      "latitude": latitude,
+      "longitude": longitude,
+    }
+  );
+
+  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllNearbyBicycleStationsQuery, options);
+
+  if (result.hasException) {
+    throw Exception('Error en query: ${result.exception.toString()}');
+  }
+
+  final data = result.data?['getEstacionesDeBicingCercanas'];
+  if (data != null) {
+    return (data as List)
+        .map((item) => BicycleStationDetails.fromJson(item))
+        .toList();
+  }
+  
+  return null;
+}
+
 Future<EVStationDetails?> DBgetEVStationDetails(String stationID) async {
   final QueryOptions options = QueryOptions(
     document: gql(GraphQLQueries.getEVStationDetailsQuery),
@@ -108,5 +133,36 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
         .toList();
   }
   
+  return null;
+}
+
+Future<List<EVStationDetails>?> DBgetAllNearbyEVStationDetails(double latitude, double longitude) async {
+  final QueryOptions options = QueryOptions(
+    document: gql(GraphQLQueries.getAllNearbyEVStationsQuery),
+    variables: {
+      "location": {
+        "coordinates": {
+          "latitude": latitude,
+          "longitude": longitude,
+        },
+        "radiusKm": 100
+      }
+    }
+  );
+
+  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllNearbyEVStationsQuery, options);
+
+  if (result.hasException) {
+    throw Exception('Error en query: ${result.exception.toString()}');
+  }
+    print('Raw GraphQL response: ${result.data}');
+
+  final data = result.data?['nearbyStations'];
+  if (data != null) {
+    return (data as List)
+        .map((item) => EVStationDetails.fromJson(item))
+        .toList();
+  }
+
   return null;
 }

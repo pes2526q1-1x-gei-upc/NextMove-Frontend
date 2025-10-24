@@ -30,6 +30,7 @@ class EVStationDetails extends StationDetails {
     required super.availableSlots,
     required super.totalSlots,
     required super.rating,
+    super.distanceKm,
     required this.isSuperFast,
     required this.connectors,
     required this.accessType,
@@ -60,6 +61,7 @@ class EVStationDetails extends StationDetails {
       availableSlots: connectors.where((c) => c.status == ConnectorStatus.available).length,
       totalSlots: connectors.length,
       rating: 5, //TODO: rating real des de la BD
+      distanceKm: data['distance'] != null ? (data['distance']).toDouble() : null,
       isSuperFast: data['isSuperFast'],
       connectors: connectors,
       accessType: data['accessType'] ?? '',

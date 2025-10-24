@@ -14,6 +14,7 @@ class StationDetails {
     final int totalSlots;
     final int availableSlots;
     final int rating;
+    final double? distanceKm;
 
     StationDetails({
     required this.id,
@@ -22,6 +23,7 @@ class StationDetails {
     required this.totalSlots,
     required this.availableSlots,
     required this.rating,
+    this.distanceKm,
     });
 }
 
@@ -55,6 +57,14 @@ Future<BicycleStationDetails?> getBicycleStationDetails(String stationID) async 
     return await DBgetBicycleStationDetails(stationID);
 }
 
+Future<List<StationDetails>?> getAllNearbyBicycleStationDetails(double latitude, double longitude) async {
+    return await DBgetAllNearbyBicycleStationDetails(latitude, longitude);
+}
+
 Future<EVStationDetails?> getEVStationDetails(String stationID) async {
     return await DBgetEVStationDetails(stationID);
+}
+
+Future<List<EVStationDetails>?> getAllNearbyEVStationDetails(double latitude, double longitude) async {
+    return await DBgetAllNearbyEVStationDetails(latitude, longitude);
 }
