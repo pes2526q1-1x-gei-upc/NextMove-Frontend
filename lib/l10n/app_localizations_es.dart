@@ -82,6 +82,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unknownError => 'Error desconocido';
 
   @override
+  String get searchStation => 'Busca una estación...';
   String get address => 'Dirección';
 
   @override

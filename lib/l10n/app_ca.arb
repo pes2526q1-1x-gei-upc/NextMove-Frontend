@@ -35,6 +35,7 @@
         }
     },
     "unknownError": "Error desconegut",
+    "searchStation": "Cerca una estació..."
     "address": "Adreça",
     "totalAnchors": "Total d'ancoratges",
     "totalChargers": "Total de carregadors",

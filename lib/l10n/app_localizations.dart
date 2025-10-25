@@ -220,6 +220,11 @@ abstract class AppLocalizations {
   /// **'Unknown error'**
   String get unknownError;
 
+  /// No description provided for @searchStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a station...'**
+  String get searchStation;
   /// No description provided for @address.
   ///
   /// In en, this message translates to:
