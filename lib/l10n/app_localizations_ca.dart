@@ -80,4 +80,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get unknownError => 'Error desconegut';
+
+  @override
+  String get searchStation => 'Cerca una estació...';
 }

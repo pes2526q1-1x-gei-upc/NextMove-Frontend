@@ -19,6 +19,7 @@ class GraphQLQueries {
           id
           name
           city
+          address
           coordinates{
             latitude
             longitude
@@ -67,5 +68,16 @@ class GraphQLQueries {
       }
     }
   ''';
-
+  static const String getBikeStationsQuery = r'''
+    query getBikeStations {
+      getEstacionesDeBicing {
+        id
+        nombre
+        coordenadas {
+          lat
+          lon
+        }
+      }
+    }
+  ''';
 }
