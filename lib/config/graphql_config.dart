@@ -11,14 +11,13 @@ class GraphQLConfig {
   // static String get baseUrl => dotenv.env['API_BASE_URL']!;
   static String get baseUrl {
     final url =
-        dotenv.env['API_BASE_URL'] ?? 'http://192.168.1.136:3000/graphql';
-    print('GraphQL URL: $url'); // Log para debug
+        dotenv.env['API_BASE_URL']! ;
     return url;
   }
 
   static ValueNotifier<GraphQLClient> initializeClient() {
     final HttpLink httpLink = HttpLink(
-      dotenv.env['GRAPHQL_ENDPOINT'] ?? 'http://192.168.1.136:3000/graphql',
+      dotenv.env['GRAPHQL_ENDPOINT'] !,
     );
 
     final AuthLink authLink = AuthLink(
