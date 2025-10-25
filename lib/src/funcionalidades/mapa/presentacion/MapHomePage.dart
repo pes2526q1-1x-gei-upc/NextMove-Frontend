@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/StationList.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';

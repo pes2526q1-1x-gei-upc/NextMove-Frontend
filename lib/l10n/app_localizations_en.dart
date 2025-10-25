@@ -81,6 +81,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchStation => 'Search for a station...';
+
+  @override
   String get address => 'Address';
 
   @override

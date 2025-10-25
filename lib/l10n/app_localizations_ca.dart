@@ -83,6 +83,8 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get searchStation => 'Cerca una estació...';
+
+  @override
   String get address => 'Adreça';
 
   @override

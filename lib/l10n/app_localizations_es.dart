@@ -83,6 +83,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchStation => 'Busca una estación...';
+
+  @override
   String get address => 'Dirección';
 
   @override

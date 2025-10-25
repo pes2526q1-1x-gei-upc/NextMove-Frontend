@@ -225,6 +225,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search for a station...'**
   String get searchStation;
+
   /// No description provided for @address.
   ///
   /// In en, this message translates to:

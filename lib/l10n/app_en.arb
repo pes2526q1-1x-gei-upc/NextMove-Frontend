@@ -35,7 +35,7 @@
         }
     },
     "unknownError": "Unknown error",
-    "searchStation": "Search for a station..."
+    "searchStation": "Search for a station...",
     "address": "Address",
     "totalAnchors": "Total anchors",
     "totalChargers": "Total chargers",
