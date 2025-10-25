@@ -9,7 +9,7 @@ class GraphQLQueries {
         nombre
         email
       }
-    }
+    }l
   ''';
 
     static const String getAllStationsQuery = r'''
