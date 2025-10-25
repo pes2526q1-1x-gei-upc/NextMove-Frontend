@@ -2,6 +2,17 @@
 // Go to /api/gql/playground to test your queries before using them :)
 
 class GraphQLQueries {
+  static const String getMeQuery = r'''
+    query Me {
+      me {
+        id
+        nombre
+        email
+        createdAt
+      }
+    }
+  ''';
+
   static const String getUserQuery = r'''
     query getUser($id: ID!) {
       User(id: $id) {
@@ -9,61 +20,131 @@ class GraphQLQueries {
         nombre
         email
       }
-    }l
-  ''';
-
-    static const String getAllStationsQuery = r'''
-    query getAllStations {
-      stations {
-        stations{
-          id
-          name
-          city
-          address
-          coordinates{
-            latitude
-            longitude
-          }
-          connectors{
-            type
-            powerKw
-            status
-          }
-          isSuperFast
-        }
-        total
-      }
     }
-
   ''';
-
-  static const String getAllStationsCoordinatesQuery = r'''
-    query getAllStationsCoordinates {
-      stations {
-        stations{
-          id
-          name
-          coordinates{
-            latitude
-            longitude
-          }
-        }
+  static const String getBicycleStationDetailsQuery = r'''
+    query getBicingStationDetails($stationID: ID!) {
+      getEstacionDeBicing(id: $stationID) {
+        nombre,
+        direccion,
+        plazasTotales,
+        estacionCargaElectrica,
+        sePuedenAlquilarBicis,
+        sePuedeAnclarBicis,
+        plazasOcupadas,
+        anclajesDisponibles,
+        estado,
+        bicisMecanicasDisponibles,
+        bicisElectricasDisponibles
       }
-    }
+   }
+  '''; //TODO: afegir altres camps
 
-  ''';
-
-  
-  static const String getBikeStationsQuery = r'''
-    query getBikeStations {
+  static const String getAllBicycleStationsQuery = r'''
+    query getAllBicingStations {
       getEstacionesDeBicing {
+        id,
+        nombre,
+        direccion,
+        coordenadas {
+          lat,
+          lon
+        },
+        plazasTotales,
+        estacionCargaElectrica,
+        sePuedenAlquilarBicis,
+        sePuedeAnclarBicis,
+        plazasOcupadas,
+        anclajesDisponibles,
+        estado,
+        bicisMecanicasDisponibles,
+        bicisElectricasDisponibles
+      }
+    }''';
+
+  static const String getAllNearbyBicycleStationsQuery = r'''
+  query getAllNearbyBicycleStations($latitude: Float!, $longitude: Float!) {
+    getEstacionesDeBicingCercanas(location: {lat: $latitude, lon: $longitude}) {
         id
+        estado
+        direccion
         nombre
+        plazasTotales
+        plazasOcupadas
+        sePuedenAlquilarBicis
+        sePuedeAnclarBicis
+        bicisMecanicasDisponibles
+        bicisElectricasDisponibles
+        anclajesDisponibles
+        estacionCargaElectrica
         coordenadas {
           lat
           lon
         }
+        distanciaKm
+      }
+    }''';
+
+  static const String getEVStationDetailsQuery = r'''
+    query getEVStationDetails($stationID: ID!) {
+      station(id: $stationID) {
+        name
+        address
+        connectors {
+          type
+          powerKw
+          status
+        }
+        accessType
+        isSuperFast
       }
     }
   ''';
+
+  static const String getAllEVStationsQuery = r'''
+    query getEVStations {
+      stations {
+        stations {
+          id
+          name
+          address
+          city
+          coordinates {
+            latitude
+            longitude
+          }
+          connectors {
+            type
+            powerKw
+            status
+            statusCode
+          }
+          accessType
+          isSuperFast
+          lastUpdated
+          distance
+        }
+      }
+    }''';
+
+  static const String getAllNearbyEVStationsQuery = r'''
+  query getAllNearbyEVStations ($location: LocationInput!) {
+    nearbyStations(location: $location) {
+      id
+      name
+      address
+      city
+      coordinates {
+        longitude
+        latitude
+      }
+      distance
+      connectors {
+        type
+        powerKw
+        status
+      }
+      isSuperFast
+    }
+  }''';
 }

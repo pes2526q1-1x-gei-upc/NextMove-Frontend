@@ -14,11 +14,9 @@ class MapHomePage extends StatefulWidget {
 
 class _MapHomePageState extends State<MapHomePage> {
   late GoogleMapController mapController;
-  List<StationModel>? stations = [];
-  List<StationModel>? bikeStations = [];
-  //new target catalunya center
+  List<StationDetails>? stations = [];
+  List<StationDetails>? bikeStations = [];
   final LatLng _catCenter = const LatLng(41.8205, 1.8677);
-  //final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   
   // Estado para el modo (bicicleta o coche)
@@ -28,15 +26,14 @@ class _MapHomePageState extends State<MapHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadStations(getAllStations, (data) => stations = data,);
-    _loadStations(getAllBikeStations, (data) => bikeStations = data,);
+    _loadStations(getAllEVStationDetails, (data) => stations = data,);
+    _loadStations(getAllBicycleStationDetails, (data) => bikeStations = data,);
     //_loadBikeStations(getAllBikeStations, (data) => bikeStations = data);
   }
 
-  Future<void> _loadStations(Future<List<StationModel>?> Function() getStatsFunc, void Function(List<StationModel>) onSuccess,) async {
+  Future<void> _loadStations(Future<List<StationDetails>?> Function() getStatsFunc, void Function(List<StationDetails>) onSuccess,) async {
     try {
       final stationsToLoad = await getStatsFunc();
-      final stationsToLoad = await getAllStations();
       setState(() {
         onSuccess(stationsToLoad!);
       });
@@ -79,6 +76,7 @@ class _MapHomePageState extends State<MapHomePage> {
       _currentMode = mode;
     });
     // LOGICA DE RECARGAR ESTACIONES SEGUN MODO
+
   }
 
   // Iconos bici y coches
@@ -101,22 +99,6 @@ class _MapHomePageState extends State<MapHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mapa de Estaciones'),
-        backgroundColor: Colors.green[700],
-      ),
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _catCenter,
-          zoom: 7.5,
-        ),
-        markers: _buildMarkers(),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        liteModeEnabled: false, 
-        mapType: MapType.normal,  
-      // Sin AppBar, todo en body
       body: Stack(
         children: [
           GoogleMap(
@@ -266,17 +248,17 @@ class _MapHomePageState extends State<MapHomePage> {
   Set<Marker> _buildMarkers() {
     Set<Marker> markers = {};
     //print del primer elemento de la estacion
-    for(int i = 0; i < stations!.length; i++) {
-    if (stations == null || stations!.isEmpty) {
-      print("null stations");
-      return {};
+    final customIcon = _getCustomMarkerIcon();
+    List<StationDetails>? stationsToMark = []; 
+    if(_currentMode == 'bicicleta') {
+       stationsToMark = bikeStations;
+    } else {
+      stationsToMark = stations;
     }
 
-    Set<Marker> markers = {};
-    final customIcon = _getCustomMarkerIcon(); 
 
-    for (int i = 0; i < stations!.length; i++) {
-      final station = stations![i];
+    for (int i = 0; i < stationsToMark!.length; i++) {
+      final station = stationsToMark![i];
       markers.add(
         Marker(
           markerId: MarkerId(station.id),
@@ -322,20 +304,6 @@ class _MapHomePageState extends State<MapHomePage> {
               ),
             );
           },
-        ),
-      );
-    }
-
-    for(int j = 0; j < bikeStations!.length; j++) {
-      final bikeStation = bikeStations![j];
-      markers.add(
-        Marker(
-          markerId: MarkerId(bikeStation.id),
-          position: LatLng(bikeStation.latitude, bikeStation.longitude),
-          infoWindow: InfoWindow(
-            title: bikeStation.name,
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         ),
       );
     }
