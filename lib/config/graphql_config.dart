@@ -2,26 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'package:flutter/foundation.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class GraphQLConfig {
   // static String get baseUrl => dotenv.env['API_BASE_URL']!;
   static String get baseUrl {
     final url =
-        dotenv.env['API_BASE_URL'] ?? 'http://192.168.0.21:3000/graphql';
+        dotenv.env['API_BASE_URL'] ?? 'http://192.168.1.136:3000/graphql';
     print('GraphQL URL: $url'); // Log para debug
     return url;
   }
 
-  static late HttpLink httpLink; 
-
-  static GraphQLClient getClient() {
-    return GraphQLClient(
-      link: httpLink,
-      cache: GraphQLCache(store: InMemoryStore()),
-    ); // defino cliente GraphQL para usarlo donde sea
-  }
-
   static ValueNotifier<GraphQLClient> initializeClient() {
-    httpLink = HttpLink(baseUrl);
-    return ValueNotifier(getClient());
+    final HttpLink httpLink = HttpLink(
+      dotenv.env['GRAPHQL_ENDPOINT'] ?? 'http://192.168.1.136:3000/graphql',
+    );
+
+    final AuthLink authLink = AuthLink(
+      getToken: () async {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          final token = await user.getIdToken();
+          return 'Bearer $token';
+        }
+        return null;
+      },
+    );
+
+    final Link link = authLink.concat(httpLink);
+
+    return ValueNotifier(
+      GraphQLClient(
+        cache: GraphQLCache(store: InMemoryStore()),
+        link: link,
+      ),
+    );
   }
 }

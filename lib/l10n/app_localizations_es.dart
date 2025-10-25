@@ -83,4 +83,116 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchStation => 'Busca una estación...';
+  String get address => 'Dirección';
+
+  @override
+  String get totalAnchors => 'Total de anclajes';
+
+  @override
+  String get totalChargers => 'Total de cargadores';
+
+  @override
+  String get availableAnchors => 'Anclajes disponibles';
+
+  @override
+  String get availableChargers => 'Cargadores disponibles';
+
+  @override
+  String get rating => 'Valoración';
+
+  @override
+  String get power => 'Potencia';
+
+  @override
+  String get powerType => 'Tipo de corriente';
+
+  @override
+  String get ac => 'CA';
+
+  @override
+  String get dc => 'CC';
+
+  @override
+  String get speedType => 'Tipo de velocidad';
+
+  @override
+  String get superFast => 'Súper rápido';
+
+  @override
+  String get fast => 'Rápido';
+
+  @override
+  String get semiFast => 'Semi-rápido';
+
+  @override
+  String get connectionType => 'Tipo de conexión';
+
+  @override
+  String get chargerType => 'Tipo de cargador';
+
+  @override
+  String get css2 => 'CSS2';
+
+  @override
+  String get chademo => 'CHAdeMO';
+
+  @override
+  String get mennekes => 'Mennekes';
+
+  @override
+  String get shucko => 'Shucko';
+
+  @override
+  String get availableBikes => 'Bicicletas disponibles';
+
+  @override
+  String get electricRecharge => 'Recarga eléctrica';
+
+  @override
+  String get canAnchorBikes => 'Puede anclar bicicletas';
+
+  @override
+  String get canRentBikes => 'Puede alquilar bicicletas';
+
+  @override
+  String get state => 'Estado';
+
+  @override
+  String get availableMechanicalBikes => 'Bicicletas mecánicas disponibles';
+
+  @override
+  String get availableElectricBikes => 'Bicicletas eléctricas disponibles';
+
+  @override
+  String get operational => 'En funcionamiento';
+
+  @override
+  String get closed => 'Cerrado';
+
+  @override
+  String get available => 'Disponible';
+
+  @override
+  String get occupied => 'Ocupado';
+
+  @override
+  String get unavailable => 'No disponible';
+
+  @override
+  String get connectors => 'Conectores';
+
+  @override
+  String get accessType => 'Tipo de acceso';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
+  String get unknown => 'Desconegut';
+
+  @override
+  String get stations => 'Estaciones';
 }
