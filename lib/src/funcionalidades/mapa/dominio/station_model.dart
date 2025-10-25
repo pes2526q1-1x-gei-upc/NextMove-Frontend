@@ -22,6 +22,15 @@ class StationModel {
     );
   }
 
+  factory StationModel.fromJsonBicing(Map<String, dynamic> json) {
+    return StationModel(
+      id: json['id'] as String,
+      name: json['nombre'] as String,
+      latitude: (json['coordenadas']['lat'] as num).toDouble(),
+      longitude: (json['coordenadas']['lon'] as num).toDouble(),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -38,3 +47,7 @@ class StationModel {
 Future<List<StationModel>?> getAllStations() async {
     return await DBgetAllStations();
 }
+
+Future<List<StationModel>?> getAllBikeStations() async {
+    return await DBgetAllBikeStations();
+  }

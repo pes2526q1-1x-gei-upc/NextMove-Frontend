@@ -12,25 +12,31 @@ class MapHomePage extends StatefulWidget {
 class _MapHomePageState extends State<MapHomePage> {
   late GoogleMapController mapController;
   List<StationModel>? stations = [];
-  final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
+  List<StationModel>? bikeStations = [];
+  //new target catalunya center
+  final LatLng _catCenter = const LatLng(41.8205, 1.8677);
+  //final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
 
   @override
   void initState() {
     super.initState();
-    _loadStations();
+    _loadStations(getAllStations, (data) => stations = data,);
+    _loadStations(getAllBikeStations, (data) => bikeStations = data,);
+    //_loadBikeStations(getAllBikeStations, (data) => bikeStations = data);
   }
 
-  Future<void> _loadStations() async {
+  Future<void> _loadStations(Future<List<StationModel>?> Function() getStatsFunc, void Function(List<StationModel>) onSuccess,) async {
     try {
-      
-      final stationsToLoad = await getAllStations();
+      final stationsToLoad = await getStatsFunc();
       setState(() {
-        stations = stationsToLoad;
+        onSuccess(stationsToLoad!);
       });
     } catch (e) {
       throw Exception('Error loading stations: $e');
     }
   }
+
+ 
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -69,8 +75,8 @@ class _MapHomePageState extends State<MapHomePage> {
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
-          target: _bcnCenter,
-          zoom: 12,
+          target: _catCenter,
+          zoom: 7.5,
         ),
         markers: _buildMarkers(),
         myLocationEnabled: true,
@@ -82,13 +88,7 @@ class _MapHomePageState extends State<MapHomePage> {
   }
 
   Set<Marker> _buildMarkers() {
-    if(stations!.isEmpty) {
-      print("null stations");
-      return {};
-    }
-
     Set<Marker> markers = {};
-    final firstStation = stations?[0];
     //print del primer elemento de la estacion
     for(int i = 0; i < stations!.length; i++) {
       final station = stations![i];
@@ -99,6 +99,20 @@ class _MapHomePageState extends State<MapHomePage> {
           infoWindow: InfoWindow(
             title: station.name,
           ),
+        ),
+      );
+    }
+
+    for(int j = 0; j < bikeStations!.length; j++) {
+      final bikeStation = bikeStations![j];
+      markers.add(
+        Marker(
+          markerId: MarkerId(bikeStation.id),
+          position: LatLng(bikeStation.latitude, bikeStation.longitude),
+          infoWindow: InfoWindow(
+            title: bikeStation.name,
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         ),
       );
     }

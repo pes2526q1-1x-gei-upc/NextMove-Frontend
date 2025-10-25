@@ -44,3 +44,20 @@ Future<List<StationModel>> DBgetAllStations() async {
     return stations;
     */
   }
+
+Future<List<StationModel>> DBgetAllBikeStations() async {
+    final QueryOptions options = QueryOptions(
+      
+      document: gql(GraphQLQueries.getBikeStationsQuery),
+    );
+    final QueryResult result;
+  
+     result = await getGraphQLQuery( options);
+  
+    if (result.hasException) {
+      throw Exception('Failed to load bike stations: ${result.exception.toString()}');
+    }
+
+    final stationsData = result.data?['getEstacionesDeBicing']as List<dynamic>; 
+    return stationsData.map((json) => StationModel.fromJsonBicing(json as Map<String, dynamic>)).toList(); 
+  }
