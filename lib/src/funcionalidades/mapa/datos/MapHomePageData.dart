@@ -1,4 +1,4 @@
-//import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
+//import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';  // Comentado, no lo necesitas
 
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -7,32 +7,34 @@ import 'package:nextmove_app/src/funcionalidades/mapa/dominio/station_model.dart
 import 'dart:async';
 
 Future<QueryResult> getGraphQLQuery(QueryOptions options) async {
-  GraphQLClient client = GraphQLConfig.getClient();
-  final QueryResult result;
+  GraphQLClient client = GraphQLConfig.getClient();  // Mueve aquí si no está
   
-     result = await client.query(options).timeout(
+  try {
+    final result = await client.query(options).timeout(
       Duration(seconds: 10),
       onTimeout: () {
         throw TimeoutException('GraphQL query timeout after 10 seconds');
       },
-    ); 
-
-  return result;
-
+    );
+    return result;
+  } catch (e) {
+    rethrow;
+  }
 }
 
 Future<List<StationModel>> DBgetAllStations() async {
-    final QueryOptions options = QueryOptions(
-      
-      document: gql(GraphQLQueries.getAllStationsQuery),
-    );
-    final QueryResult result;
+
+  final QueryOptions options = QueryOptions(
+    document: gql(GraphQLQueries.getAllStationsQuery),
+  );
+
+
+  final QueryResult result = await getGraphQLQuery(options);
+
   
-     result = await getGraphQLQuery( options);
-  
-    if (result.hasException) {
-      throw Exception('Failed to load stations: ${result.exception.toString()}');
-    }
+  if (result.hasException) {
+    throw Exception('Failed to load stations: ${result.exception.toString()}');
+  }
 
     final stationsData = result.data?['stations']['stations'] as List<dynamic>; 
     return stationsData.map((json) => StationModel.fromJson(json as Map<String, dynamic>)).toList(); //Esto es poco entendible, mejor lo puedo pasar a un bucle normal
@@ -43,4 +45,21 @@ Future<List<StationModel>> DBgetAllStations() async {
     } 
     return stations;
     */
+  }
+
+Future<List<StationModel>> DBgetAllBikeStations() async {
+    final QueryOptions options = QueryOptions(
+      
+      document: gql(GraphQLQueries.getBikeStationsQuery),
+    );
+    final QueryResult result;
+  
+     result = await getGraphQLQuery( options);
+  
+    if (result.hasException) {
+      throw Exception('Failed to load bike stations: ${result.exception.toString()}');
+    }
+
+    final stationsData = result.data?['getEstacionesDeBicing']as List<dynamic>; 
+    return stationsData.map((json) => StationModel.fromJsonBicing(json as Map<String, dynamic>)).toList(); 
   }

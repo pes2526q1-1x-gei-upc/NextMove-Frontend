@@ -15,6 +15,10 @@ class MapHomePage extends StatefulWidget {
 class _MapHomePageState extends State<MapHomePage> {
   late GoogleMapController mapController;
   List<StationModel>? stations = [];
+  List<StationModel>? bikeStations = [];
+  //new target catalunya center
+  final LatLng _catCenter = const LatLng(41.8205, 1.8677);
+  //final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   
   // Estado para el modo (bicicleta o coche)
@@ -24,19 +28,24 @@ class _MapHomePageState extends State<MapHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadStations();
+    _loadStations(getAllStations, (data) => stations = data,);
+    _loadStations(getAllBikeStations, (data) => bikeStations = data,);
+    //_loadBikeStations(getAllBikeStations, (data) => bikeStations = data);
   }
 
-  Future<void> _loadStations() async {
+  Future<void> _loadStations(Future<List<StationModel>?> Function() getStatsFunc, void Function(List<StationModel>) onSuccess,) async {
     try {
+      final stationsToLoad = await getStatsFunc();
       final stationsToLoad = await getAllStations();
       setState(() {
-        stations = stationsToLoad;
+        onSuccess(stationsToLoad!);
       });
     } catch (e) {
       throw Exception('Error loading stations: $e');
     }
   }
+
+ 
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
@@ -92,6 +101,21 @@ class _MapHomePageState extends State<MapHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Mapa de Estaciones'),
+        backgroundColor: Colors.green[700],
+      ),
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: _catCenter,
+          zoom: 7.5,
+        ),
+        markers: _buildMarkers(),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        liteModeEnabled: false, 
+        mapType: MapType.normal,  
       // Sin AppBar, todo en body
       body: Stack(
         children: [
@@ -240,6 +264,9 @@ class _MapHomePageState extends State<MapHomePage> {
   }
 
   Set<Marker> _buildMarkers() {
+    Set<Marker> markers = {};
+    //print del primer elemento de la estacion
+    for(int i = 0; i < stations!.length; i++) {
     if (stations == null || stations!.isEmpty) {
       print("null stations");
       return {};
@@ -298,6 +325,21 @@ class _MapHomePageState extends State<MapHomePage> {
         ),
       );
     }
+
+    for(int j = 0; j < bikeStations!.length; j++) {
+      final bikeStation = bikeStations![j];
+      markers.add(
+        Marker(
+          markerId: MarkerId(bikeStation.id),
+          position: LatLng(bikeStation.latitude, bikeStation.longitude),
+          infoWindow: InfoWindow(
+            title: bikeStation.name,
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        ),
+      );
+    }
+
     return markers;
   }
 }
