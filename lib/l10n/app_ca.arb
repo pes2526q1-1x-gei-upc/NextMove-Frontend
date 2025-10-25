@@ -34,5 +34,6 @@
             }
         }
     },
-    "unknownError": "Error desconegut"
+    "unknownError": "Error desconegut",
+    "searchStation": "Cerca una estació..."
 }
