@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -63,8 +64,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
-        home: MapHomePage(),
-        //StationDetailsPage(stationID: "125", stationType: StationType.bicycle)/*isLoggedIn ? MapHomePage() : WelcomePage()*/,
+        home: isLoggedIn ? MapHomePage() : WelcomePage(),
       ),
     );
   }
