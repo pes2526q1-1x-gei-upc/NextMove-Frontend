@@ -70,14 +70,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
               AppLocalizations.of(context)!.whatIsYourEmailAddress,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            
-            // Button to test GraphQL query
-            ElevatedButton(
-              onPressed: _testQuery,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              child: Text('Probar Query GraphQL'),
-            ),
-
             const SizedBox(height: 32),
             TextField(
               controller: _emailController,
