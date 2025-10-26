@@ -208,6 +208,162 @@ abstract class AppLocalizations {
   /// **'The password is incorrect.'**
   String get wrongPassword;
 
+  /// No description provided for @userDataPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish your profile'**
+  String get userDataPreferences;
+
+  /// No description provided for @nickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get nickname;
+
+  /// No description provided for @nicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your nickname'**
+  String get nicknameHint;
+
+  /// No description provided for @birthdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthdate'**
+  String get birthdate;
+
+  /// No description provided for @bithdateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ex: 1990-01-01'**
+  String get bithdateHint;
+
+  /// No description provided for @mandatoryBirthDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthdate is mandatory'**
+  String get mandatoryBirthDate;
+
+  /// No description provided for @invalidBirthDateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date format. Use YYYY-MM-DD'**
+  String get invalidBirthDateFormat;
+
+  /// No description provided for @telephoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Telephone number'**
+  String get telephoneNumber;
+
+  /// No description provided for @preferredLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred language'**
+  String get preferredLanguage;
+
+  /// No description provided for @userDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get userDescription;
+
+  /// No description provided for @userDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a brief description about yourself'**
+  String get userDescriptionHint;
+
+  /// No description provided for @preferredMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred mode'**
+  String get preferredMode;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @imagePickerError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while selecting the image.'**
+  String get imagePickerError;
+
+  /// No description provided for @saveChangesFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved successfully.'**
+  String get saveChangesFeedback;
+
+  /// No description provided for @formError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please correct the errors before saving.'**
+  String get formError;
+
+  /// No description provided for @mandatoryNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname is mandatory'**
+  String get mandatoryNickname;
+
+  /// No description provided for @mandatoryPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Telephone number is mandatory'**
+  String get mandatoryPhoneNumber;
+
+  /// No description provided for @invalidPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid telephone number format'**
+  String get invalidPhoneNumber;
+
+  /// No description provided for @mandatoryPreferredMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred mode is mandatory'**
+  String get mandatoryPreferredMode;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// No description provided for @nicknameNonEditable.
+  ///
+  /// In en, this message translates to:
+  /// **'Nickname'**
+  String get nicknameNonEditable;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullName;
+
+  /// No description provided for @mandatoryFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is mandatory'**
+  String get mandatoryFullName;
+
   /// No description provided for @errorOccurred.
   ///
   /// In en, this message translates to:

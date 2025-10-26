@@ -72,6 +72,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wrongPassword => 'The password is incorrect.';
 
   @override
+  String get userDataPreferences => 'Finish your profile';
+
+  @override
+  String get nickname => 'Nickname';
+
+  @override
+  String get nicknameHint => 'Enter your nickname';
+
+  @override
+  String get birthdate => 'Birthdate';
+
+  @override
+  String get bithdateHint => 'Ex: 1990-01-01';
+
+  @override
+  String get mandatoryBirthDate => 'Birthdate is mandatory';
+
+  @override
+  String get invalidBirthDateFormat => 'Invalid date format. Use YYYY-MM-DD';
+
+  @override
+  String get telephoneNumber => 'Telephone number';
+
+  @override
+  String get preferredLanguage => 'Preferred language';
+
+  @override
+  String get userDescription => 'Description';
+
+  @override
+  String get userDescriptionHint => 'Enter a brief description about yourself';
+
+  @override
+  String get preferredMode => 'Preferred mode';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get imagePickerError => 'An error occurred while selecting the image.';
+
+  @override
+  String get saveChangesFeedback => 'Changes saved successfully.';
+
+  @override
+  String get formError => 'Please correct the errors before saving.';
+
+  @override
+  String get mandatoryNickname => 'Nickname is mandatory';
+
+  @override
+  String get mandatoryPhoneNumber => 'Telephone number is mandatory';
+
+  @override
+  String get invalidPhoneNumber => 'Invalid telephone number format';
+
+  @override
+  String get mandatoryPreferredMode => 'Preferred mode is mandatory';
+
+  @override
+  String get editProfile => 'Edit profile';
+
+  @override
+  String get nicknameNonEditable => 'Nickname';
+
+  @override
+  String get fullName => 'Full name';
+
+  @override
+  String get mandatoryFullName => 'Full name is mandatory';
+
+  @override
   String errorOccurred(String error) {
     return 'An error has occurred: $error';
   }

@@ -74,6 +74,86 @@ class AppLocalizationsEs extends AppLocalizations {
   String get wrongPassword => 'La contraseña es incorrecta.';
 
   @override
+  String get userDataPreferences => 'Acaba de completar tu perfil';
+
+  @override
+  String get nickname => 'Apodo';
+
+  @override
+  String get nicknameHint => 'Introduce tu apodo';
+
+  @override
+  String get birthdate => 'Fecha de nacimiento';
+
+  @override
+  String get bithdateHint => 'Ej: 1990-01-01';
+
+  @override
+  String get mandatoryBirthDate => 'La fecha de nacimiento es obligatoria';
+
+  @override
+  String get invalidBirthDateFormat =>
+      'Formato de fecha inválido. Usa YYYY-MM-DD';
+
+  @override
+  String get telephoneNumber => 'Número de teléfono';
+
+  @override
+  String get preferredLanguage => 'Idioma preferido';
+
+  @override
+  String get userDescription => 'Descripción';
+
+  @override
+  String get userDescriptionHint => 'Introduce una breve descripción sobre ti';
+
+  @override
+  String get preferredMode => 'Modo preferido';
+
+  @override
+  String get saveChanges => 'Guardar cambios';
+
+  @override
+  String get camera => 'Cámara';
+
+  @override
+  String get gallery => 'Galería';
+
+  @override
+  String get imagePickerError =>
+      'Se produjo un error al seleccionar la imagen.';
+
+  @override
+  String get saveChangesFeedback => 'Cambios guardados con éxito.';
+
+  @override
+  String get formError => 'Por favor, corrige los errores antes de guardar.';
+
+  @override
+  String get mandatoryNickname => 'El apodo es obligatorio';
+
+  @override
+  String get mandatoryPhoneNumber => 'El número de teléfono es obligatorio';
+
+  @override
+  String get invalidPhoneNumber => 'Formato de número de teléfono inválido';
+
+  @override
+  String get mandatoryPreferredMode => 'El modo preferido es obligatorio';
+
+  @override
+  String get editProfile => 'Editar perfil';
+
+  @override
+  String get nicknameNonEditable => 'Apodo';
+
+  @override
+  String get fullName => 'Nombre completo';
+
+  @override
+  String get mandatoryFullName => 'El nombre completo es obligatorio';
+
+  @override
   String errorOccurred(String error) {
     return 'Ha ocurrido un error: $error';
   }

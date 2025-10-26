@@ -74,6 +74,86 @@ class AppLocalizationsCa extends AppLocalizations {
   String get wrongPassword => 'La contrasenya és incorrecta.';
 
   @override
+  String get userDataPreferences => 'Acaba de completar el teu perfil';
+
+  @override
+  String get nickname => 'Sobrenom';
+
+  @override
+  String get nicknameHint => 'Introdueix el teu sobrenom';
+
+  @override
+  String get birthdate => 'Data de naixement';
+
+  @override
+  String get bithdateHint => 'Ex: 1990-01-01';
+
+  @override
+  String get mandatoryBirthDate => 'La data de naixement és obligatòria';
+
+  @override
+  String get invalidBirthDateFormat =>
+      'Format de data invàlid. Utilitza YYYY-MM-DD';
+
+  @override
+  String get telephoneNumber => 'Número de telèfon';
+
+  @override
+  String get preferredLanguage => 'Idioma preferit';
+
+  @override
+  String get userDescription => 'Descripció';
+
+  @override
+  String get userDescriptionHint => 'Introdueix una breu descripció sobre tu';
+
+  @override
+  String get preferredMode => 'Mode preferit';
+
+  @override
+  String get saveChanges => 'Desa els canvis';
+
+  @override
+  String get camera => 'Càmera';
+
+  @override
+  String get gallery => 'Galeria';
+
+  @override
+  String get imagePickerError =>
+      'S\'ha produït un error en seleccionar la imatge.';
+
+  @override
+  String get saveChangesFeedback => 'Canvis desats correctament.';
+
+  @override
+  String get formError => 'Si us plau, corregeix els errors abans de desar.';
+
+  @override
+  String get mandatoryNickname => 'El sobrenom és obligatori';
+
+  @override
+  String get mandatoryPhoneNumber => 'El número de telèfon és obligatori';
+
+  @override
+  String get invalidPhoneNumber => 'Format de número de telèfon invàlid';
+
+  @override
+  String get mandatoryPreferredMode => 'El mode preferit és obligatori';
+
+  @override
+  String get editProfile => 'Edita el perfil';
+
+  @override
+  String get nicknameNonEditable => 'Sobrenom';
+
+  @override
+  String get fullName => 'Nom complet';
+
+  @override
+  String get mandatoryFullName => 'El nom complet és obligatori';
+
+  @override
   String errorOccurred(String error) {
     return 'Ha ocorregut un error: $error';
   }
