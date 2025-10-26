@@ -239,6 +239,8 @@ class _MapHomePageState extends State<MapHomePage> {
                   MaterialPageRoute(
                     builder: (context) => StationList(
                       stationType: _currentMode,
+                      latitude: _userLocation?.latitude ?? 0,
+                      longitude: _userLocation?.longitude ?? 0,
                     ),
                   ),
                 );
