@@ -7,13 +7,16 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station
 
 class StationList extends StatelessWidget {
   final StationType stationType;
-  const StationList({super.key, required this.stationType});
+  final double latitude;
+  final double longitude;
+  const StationList({super.key, required this.stationType, required this.latitude, required this.longitude});
 
   @override
   Widget build(BuildContext context) {
+    print('Fetching stations for $stationType at ($latitude, $longitude)');
     Future<List<StationDetails>?> allStationDetailsFuture = switch (stationType) {
-      StationType.bicycle => getAllNearbyBicycleStationDetails(41.3801751, 2.1399754),
-      StationType.electricVehicle => getAllNearbyEVStationDetails(41.3801751, 2.1399754),
+      StationType.bicycle => getAllNearbyBicycleStationDetails(latitude, longitude),
+      StationType.electricVehicle => getAllNearbyEVStationDetails(latitude, longitude),
     };
 
     return FutureBuilder<List<StationDetails>?>(
