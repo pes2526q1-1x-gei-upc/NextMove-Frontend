@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,9 @@ class _MapHomePageState extends State<MapHomePage> {
   List<StationDetails>? bikeStations = [];
   final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
+  LatLng? _userLocation;
+
+  StreamSubscription<Position>? _positionStream; // listener de los cambios de ubicacion
   
   // Estado para el modo (bicicleta o coche)
   StationType _currentMode = StationType.bicycle; // Por defecto bicicleta, ya usaremos el modo por defecto del usuario
@@ -30,6 +34,7 @@ class _MapHomePageState extends State<MapHomePage> {
     _loadStations(getAllEVStationDetails, (data) => stations = data,);
     _loadStations(getAllBicycleStationDetails, (data) => bikeStations = data,);
     //_loadBikeStations(getAllBikeStations, (data) => bikeStations = data);
+    _initializateLocation();
   }
 
   Future<void> _loadStations(Future<List<StationDetails>?> Function() getStatsFunc, void Function(List<StationDetails>) onSuccess,) async {
@@ -43,18 +48,71 @@ class _MapHomePageState extends State<MapHomePage> {
     }
   }
 
+  Future<void> _initializateLocation() async {
+    await _checkLocationPermission();
+  }
+
  
 
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      await Geolocator.requestPermission();
+        permission = await Geolocator.requestPermission();
     }
+
+    if(permission == LocationPermission.deniedForever) {
+      _showPermissionDialog();
+    }
+
+    if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+      _startLocationUpdates();
+    }
+  }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Se requiere permiso de ubicación'),
+        content: const Text('Habilite la ubicación en la configuración del dispositivo'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Aceptar'),
+          ),
+          TextButton(
+            onPressed: (){
+              Geolocator.openAppSettings();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Abrir ajustes'),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _startLocationUpdates() {
+     final LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high, //lo suyo seria lo que decida el usuario
+      distanceFilter: 50, //se actualiza cada 50 metros
+     );
+      _positionStream =  Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+    (Position? position) {
+      setState(() {
+        if(position != null) _userLocation = LatLng(position.latitude, position.longitude);
+      });
+        print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    });
+
+
+
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     _setMapStyle();
+
   }
 
   void _setMapStyle() async {
