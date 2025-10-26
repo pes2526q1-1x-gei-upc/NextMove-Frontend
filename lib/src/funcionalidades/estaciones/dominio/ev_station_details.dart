@@ -1,4 +1,5 @@
-import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
+
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 enum PowerType {
   ac,
@@ -30,6 +31,8 @@ class EVStationDetails extends StationDetails {
     required super.availableSlots,
     required super.totalSlots,
     required super.rating,
+    required super.latitude,
+    required super.longitude,
     super.distanceKm,
     required this.isSuperFast,
     required this.connectors,
@@ -58,6 +61,8 @@ class EVStationDetails extends StationDetails {
       id: data['id'],
       name: data['name'] ?? '',
       address: data['address'] ?? '',
+      latitude: (data['coordinates']['latitude'] as num).toDouble(),
+      longitude: (data['coordinates']['longitude'] as num).toDouble(),
       availableSlots: connectors.where((c) => c.status == ConnectorStatus.available).length,
       totalSlots: connectors.length,
       rating: 5, //TODO: rating real des de la BD

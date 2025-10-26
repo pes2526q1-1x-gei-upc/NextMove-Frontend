@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -19,7 +21,7 @@ class _MapHomePageState extends State<MapHomePage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   
   // Estado para el modo (bicicleta o coche)
-  String _currentMode = 'bicicleta'; // Por defecto bicicleta, ya usaremos el modo por defecto del usuario
+  StationType _currentMode = StationType.bicycle; // Por defecto bicicleta, ya usaremos el modo por defecto del usuario
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -70,7 +72,7 @@ class _MapHomePageState extends State<MapHomePage> {
   }
 
   // Cambiar modo
-  void _switchMode(String mode) {
+  void _switchMode(StationType mode) {
     setState(() {
       _currentMode = mode;
     });
@@ -80,7 +82,7 @@ class _MapHomePageState extends State<MapHomePage> {
 
   // Iconos bici y coches
   BitmapDescriptor _getCustomMarkerIcon() {
-    if (_currentMode == 'bicicleta') {
+    if (_currentMode == StationType.bicycle) {
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
     } else {
       return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
@@ -168,6 +170,44 @@ class _MapHomePageState extends State<MapHomePage> {
             ),
           ),
 
+            // BOTON LISTA DE ESTACIONES
+            Positioned(
+            top: 130,
+            right: 16,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StationList(
+                      stationType: _currentMode,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                ),
+                ],
+              ),
+              child: Icon(
+                Icons.list,
+                color: Colors.grey[700],
+                size: 28,
+              ),
+              ),
+            ),
+            ),
+
           // BOTONES DE TOGGLE MODO
           Positioned(
             bottom: 30,
@@ -195,18 +235,18 @@ class _MapHomePageState extends State<MapHomePage> {
                     Expanded(
                       flex: 1,
                       child: GestureDetector(
-                        onTap: () => _switchMode('bicicleta'),
+                        onTap: () => _switchMode(StationType.bicycle),
                         child: AnimatedContainer( // AnimatedContainer para transiciones 
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: _currentMode == 'bicicleta' ? Colors.blue.shade600 : Colors.transparent,
+                            color: _currentMode == StationType.bicycle ? Colors.blue.shade600 : Colors.transparent,
                             borderRadius: BorderRadius.circular(26), 
                           ),
                           child: Icon(
                             Icons.directions_bike,
-                            color: _currentMode == 'bicicleta' ? Colors.white : Colors.grey[700],
+                            color: _currentMode == StationType.bicycle ? Colors.white : Colors.grey[700],
                             size: 24,
                           ),
                         ),
@@ -217,18 +257,18 @@ class _MapHomePageState extends State<MapHomePage> {
                     Expanded(
                       flex: 1,
                       child: GestureDetector(
-                        onTap: () => _switchMode('coche'),
+                        onTap: () => _switchMode(StationType.electricVehicle),
                         child: AnimatedContainer( 
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: _currentMode == 'coche' ? Colors.green.shade600 : Colors.transparent,
+                            color: _currentMode == StationType.electricVehicle ? Colors.green.shade600 : Colors.transparent,
                             borderRadius: BorderRadius.circular(26), 
                           ),
                           child: Icon(
                             Icons.electric_car,
-                            color: _currentMode == 'coche' ? Colors.white : Colors.grey[700],
+                            color: _currentMode == StationType.electricVehicle ? Colors.white : Colors.grey[700],
                             size: 24,
                           ),
                         ),
@@ -249,7 +289,7 @@ class _MapHomePageState extends State<MapHomePage> {
     //print del primer elemento de la estacion
     final customIcon = _getCustomMarkerIcon();
     List<StationDetails>? stationsToMark = []; 
-    if(_currentMode == 'bicicleta') {
+    if(_currentMode == StationType.bicycle) {
        stationsToMark = bikeStations;
     } else {
       stationsToMark = stations;
@@ -288,7 +328,7 @@ class _MapHomePageState extends State<MapHomePage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentMode == 'bicicleta' ? Colors.blue : Colors.green,
+                          backgroundColor: _currentMode == StationType.bicycle ? Colors.blue : Colors.green,
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {

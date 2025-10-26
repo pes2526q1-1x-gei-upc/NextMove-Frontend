@@ -1,4 +1,5 @@
-import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_details.dart';
+
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 enum BicycleStationState {
   operational,
@@ -21,6 +22,8 @@ class BicycleStationDetails extends StationDetails {
     required super.totalSlots,
     required super.availableSlots,
     required super.rating,
+    required super.latitude,
+    required super.longitude,
     super.distanceKm,
     required this.availableBikes,
     required this.electricRechargeStation,
@@ -37,6 +40,8 @@ class BicycleStationDetails extends StationDetails {
       id: data['id'],
       name: data['nombre'],
       address: data['direccion'],
+      latitude: (data['coordenadas']['lat'] as num).toDouble(),
+      longitude: (data['coordenadas']['lon'] as num).toDouble(),
       totalSlots: data['plazasTotales'],
       availableSlots: data['anclajesDisponibles'],
       rating: 5, // TODO: obtenir valoració de la BD

@@ -1,8 +1,8 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/dominio/bicycle_station_details.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/dominio/ev_station_details.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/bicycle_station_details.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/ev_station_details.dart';
 
 Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
   // OJO porque ahora coge el valor del notifier retornado, no el notifier!
