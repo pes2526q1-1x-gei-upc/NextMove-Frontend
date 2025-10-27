@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
 import 'firebase_options.dart';
@@ -48,23 +50,26 @@ class _NextMoveAppState extends State<NextMoveApp> {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: client,
-      child: MaterialApp(
-        title: 'NextMove',
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        localeResolutionCallback: (locale, supportedLocales) {
-          for (var supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale?.languageCode) {
-              return supportedLocale;
+      child: ChangeNotifierProvider(
+        create: (_) => UserProvider(),
+        child: MaterialApp(
+          title: 'NextMove',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localeResolutionCallback: (locale, supportedLocales) {
+            for (var supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == locale?.languageCode) {
+                return supportedLocale;
+              }
             }
-          }
-          // Fallback to English
-          return const Locale('en');
-        },
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+            // Fallback to English
+            return const Locale('en');
+          },
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          ),
+          home: isLoggedIn ? MapHomePage() : WelcomePage(),
         ),
-        home: isLoggedIn ? MapHomePage() : WelcomePage(),
       ),
     );
   }
