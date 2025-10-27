@@ -19,9 +19,9 @@ class GraphQLConfig {
 
     final AuthLink authLink = AuthLink(
       getToken: () async {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          final token = await user.getIdToken();
+        final fireBaseUser = FirebaseAuth.instance.currentUser;
+        if (fireBaseUser != null) {
+          final token = await fireBaseUser.getIdToken();
           return 'Bearer $token';
         }
         return null;
