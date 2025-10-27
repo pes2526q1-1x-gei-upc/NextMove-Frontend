@@ -56,7 +56,7 @@ class EVStationDetails extends StationDetails {
         ));
       }
     }
-    print('Parsing EV station: id=${data['id']}, name=${data['name']}');
+    // print('Parsing EV station: id=${data['id']}, name=${data['name']}');
     return EVStationDetails(
       id: data['id'],
       name: data['name'] ?? '',

@@ -13,7 +13,7 @@ class StationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Fetching stations for $stationType at ($latitude, $longitude)');
+    // print('Fetching stations for $stationType at ($latitude, $longitude)');
     Future<List<StationDetails>?> allStationDetailsFuture = switch (stationType) {
       StationType.bicycle => getAllNearbyBicycleStationDetails(latitude, longitude),
       StationType.electricVehicle => getAllNearbyEVStationDetails(latitude, longitude),
