@@ -63,27 +63,28 @@ class GraphQLQueries {
     }''';
 
   static const String getAllNearbyBicycleStationsQuery = r'''
-  query getAllNearbyBicycleStations($latitude: Float!, $longitude: Float!) {
-    getEstacionesDeBicingCercanas(location: {lat: $latitude, lon: $longitude}) {
-        id
-        estado
-        direccion
-        nombre
-        plazasTotales
-        plazasOcupadas
-        sePuedenAlquilarBicis
-        sePuedeAnclarBicis
-        bicisMecanicasDisponibles
-        bicisElectricasDisponibles
-        anclajesDisponibles
-        estacionCargaElectrica
-        coordenadas {
-          lat
-          lon
-        }
-        distanciaKm
+  query getAllNearbyBicycleStations($location: LocationInput!) {
+  getEstacionesDeBicingCercanas(location: $location) {
+      id
+      estado
+      direccion
+      nombre
+      plazasTotales
+      plazasOcupadas
+      sePuedenAlquilarBicis
+      sePuedeAnclarBicis
+      bicisMecanicasDisponibles
+      bicisElectricasDisponibles
+      anclajesDisponibles
+      estacionCargaElectrica
+      coordenadas {
+        lat
+        lon
       }
-    }''';
+      
+      distanciaKm
+    }
+  }''';
 
   static const String getEVStationDetailsQuery = r'''
     query getEVStationDetails($stationID: ID!) {

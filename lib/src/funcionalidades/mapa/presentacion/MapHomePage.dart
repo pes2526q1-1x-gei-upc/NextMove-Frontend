@@ -392,8 +392,13 @@ class _MapHomePageState extends State<MapHomePage> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
-                          //ACCION PARA LLEVARLE A LA INFORMACION DETALLADA
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => StationDetailsPage(
+                              stationID: station.id,
+                              stationType: _currentMode,
+                              stationDetails: station,
+                            )),
+                          );
                         },
                         child: const Text('Info'),
                       ),

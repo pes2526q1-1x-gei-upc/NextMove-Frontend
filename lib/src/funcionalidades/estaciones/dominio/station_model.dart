@@ -59,6 +59,7 @@ Future<List<StationModel>?> getAllBikeStations() async {
     return await DBgetAllBikeStations();
   }*/
 
+import 'package:nextmove_app/src/funcionalidades/estaciones/datos/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/datos/MapHomePageData.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/bicycle_station_details.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/ev_station_details.dart';

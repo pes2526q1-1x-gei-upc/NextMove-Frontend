@@ -16,17 +16,24 @@ Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
   return result;
 }
 
-Future<BicycleStationDetails?> DBgetBicycleStationDetails(String stationID) async {
+Future<BicycleStationDetails?> DBgetBicycleStationDetails(
+  String stationID,
+) async {
   final QueryOptions options = QueryOptions(
     document: gql(GraphQLQueries.getBicycleStationDetailsQuery),
     variables: {'stationID': stationID},
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getBicycleStationDetailsQuery, options);
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getBicycleStationDetailsQuery,
+    options,
+  );
 
   print('Full GraphQL response for stationID $stationID: ${result.data}');
   if (result.hasException) {
-    print('GraphQL Exception for stationID $stationID: ${result.exception.toString()}');
+    print(
+      'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
+    );
     throw Exception('Error en query: ${result.exception.toString()}');
   }
 
@@ -45,7 +52,10 @@ Future<List<BicycleStationDetails>?> DBgetAllBicycleStationDetails() async {
     document: gql(GraphQLQueries.getAllBicycleStationsQuery),
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllBicycleStationsQuery, options);
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getAllBicycleStationsQuery,
+    options,
+  );
 
   if (result.hasException) {
     print('GraphQL Exception: ${result.exception.toString()}');
@@ -64,16 +74,24 @@ Future<List<BicycleStationDetails>?> DBgetAllBicycleStationDetails() async {
   return null;
 }
 
-Future<List<BicycleStationDetails>?> DBgetAllNearbyBicycleStationDetails(double latitude, double longitude) async {
+Future<List<BicycleStationDetails>?> DBgetAllNearbyBicycleStationDetails(
+  double latitude,
+  double longitude,
+) async {
   final QueryOptions options = QueryOptions(
     document: gql(GraphQLQueries.getAllNearbyBicycleStationsQuery),
     variables: {
-      "latitude": latitude,
-      "longitude": longitude,
-    }
+      "location": {
+        "radiusKm": 100,
+        "coordinates": {"latitude": latitude, "longitude": longitude},
+      },
+    },
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllNearbyBicycleStationsQuery, options);
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getAllNearbyBicycleStationsQuery,
+    options,
+  );
 
   if (result.hasException) {
     throw Exception('Error en query: ${result.exception.toString()}');
@@ -85,7 +103,7 @@ Future<List<BicycleStationDetails>?> DBgetAllNearbyBicycleStationDetails(double 
         .map((item) => BicycleStationDetails.fromJson(item))
         .toList();
   }
-  
+
   return null;
 }
 
@@ -95,19 +113,22 @@ Future<EVStationDetails?> DBgetEVStationDetails(String stationID) async {
     variables: {'stationID': stationID},
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getEVStationDetailsQuery, options);
-  
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getEVStationDetailsQuery,
+    options,
+  );
+
   if (result.hasException) {
     throw Exception('Error en query: ${result.exception.toString()}');
   }
 
   final data = result.data?['station'];
   print(data);
-  
+
   if (data != null) {
     return EVStationDetails.fromJson(data);
   }
-  
+
   return null;
 }
 
@@ -116,7 +137,10 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
     document: gql(GraphQLQueries.getAllEVStationsQuery),
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllEVStationsQuery, options);
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getAllEVStationsQuery,
+    options,
+  );
 
   if (result.hasException) {
     throw Exception('Error en query: ${result.exception.toString()}');
@@ -124,38 +148,39 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
 
   final data = result.data?['stations']['stations'];
   if (data != null) {
-    return (data as List)
-        .map((item) {
-          final station = EVStationDetails.fromJson(item);
-          print('Raw EV station item: $station');
-          return station;
-        })
-        .toList();
+    return (data as List).map((item) {
+      final station = EVStationDetails.fromJson(item);
+      print('Raw EV station item: $station');
+      return station;
+    }).toList();
   }
-  
+
   return null;
 }
 
-Future<List<EVStationDetails>?> DBgetAllNearbyEVStationDetails(double latitude, double longitude) async {
+Future<List<EVStationDetails>?> DBgetAllNearbyEVStationDetails(
+  double latitude,
+  double longitude,
+) async {
   final QueryOptions options = QueryOptions(
     document: gql(GraphQLQueries.getAllNearbyEVStationsQuery),
     variables: {
       "location": {
-        "coordinates": {
-          "latitude": latitude,
-          "longitude": longitude,
-        },
-        "radiusKm": 100
-      }
-    }
+        "coordinates": {"latitude": latitude, "longitude": longitude},
+        "radiusKm": 100,
+      },
+    },
   );
 
-  final QueryResult result = await getGraphQLQuery(GraphQLQueries.getAllNearbyEVStationsQuery, options);
+  final QueryResult result = await getGraphQLQuery(
+    GraphQLQueries.getAllNearbyEVStationsQuery,
+    options,
+  );
 
   if (result.hasException) {
     throw Exception('Error en query: ${result.exception.toString()}');
   }
-    print('Raw GraphQL response: ${result.data}');
+  print('Raw GraphQL response: ${result.data}');
 
   final data = result.data?['nearbyStations'];
   if (data != null) {
