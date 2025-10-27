@@ -15,7 +15,16 @@ Future<UserCredential> signInWithGoogle() async {
 
   // Create a new credential
   final credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
-
   // Once signed in, return the UserCredential
-  return await FirebaseAuth.instance.signInWithCredential(credential);
+  final userCredential = await FirebaseAuth.instance.signInWithCredential(
+    credential,
+  );
+
+  // 🔑 AQUÍ obtienes el token de Firebase para el header
+  final firebaseToken = await userCredential.user?.getIdToken();
+  print("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
+  print("📧 Email: ${userCredential.user?.email}");
+  print("👤 Display Name: ${userCredential.user?.displayName}");
+
+  return userCredential;
 }

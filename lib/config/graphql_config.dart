@@ -5,23 +5,20 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class GraphQLConfig {
-  // static String get baseUrl => dotenv.env['API_BASE_URL']!;
-  static String get baseUrl {
-    final url =
-        dotenv.env['API_BASE_URL']! ;
-    return url;
-  }
-
   static ValueNotifier<GraphQLClient> initializeClient() {
-    final HttpLink httpLink = HttpLink(
-      dotenv.env['GRAPHQL_ENDPOINT'] !,
-    );
+    final endpoint = dotenv.env['GRAPHQL_ENDPOINT'];
+
+    if (endpoint == null) {
+      throw Exception('GRAPHQL_ENDPOINT no está definida en .env');
+    }
+
+    final HttpLink httpLink = HttpLink(endpoint);
 
     final AuthLink authLink = AuthLink(
       getToken: () async {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          final token = await user.getIdToken();
+        final fireBaseUser = FirebaseAuth.instance.currentUser;
+        if (fireBaseUser != null) {
+          final token = await fireBaseUser.getIdToken();
           return 'Bearer $token';
         }
         return null;

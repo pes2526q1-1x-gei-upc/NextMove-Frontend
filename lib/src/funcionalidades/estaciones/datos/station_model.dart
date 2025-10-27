@@ -29,7 +29,7 @@ Future<BicycleStationDetails?> DBgetBicycleStationDetails(
     options,
   );
 
-  print('Full GraphQL response for stationID $stationID: ${result.data}');
+  // print('Full GraphQL response for stationID $stationID: ${result.data}');
   if (result.hasException) {
     print(
       'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
@@ -38,7 +38,7 @@ Future<BicycleStationDetails?> DBgetBicycleStationDetails(
   }
 
   final data = result.data?['getEstacionDeBicing'];
-  print('getEstacionDeBicing data for stationID $stationID: $data');
+  // print('getEstacionDeBicing data for stationID $stationID: $data');
 
   if (data != null) {
     return BicycleStationDetails.fromJson(data);
@@ -63,7 +63,7 @@ Future<List<BicycleStationDetails>?> DBgetAllBicycleStationDetails() async {
   }
 
   final data = result.data?['getEstacionesDeBicing'];
-  print('getEstacionesDeBicing data: $data');
+  // print('getEstacionesDeBicing data: $data');
 
   if (data != null) {
     return (data as List)
@@ -123,7 +123,7 @@ Future<EVStationDetails?> DBgetEVStationDetails(String stationID) async {
   }
 
   final data = result.data?['station'];
-  print(data);
+  // print(data);
 
   if (data != null) {
     return EVStationDetails.fromJson(data);
@@ -150,7 +150,7 @@ Future<List<EVStationDetails>?> DBgetAllEVStationDetails() async {
   if (data != null) {
     return (data as List).map((item) {
       final station = EVStationDetails.fromJson(item);
-      print('Raw EV station item: $station');
+      // print('Raw EV station item: $station');
       return station;
     }).toList();
   }
@@ -180,7 +180,7 @@ Future<List<EVStationDetails>?> DBgetAllNearbyEVStationDetails(
   if (result.hasException) {
     throw Exception('Error en query: ${result.exception.toString()}');
   }
-  print('Raw GraphQL response: ${result.data}');
+  // print('Raw GraphQL response: ${result.data}');
 
   final data = result.data?['nearbyStations'];
   if (data != null) {

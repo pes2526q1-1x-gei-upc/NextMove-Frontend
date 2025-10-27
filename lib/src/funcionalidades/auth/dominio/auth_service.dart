@@ -1,4 +1,5 @@
 // src/funcionalidades/auth/dominio/auth_service.dart
+import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../../graphql/queries.dart';
 class AuthService {
@@ -16,15 +17,17 @@ class AuthService {
       final QueryResult result = await _client.query(options);
 
       if (result.hasException) {
+        debugPrint('Error al obtener usuario: ${result.exception.toString()}');
         throw Exception('Error al obtener usuario: ${result.exception.toString()}');
       }
 
       if (result.data != null && result.data!['me'] != null) {
         return result.data!['me'] as Map<String, dynamic>;
       }
-
+      debugPrint('WARNING: usuario vacío');
       return null;
     } catch (e) {
+      debugPrint('Error al obtener usuario: $e');
       throw Exception('Error en getCurrentUser: $e');
     }
   }

@@ -1,404 +1,191 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preserences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
 
-class UserDataPreferences extends StatefulWidget {
-  const UserDataPreferences({super.key});
-
-  @override
-  State<UserDataPreferences> createState() => _UserDataPreferencesState();
-}
-
-class _UserDataPreferencesState extends State<UserDataPreferences> {
-  final _formKey = GlobalKey<FormState>();
-
-  // Controladores
-  final TextEditingController _apodoController = TextEditingController();
-  final TextEditingController _telefonoController = TextEditingController();
-  final TextEditingController _fechaNacimientoController = TextEditingController();
-  final TextEditingController _descripcionController = TextEditingController();
-  final TextEditingController _nombreCompletoController = TextEditingController();
-
-  // Estado para la imagen 
-  final ImagePicker _picker = ImagePicker();
-  File? _selectedImageFile; // Guardará la imagen seleccionada por el usuario
-  
-  // Imagen por defecto, obtener la de google si existe, futura implementación
-  final AssetImage _avatarImage = AssetImage('assets/Profile_avatar_placeholder_large.png');
-
-  // Estado para los Dropdowns
-  String? _selectedIdioma;
-  String? _selectedModo;
-
-  final List<String> _idiomas = ['Espanol', 'English', 'Català'];
-  final List<String> _modos = ['Bici', 'Coche'];
-
-  @override
-  void initState() {
-    super.initState();
-    //Se pueden cargar datos iniciales haciendo por ejemplo los datos de google
-    //_apodoController.text = "UsuarioEjemplo";
-  }
-  
-  @override
-  void dispose() {
-    //Limpiar controladores
-    _apodoController.dispose();
-    _telefonoController.dispose();
-    _fechaNacimientoController.dispose();
-    _descripcionController.dispose();
-    super.dispose();
-  }
-
-  //Método para mostrar el DatePicker
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  // Método para mostrar el menú de selección de imagen
-  void _showImageSourceActionSheet() {
-    final l10n = AppLocalizations.of(context)!;
-    
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text(AppLocalizations.of(context)!.gallery), 
-                onTap: () {
-                  _pickImage(ImageSource.gallery);
-                  Navigator.of(context).pop();
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.camera_alt),
-                title: Text(l10n.camera),
-                onTap: () {
-                  _pickImage(ImageSource.camera);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // Método para seleccionar la imagen
-  Future<void> _pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        maxWidth: 800,
-        imageQuality: 85,
-      );
-
-      if (pickedFile != null) {
-        setState(() {
-          _selectedImageFile = File(pickedFile.path);
-        });
-      }
-    } catch (e) {
-      print("Error al seleccionar imagen: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
-      );
-    }
-  }
-
-  // Método para guardar cambios
-  void _guardarCambios() {
-    // Primero, validamos que el formulario esté correcto
-    if (_formKey.currentState!.validate()) {
-      // Si es válido, recopilamos todos los datos
-      // Implementar la lógica para guardar los datos en el backend
-      //print('Datos a guardar: $userData');
-      UserData preferences = UserData(
-        apodo: _apodoController.text,
-        nombreCompleto: _nombreCompletoController.text, 
-        //email: '', // NO sera necesario
-        fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-        fechaRegistro: DateTime.now(), 
-        numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-        idiomaPreferido: _selectedIdioma ?? 'none',
-        descripcion: _descripcionController.text,
-        modoPreferido: _selectedModo ?? '',
-        //fotoPerfilUrl: '',
-      );
-      sendUserDataPreferences(preferences);
-
-
-      // Damos feedback al usuario
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback)),
-      );
-
-      //TEMPORAL, PARA PROBAR
-      Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => EditUserDataPreferences(),  // Pasa datos si necesitas, ej: EditUserDataPreferences(userData: preferences)
-      ),
-    );
-    } else {
-      // Si el formulario no es válido, mostramos un error
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
-      );
-    }
-  }
-
+class UserDataPreferencesPage extends StatelessWidget {
+  const UserDataPreferencesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final userProvider = Provider.of<UserProvider>(context);
+    final userData = fetchUserDataPreferencesFromProvider(context);
+    final firebaseUserId = userProvider.firebaseUserId;
+
+    if (userData == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Perfil de Usuario')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Cargando datos del usuario...'),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.userDataPreferences,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        title: Text('Perfil de Usuario'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditUserDataPreferencesPage(),
+                ),
+              );
+            },
+            tooltip: 'Editar perfil',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Avatar
+            Center(
+              child: CircleAvatar(
+                radius: 60,
+                backgroundImage: AssetImage(
+                  'assets/Profile_avatar_placeholder_large.png',
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
 
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: GestureDetector(
-                    onTap: _showImageSourceActionSheet,
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          // Mostramos la imagen seleccionada, o la de por defecto
-                          backgroundImage: _selectedImageFile != null
-                              ? FileImage(_selectedImageFile!) as ImageProvider
-                              : _avatarImage,
-                        ),
-                        // Icono de "editar" sobre la foto
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Theme.of(context).primaryColor,
-                            child: Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Colors.white,
+            // Firebase User ID
+            if (firebaseUserId != null)
+              _buildInfoCard(
+                'Firebase User ID',
+                firebaseUserId,
+                Icons.fingerprint,
+              ),
+            SizedBox(height: 12),
+
+            // Apodo
+            _buildInfoCard('Apodo', userData.apodo, Icons.person),
+            SizedBox(height: 12),
+
+            // Nombre completo
+            _buildInfoCard(
+              'Nombre Completo',
+              userData.nombreCompleto,
+              Icons.badge,
+            ),
+            SizedBox(height: 12),
+
+            // Fecha de nacimiento
+            _buildInfoCard(
+              'Fecha de Nacimiento',
+              '${userData.fechaNacimiento.day}/${userData.fechaNacimiento.month}/${userData.fechaNacimiento.year}',
+              Icons.cake,
+            ),
+            SizedBox(height: 12),
+
+            // Teléfono
+            _buildInfoCard(
+              'Número de Teléfono',
+              userData.numeroTelefono.toString(),
+              Icons.phone,
+            ),
+            SizedBox(height: 12),
+
+            // Idioma
+            _buildInfoCard(
+              'Idioma Preferido',
+              userData.idiomaPreferido.isEmpty
+                  ? 'No especificado'
+                  : userData.idiomaPreferido,
+              Icons.language,
+            ),
+            SizedBox(height: 12),
+
+            // Modo preferido
+            _buildInfoCard(
+              'Modo Preferido',
+              userData.modoPreferido,
+              Icons.directions_car,
+            ),
+            SizedBox(height: 12),
+
+            // Descripción
+            if (userData.descripcion.isNotEmpty)
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.description, size: 28, color: Colors.blue),
+                          SizedBox(width: 16),
+                          Text(
+                            'Descripción',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Apodo
-                TextFormField(
-                  controller: _apodoController,
-                  decoration: InputDecoration(
-                    labelText: l10n.nickname,
-                    border: OutlineInputBorder(),
-                    hintText: l10n.nicknameHint,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryNickname;
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                //Nombre Completo
-                TextFormField(
-                  controller: _nombreCompletoController,
-                  decoration: InputDecoration(
-                    labelText: l10n.fullName,
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryFullName;
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16),
-
-                // Fecha de nacimiento
-                TextFormField(
-                  controller: _fechaNacimientoController,
-                  decoration: InputDecoration(
-                    labelText: l10n.birthdate,
-                    border: OutlineInputBorder(),
-                    hintText: l10n.bithdateHint,
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.mandatoryBirthDate;
-                    }
-                    return null;
-                  },
-                  readOnly: true, 
-                  onTap: () {
-                    _selectDate(context); // Muestra el DatePicker
-                  },
-                ),
-                SizedBox(height: 16),
-
-                //Teléfono
-                TextFormField(
-                  controller: _telefonoController,
-                  decoration: InputDecoration(
-                    labelText: l10n.telephoneNumber,
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    // Validación simple de formato de teléfono
-                    final phoneRegExp = RegExp(r'^\+?[0-9]{7,15}$');
-                    if (!phoneRegExp.hasMatch(value!)) {
-                      if(value.isNotEmpty) return l10n.invalidPhoneNumber;
-                    }
-                    return null;
-                  },
-                  keyboardType: TextInputType.phone,
-                ),
-                SizedBox(height: 16),
-
-                //Descripcion
-                TextFormField(
-                  controller: _descripcionController,
-                  decoration: InputDecoration(
-                    labelText: l10n.userDescription,
-                    border: OutlineInputBorder(),
-                    alignLabelWithHint: true,
-                  ),
-                  maxLines: 4,
-                  keyboardType: TextInputType.multiline,
-                ),
-                SizedBox(height: 16),
-
-              // Modo e Idioma preferidos en la misma fila
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedModo,
-                        decoration: InputDecoration(
-                          labelText: l10n.preferredMode,
-                          border: OutlineInputBorder(),
-                        ),
-                        dropdownColor: Theme.of(context).cardColor,
-                        menuMaxHeight: 200,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return l10n.mandatoryPreferredMode;
-                          }
-                          return null;
-                        },
-                        items: _modos.map((String modo) {
-                          IconData icon = modo == 'Bici' ? Icons.directions_bike : Icons.electric_car;
-                          return DropdownMenuItem<String>(
-                            value: modo,
-                            child: Row(
-                              children: [
-                                Icon(icon, color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 12),
-                                Text(
-                                  modo,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? nuevoValor) {
-                          setState(() {
-                            _selectedModo = nuevoValor;
-                          });
-                        },
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedIdioma,
-                        decoration: InputDecoration(
-                          labelText: l10n.preferredLanguage,
-                          border: OutlineInputBorder(),
-                        ),
-                        dropdownColor: Theme.of(context).cardColor,
-                        menuMaxHeight: 200,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                        items: _idiomas.map((String idioma) {
-                          return DropdownMenuItem<String>(
-                            value: idioma,
-                            child: Row(
-                              children: [
-                                
-                                const SizedBox(width: 12),
-                                Text(
-                                  idioma,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? nuevoValor) {
-                          setState(() {
-                            _selectedIdioma = nuevoValor;
-                          });
-                        },
+                      SizedBox(height: 8),
+                      Text(
+                        userData.descripcion,
+                        style: TextStyle(fontSize: 16),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Guardar cambios
-                //SizedBox(height: 32),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _guardarCambios,
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    child: Text(l10n.saveChanges),
+                    ],
                   ),
                 ),
-              ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(String label, String value, IconData icon) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(icon, size: 28, color: Colors.blue),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -7,7 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preserences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
@@ -39,13 +39,23 @@ class _MapHomePageState extends State<MapHomePage> {
   }
 
   Future<void> _loadStations(Future<List<StationDetails>?> Function() getStatsFunc, void Function(List<StationDetails>) onSuccess,) async {
-    try {
+try {
       final stationsToLoad = await getStatsFunc();
+      if (stationsToLoad != null) {
       setState(() {
-        onSuccess(stationsToLoad!);
+          onSuccess(stationsToLoad);
       });
-    } catch (e) {
-      throw Exception('Error loading stations: $e');
+      }
+    } catch (e, stackTrace) {
+      debugPrint('Error loading stations: $e');
+      debugPrint('Stack trace: $stackTrace');
+      // No lanzar la excepción, solo loguear
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al cargar estaciones: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -152,7 +162,9 @@ class _MapHomePageState extends State<MapHomePage> {
   void _navigateToEditUser() {
     Navigator.push(
      context,
-     MaterialPageRoute(builder: (context) => const EditUserDataPreferences()),
+      MaterialPageRoute(
+        builder: (context) => const EditUserDataPreferencesPage(),
+      ),
     );
   }
 

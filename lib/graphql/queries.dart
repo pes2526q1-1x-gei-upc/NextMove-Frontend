@@ -5,9 +5,13 @@ class GraphQLQueries {
   static const String getMeQuery = r'''
     query Me {
       me {
-        id
-        nombre
         email
+        name
+        photo
+        preferredMode
+        birthDate
+        bioDescription
+        phoneNumber
         createdAt
       }
     }
@@ -47,8 +51,8 @@ class GraphQLQueries {
         nombre,
         direccion,
         coordenadas {
-          lat,
-          lon
+          latitude,
+          longitude
         },
         plazasTotales,
         estacionCargaElectrica,
@@ -78,8 +82,8 @@ class GraphQLQueries {
       anclajesDisponibles
       estacionCargaElectrica
       coordenadas {
-        lat
-        lon
+        latitude
+        longitude
       }
       
       distanciaKm
