@@ -5,9 +5,13 @@ class GraphQLQueries {
   static const String getMeQuery = r'''
     query Me {
       me {
-        id
-        nombre
         email
+        name
+        photo
+        preferredMode
+        birthDate
+        bioDescription
+        phoneNumber
         createdAt
       }
     }
