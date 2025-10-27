@@ -17,9 +17,6 @@ Future<UserData> pushUserDataPreferences(
   debugPrint("Modo Preferido: ${preferences.modoPreferido}");
   debugPrint("========================");
 
-  // TODO: Implementar llamada real a GraphQL
-  // Ejemplo de cómo sería con tu API:
-
   final GraphQLClient client = GraphQLProvider.of(context).value;
 
   const String updateUserMutation = r'''
@@ -95,6 +92,7 @@ UserData DBfetchUserDataPreferences() {
 
 // TODO: Implementar función para obtener usuario desde GraphQL
 /*
+ESTA WEA PORQUE NO FUNCIONAA DOLASNDAWSDASD
 Future<UserData?> fetchUserDataFromAPI(BuildContext context, String userId) async {
   final GraphQLClient client = GraphQLProvider.of(context).value;
   

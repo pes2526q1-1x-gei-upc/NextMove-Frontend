@@ -14,7 +14,7 @@ class EditUserDataPreferencesPage extends StatefulWidget {
 class _EditUserDataPreferencesPageState
     extends State<EditUserDataPreferencesPage> {
   late TextEditingController _apodoController;
-  late TextEditingController _nombreCompletoController; // ← Añadido
+  late TextEditingController _nombreCompletoController; 
   late TextEditingController _numeroTelefonoController;
   late TextEditingController _descripcionController;
   String _idiomaPreferido = "Español";
@@ -27,7 +27,7 @@ class _EditUserDataPreferencesPageState
     super.initState();
 
     _apodoController = TextEditingController();
-    _nombreCompletoController = TextEditingController(); // ← Añadido
+    _nombreCompletoController = TextEditingController(); 
     _numeroTelefonoController = TextEditingController();
     _descripcionController = TextEditingController();
 
@@ -43,7 +43,7 @@ class _EditUserDataPreferencesPageState
       setState(() {
         _currentUserData = userData;
         _apodoController.text = userData.apodo;
-        _nombreCompletoController.text = userData.nombreCompleto; // ← Añadido
+        _nombreCompletoController.text = userData.nombreCompleto; 
         _numeroTelefonoController.text = userData.numeroTelefono.toString();
         _descripcionController.text = userData.descripcion;
         _idiomaPreferido = userData.idiomaPreferido.isNotEmpty
@@ -62,7 +62,7 @@ class _EditUserDataPreferencesPageState
   @override
   void dispose() {
     _apodoController.dispose();
-    _nombreCompletoController.dispose(); // ← Añadido
+    _nombreCompletoController.dispose(); 
     _numeroTelefonoController.dispose();
     _descripcionController.dispose();
     super.dispose();
@@ -86,7 +86,7 @@ class _EditUserDataPreferencesPageState
     final updatedData = UserData(
       apodo: _apodoController.text,
       nombreCompleto:
-          _nombreCompletoController.text, // ← Cambiado (ahora se puede editar)
+          _nombreCompletoController.text, 
       fechaNacimiento: _currentUserData!.fechaNacimiento,
       fechaRegistro: _currentUserData!.fechaRegistro,
       numeroTelefono: int.tryParse(_numeroTelefonoController.text) ?? 0,
@@ -205,13 +205,13 @@ class _EditUserDataPreferencesPageState
 
             // Nombre completo
             TextField(
-              controller: _nombreCompletoController, // ← Cambiado
+              controller: _nombreCompletoController, 
               decoration: InputDecoration(
                 labelText: 'Nombre Completo',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.badge),
                 enabled:
-                    true, // ← Cambiado a true si quieres que sea editable, o déjalo en false
+                    true, // TODO: decidir si queremos que este campo sea editable? (true o false) 
               ),
             ),
             SizedBox(height: 16),

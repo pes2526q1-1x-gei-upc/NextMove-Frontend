@@ -76,7 +76,7 @@ class _OnboardingUserDataPageState extends State<OnboardingUserDataPage> {
     final userData = UserData(
       apodo: _apodoController.text,
       nombreCompleto: _nombreCompletoController.text,
-      fechaNacimiento: DateTime.now(), // Puedes añadir selector de fecha
+      fechaNacimiento: DateTime.now(), 
       fechaRegistro: DateTime.now(),
       numeroTelefono: int.tryParse(_numeroTelefonoController.text) ?? 0,
       idiomaPreferido: "Español",
