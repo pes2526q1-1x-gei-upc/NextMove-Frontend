@@ -51,8 +51,8 @@ class GraphQLQueries {
         nombre,
         direccion,
         coordenadas {
-          lat,
-          lon
+          latitude,
+          longitude
         },
         plazasTotales,
         estacionCargaElectrica,
@@ -82,8 +82,8 @@ class GraphQLQueries {
       anclajesDisponibles
       estacionCargaElectrica
       coordenadas {
-        lat
-        lon
+        latitude
+        longitude
       }
       
       distanciaKm

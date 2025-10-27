@@ -35,13 +35,13 @@ class BicycleStationDetails extends StationDetails {
   });
 
   factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
-    print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
+    // print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
     return BicycleStationDetails(
       id: data['id'],
       name: data['nombre'],
       address: data['direccion'],
-      latitude: (data['coordenadas']['lat'] as num).toDouble(),
-      longitude: (data['coordenadas']['lon'] as num).toDouble(),
+      latitude: (data['coordenadas']['latitude'] as num).toDouble(),
+      longitude: (data['coordenadas']['longitude'] as num).toDouble(),
       totalSlots: data['plazasTotales'],
       availableSlots: data['anclajesDisponibles'],
       rating: 5, // TODO: obtenir valoració de la BD
