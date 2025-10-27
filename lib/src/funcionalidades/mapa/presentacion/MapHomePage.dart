@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preserences_page.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
@@ -149,10 +150,10 @@ class _MapHomePageState extends State<MapHomePage> {
 
   // Navegar a EditUserDataPreferences
   void _navigateToEditUser() {
-    //Navigator.push(
-    //  context,
-    //  MaterialPageRoute(builder: (context) => const EditUserDataPreferences()),
-    //);
+    Navigator.push(
+     context,
+     MaterialPageRoute(builder: (context) => const EditUserDataPreferences()),
+    );
   }
 
   @override
