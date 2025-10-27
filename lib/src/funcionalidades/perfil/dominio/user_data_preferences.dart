@@ -36,6 +36,21 @@ class UserData {
     required this.modoPreferido,
   });
 
+/// Aquí aplico el Patrón Factory!
+  ///
+  /// Un factory constructor NO crea el objeto directamente como un constructor normal.
+  /// En su lugar, puede ejecutar lógica (validaciones, transformaciones, manejo de errores)
+  /// ANTES de decidir cómo crear el objeto o incluso si crearlo.
+  /// - Entrada: {"preferredMode": "CAR", "phoneNumber": "123"}
+  /// - Proceso: Convierte "CAR" → "Coche", String "123" → int 123
+  /// - Salida: UserData(modoPreferido: "Coche", numeroTelefono: 123)
+  ///
+  /// Sin factory tendríamos que repetir estas conversiones en cada pantalla.
+  /// Con factory las hacemos una sola vez aquí (llamando UserData.fromGraphQl donde necesitemos)
+  ///
+  /// Facilita el mantenimiento: si cambia la API, solo se modifica aquí -> principio abierto cerrado
+  /// Y un poco más de documentación para más tortura muajajaja https://dart.dev/language/constructors#factory-constructors
+
 factory UserData.fromGraphQL(
     Map<String, dynamic> data,
     String firebaseUserId,
@@ -85,7 +100,7 @@ factory UserData.fromGraphQL(
   }
 }
 
-// Obtener datos del usuario desde Provider
+
 UserData? fetchUserDataPreferencesFromProvider(BuildContext context) {
   final userProvider = Provider.of<UserProvider>(context, listen: false);
   final userData = userProvider.user;
@@ -98,17 +113,16 @@ UserData? fetchUserDataPreferencesFromProvider(BuildContext context) {
   return UserData.fromGraphQL(userData, firebaseUserId);
 }
 
-// Enviar datos del usuario (delegado a capa de datos)
+
 void sendUserDataPreferences(UserData preferences, BuildContext context) {
   pushUserDataPreferences(preferences, context);
 }
 
-// Obtener datos del usuario desde la base de datos (delegado a capa de datos)
+
 UserData fetchUserDataPreferences() {
   return DBfetchUserDataPreferences();
 }
 
-// Actualizar datos del usuario
 Future<void> updateUserDataPreferences(
   UserData preferences,
   BuildContext context,
@@ -117,10 +131,10 @@ Future<void> updateUserDataPreferences(
   debugPrint("Dominio: Actualizando preferencias del usuario");
   debugPrint("========================");
 
-  // 1. Enviar a la API (capa de datos)
+  // llamada a API
   await pushUserDataPreferences(preferences, context);
 
-  // 2. Actualizar Provider para mantener sincronizado el estado local
+  // Recordad que en el UserProvider tenemos guardado al usuario actual!! Por lo tanto, también hay que sincronizarlo
   final userProvider = Provider.of<UserProvider>(context, listen: false);
   final currentUser = userProvider.user;
 
@@ -132,8 +146,7 @@ Future<void> updateUserDataPreferences(
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(
       preferences.modoPreferido,
     );
-    // birthDate se mantiene igual
-    // photo se mantiene igual
+
 
     userProvider.setUser(
       updatedUser,
