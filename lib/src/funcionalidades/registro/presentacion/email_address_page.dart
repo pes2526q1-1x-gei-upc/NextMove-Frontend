@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
 
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
