@@ -5,6 +5,11 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -41,7 +46,29 @@ class WelcomePage extends StatelessWidget {
                 width: signInButtonsWidth,
                 text: AppLocalizations.of(context)!.signInWithGoogle,
                 onPressed: () async {
-                  await signInWithGoogle();
+                  final userCredential = await signInWithGoogle();
+                  final firebaseToken = await userCredential.user?.getIdToken();
+                  final firebaseUserId = userCredential.user?.uid;
+
+                  // obtener el usuario mediante la API y guardarlo en Provider
+                  final client = GraphQLProvider.of(context).value;
+                  final authService = AuthService(client);
+
+                  try {
+                    final meData = await authService.getCurrentUser();
+                    if (meData != null && firebaseUserId != null) {
+                      debugPrint("Hey acabo de guardar los siguientes datos:");
+                      debugPrint("Firebase User ID: $firebaseUserId");
+                      debugPrint("User Data: $meData");
+                      Provider.of<UserProvider>(context, listen: false).setUser(
+                        meData,
+                        firebaseUserId: firebaseUserId,
+                        firebaseToken: firebaseToken,
+                      );
+                    }
+                  } catch (e) {
+                    print("Error cargando usuario GraphQL: $e");
+                  }
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => const MapHomePage()),
                   );
