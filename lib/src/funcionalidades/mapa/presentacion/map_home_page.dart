@@ -23,28 +23,33 @@ class _MapHomePageState extends State<MapHomePage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   LatLng? _userLocation;
 
-  StreamSubscription<Position>? _positionStream; // listener de los cambios de ubicacion
-  
+  StreamSubscription<Position>?
+  _positionStream; // listener de los cambios de ubicacion
+
   // Estado para el modo (bicicleta o coche)
-  StationType _currentMode = StationType.bicycle; // Por defecto bicicleta, ya usaremos el modo por defecto del usuario
+  StationType _currentMode = StationType
+      .bicycle; // Por defecto bicicleta, ya usaremos el modo por defecto del usuario
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadStations(getAllEVStationDetails, (data) => stations = data,);
-    _loadStations(getAllBicycleStationDetails, (data) => bikeStations = data,);
+    _loadStations(getAllEVStationDetails, (data) => stations = data);
+    _loadStations(getAllBicycleStationDetails, (data) => bikeStations = data);
     //_loadBikeStations(getAllBikeStations, (data) => bikeStations = data);
     _initializateLocation();
   }
 
-  Future<void> _loadStations(Future<List<StationDetails>?> Function() getStatsFunc, void Function(List<StationDetails>) onSuccess,) async {
-try {
+  Future<void> _loadStations(
+    Future<List<StationDetails>?> Function() getStatsFunc,
+    void Function(List<StationDetails>) onSuccess,
+  ) async {
+    try {
       final stationsToLoad = await getStatsFunc();
       if (stationsToLoad != null) {
-      setState(() {
+        setState(() {
           onSuccess(stationsToLoad);
-      });
+        });
       }
     } catch (e, stackTrace) {
       debugPrint('Error loading stations: $e');
@@ -63,19 +68,18 @@ try {
     await _checkLocationPermission();
   }
 
- 
-
   Future<void> _checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+      permission = await Geolocator.requestPermission();
     }
 
-    if(permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.deniedForever) {
       _showPermissionDialog();
     }
 
-    if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
       _startLocationUpdates();
     }
   }
@@ -85,45 +89,50 @@ try {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Se requiere permiso de ubicación'),
-        content: const Text('Habilite la ubicación en la configuración del dispositivo'),
+        content: const Text(
+          'Habilite la ubicación en la configuración del dispositivo',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Aceptar'),
           ),
           TextButton(
-            onPressed: (){
+            onPressed: () {
               Geolocator.openAppSettings();
               Navigator.of(context).pop();
             },
             child: const Text('Abrir ajustes'),
-          )
+          ),
         ],
       ),
     );
   }
 
   void _startLocationUpdates() {
-     final LocationSettings locationSettings = LocationSettings(
+    final LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high, //lo suyo seria lo que decida el usuario
       distanceFilter: 50, //se actualiza cada 50 metros
-     );
-      _positionStream =  Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-    (Position? position) {
-      setState(() {
-        if(position != null) _userLocation = LatLng(position.latitude, position.longitude);
-      });
-        print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
-    });
-
-
-
+    );
+    _positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: locationSettings,
+        ).listen((Position? position) {
+          setState(() {
+            if (position != null)
+              _userLocation = LatLng(position.latitude, position.longitude);
+          });
+          print(
+            position == null
+                ? 'Unknown'
+                : '${position.latitude.toString()}, ${position.longitude.toString()}',
+          );
+        });
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     _setMapStyle();
-
   }
 
   void _setMapStyle() async {
@@ -146,7 +155,6 @@ try {
       _currentMode = mode;
     });
     // LOGICA DE RECARGAR ESTACIONES SEGUN MODO
-
   }
 
   // Iconos bici y coches
@@ -161,7 +169,7 @@ try {
   // Navegar a EditUserDataPreferences
   void _navigateToEditUser() {
     Navigator.push(
-     context,
+      context,
       MaterialPageRoute(
         builder: (context) => const EditUserDataPreferencesPage(),
       ),
@@ -175,10 +183,7 @@ try {
         children: [
           GoogleMap(
             onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _bcnCenter,
-              zoom: 12,
-            ),
+            initialCameraPosition: CameraPosition(target: _bcnCenter, zoom: 12),
             markers: _buildMarkers(),
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
@@ -188,26 +193,23 @@ try {
 
           // BOTON FOTO DE USUARIO
           Positioned(
-            top: 70, // Ajustado para status bar, igual cambiar para android o dependiendo del display del dispositivo...
+            top:
+                70, // Ajustado para status bar, igual cambiar para android o dependiendo del display del dispositivo...
             left: 16,
             child: GestureDetector(
               onTap: _navigateToEditUser,
               child: CircleAvatar(
-                radius: 25, 
+                radius: 25,
                 backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  color: Colors.grey[600],
-                  size: 28, 
-                ),
+                child: Icon(Icons.person, color: Colors.grey[600], size: 28),
               ),
             ),
           ),
 
           // BARRA DE BUSQUEDA
           Positioned(
-            top: 70, 
-            left: 80, 
+            top: 70,
+            left: 80,
             right: 16,
             child: Container(
               height: 50,
@@ -232,7 +234,10 @@ try {
                     borderRadius: BorderRadius.circular(25),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
                 ),
                 onSubmitted: (value) {
                   //LOGICA DE BUSQUEDA
@@ -241,8 +246,8 @@ try {
             ),
           ),
 
-            // BOTON LISTA DE ESTACIONES
-            Positioned(
+          // BOTON LISTA DE ESTACIONES
+          Positioned(
             top: 130,
             right: 16,
             child: GestureDetector(
@@ -259,27 +264,23 @@ try {
                 );
               },
               child: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 5,
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                    ),
+                  ],
                 ),
-                ],
-              ),
-              child: Icon(
-                Icons.list,
-                color: Colors.grey[700],
-                size: 28,
-              ),
+                child: Icon(Icons.list, color: Colors.grey[700], size: 28),
               ),
             ),
-            ),
+          ),
 
           // BOTONES DE TOGGLE MODO
           Positioned(
@@ -291,13 +292,13 @@ try {
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(30), 
+                  borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15), 
+                      color: Colors.black.withOpacity(0.15),
                       spreadRadius: 2,
-                      blurRadius: 10, 
-                      offset: const Offset(0, 5), 
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -309,39 +310,54 @@ try {
                       flex: 1,
                       child: GestureDetector(
                         onTap: () => _switchMode(StationType.bicycle),
-                        child: AnimatedContainer( // AnimatedContainer para transiciones 
+                        child: AnimatedContainer(
+                          // AnimatedContainer para transiciones
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
-                            color: _currentMode == StationType.bicycle ? Colors.blue.shade600 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(26), 
+                            color: _currentMode == StationType.bicycle
+                                ? Colors.blue.shade600
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(26),
                           ),
                           child: Icon(
                             Icons.directions_bike,
-                            color: _currentMode == StationType.bicycle ? Colors.white : Colors.grey[700],
+                            color: _currentMode == StationType.bicycle
+                                ? Colors.white
+                                : Colors.grey[700],
                             size: 24,
                           ),
                         ),
                       ),
                     ),
-                    
+
                     // Segmento coche
                     Expanded(
                       flex: 1,
                       child: GestureDetector(
                         onTap: () => _switchMode(StationType.electricVehicle),
-                        child: AnimatedContainer( 
+                        child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
-                            color: _currentMode == StationType.electricVehicle ? Colors.green.shade600 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(26), 
+                            color: _currentMode == StationType.electricVehicle
+                                ? Colors.green.shade600
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(26),
                           ),
                           child: Icon(
                             Icons.electric_car,
-                            color: _currentMode == StationType.electricVehicle ? Colors.white : Colors.grey[700],
+                            color: _currentMode == StationType.electricVehicle
+                                ? Colors.white
+                                : Colors.grey[700],
                             size: 24,
                           ),
                         ),
@@ -361,13 +377,12 @@ try {
     Set<Marker> markers = {};
     //print del primer elemento de la estacion
     final customIcon = _getCustomMarkerIcon();
-    List<StationDetails>? stationsToMark = []; 
-    if(_currentMode == StationType.bicycle) {
-       stationsToMark = bikeStations;
+    List<StationDetails>? stationsToMark = [];
+    if (_currentMode == StationType.bicycle) {
+      stationsToMark = bikeStations;
     } else {
       stationsToMark = stations;
     }
-
 
     for (int i = 0; i < stationsToMark!.length; i++) {
       final station = stationsToMark![i];
@@ -389,28 +404,32 @@ try {
                   children: [
                     Text(
                       station.address,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      station.address,
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    Text(station.address, style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentMode == StationType.bicycle ? Colors.blue : Colors.green,
+                          backgroundColor: _currentMode == StationType.bicycle
+                              ? Colors.blue
+                              : Colors.green,
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => StationDetailsPage(
-                              stationID: station.id,
-                              stationType: _currentMode,
-                              stationDetails: station,
-                            )),
+                            MaterialPageRoute(
+                              builder: (context) => StationDetailsPage(
+                                stationID: station.id,
+                                stationType: _currentMode,
+                                stationDetails: station,
+                              ),
+                            ),
                           );
                         },
                         child: const Text('Info'),

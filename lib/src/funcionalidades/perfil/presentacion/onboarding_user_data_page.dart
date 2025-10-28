@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/MapHomePage.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
 
 class OnboardingUserDataPage extends StatefulWidget {
   const OnboardingUserDataPage({super.key});
@@ -85,7 +85,7 @@ class _OnboardingUserDataPageState extends State<OnboardingUserDataPage> {
     );
 
     try {
-      await updateUserDataPreferences(userData, context);
+      updateUserDataPreferences(userData, context);
 
       if (mounted) {
         // Navegar al home y eliminar todo el stack anterior
