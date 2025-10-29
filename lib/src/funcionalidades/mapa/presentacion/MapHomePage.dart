@@ -16,6 +16,8 @@ class _MapHomePageState extends State<MapHomePage> {
   late GoogleMapController mapController;
   List<StationDetails>? stations = [];
   List<StationDetails>? bikeStations = [];
+  Set<Marker> carsMarkers = {};
+  Set<Marker> bikeMarkers = {};
   final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   LatLng? _userLocation;
@@ -307,63 +309,78 @@ class _MapHomePageState extends State<MapHomePage> {
     //print del primer elemento de la estacion
     final customIcon = _getCustomMarkerIcon();
     List<StationDetails>? stationsToMark = []; 
-    if(_currentMode == 'bicicleta') {
-       stationsToMark = bikeStations;
-    } else {
-      stationsToMark = stations;
-    }
+   
 
-
-    for (int i = 0; i < stationsToMark!.length; i++) {
-      final station = stationsToMark![i];
-      markers.add(
-        Marker(
-          markerId: MarkerId(station.id),
-          position: LatLng(station.latitude, station.longitude),
-          icon: customIcon,
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              builder: (context) => Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      station.address,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      station.address,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentMode == 'bicicleta' ? Colors.blue : Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          //ACCION PARA LLEVARLE A LA INFORMACION DETALLADA
-                        },
-                        child: const Text('Info'),
-                      ),
-                    ),
-                  ],
+    if((_currentMode == 'bicicleta' && bikeMarkers.isEmpty) || (_currentMode == 'coche' && carsMarkers.isEmpty)) {
+         if(_currentMode == 'bicicleta') {
+            stationsToMark = bikeStations;
+          } else {
+            stationsToMark = stations;
+          }
+        for (int i = 0; i < stationsToMark!.length; i++) {
+        final station = stationsToMark![i];
+        markers.add( 
+          Marker(
+            markerId: MarkerId(station.id),
+            position: LatLng(station.latitude, station.longitude),
+            icon: customIcon,
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-              ),
-            );
-          },
-        ),
-      );
-    }
+                builder: (context) => Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        station.address,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        station.address,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _currentMode == 'bicicleta' ? Colors.blue : Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            //ACCION PARA LLEVARLE A LA INFORMACION DETALLADA
+                          },
+                          child: const Text('Info'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }
+      if(_currentMode == 'bicicleta') {
+          bikeMarkers = markers;
+        } else {
+          carsMarkers = markers;
+        }
+    } 
+
+    else if(_currentMode == 'bicicleta') {
+          markers = bikeMarkers;
+        } else {
+          markers = carsMarkers;
+        }
+    
+    
 
     return markers;
   }
