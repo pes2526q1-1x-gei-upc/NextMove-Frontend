@@ -25,6 +25,7 @@ class _MapHomePageState extends State<MapHomePage> {
 
   StreamSubscription<Position>?
   _positionStream; // listener de los cambios de ubicacion
+  MapType _currentMapType = MapType.normal;
 
   // Estado para el modo (bicicleta o coche)
   StationType _currentMode = StationType
@@ -187,6 +188,14 @@ class _MapHomePageState extends State<MapHomePage> {
     }
   }
 
+  void _toggleMapType() {
+    setState(() {
+      _currentMapType = _currentMapType == MapType.normal
+          ? MapType.satellite
+          : MapType.normal;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,8 +207,10 @@ class _MapHomePageState extends State<MapHomePage> {
             markers: _buildMarkers(),
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
             liteModeEnabled: false,
-            mapType: MapType.normal,
+            compassEnabled: true,
+            mapType: _currentMapType,
           ),
 
           // BOTON FOTO DE USUARIO
@@ -293,6 +304,7 @@ class _MapHomePageState extends State<MapHomePage> {
             ),
           ),
 
+          // BOTON CENTRAR EN USUARIO, hacemos uno propio y ocultamos el de google maps
           Positioned(
             top: 190, // Un poco más abajo que el botón de lista (130 + 50 + 10 de margen)
             right: 16,
@@ -316,7 +328,39 @@ class _MapHomePageState extends State<MapHomePage> {
               ),
             ),
           ),
-          
+
+        // BOTON CAMBIAR TIPO DE MAPA
+          Positioned(
+            top: 250, // Debajo del botón de centrado (190 + 50 + 10)
+            right: 16,
+            child: GestureDetector(
+              onTap: _toggleMapType, // Llama a la nueva función
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+                // Cambiamos el icono según el modo actual
+                child: Icon(
+                  _currentMapType == MapType.normal 
+                    ? Icons.satellite // Si es normal, muestra icono para cambiar a satélite
+                    : Icons.map,      // Si es satélite, muestra icono para cambiar a normal
+                  color: Colors.grey[700],
+                  size: 28,
+                ),
+              ),
+            ),
+          ),
+
           // BOTONES DE TOGGLE MODO 
           Positioned(
             bottom: 30,
