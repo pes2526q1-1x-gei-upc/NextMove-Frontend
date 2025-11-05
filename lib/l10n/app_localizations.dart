@@ -265,7 +265,7 @@ abstract class AppLocalizations {
   /// No description provided for @userDescription.
   ///
   /// In en, this message translates to:
-  /// **'Description'**
+  /// **'Description (optional)'**
   String get userDescription;
 
   /// No description provided for @userDescriptionHint.
@@ -301,7 +301,7 @@ abstract class AppLocalizations {
   /// No description provided for @imagePickerError.
   ///
   /// In en, this message translates to:
-  /// **'An error occurred while selecting the image.'**
+  /// **'Error selecting image'**
   String get imagePickerError;
 
   /// No description provided for @saveChangesFeedback.
@@ -609,6 +609,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stations'**
   String get stations;
+
+  /// No description provided for @saveChangesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving changes.'**
+  String get saveChangesError;
 }
 
 class _AppLocalizationsDelegate

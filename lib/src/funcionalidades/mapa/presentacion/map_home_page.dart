@@ -171,9 +171,20 @@ class _MapHomePageState extends State<MapHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EditUserDataPreferencesPage(),
+        builder: (context) => const EditUserDataPreferences(),
       ),
     );
+  }
+
+  void _centerOnUser() {
+    if (_userLocation != null) {
+      mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          _userLocation!,
+          15, // Puedes ajustar el nivel de zoom al centrar
+        ),
+      );
+    }
   }
 
   @override
@@ -186,7 +197,7 @@ class _MapHomePageState extends State<MapHomePage> {
             initialCameraPosition: CameraPosition(target: _bcnCenter, zoom: 12),
             markers: _buildMarkers(),
             myLocationEnabled: true,
-            myLocationButtonEnabled: true,
+            myLocationButtonEnabled: false,
             liteModeEnabled: false,
             mapType: MapType.normal,
           ),
@@ -195,7 +206,7 @@ class _MapHomePageState extends State<MapHomePage> {
           Positioned(
             top:
                 70, // Ajustado para status bar, igual cambiar para android o dependiendo del display del dispositivo...
-            left: 16,
+            right: 16,
             child: GestureDetector(
               onTap: _navigateToEditUser,
               child: CircleAvatar(
@@ -209,8 +220,8 @@ class _MapHomePageState extends State<MapHomePage> {
           // BARRA DE BUSQUEDA
           Positioned(
             top: 70,
-            left: 80,
-            right: 16,
+            left: 16,
+            right: 80,
             child: Container(
               height: 50,
               width: double.infinity,
@@ -282,83 +293,97 @@ class _MapHomePageState extends State<MapHomePage> {
             ),
           ),
 
-          // BOTONES DE TOGGLE MODO
           Positioned(
-            bottom: 30,
-            left: 140,
-            right: 140,
-            child: Center(
+            top: 190, // Un poco más abajo que el botón de lista (130 + 50 + 10 de margen)
+            right: 16,
+            child: GestureDetector(
+              onTap: _centerOnUser, // Llama a la función que creamos
               child: Container(
-                padding: const EdgeInsets.all(3),
+                height: 50,
+                width: 50,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
+                  shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.grey.withOpacity(0.3),
                       spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      blurRadius: 5,
                     ),
                   ],
                 ),
+                child: Icon(Icons.my_location, color: Colors.grey[700], size: 28),
+              ),
+            ),
+          ),
+          
+          // BOTONES DE TOGGLE MODO 
+          Positioned(
+            bottom: 30,
+            left: 100,
+            right: 100,
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    spreadRadius: 2,
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Segmento bicicleta
+                    // BOTÓN BICICLETA - FONDO COMPLETO
                     Expanded(
-                      flex: 1,
-                      child: GestureDetector(
-                        onTap: () => _switchMode(StationType.bicycle),
-                        child: AnimatedContainer(
-                          // AnimatedContainer para transiciones
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _currentMode == StationType.bicycle
-                                ? Colors.blue.shade600
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(26),
-                          ),
-                          child: Icon(
-                            Icons.directions_bike,
-                            color: _currentMode == StationType.bicycle
-                                ? Colors.white
-                                : Colors.grey[700],
-                            size: 24,
+                      child: Material(
+                        color: _currentMode == StationType.bicycle
+                            ? Colors.blue.shade600
+                            : Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _switchMode(StationType.bicycle),
+                          child: Center(
+                            child: Icon(
+                              Icons.directions_bike,
+                              color: _currentMode == StationType.bicycle
+                                  ? Colors.white
+                                  : Colors.grey[700],
+                              size: 28,
+                            ),
                           ),
                         ),
                       ),
                     ),
 
-                    // Segmento coche
+                    // SEPARADOR CENTRAL
+                    Container(
+                      width: 1,
+                      height: double.infinity,
+                      color: Colors.grey[300],
+                    ),
+
+                    // BOTÓN COCHE - FONDO COMPLETO
                     Expanded(
-                      flex: 1,
-                      child: GestureDetector(
-                        onTap: () => _switchMode(StationType.electricVehicle),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _currentMode == StationType.electricVehicle
-                                ? Colors.green.shade600
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(26),
-                          ),
-                          child: Icon(
-                            Icons.electric_car,
-                            color: _currentMode == StationType.electricVehicle
-                                ? Colors.white
-                                : Colors.grey[700],
-                            size: 24,
+                      child: Material(
+                        color: _currentMode == StationType.electricVehicle
+                            ? Colors.green.shade600
+                            : Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _switchMode(StationType.electricVehicle),
+                          child: Center(
+                            child: Icon(
+                              Icons.electric_car,
+                              color: _currentMode == StationType.electricVehicle
+                                  ? Colors.white
+                                  : Colors.grey[700],
+                              size: 28,
+                            ),
                           ),
                         ),
                       ),

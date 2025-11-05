@@ -102,7 +102,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get preferredLanguage => 'Idioma preferido';
 
   @override
-  String get userDescription => 'Descripción';
+  String get userDescription => 'Descripción (opcional)';
 
   @override
   String get userDescriptionHint => 'Introduce una breve descripción sobre ti';
@@ -120,8 +120,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gallery => 'Galería';
 
   @override
-  String get imagePickerError =>
-      'Se produjo un error al seleccionar la imagen.';
+  String get imagePickerError => 'Error al seleccionar la imagen';
 
   @override
   String get saveChangesFeedback => 'Cambios guardados con éxito.';
@@ -277,4 +276,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get stations => 'Estaciones';
+
+  @override
+  String get saveChangesError => 'Error al guardar los cambios.';
 }

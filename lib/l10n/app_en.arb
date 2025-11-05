@@ -34,7 +34,7 @@
     "invalidBirthDateFormat": "Invalid date format. Use YYYY-MM-DD",
     "telephoneNumber": "Telephone number",
     "preferredLanguage": "Preferred language",
-    "userDescription": "Description",
+    "userDescription": "Description (optional)",
     "userDescriptionHint": "Enter a brief description about yourself",
     "preferredMode": "Preferred mode",
     "saveChanges": "Save changes",
@@ -100,5 +100,7 @@
     "error": "Error",
     "unknownPower": "Unknown power",
     "unknown": "Unknown",
-    "stations": "Stations"
+    "stations": "Stations",
+    "imagePickerError": "Error selecting image",
+    "saveChangesError": "Error saving changes."
 }

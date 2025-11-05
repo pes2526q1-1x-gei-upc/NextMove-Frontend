@@ -6,7 +6,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page
 
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/onboarding_user_data_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
@@ -178,7 +177,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       appKey.currentState?.setLoggedIn(true);
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => OnboardingUserDataPage(),
+                          builder: (context) => UserDataPreferences(),
                         ),
                       );
                     } catch (e) {
