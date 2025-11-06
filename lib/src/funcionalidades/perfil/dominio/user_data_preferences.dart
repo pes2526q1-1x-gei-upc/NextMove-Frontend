@@ -92,7 +92,7 @@ factory UserData.fromGraphQL(
     switch (localMode) {
       case 'Coche':
         return 'CAR';
-      case 'Bicicleta':
+      case 'Bici':
         return 'BIKE';
       default:
         return 'CAR';

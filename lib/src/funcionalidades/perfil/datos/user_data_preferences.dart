@@ -15,7 +15,7 @@ Future<UserData> pushUserDataPreferences(
   debugPrint("Nombre Completo: ${preferences.nombreCompleto}");
   debugPrint("Número de Teléfono: ${preferences.numeroTelefono}");
   debugPrint("Descripción: ${preferences.descripcion}");
-  debugPrint("Modo Preferido: ${preferences.modoPreferido}");
+  //debugPrint("Modo Preferido: ${preferences.modoPreferido}");
   debugPrint("========================");
 
   final GraphQLClient client = GraphQLProvider.of(context).value;

@@ -33,8 +33,9 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
   String? _selectedIdioma;
   String? _selectedModo;
 
+  // Valores consistentes con lo que ve el usuario
   final List<String> _idiomas = ['Español', 'English', 'Català'];
-  final List<String> _modos = ['Bici', 'Coche'];
+  final List<String> _modos = ['Bicicleta', 'Coche'];
 
   UserData? _currentUserData;
   bool _isLoading = true;
@@ -64,12 +65,41 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
         _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(userData.fechaNacimiento);
         _telefonoController.text = userData.numeroTelefono == 0 ? '' : userData.numeroTelefono.toString();
         _descripcionController.text = userData.descripcion;
+
+        // Idioma: fallback a Español si vacío
         _selectedIdioma = userData.idiomaPreferido.isNotEmpty ? userData.idiomaPreferido : 'Español';
-        _selectedModo = userData.modoPreferido;
+
+        // Modo: convertir BIKE/CAR → Bicicleta/Coche
+        _selectedModo = _mapModoToDisplay(userData.modoPreferido);
+
         _isLoading = false;
       });
     } else {
       setState(() => _isLoading = false);
+    }
+  }
+
+  // Convierte valores backend (BIKE/CAR) a valores del dropdown
+  String _mapModoToDisplay(String backendValue) {
+    switch (backendValue.toUpperCase()) {
+      case 'BIKE':
+        return 'Bicicleta';
+      case 'CAR':
+        return 'Coche';
+      default:
+        return 'Bicicleta'; // fallback
+    }
+  }
+
+  // Convierte valores del dropdown a backend (opcional, si guardas así)
+  String _mapModoToBackend(String displayValue) {
+    switch (displayValue) {
+      case 'Bicicleta':
+        return 'BIKE';
+      case 'Coche':
+        return 'CAR';
+      default:
+        return 'BIKE';
     }
   }
 
@@ -81,21 +111,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     _telefonoController.dispose();
     _descripcionController.dispose();
     super.dispose();
-  }
-
-  // === Date Picker (no editable) ===
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
   }
 
   // === Image Picker ===
@@ -156,7 +171,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
 
     if (_currentUserData == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Error: No hay datos de usuario'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Error: No hay datos de usuario'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -171,7 +186,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
-      modoPreferido: _selectedModo ?? 'Coche',
+      modoPreferido: _mapModoToBackend(_selectedModo ?? 'Bicicleta'), // ← Guardar en formato backend
     );
 
     try {
@@ -212,7 +227,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     if (_currentUserData == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.editProfile)),
-        body: Center(child: Text("error al cargar datos de usuario")),
+        body: const Center(child: Text("Error al cargar datos de usuario")),
       );
     }
 
@@ -334,7 +349,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
                       icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                       validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
                       items: _modos.map((modo) {
-                        final icon = modo == 'Bici' ? Icons.directions_bike : Icons.electric_car;
+                        final icon = modo == 'Bicicleta' ? Icons.directions_bike : Icons.electric_car;
                         return DropdownMenuItem(
                           value: modo,
                           child: Row(

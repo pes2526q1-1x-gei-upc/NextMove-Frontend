@@ -30,34 +30,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
     super.dispose();
   }
 
-  Future<void> _testQuery() async {
-    final GraphQLClient client = GraphQLProvider.of(context).value;
-
-    final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getUserQuery),
-      variables: {
-        'id': '1', // ID hardcodeado para probar
-      },
-    );
-
-    final QueryResult result = await client.query(options);
-
-    if (result.hasException) {
-      print('Error en query: ${result.exception.toString()}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${result.exception.toString()}')),
-      );
-    } else {
-      print('Resultado: ${result.data}');
-      final userData = result.data?['User'];
-      if (userData != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Usuario: ${userData['nombre']}')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
