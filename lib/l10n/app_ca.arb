@@ -34,7 +34,7 @@
     "invalidBirthDateFormat": "Format de data invàlid. Utilitza YYYY-MM-DD",
     "telephoneNumber": "Número de telèfon",
     "preferredLanguage": "Idioma preferit",
-    "userDescription": "Descripció",
+    "userDescription": "Descripció (opcional)",
     "userDescriptionHint": "Introdueix una breu descripció sobre tu",
     "preferredMode": "Mode preferit",
     "saveChanges": "Desa els canvis",
@@ -100,5 +100,7 @@
     "error": "Error",
     "unknownPower": "Potència desconeguda",
     "unknown": "Desconegut",
-    "stations": "Estacions"
+    "stations": "Estacions",
+    "imagePickerError": "Error al seleccionar la imatge",
+    "saveChangesError": "Error al desar els canvis."
 }

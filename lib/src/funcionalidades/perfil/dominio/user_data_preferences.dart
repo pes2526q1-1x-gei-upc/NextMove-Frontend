@@ -92,7 +92,7 @@ factory UserData.fromGraphQL(
     switch (localMode) {
       case 'Coche':
         return 'CAR';
-      case 'Bicicleta':
+      case 'Bici':
         return 'BIKE';
       default:
         return 'CAR';
@@ -113,12 +113,12 @@ UserData? fetchUserDataPreferencesFromProvider(BuildContext context) {
   return UserData.fromGraphQL(userData, firebaseUserId);
 }
 
-
+// Enviar las preferencias del usuario a la capa de datos
 void sendUserDataPreferences(UserData preferences, BuildContext context) {
-  pushUserDataPreferences(preferences, context);
+  pushUserDataPreferences(preferences, context);    // a capa de datos
 }
 
-
+// Obtener las preferencias del usuario desde la capa de datos
 UserData fetchUserDataPreferences() {
   return DBfetchUserDataPreferences();
 }
@@ -143,9 +143,7 @@ Future<void> updateUserDataPreferences(
     updatedUser['name'] = preferences.nombreCompleto;
     updatedUser['phoneNumber'] = preferences.numeroTelefono.toString();
     updatedUser['bioDescription'] = preferences.descripcion;
-    updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(
-      preferences.modoPreferido,
-    );
+    updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
 
 
     userProvider.setUser(

@@ -10,11 +10,12 @@ Future<UserData> pushUserDataPreferences(
 ) async {
   debugPrint("========================");
   debugPrint("Capa de Datos: Enviando preferencias de usuario a la API");
+  debugPrint("Enviando preferredMode: ${UserData.mapPreferredModeToAPI(preferences.modoPreferido)}");
   debugPrint("Apodo: ${preferences.apodo}");
   debugPrint("Nombre Completo: ${preferences.nombreCompleto}");
   debugPrint("Número de Teléfono: ${preferences.numeroTelefono}");
   debugPrint("Descripción: ${preferences.descripcion}");
-  debugPrint("Modo Preferido: ${preferences.modoPreferido}");
+  //debugPrint("Modo Preferido: ${preferences.modoPreferido}");
   debugPrint("========================");
 
   final GraphQLClient client = GraphQLProvider.of(context).value;

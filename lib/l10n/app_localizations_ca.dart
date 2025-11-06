@@ -102,7 +102,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get preferredLanguage => 'Idioma preferit';
 
   @override
-  String get userDescription => 'Descripció';
+  String get userDescription => 'Descripció (opcional)';
 
   @override
   String get userDescriptionHint => 'Introdueix una breu descripció sobre tu';
@@ -120,8 +120,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get gallery => 'Galeria';
 
   @override
-  String get imagePickerError =>
-      'S\'ha produït un error en seleccionar la imatge.';
+  String get imagePickerError => 'Error al seleccionar la imatge';
 
   @override
   String get saveChangesFeedback => 'Canvis desats correctament.';
@@ -277,4 +276,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get stations => 'Estacions';
+
+  @override
+  String get saveChangesError => 'Error al desar els canvis.';
 }
