@@ -1,29 +1,20 @@
+// src/funcionalidades/perfil/dominio/user_data_preferences.dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/datos/user_data_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
-enum ModoPreferido {
-  coche,
-  bicicleta
-}
-
-enum IdiomaPreferido {
-  espanol,
-  ingles,
-  catala
-}
-
 class UserData {
   final String apodo;
   final String nombreCompleto;
   final DateTime fechaNacimiento;
   final DateTime fechaRegistro;
-  int numeroTelefono;
-  late String idiomaPreferido;
-  late String descripcion;
-  late String modoPreferido;
+  final int numeroTelefono;
+  final String idiomaPreferido;
+  final String descripcion;
+  final String modoPreferido;
 
   UserData({
     required this.apodo,
@@ -36,27 +27,10 @@ class UserData {
     required this.modoPreferido,
   });
 
-/// Aquí aplico el Patrón Factory!
-  ///
-  /// Un factory constructor NO crea el objeto directamente como un constructor normal.
-  /// En su lugar, puede ejecutar lógica (validaciones, transformaciones, manejo de errores)
-  /// ANTES de decidir cómo crear el objeto o incluso si crearlo.
-  /// - Entrada: {"preferredMode": "CAR", "phoneNumber": "123"}
-  /// - Proceso: Convierte "CAR" → "Coche", String "123" → int 123
-  /// - Salida: UserData(modoPreferido: "Coche", numeroTelefono: 123)
-  ///
-  /// Sin factory tendríamos que repetir estas conversiones en cada pantalla.
-  /// Con factory las hacemos una sola vez aquí (llamando UserData.fromGraphQl donde necesitemos)
-  ///
-  /// Facilita el mantenimiento: si cambia la API, solo se modifica aquí -> principio abierto cerrado
-  /// Y un poco más de documentación para más tortura muajajaja https://dart.dev/language/constructors#factory-constructors
-
-factory UserData.fromGraphQL(
-    Map<String, dynamic> data,
-    String firebaseUserId,
-  ) {
+  // === FACTORY: CONVIERTE DATOS DE GRAPHQL A UI ===
+  factory UserData.fromGraphQL(Map<String, dynamic> data, String firebaseUserId) {
     return UserData(
-      apodo: data['name'] ?? 'Usuario',
+      apodo: data['nickname'] ?? 'Usuario',
       nombreCompleto: data['name'] ?? 'Nombre no disponible',
       fechaNacimiento: data['birthDate'] != null
           ? DateTime.parse(data['birthDate'])
@@ -67,84 +41,76 @@ factory UserData.fromGraphQL(
       numeroTelefono: data['phoneNumber'] != null
           ? int.tryParse(data['phoneNumber'].toString()) ?? 0
           : 0,
-      idiomaPreferido: '', // No existe en la API GraphQL
+      idiomaPreferido: data['preferredLanguage'] ?? 'Español',
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
     );
   }
 
-  // Helper para convertir Mode de API a String local
+  // === Mapeo API → UI ===
   static String mapPreferredModeFromAPI(String? apiMode) {
-    if (apiMode == null) return 'Coche';
-
-    switch (apiMode) {
-      case 'CAR':
-        return 'Coche';
+    switch (apiMode?.toUpperCase()) {
       case 'BIKE':
         return 'Bicicleta';
+      case 'CAR':
+        return 'Coche';
       default:
         return 'Coche';
     }
   }
 
-  // Helper para convertir String local a Mode de API
+  // === Mapeo UI → API (CORREGIDO) ===
   static String mapPreferredModeToAPI(String localMode) {
     switch (localMode) {
+      case 'Bicicleta':
+        return 'BIKE';
       case 'Coche':
         return 'CAR';
-      case 'Bici':
-        return 'BIKE';
       default:
         return 'CAR';
     }
   }
 }
 
-
+// === LEER DESDE UserProvider ===
 UserData? fetchUserDataPreferencesFromProvider(BuildContext context) {
   final userProvider = Provider.of<UserProvider>(context, listen: false);
   final userData = userProvider.user;
   final firebaseUserId = userProvider.firebaseUserId;
 
-  if (userData == null || firebaseUserId == null) {
-    return null;
-  }
+  if (userData == null || firebaseUserId == null) return null;
 
   return UserData.fromGraphQL(userData, firebaseUserId);
 }
 
-// Enviar las preferencias del usuario a la capa de datos
+// === ENVIAR A CAPA DE DATOS ===
 void sendUserDataPreferences(UserData preferences, BuildContext context) {
-  pushUserDataPreferences(preferences, context);    // a capa de datos
+  pushUserDataPreferences(preferences, context);
 }
 
-// Obtener las preferencias del usuario desde la capa de datos
+// === OBTENER FALLBACK ===
 UserData fetchUserDataPreferences() {
   return DBfetchUserDataPreferences();
 }
 
-Future<void> updateUserDataPreferences(
-  UserData preferences,
-  BuildContext context,
-) async {
-  debugPrint("========================");
+// === ACTUALIZAR + SINCRONIZAR CON PROVIDER ===
+Future<void> updateUserDataPreferences(UserData preferences, BuildContext context) async {
   debugPrint("Dominio: Actualizando preferencias del usuario");
-  debugPrint("========================");
 
-  // llamada a API
   await pushUserDataPreferences(preferences, context);
 
-  // Recordad que en el UserProvider tenemos guardado al usuario actual!! Por lo tanto, también hay que sincronizarlo
   final userProvider = Provider.of<UserProvider>(context, listen: false);
   final currentUser = userProvider.user;
 
   if (currentUser != null) {
     final updatedUser = Map<String, dynamic>.from(currentUser);
     updatedUser['name'] = preferences.nombreCompleto;
+    updatedUser['nickname'] = preferences.apodo;
     updatedUser['phoneNumber'] = preferences.numeroTelefono.toString();
     updatedUser['bioDescription'] = preferences.descripcion;
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
-
+    updatedUser['preferredLanguage'] = preferences.idiomaPreferido;
+    updatedUser['birthDate'] = preferences.fechaNacimiento.toIso8601String().split('T').first;
 
     userProvider.setUser(
       updatedUser,

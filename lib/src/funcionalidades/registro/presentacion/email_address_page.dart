@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
 
 import 'package:nextmove_app/graphql/queries.dart';
@@ -10,6 +12,7 @@ import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_pa
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
+import 'package:provider/provider.dart';
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
 
@@ -28,6 +31,34 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _testQuery() async {
+    final GraphQLClient client = GraphQLProvider.of(context).value;
+
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getUserQuery),
+      variables: {
+        'id': '1', // ID hardcodeado para probar
+      },
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      print('Error en query: ${result.exception.toString()}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${result.exception.toString()}')),
+      );
+    } else {
+      print('Resultado: ${result.data}');
+      final userData = result.data?['User'];
+      if (userData != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuario: ${userData['nombre']}')),
+        );
+      }
+    }
   }
 
   @override
@@ -142,10 +173,37 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       return;
                     }
                     try {
-                      createUserWithEmailAndPassword(
+                      await createUserWithEmailAndPassword(
                         email: emailAddress,
                         password: password
                       );
+                      print("Usuario creado con email y password");
+                      final firebaseUser = FirebaseAuth.instance.currentUser!;
+                      print("Firebase User ID: ${firebaseUser.uid}");
+                      final firebaseToken = await firebaseUser.getIdToken();
+                      print("Firebase Token: $firebaseToken");
+
+                      // === CLAVE: Llamar a getCurrentUser() ===
+                      // Esto creará el usuario en tu DB automáticamente
+                      final client = GraphQLProvider.of(context).value;
+                      print("GraphQL Client obtenido");
+                      final authService = AuthService(client);
+                      print("AuthService creado");
+
+                      final meData = await authService.getCurrentUser(); // ← ¡Aquí se crea si no existe!
+                      print("Datos del usuario obtenidos: $meData");
+                      if (meData == null) {
+                        throw Exception("No se pudo obtener o crear el usuario en el backend");
+                      }
+
+                      // === Actualizar el provider ===
+                      Provider.of<UserProvider>(context, listen: false).setUser(
+                        meData,
+                        firebaseUserId: firebaseUser.uid,
+                        firebaseToken: firebaseToken,
+                      );
+                      print("UserProvider actualizado");
+
                       appKey.currentState?.setLoggedIn(true);
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
