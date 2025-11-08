@@ -98,9 +98,11 @@
     "connectors": "Conectores",
     "accessType": "Tipo de acceso",
     "error": "Error",
-    "unknownPower": "Potència desconeguda",
-    "unknown": "Desconegut",
+    "unknownPower": "Potencia desconocida",
+    "unknown": "Desconocido",
     "stations": "Estaciones",
-    "imagePickerError": "Error al seleccionar la imagen",
-    "saveChangesError": "Error al guardar los cambios."
+    "saveChangesError": "Error al guardar los cambios.",
+    "bicycle": "Bicicleta",
+    "car": "Coche",
+    "finishRegistration": "Finalizar registro"
 }

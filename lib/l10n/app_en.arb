@@ -101,6 +101,8 @@
     "unknownPower": "Unknown power",
     "unknown": "Unknown",
     "stations": "Stations",
-    "imagePickerError": "Error selecting image",
-    "saveChangesError": "Error saving changes."
+    "saveChangesError": "Error saving changes.",
+    "bicycle": "Bicycle",
+    "car": "Car",
+    "finishRegistration": "Finish registration"
 }

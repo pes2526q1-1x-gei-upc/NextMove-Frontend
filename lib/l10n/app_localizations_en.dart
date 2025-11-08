@@ -117,7 +117,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gallery => 'Gallery';
 
   @override
-  String get imagePickerError => 'Error selecting image';
+  String get imagePickerError => 'An error occurred while selecting the image.';
 
   @override
   String get saveChangesFeedback => 'Changes saved successfully.';
@@ -276,4 +276,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveChangesError => 'Error saving changes.';
+
+  @override
+  String get bicycle => 'Bicycle';
+
+  @override
+  String get car => 'Car';
+
+  @override
+  String get finishRegistration => 'Finish registration';
 }
