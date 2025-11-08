@@ -41,13 +41,18 @@ class UserData {
       numeroTelefono: data['phoneNumber'] != null
           ? int.tryParse(data['phoneNumber'].toString()) ?? 0
           : 0,
-      idiomaPreferido: data['preferredLanguage'] ?? 'Español',
+          
+      // === CAMBIO AQUÍ ===
+      // Mapeamos el valor de API (ej. "en") a UI (ej. "English")
+      idiomaPreferido: mapLanguageFromAPI(data['preferredLanguage']), 
+      
+      
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
     );
   }
 
-  // === Mapeo API → UI ===
+  // === Mapeo Modo API → UI ===
   static String mapPreferredModeFromAPI(String? apiMode) {
     switch (apiMode?.toUpperCase()) {
       case 'BIKE':
@@ -59,7 +64,7 @@ class UserData {
     }
   }
 
-  // === Mapeo UI → API (CORREGIDO) ===
+  // === Mapeo Modo UI → API ===
   static String mapPreferredModeToAPI(String localMode) {
     switch (localMode) {
       case 'Bicicleta':
@@ -68,6 +73,36 @@ class UserData {
         return 'CAR';
       default:
         return 'CAR';
+    }
+  }
+
+  // === MAPEAMIENTO DE IDIOMA AÑADIDO ===
+
+  // === Mapeo Idioma API → UI ===
+  static String mapLanguageFromAPI(String? apiLang) {
+    switch (apiLang?.toLowerCase()) {
+      case 'es':
+        return 'Español';
+      case 'en':
+        return 'English';
+      case 'ca':
+        return 'Català';
+      default:
+        return 'Español'; // Idioma por defecto de la UI
+    }
+  }
+
+  // === Mapeo Idioma UI → API ===
+  static String mapLanguageToAPI(String uiLang) {
+    switch (uiLang) {
+      case 'Español':
+        return 'es';
+      case 'English':
+        return 'en';
+      case 'Català':
+        return 'ca';
+      default:
+        return 'es';
     }
   }
 }
@@ -109,7 +144,12 @@ Future<void> updateUserDataPreferences(UserData preferences, BuildContext contex
     updatedUser['phoneNumber'] = preferences.numeroTelefono.toString();
     updatedUser['bioDescription'] = preferences.descripcion;
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
-    updatedUser['preferredLanguage'] = preferences.idiomaPreferido;
+    
+    // === CAMBIO AQUÍ ===
+    // Mapeamos el valor de UI (ej. "English") a API (ej. "en") para el Provider
+    updatedUser['preferredLanguage'] = UserData.mapLanguageToAPI(preferences.idiomaPreferido);
+    
+    
     updatedUser['birthDate'] = preferences.fechaNacimiento.toIso8601String().split('T').first;
 
     userProvider.setUser(

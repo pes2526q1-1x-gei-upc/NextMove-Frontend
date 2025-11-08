@@ -64,16 +64,19 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
   }
 
   Future<void> _loadUserData() async {
-    final userDataFromMe = await _fetchFromMe();
 
-    if (userDataFromMe != null) {
-      _applyUserData(userDataFromMe);
-      return;
-    }
-
+    // Lee del Provider 
     final userDataFromProvider = fetchUserDataPreferencesFromProvider(context);
+
     if (userDataFromProvider != null) {
       _applyUserData(userDataFromProvider);
+      return; 
+    }
+
+    // Si el provider no tiene nada, vamos a la red.
+    final userDataFromMe = await _fetchFromMe(); 
+    if (userDataFromMe != null) {
+      _applyUserData(userDataFromMe);
     } else {
       setState(() => _isLoading = false);
     }
@@ -87,7 +90,11 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(userData.fechaNacimiento);
       _telefonoController.text = userData.numeroTelefono == 0 ? '' : userData.numeroTelefono.toString();
       _descripcionController.text = userData.descripcion;
-      _selectedIdioma = userData.idiomaPreferido.isNotEmpty ? userData.idiomaPreferido : 'Español';
+      
+      // === CAMBIO AQUÍ ===
+      // Asignamos directamente el valor de UI (ej. "English")
+      _selectedIdioma = userData.idiomaPreferido; 
+      
       _selectedModo = userData.modoPreferido; // ← "Bicicleta" o "Coche"
       _isLoading = false;
     });
@@ -99,7 +106,10 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       final client = GraphQLProvider.of(context).value;
 
       final result = await client.query(
-        QueryOptions(document: gql(GraphQLQueries.getMeQuery)),
+        QueryOptions(
+          document: gql(GraphQLQueries.getMeQuery),
+          fetchPolicy: FetchPolicy.networkOnly,
+        ),
       );
 
       if (result.hasException) {
@@ -194,7 +204,10 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
-      modoPreferido: UserData.mapPreferredModeToAPI(_selectedModo ?? 'Coche'),
+      
+      // === CAMBIO AQUÍ ===
+      // Pasamos el valor de UI (ej. "Bicicleta")
+      modoPreferido: _selectedModo ?? 'Coche',
     );
 
     try {
