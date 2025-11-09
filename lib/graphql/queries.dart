@@ -7,12 +7,14 @@ class GraphQLQueries {
       me {
         email
         name
+        nickname
         photo
         preferredMode
         birthDate
         bioDescription
         phoneNumber
         createdAt
+        preferredLanguage
       }
     }
   ''';
