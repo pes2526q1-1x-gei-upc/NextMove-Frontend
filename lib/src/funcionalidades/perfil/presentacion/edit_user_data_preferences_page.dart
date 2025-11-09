@@ -55,7 +55,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_isLoading) {
-      _loadUserData(); // ← AQUÍ SÍ ES SEGURO
+      _loadUserData(); 
     }
   }
 

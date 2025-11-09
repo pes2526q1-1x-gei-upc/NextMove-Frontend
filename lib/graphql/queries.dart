@@ -7,6 +7,7 @@ class GraphQLQueries {
       me {
         email
         name
+        nickname
         photo
         nickname
         preferredMode
@@ -33,6 +34,7 @@ class GraphQLQueries {
         email
         name
         needsToRegister
+        preferredLanguage
       }
     }
   ''';
