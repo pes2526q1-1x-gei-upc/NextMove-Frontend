@@ -8,11 +8,31 @@ class GraphQLQueries {
         email
         name
         photo
+        nickname
         preferredMode
         birthDate
         bioDescription
+        preferredLanguage
         phoneNumber
         createdAt
+        needsToRegister
+      }
+    }
+  ''';
+
+  static const String upsertUserMutation = r'''
+    mutation UpsertUser($id: String!, $email: String, $name: String, $needsToRegister: Boolean) {
+      insert_users_one(
+        object: { id: $id, email: $email, name: $name, needsToRegister: $needsToRegister }
+        on_conflict: {
+          constraint: users_pkey
+          update_columns: [email, name, updated_at, needsToRegister]
+        }
+      ) {
+        id
+        email
+        name
+        needsToRegister
       }
     }
   ''';

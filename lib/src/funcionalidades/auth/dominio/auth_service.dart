@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../../graphql/queries.dart';
+
 class AuthService {
   final GraphQLClient _client;
 
@@ -18,7 +19,9 @@ class AuthService {
 
       if (result.hasException) {
         debugPrint('Error al obtener usuario: ${result.exception.toString()}');
-        throw Exception('Error al obtener usuario: ${result.exception.toString()}');
+        throw Exception(
+          'Error al obtener usuario: ${result.exception.toString()}',
+        );
       }
 
       if (result.data != null && result.data!['me'] != null) {
@@ -29,6 +32,38 @@ class AuthService {
     } catch (e) {
       debugPrint('Error al obtener usuario: $e');
       throw Exception('Error en getCurrentUser: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> upsertUserFromFirebase({
+    required String firebaseUid,
+    required String? email,
+    required String? name,
+    bool? needsToRegister,
+  }) async {
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.upsertUserMutation),
+      variables: {
+        'id': firebaseUid,
+        'email': email,
+        'name': name,
+        'needsToRegister': needsToRegister,
+      },
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    try {
+      final result = await _client.mutate(options);
+
+      if (result.hasException) {
+        debugPrint('Error en upsert: ${result.exception}');
+        return null;
+      }
+
+      return result.data?['insert_users_one'];
+    } catch (e) {
+      debugPrint('Error en upsertUser: $e');
+      return null;
     }
   }
 }

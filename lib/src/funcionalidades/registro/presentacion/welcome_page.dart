@@ -3,6 +3,7 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -16,7 +17,7 @@ class WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var signInButtonsWidth = MediaQuery.of(context).size.width * (2/3);
+    var signInButtonsWidth = MediaQuery.of(context).size.width * (2 / 3);
     return Scaffold(
       body: Center(
         child: Padding(
@@ -39,40 +40,74 @@ class WelcomePage extends StatelessWidget {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => EmailAddressPage()),
                   );
-                }
+                },
               ),
               SignInButton(
                 Buttons.Google,
                 width: signInButtonsWidth,
                 text: AppLocalizations.of(context)!.signInWithGoogle,
                 onPressed: () async {
-                  final userCredential = await signInWithGoogle();
-                  final firebaseToken = await userCredential.user?.getIdToken();
-                  final firebaseUserId = userCredential.user?.uid;
-
-                  // obtener el usuario mediante la API y guardarlo en Provider
-                  final client = GraphQLProvider.of(context).value;
-                  final authService = AuthService(client);
-
                   try {
+                    final userCredential = await signInWithGoogle();
+                    if (userCredential.user == null) return;
+
+                    final firebaseUserId = userCredential.user!.uid;
+                    final firebaseToken = await userCredential.user!.getIdToken();
+                    final email = userCredential.user!.email;
+                    final name = userCredential.user!.displayName;
+
+                    final client = GraphQLProvider.of(context).value;
+                    final authService = AuthService(client);
+
+                    final upsertData = await authService.upsertUserFromFirebase(
+                      firebaseUid: firebaseUserId,
+                      email: email,
+                      name: name,
+                    );
+
+                    if (upsertData == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error al sincronizar usuario")),
+                      );
+                      return;
+                    }
+
                     final meData = await authService.getCurrentUser();
-                    if (meData != null && firebaseUserId != null) {
-                      debugPrint("Hey acabo de guardar los siguientes datos:");
-                      debugPrint("Firebase User ID: $firebaseUserId");
-                      debugPrint("User Data: $meData");
+
+                    if (meData != null) {
                       Provider.of<UserProvider>(context, listen: false).setUser(
                         meData,
                         firebaseUserId: firebaseUserId,
                         firebaseToken: firebaseToken,
                       );
                     }
+
+                    if (context.mounted) {
+                      final needsToRegister = meData != null && (meData['needsToRegister'] == true);
+                      if (needsToRegister) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const UserDataPreferences(),
+                          ),
+                        );
+                      } else {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const MapHomePage(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    }
                   } catch (e) {
-                    print("Error cargando usuario GraphQL: $e");
+                    debugPrint("Error login: $e");
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                    }
                   }
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const MapHomePage()),
-                  );
-                }
+                },
               ),
             ],
           ),
