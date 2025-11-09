@@ -301,7 +301,7 @@ abstract class AppLocalizations {
   /// No description provided for @imagePickerError.
   ///
   /// In en, this message translates to:
-  /// **'Error selecting image'**
+  /// **'An error occurred while selecting the image.'**
   String get imagePickerError;
 
   /// No description provided for @saveChangesFeedback.
@@ -615,6 +615,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error saving changes.'**
   String get saveChangesError;
+
+  /// No description provided for @bicycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bicycle'**
+  String get bicycle;
+
+  /// No description provided for @car.
+  ///
+  /// In en, this message translates to:
+  /// **'Car'**
+  String get car;
+
+  /// No description provided for @finishRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish registration'**
+  String get finishRegistration;
 }
 
 class _AppLocalizationsDelegate

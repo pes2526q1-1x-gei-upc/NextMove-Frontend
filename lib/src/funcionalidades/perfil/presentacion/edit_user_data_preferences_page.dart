@@ -35,7 +35,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
 
   // Valores UI
   final List<String> _idiomas = ['Español', 'English', 'Català'];
-  final List<String> _modos = ['Bicicleta', 'Coche'];
 
   UserData? _currentUserData;
   bool _isLoading = true;
@@ -89,6 +88,16 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       _selectedModo = userData.modoPreferido;
       _isLoading = false;
     });
+  // Convierte valores backend (BIKE/CAR) a valores del dropdown
+  String _mapModoToDisplay(String backendValue) {
+    switch (backendValue.toUpperCase()) {
+      case 'BIKE':
+        return AppLocalizations.of(context)!.bicycle;
+      case 'CAR':
+        return AppLocalizations.of(context)!.car;
+      default:
+        return AppLocalizations.of(context)!.bicycle; // fallback
+    }
   }
 
   Future<UserData?> _fetchFromMe() async {
@@ -355,15 +364,16 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
                       ),
                       icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                       validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                      items: _modos.map((modo) {
-                        final icon = modo == 'Bicicleta' ? Icons.directions_bike : Icons.electric_car;
+                      items: ModoPreferido.values.map((modo) {
+                        final icon = modo == ModoPreferido.bicicleta ? Icons.directions_bike : Icons.electric_car;
+                        String modoString = modo == ModoPreferido.bicicleta ? AppLocalizations.of(context)!.bicycle : AppLocalizations.of(context)!.car;
                         return DropdownMenuItem(
-                          value: modo,
+                          value: modoString,
                           child: Row(
                             children: [
                               Icon(icon, color: Theme.of(context).primaryColor),
                               const SizedBox(width: 12),
-                              Text(modo, style: const TextStyle(fontWeight: FontWeight.w500)),
+                              Text(modoString, style: const TextStyle(fontWeight: FontWeight.w500)),
                             ],
                           ),
                         );

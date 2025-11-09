@@ -101,6 +101,8 @@
     "unknownPower": "Potència desconeguda",
     "unknown": "Desconegut",
     "stations": "Estacions",
-    "imagePickerError": "Error al seleccionar la imatge",
-    "saveChangesError": "Error al desar els canvis."
+    "saveChangesError": "Error al desar els canvis.",
+    "bicycle": "Bicicleta",
+    "car": "Cotxe",
+    "finishRegistration": "Finalitzar registre"
 }
