@@ -120,7 +120,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gallery => 'Galería';
 
   @override
-  String get imagePickerError => 'Error al seleccionar la imagen';
+  String get imagePickerError =>
+      'Se produjo un error al seleccionar la imagen.';
 
   @override
   String get saveChangesFeedback => 'Cambios guardados con éxito.';
@@ -269,14 +270,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get error => 'Error';
 
   @override
-  String get unknownPower => 'Potència desconeguda';
+  String get unknownPower => 'Potencia desconocida';
 
   @override
-  String get unknown => 'Desconegut';
+  String get unknown => 'Desconocido';
 
   @override
   String get stations => 'Estaciones';
 
   @override
   String get saveChangesError => 'Error al guardar los cambios.';
+
+  @override
+  String get bicycle => 'Bicicleta';
+
+  @override
+  String get car => 'Coche';
+
+  @override
+  String get finishRegistration => 'Finalizar registro';
 }

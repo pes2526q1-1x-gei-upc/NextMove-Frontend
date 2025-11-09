@@ -12,6 +12,8 @@ import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_pa
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
 import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
+
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
 
@@ -66,62 +68,231 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.whatIsYourEmailAddress,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.of(context)!.emailAddress,
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-              readOnly: emailChecked,
-              style: emailChecked ? TextStyle(color: Theme.of(context).disabledColor) : null,
-            ),
-            if (emailChecked) ...[
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.password,
-                  border: const OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              if (needsToRegister) ...[
-                Text(
-                  AppLocalizations.of(context)!.passwordRequirements,
-                  style: TextStyle(fontSize: 14),
-                )
-              ],
-            ],
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                final emailAddress = _emailController.text.trim();
-                if (!emailChecked) {
-                  try {
-                    needsToRegister = !(await isEmailRegistered(emailAddress));
-                    if (needsToRegister) {
-                    await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(AppLocalizations.of(context)!.register),
-                        content: Text(AppLocalizations.of(context)!.needsToRegister),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('OK'),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.whatIsYourEmailAddress,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.emailAddress,
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        readOnly: emailChecked,
+                        style: emailChecked
+                            ? TextStyle(color: Theme.of(context).disabledColor)
+                            : null,
+                      ),
+                      if (emailChecked) ...[
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _passwordController,
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.password,
+                            border: const OutlineInputBorder(),
+                          ),
+                          obscureText: true,
+                        ),
+                        if (needsToRegister) ...[
+                          Text(
+                            AppLocalizations.of(context)!.passwordRequirements,
+                            style: TextStyle(fontSize: 14),
                           ),
                         ],
+                      ],
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final emailAddress = _emailController.text.trim();
+                          if (!emailChecked) {
+                            try {
+                              needsToRegister = !(await isEmailRegistered(
+                                emailAddress,
+                              ));
+                              if (needsToRegister) {
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text(
+                                      AppLocalizations.of(context)!.register,
+                                    ),
+                                    content: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.needsToRegister,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                needsToRegister = needsToRegister;
+                                emailChecked = true;
+                              });
+                            } on FirebaseAuthException catch (e) {
+                              if (e.code == 'invalid-email') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.invalidEmail,
+                                    ),
+                                  ),
+                                );
+                                return;
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.errorOccurred(
+                                        e.message ??
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.unknownError,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.errorOccurred(e.toString()),
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                          } else {
+                            if (needsToRegister) {
+                              final password = _passwordController.text;
+                              final passwordValidationResult = isPasswordValid(
+                                password,
+                              );
+                              if (passwordValidationResult !=
+                                  PasswordValidationError.valid) {
+                                String errorMessage =
+                                    switch (passwordValidationResult) {
+                                      PasswordValidationError.tooShort =>
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.passwordTooShort,
+                                      PasswordValidationError.needsLowercase =>
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.passwordNeedsLowercase,
+                                      PasswordValidationError.needsUppercase =>
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.passwordNeedsUppercase,
+                                      PasswordValidationError.needsNumber =>
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.passwordNeedsNumber,
+                                      PasswordValidationError
+                                          .needsSpecialCharacter =>
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.passwordNeedsSpecialCharacter,
+                                      _ => '',
+                                    };
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(errorMessage)),
+                                );
+                                return;
+                              }
+                              try {
+                                createUserWithEmailAndPassword(
+                                  email: emailAddress,
+                                  password: password,
+                                );
+                                appKey.currentState?.setLoggedIn(true);
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => UserDataPreferences(),
+                                  ),
+                                );
+                              } catch (e) {
+                                print(e);
+                              }
+                            } else {
+                              final password = _passwordController.text;
+                              try {
+                                await signInWithEmailAndPassword(
+                                  email: emailAddress,
+                                  password: password,
+                                );
+                                appKey.currentState?.setLoggedIn(true);
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => MapHomePage(),
+                                  ),
+                                  (route) => false,
+                                );
+                              } on FirebaseAuthException catch (e) {
+                                if (e.code == 'wrong-password') {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.wrongPassword,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.errorOccurred(
+                                          e.message ??
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.unknownError,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        },
+                        child: emailChecked
+                            ? (needsToRegister
+                                  ? Text(AppLocalizations.of(context)!.register)
+                                  : Text(AppLocalizations.of(context)!.signIn))
+                            : Text(AppLocalizations.of(context)!.continue_),
                       ),
                     );
                   }
@@ -242,7 +413,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                                          Text(AppLocalizations.of(context)!.signIn)) :
                         Text(AppLocalizations.of(context)!.continue_)
               ),
-          ],
+            );
+          },
         ),
       ),
     );
