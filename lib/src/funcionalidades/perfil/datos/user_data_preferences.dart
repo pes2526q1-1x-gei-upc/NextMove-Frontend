@@ -8,67 +8,101 @@ Future<UserData> pushUserDataPreferences(
   UserData preferences,
   BuildContext context,
 ) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) throw Exception("Usuario no autenticado");
+
+  final email = user.email;
+  if (email == null) throw Exception("Email no disponible");
+
   debugPrint("========================");
-  debugPrint("Capa de Datos: Enviando preferencias de usuario a la API");
-  debugPrint("Enviando preferredMode: ${UserData.mapPreferredModeToAPI(preferences.modoPreferido)}");
+  debugPrint("Actualizando usuario con email: $email");
+  debugPrint("Nombre: ${preferences.nombreCompleto}");
   debugPrint("Apodo: ${preferences.apodo}");
-  debugPrint("Nombre Completo: ${preferences.nombreCompleto}");
-  debugPrint("Número de Teléfono: ${preferences.numeroTelefono}");
-  debugPrint("Descripción: ${preferences.descripcion}");
-  //debugPrint("Modo Preferido: ${preferences.modoPreferido}");
-  debugPrint("========================");
+  debugPrint("Teléfono: ${preferences.numeroTelefono}");
+  debugPrint("Fecha nacimiento: ${preferences.fechaNacimiento}");
+
 
   final GraphQLClient client = GraphQLProvider.of(context).value;
 
+  
   const String updateUserMutation = r'''
-    mutation UpdateMe($name: String, $preferredMode: Mode, $phoneNumber: String, $bioDescription: String) {
+    mutation UpdateMe(
+      $email: String!
+      $name: String
+      $nickname: String
+      $phoneNumber: String
+      $bioDescription: String
+      $preferredMode: Mode
+      $preferredLanguage: String
+      $birthDate: String
+    ) {
       updateMe(
-        name: $name,
-        preferredMode: $preferredMode,
-        phoneNumber: $phoneNumber,
+        email: $email
+        name: $name
+        nickname: $nickname
+        phoneNumber: $phoneNumber
         bioDescription: $bioDescription
+        preferredMode: $preferredMode
+        preferredLanguage: $preferredLanguage
+        birthDate: $birthDate
       ) {
         email
         name
-        photo
-        preferredMode
-        birthDate
-        bioDescription
+        nickname
         phoneNumber
-        createdAt
+        bioDescription
+        preferredMode
+        preferredLanguage
+        birthDate
       }
     }
   ''';
 
+  // FORMATEO DE FECHA: "YYYY-MM-DD"
+  String? formatBirthDate(DateTime? date) {
+    if (date == null) return null;
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  // TELÉFONO: solo si no es 0 o vacío
+  String? formatPhone(int? phone) {
+    if (phone == null || phone == 0) return null;
+    return phone.toString();
+  }
+
   final MutationOptions options = MutationOptions(
     document: gql(updateUserMutation),
     variables: {
-      'name': preferences.nombreCompleto,
-      'preferredMode': UserData.mapPreferredModeToAPI(
-        preferences.modoPreferido,
-      ),
-      'phoneNumber': preferences.numeroTelefono.toString(),
-      'bioDescription': preferences.descripcion.isEmpty
-          ? null
-          : preferences.descripcion,
+      'email': email,
+      'name': preferences.nombreCompleto?.trim().isEmpty == true ? null : preferences.nombreCompleto?.trim(),
+      'nickname': preferences.apodo?.trim().isEmpty == true ? null : preferences.apodo?.trim(),
+      'phoneNumber': formatPhone(preferences.numeroTelefono),
+      'bioDescription': preferences.descripcion.trim().isEmpty ? null : preferences.descripcion.trim(),
+      'preferredMode': UserData.mapPreferredModeToAPI(preferences.modoPreferido),
+      'preferredLanguage': UserData.mapLanguageToAPI(preferences.idiomaPreferido),
+      
+      'birthDate': formatBirthDate(preferences.fechaNacimiento),
     },
   );
 
   final QueryResult result = await client.mutate(options);
 
   if (result.hasException) {
-    debugPrint("Error al actualizar usuario: ${result.exception.toString()}");
-    throw Exception('Error al actualizar usuario: ${result.exception}');
+    debugPrint("ERROR GraphQL: ${result.exception}");
+    for (var err in result.exception?.graphqlErrors ?? []) {
+      debugPrint("GraphQL Error: ${err.message}");
+    }
+    throw Exception('Error al actualizar: ${result.exception}');
   }
 
-  debugPrint("Usuario actualizado correctamente en la API");
+  final data = result.data?['updateMe'];
+  if (data == null) {
+    throw Exception("No se actualizó el usuario con email: $email");
+  }
 
-  // Por ahora, solo simula el guardado
-  await Future.delayed(Duration(seconds: 1));
-  
+  debugPrint("Usuario actualizado correctamente: $data");
   return preferences;
 }
-
 
 // Obtener datos del usuario desde la base de datos
 UserData DBfetchUserDataPreferences() {
@@ -78,57 +112,14 @@ UserData DBfetchUserDataPreferences() {
   );
   debugPrint("========================");
 
-  // Datos por defecto (fallback cuando no hay datos en Provider)
   return UserData(
     apodo: "Usuario",
     nombreCompleto: "Nombre no disponible",
     fechaNacimiento: DateTime.now(),
     fechaRegistro: DateTime.now(),
     numeroTelefono: 0,
-    idiomaPreferido: "Español",
+    idiomaPreferido: "Español", // Valor de UI por defecto
     descripcion: "",
-    modoPreferido: "Coche",
+    modoPreferido: "Coche", // Valor de UI por defecto
   );
 }
-
-// TODO: Implementar función para obtener usuario desde GraphQL
-/*
-ESTA WEA PORQUE NO FUNCIONAA DOLASNDAWSDASD
-Future<UserData?> fetchUserDataFromAPI(BuildContext context, String userId) async {
-  final GraphQLClient client = GraphQLProvider.of(context).value;
-  
-  const String getUserQuery = r'''
-    query GetUser($userId: ID!) {
-      user(id: $userId) {
-        id
-        username
-        name
-        email
-        phone
-        bio
-        birthDate
-        createdAt
-        preferredLanguage
-        preferredMode
-      }
-    }
-  ''';
-  
-  final QueryOptions options = QueryOptions(
-    document: gql(getUserQuery),
-    variables: {'userId': userId},
-  );
-  
-  final QueryResult result = await client.query(options);
-  
-  if (result.hasException) {
-    debugPrint("Error al obtener usuario: ${result.exception.toString()}");
-    return null;
-  }
-  
-  final data = result.data?['user'];
-  if (data == null) return null;
-  
-  return UserData.fromGraphQL(data, userId);
-}
-*/

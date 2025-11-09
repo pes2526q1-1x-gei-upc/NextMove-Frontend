@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 
 class EditUserDataPreferences extends StatefulWidget {
   const EditUserDataPreferences({super.key});
@@ -33,8 +33,9 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
   String? _selectedIdioma;
   String? _selectedModo;
 
-  // Valores consistentes con lo que ve el usuario
+  // Valores UI
   final List<String> _idiomas = ['Español', 'English', 'Català'];
+  final List<String> _modos = ['Bicicleta', 'Coche'];
 
   UserData? _currentUserData;
   bool _isLoading = true;
@@ -43,36 +44,35 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
   void initState() {
     super.initState();
     _apodoController = TextEditingController();
-    _nombreCompletoController = TextEditingController();
-    _fechaNacimientoController = TextEditingController();
     _telefonoController = TextEditingController();
+    _fechaNacimientoController = TextEditingController();
     _descripcionController = TextEditingController();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserData();
-    });
+    _nombreCompletoController = TextEditingController();
   }
 
-  void _loadUserData() {
-    final userData = fetchUserDataPreferencesFromProvider(context);
+  // === CARGA CON PRIORIDAD: me → UserProvider ===
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isLoading) {
+      _loadUserData(); // ← AQUÍ SÍ ES SEGURO
+    }
+  }
 
-    if (userData != null) {
-      setState(() {
-        _currentUserData = userData;
-        _apodoController.text = userData.apodo;
-        _nombreCompletoController.text = userData.nombreCompleto;
-        _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(userData.fechaNacimiento);
-        _telefonoController.text = userData.numeroTelefono == 0 ? '' : userData.numeroTelefono.toString();
-        _descripcionController.text = userData.descripcion;
+  Future<void> _loadUserData() async {
 
-        // Idioma: fallback a Español si vacío
-        _selectedIdioma = userData.idiomaPreferido.isNotEmpty ? userData.idiomaPreferido : 'Español';
+    // Lee del Provider 
+    final userDataFromProvider = fetchUserDataPreferencesFromProvider(context);
 
-        // Modo: convertir BIKE/CAR → Bicicleta/Coche
-        _selectedModo = _mapModoToDisplay(userData.modoPreferido);
+    if (userDataFromProvider != null) {
+      _applyUserData(userDataFromProvider);
+      return; 
+    }
 
-        _isLoading = false;
-      });
+    // Si el provider no tiene nada, vamos a la red.
+    final userDataFromMe = await _fetchFromMe(); 
+    if (userDataFromMe != null) {
+      _applyUserData(userDataFromMe);
     } else {
       setState(() => _isLoading = false);
     }
@@ -90,27 +90,32 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       _selectedModo = userData.modoPreferido;
       _isLoading = false;
     });
-  // Convierte valores backend (BIKE/CAR) a valores del dropdown
-  String _mapModoToDisplay(String backendValue) {
-    switch (backendValue.toUpperCase()) {
-      case 'BIKE':
-        return AppLocalizations.of(context)!.bicycle;
-      case 'CAR':
-        return AppLocalizations.of(context)!.car;
-      default:
-        return AppLocalizations.of(context)!.bicycle; // fallback
-    }
   }
 
-  // Convierte valores del dropdown a backend (opcional, si guardas así)
-  String _mapModoToBackend(String displayValue) {
-    switch (displayValue) {
-      case 'Bicicleta':
-        return 'BIKE';
-      case 'Coche':
-        return 'CAR';
-      default:
-        return 'BIKE';
+  // === USAR GraphQLQueries.getMeQuery ===
+  Future<UserData?> _fetchFromMe() async {
+    try {
+      final client = GraphQLProvider.of(context).value;
+
+      final result = await client.query(
+        QueryOptions(
+          document: gql(GraphQLQueries.getMeQuery),
+          fetchPolicy: FetchPolicy.networkOnly,
+        ),
+      );
+
+      if (result.hasException) {
+        debugPrint("Error en query me: ${result.exception}");
+        return null;
+      }
+
+      final data = result.data?['me'];
+      if (data == null) return null;
+
+      return UserData.fromGraphQL(data, '');
+    } catch (e) {
+      debugPrint("Error _fetchFromMe: $e");
+      return null;
     }
   }
 
@@ -124,7 +129,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     super.dispose();
   }
 
-  // === Image Picker ===
   void _showImageSourceActionSheet() {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
@@ -156,11 +160,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        maxWidth: 800,
-        imageQuality: 85,
-      );
+      final pickedFile = await _picker.pickImage(source: source, maxWidth: 800, imageQuality: 85);
       if (pickedFile != null) {
         setState(() => _selectedImageFile = File(pickedFile.path));
       }
@@ -171,7 +171,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     }
   }
 
-  // === Guardar Cambios ===
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +196,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
-      modoPreferido: _mapModoToBackend(_selectedModo ?? 'Bicicleta'), // ← Guardar en formato backend
+      modoPreferido: _selectedModo ?? 'Coche',
     );
 
     try {
@@ -220,9 +219,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     }
   }
 
-  void _goBack() {
-    Navigator.pop(context);
-  }
+  void _goBack() => Navigator.pop(context);
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +251,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Foto de perfil
               Center(
                 child: GestureDetector(
                   onTap: _showImageSourceActionSheet,
@@ -281,7 +277,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 32),
 
-              // Apodo (no editable)
               TextFormField(
                 controller: _apodoController,
                 enabled: false,
@@ -293,7 +288,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
-              // Nombre Completo (no editable)
               TextFormField(
                 controller: _nombreCompletoController,
                 enabled: false,
@@ -305,7 +299,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
-              // Fecha de Nacimiento (no editable)
               TextFormField(
                 controller: _fechaNacimientoController,
                 enabled: false,
@@ -318,7 +311,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
-              // Teléfono
               TextFormField(
                 controller: _telefonoController,
                 decoration: InputDecoration(
@@ -334,7 +326,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
-              // Descripción
               TextFormField(
                 controller: _descripcionController,
                 decoration: InputDecoration(
@@ -347,7 +338,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
-              // Modo e Idioma
               Row(
                 children: [
                   Expanded(
@@ -359,16 +349,15 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
                       ),
                       icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
                       validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                      items: ModoPreferido.values.map((modo) {
-                        final icon = modo == ModoPreferido.bicicleta ? Icons.directions_bike : Icons.electric_car;
-                        String modoString = modo == ModoPreferido.bicicleta ? AppLocalizations.of(context)!.bicycle : AppLocalizations.of(context)!.car;
+                      items: _modos.map((modo) {
+                        final icon = modo == 'Bicicleta' ? Icons.directions_bike : Icons.electric_car;
                         return DropdownMenuItem(
-                          value: modoString,
+                          value: modo,
                           child: Row(
                             children: [
                               Icon(icon, color: Theme.of(context).primaryColor),
                               const SizedBox(width: 12),
-                              Text(modoString, style: const TextStyle(fontWeight: FontWeight.w500)),
+                              Text(modo, style: const TextStyle(fontWeight: FontWeight.w500)),
                             ],
                           ),
                         );
@@ -395,7 +384,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 32),
 
-              // Botón Guardar
               Center(
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveChanges,
