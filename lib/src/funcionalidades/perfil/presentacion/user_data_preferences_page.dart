@@ -28,14 +28,15 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
   // Imagen
   final ImagePicker _picker = ImagePicker();
   File? _selectedImageFile;
-  final AssetImage _avatarImage = const AssetImage('assets/Profile_avatar_placeholder_large.png');
+  final AssetImage _avatarImage = const AssetImage(
+    'assets/Profile_avatar_placeholder_large.png',
+  );
 
   // Dropdowns
   String? _selectedIdioma;
-  String? _selectedModo;
+  ModoPreferido? _selectedModo;
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
-  final List<String> _modos = ['Bici', 'Coche'];
 
   bool _isLoading = false;
 
@@ -83,7 +84,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     );
     if (picked != null) {
       setState(() {
-        _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
+        _fechaNacimientoController.text = DateFormat(
+          'yyyy-MM-dd',
+        ).format(picked);
       });
     }
   }
@@ -163,12 +166,15 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     final userData = UserData(
       apodo: _apodoController.text.trim(),
       nombreCompleto: _nombreCompletoController.text.trim(),
-      fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+      fechaNacimiento:
+          DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
       fechaRegistro: DateTime.now(),
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
-      modoPreferido: _selectedModo ?? 'Coche',
+      modoPreferido: _selectedModo == ModoPreferido.bicicleta
+          ? 'Bicicleta'
+          : 'Coche',
     );
 
     try {
@@ -176,7 +182,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback)),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.saveChangesFeedback),
+          ),
         );
 
         // Limpiar stack y ir al home
@@ -190,7 +198,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             //content: Text('Error al guardar: $e'),
-            content : Text(AppLocalizations.of(context)!.saveChangesError + ' $e'),
+            content: Text(
+              AppLocalizations.of(context)!.saveChangesError + ' $e',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -240,8 +250,14 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                                 right: 0,
                                 child: CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).primaryColor,
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],
@@ -258,7 +274,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                           border: const OutlineInputBorder(),
                           hintText: l10n.nicknameHint,
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
+                        validator: (v) => v?.trim().isEmpty ?? true
+                            ? l10n.mandatoryNickname
+                            : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -269,7 +287,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                           labelText: l10n.fullName,
                           border: const OutlineInputBorder(),
                         ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
+                        validator: (v) => v?.trim().isEmpty ?? true
+                            ? l10n.mandatoryFullName
+                            : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -284,7 +304,8 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                         ),
                         readOnly: true,
                         onTap: () => _selectDate(context),
-                        validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
+                        validator: (v) =>
+                            v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -292,13 +313,17 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       TextFormField(
                         controller: _telefonoController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.telephoneNumber,
+                          labelText: AppLocalizations.of(
+                            context,
+                          )!.telephoneNumber,
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.phone,
                         validator: (v) {
                           if (v == null || v.isEmpty) return null;
-                          return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
+                          return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v)
+                              ? null
+                              : l10n.invalidPhoneNumber;
                         },
                       ),
                       const SizedBox(height: 16),
@@ -307,7 +332,9 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       TextFormField(
                         controller: _descripcionController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.userDescription,
+                          labelText: AppLocalizations.of(
+                            context,
+                          )!.userDescription,
                           border: const OutlineInputBorder(),
                           alignLabelWithHint: true,
                         ),
@@ -319,26 +346,45 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       Row(
                         children: [
                           Expanded(
-                            child: DropdownButtonFormField<String>(
+                            child: DropdownButtonFormField<ModoPreferido>(
                               value: _selectedModo,
                               decoration: InputDecoration(
                                 labelText: l10n.preferredMode,
                                 border: const OutlineInputBorder(),
                               ),
                               icon: const Icon(Icons.arrow_drop_down),
-                              validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                              items: _modos.map((m) {
-                                final icon = m == 'Bici' ? Icons.directions_bike : Icons.electric_car;
-                                return DropdownMenuItem(
-                                  value: m,
-                                  child: Row(children: [
-                                    Icon(icon, color: Theme.of(context).primaryColor),
-                                    const SizedBox(width: 12),
-                                    Text(m),
-                                  ]),
+                              validator: (v) => v == null
+                                  ? l10n.mandatoryPreferredMode
+                                  : null,
+                              items: ModoPreferido.values.map((modo) {
+                                final icon = modo == ModoPreferido.bicicleta
+                                    ? Icons.directions_bike
+                                    : Icons.electric_car;
+                                String modoString =
+                                    modo == ModoPreferido.bicicleta
+                                    ? AppLocalizations.of(context)!.bicycle
+                                    : AppLocalizations.of(context)!.car;
+                                return DropdownMenuItem<ModoPreferido>(
+                                  value: modo,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        icon,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        modoString,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 );
                               }).toList(),
-                              onChanged: (v) => setState(() => _selectedModo = v),
+                              onChanged: (ModoPreferido? v) =>
+                                  setState(() => _selectedModo = v),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -351,9 +397,15 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                               ),
                               icon: const Icon(Icons.arrow_drop_down),
                               items: _idiomas
-                                  .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+                                  .map(
+                                    (i) => DropdownMenuItem<String>(
+                                      value: i,
+                                      child: Text(i),
+                                    ),
+                                  )
                                   .toList(),
-                              onChanged: (v) => setState(() => _selectedIdioma = v),
+                              onChanged: (String? v) =>
+                                  setState(() => _selectedIdioma = v),
                             ),
                           ),
                         ],
@@ -365,17 +417,26 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _finalizarOnboarding,
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 50,
+                              vertical: 16,
+                            ),
                           ),
                           child: _isLoading
                               ? const SizedBox(
                                   height: 20,
                                   width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
                                 )
                               : Text(
-                                  'Finalizar Registro',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  l10n.finishRegistration,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                         ),
                       ),

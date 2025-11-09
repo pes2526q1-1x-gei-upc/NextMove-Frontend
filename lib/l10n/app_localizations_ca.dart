@@ -120,7 +120,8 @@ class AppLocalizationsCa extends AppLocalizations {
   String get gallery => 'Galeria';
 
   @override
-  String get imagePickerError => 'Error al seleccionar la imatge';
+  String get imagePickerError =>
+      'S\'ha produït un error en seleccionar la imatge.';
 
   @override
   String get saveChangesFeedback => 'Canvis desats correctament.';
@@ -279,4 +280,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get saveChangesError => 'Error al desar els canvis.';
+
+  @override
+  String get bicycle => 'Bicicleta';
+
+  @override
+  String get car => 'Cotxe';
+
+  @override
+  String get finishRegistration => 'Finalitzar registre';
 }
