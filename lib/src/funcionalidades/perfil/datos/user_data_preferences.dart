@@ -121,5 +121,6 @@ UserData DBfetchUserDataPreferences() {
     idiomaPreferido: "Español", // Valor de UI por defecto
     descripcion: "",
     modoPreferido: "Coche", // Valor de UI por defecto
+    needsToRegister: false,
   );
 }
