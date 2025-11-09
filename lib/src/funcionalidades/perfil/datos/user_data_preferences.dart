@@ -1,5 +1,3 @@
-// src/funcionalidades/perfil/datos/user_data_preferences.dart
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -22,19 +20,8 @@ Future<UserData> pushUserDataPreferences(
   debugPrint("Apodo: ${preferences.apodo}");
   debugPrint("Teléfono: ${preferences.numeroTelefono}");
   debugPrint("Fecha nacimiento: ${preferences.fechaNacimiento}");
-  
-  // Log para valores de UI
-  debugPrint("Idioma (UI): ${preferences.idiomaPreferido}");
-  debugPrint("Modo (UI): ${preferences.modoPreferido}");
-  
-  // Log para valores de API
-  debugPrint("Idioma (API): ${UserData.mapLanguageToAPI(preferences.idiomaPreferido)}");
-  debugPrint("Modo (API): ${UserData.mapPreferredModeToAPI(preferences.modoPreferido)}");
-  debugPrint("========================");
-
 
   final GraphQLClient client = GraphQLProvider.of(context).value;
-
   
   const String updateUserMutation = r'''
     mutation UpdateMe(
@@ -89,14 +76,8 @@ Future<UserData> pushUserDataPreferences(
       'nickname': preferences.apodo?.trim().isEmpty == true ? null : preferences.apodo?.trim(),
       'phoneNumber': formatPhone(preferences.numeroTelefono),
       'bioDescription': preferences.descripcion.trim().isEmpty ? null : preferences.descripcion.trim(),
-      
-      // Mapeo UI -> API (Correcto)
       'preferredMode': UserData.mapPreferredModeToAPI(preferences.modoPreferido),
-      
-      // === CAMBIO AQUÍ ===
-      // Mapeamos el valor de UI (ej. "English") a API (ej. "en")
       'preferredLanguage': UserData.mapLanguageToAPI(preferences.idiomaPreferido),
-      
       'birthDate': formatBirthDate(preferences.fechaNacimiento),
     },
   );

@@ -11,7 +11,6 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
 import 'package:provider/provider.dart';
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -183,14 +182,12 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       final firebaseToken = await firebaseUser.getIdToken();
                       print("Firebase Token: $firebaseToken");
 
-                      // === CLAVE: Llamar a getCurrentUser() ===
-                      // Esto creará el usuario en tu DB automáticamente
                       final client = GraphQLProvider.of(context).value;
                       print("GraphQL Client obtenido");
                       final authService = AuthService(client);
                       print("AuthService creado");
 
-                      final meData = await authService.getCurrentUser(); // ← ¡Aquí se crea si no existe!
+                      final meData = await authService.getCurrentUser(); // Aquí se crea si no existe
                       print("Datos del usuario obtenidos: $meData");
                       if (meData == null) {
                         throw Exception("No se pudo obtener o crear el usuario en el backend");

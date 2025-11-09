@@ -1,4 +1,3 @@
-// src/graphql/queries.dart
 class GraphQLQueries {
   // === USUARIO ACTUAL (me) ===
   static const String getMeQuery = r'''

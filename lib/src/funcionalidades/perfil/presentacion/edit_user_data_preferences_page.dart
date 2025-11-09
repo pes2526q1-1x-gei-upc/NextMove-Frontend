@@ -1,5 +1,3 @@
-// src/funcionalidades/perfil/presentacion/edit_user_data_preferences.dart
-
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -50,16 +48,13 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     _fechaNacimientoController = TextEditingController();
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
-
-    // ← NO LLAMAR _loadUserData() AQUÍ
   }
 
-  // === CARGA CON PRIORIDAD: me → UserProvider ===
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_isLoading) {
-      _loadUserData(); // ← AQUÍ SÍ ES SEGURO
+      _loadUserData(); 
     }
   }
 
@@ -90,17 +85,12 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(userData.fechaNacimiento);
       _telefonoController.text = userData.numeroTelefono == 0 ? '' : userData.numeroTelefono.toString();
       _descripcionController.text = userData.descripcion;
-      
-      // === CAMBIO AQUÍ ===
-      // Asignamos directamente el valor de UI (ej. "English")
       _selectedIdioma = userData.idiomaPreferido; 
-      
-      _selectedModo = userData.modoPreferido; // ← "Bicicleta" o "Coche"
+      _selectedModo = userData.modoPreferido;
       _isLoading = false;
     });
   }
 
-  // === USAR GraphQLQueries.getMeQuery ===
   Future<UserData?> _fetchFromMe() async {
     try {
       final client = GraphQLProvider.of(context).value;
@@ -204,9 +194,6 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
-      
-      // === CAMBIO AQUÍ ===
-      // Pasamos el valor de UI (ej. "Bicicleta")
       modoPreferido: _selectedModo ?? 'Coche',
     );
 
@@ -262,6 +249,8 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
+              // AVATAR 
               Center(
                 child: GestureDetector(
                   onTap: _showImageSourceActionSheet,
@@ -288,6 +277,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 32),
 
+              // APODO
               TextFormField(
                 controller: _apodoController,
                 enabled: false,
@@ -299,6 +289,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
+              // NOMBRE COMPLETO
               TextFormField(
                 controller: _nombreCompletoController,
                 enabled: false,
@@ -310,6 +301,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
+              // FECHA NACIMIENTO
               TextFormField(
                 controller: _fechaNacimientoController,
                 enabled: false,
@@ -322,6 +314,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
+              // TELÉFONO
               TextFormField(
                 controller: _telefonoController,
                 decoration: InputDecoration(
@@ -337,6 +330,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
+              // DESCRIPCIÓN
               TextFormField(
                 controller: _descripcionController,
                 decoration: InputDecoration(
@@ -349,6 +343,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 16),
 
+              // DROPDOWNS: MODO E IDIOMA
               Row(
                 children: [
                   Expanded(
@@ -395,6 +390,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
               ),
               const SizedBox(height: 32),
 
+              // BOTÓN GUARDAR
               Center(
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveChanges,

@@ -1,6 +1,3 @@
-// src/funcionalidades/perfil/dominio/user_data_preferences.dart
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/datos/user_data_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,12 +38,7 @@ class UserData {
       numeroTelefono: data['phoneNumber'] != null
           ? int.tryParse(data['phoneNumber'].toString()) ?? 0
           : 0,
-          
-      // === CAMBIO AQUÍ ===
-      // Mapeamos el valor de API (ej. "en") a UI (ej. "English")
       idiomaPreferido: mapLanguageFromAPI(data['preferredLanguage']), 
-      
-      
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
     );
@@ -76,8 +68,6 @@ class UserData {
     }
   }
 
-  // === MAPEAMIENTO DE IDIOMA AÑADIDO ===
-
   // === Mapeo Idioma API → UI ===
   static String mapLanguageFromAPI(String? apiLang) {
     switch (apiLang?.toLowerCase()) {
@@ -88,7 +78,7 @@ class UserData {
       case 'ca':
         return 'Català';
       default:
-        return 'Español'; // Idioma por defecto de la UI
+        return 'Español';
     }
   }
 
@@ -144,12 +134,7 @@ Future<void> updateUserDataPreferences(UserData preferences, BuildContext contex
     updatedUser['phoneNumber'] = preferences.numeroTelefono.toString();
     updatedUser['bioDescription'] = preferences.descripcion;
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
-    
-    // === CAMBIO AQUÍ ===
-    // Mapeamos el valor de UI (ej. "English") a API (ej. "en") para el Provider
     updatedUser['preferredLanguage'] = UserData.mapLanguageToAPI(preferences.idiomaPreferido);
-    
-    
     updatedUser['birthDate'] = preferences.fechaNacimiento.toIso8601String().split('T').first;
 
     userProvider.setUser(
