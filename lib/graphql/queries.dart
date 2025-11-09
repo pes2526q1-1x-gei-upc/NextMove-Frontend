@@ -1,111 +1,97 @@
+// Define your GraphQL queries here
+// Go to /api/gql/playground to test your queries before using them :)
+
 class GraphQLQueries {
-  // === USUARIO ACTUAL (me) ===
   static const String getMeQuery = r'''
     query Me {
       me {
         email
         name
-        nickname
         photo
-        birthDate
-        phoneNumber
         preferredMode
-        preferredLanguage
+        birthDate
         bioDescription
+        phoneNumber
         createdAt
       }
     }
   ''';
 
-  // === USUARIO POR EMAIL ===
   static const String getUserQuery = r'''
-    query GetUser($email: String!) {
-      User(email: $email) {
+    query getUser($id: ID!) {
+      User(id: $id) {
+        id
+        nombre
         email
-        name
-        nickname
-        photo
-        birthDate
-        phoneNumber
-        preferredMode
-        preferredLanguage
-        bioDescription
-        createdAt
       }
     }
   ''';
-
-  // === DETALLE ESTACIÓN BICING ===
   static const String getBicycleStationDetailsQuery = r'''
-    query GetBicingStationDetails($stationID: ID!) {
+    query getBicingStationDetails($stationID: ID!) {
       getEstacionDeBicing(id: $stationID) {
-        nombre
-        direccion
-        plazasTotales
-        estacionCargaElectrica
-        sePuedenAlquilarBicis
-        sePuedeAnclarBicis
-        plazasOcupadas
-        anclajesDisponibles
-        estado
-        bicisMecanicasDisponibles
+        nombre,
+        direccion,
+        plazasTotales,
+        estacionCargaElectrica,
+        sePuedenAlquilarBicis,
+        sePuedeAnclarBicis,
+        plazasOcupadas,
+        anclajesDisponibles,
+        estado,
+        bicisMecanicasDisponibles,
         bicisElectricasDisponibles
       }
-    }
-  ''';
+   }
+  '''; //TODO: afegir altres camps
 
-  // === TODAS LAS ESTACIONES BICING ===
   static const String getAllBicycleStationsQuery = r'''
-    query GetAllBicingStations {
+    query getAllBicingStations {
       getEstacionesDeBicing {
-        id
-        nombre
-        direccion
+        id,
+        nombre,
+        direccion,
         coordenadas {
-          latitude
+          latitude,
           longitude
-        }
-        plazasTotales
-        estacionCargaElectrica
-        sePuedenAlquilarBicis
-        sePuedeAnclarBicis
-        plazasOcupadas
-        anclajesDisponibles
-        estado
-        bicisMecanicasDisponibles
+        },
+        plazasTotales,
+        estacionCargaElectrica,
+        sePuedenAlquilarBicis,
+        sePuedeAnclarBicis,
+        plazasOcupadas,
+        anclajesDisponibles,
+        estado,
+        bicisMecanicasDisponibles,
         bicisElectricasDisponibles
       }
-    }
-  ''';
+    }''';
 
-  // === ESTACIONES BICING CERCANAS ===
   static const String getAllNearbyBicycleStationsQuery = r'''
-    query GetAllNearbyBicycleStations($location: LocationInput!) {
-      getEstacionesDeBicingCercanas(location: $location) {
-        id
-        estado
-        direccion
-        nombre
-        plazasTotales
-        plazasOcupadas
-        sePuedenAlquilarBicis
-        sePuedeAnclarBicis
-        bicisMecanicasDisponibles
-        bicisElectricasDisponibles
-        anclajesDisponibles
-        estacionCargaElectrica
-        coordenadas {
-          latitude
-          longitude
-        }
-        distanciaKm
+  query getAllNearbyBicycleStations($location: LocationInput!) {
+  getEstacionesDeBicingCercanas(location: $location) {
+      id
+      estado
+      direccion
+      nombre
+      plazasTotales
+      plazasOcupadas
+      sePuedenAlquilarBicis
+      sePuedeAnclarBicis
+      bicisMecanicasDisponibles
+      bicisElectricasDisponibles
+      anclajesDisponibles
+      estacionCargaElectrica
+      coordenadas {
+        latitude
+        longitude
       }
+      
+      distanciaKm
     }
-  ''';
+  }''';
 
-  // === DETALLE ESTACIÓN ELÉCTRICA ===
   static const String getEVStationDetailsQuery = r'''
-    query GetEVStationDetails($stationID: ID!) {
+    query getEVStationDetails($stationID: ID!) {
       station(id: $stationID) {
         name
         address
@@ -120,9 +106,8 @@ class GraphQLQueries {
     }
   ''';
 
-  // === TODAS LAS ESTACIONES ELÉCTRICAS ===
   static const String getAllEVStationsQuery = r'''
-    query GetEVStations {
+    query getEVStations {
       stations {
         stations {
           id
@@ -145,29 +130,26 @@ class GraphQLQueries {
           distance
         }
       }
-    }
-  ''';
+    }''';
 
-  // === ESTACIONES ELÉCTRICAS CERCANAS ===
   static const String getAllNearbyEVStationsQuery = r'''
-    query GetAllNearbyEVStations($location: LocationInput!) {
-      nearbyStations(location: $location) {
-        id
-        name
-        address
-        city
-        coordinates {
-          latitude
-          longitude
-        }
-        distance
-        connectors {
-          type
-          powerKw
-          status
-        }
-        isSuperFast
+  query getAllNearbyEVStations ($location: LocationInput!) {
+    nearbyStations(location: $location) {
+      id
+      name
+      address
+      city
+      coordinates {
+        longitude
+        latitude
       }
+      distance
+      connectors {
+        type
+        powerKw
+        status
+      }
+      isSuperFast
     }
-  ''';
+  }''';
 }
