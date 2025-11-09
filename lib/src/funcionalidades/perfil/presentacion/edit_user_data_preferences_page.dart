@@ -78,6 +78,18 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
     }
   }
 
+  void _applyUserData(UserData userData) {
+    setState(() {
+      _currentUserData = userData;
+      _apodoController.text = userData.apodo;
+      _nombreCompletoController.text = userData.nombreCompleto;
+      _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(userData.fechaNacimiento);
+      _telefonoController.text = userData.numeroTelefono == 0 ? '' : userData.numeroTelefono.toString();
+      _descripcionController.text = userData.descripcion;
+      _selectedIdioma = userData.idiomaPreferido; 
+      _selectedModo = userData.modoPreferido;
+      _isLoading = false;
+    });
   // Convierte valores backend (BIKE/CAR) a valores del dropdown
   String _mapModoToDisplay(String backendValue) {
     switch (backendValue.toUpperCase()) {

@@ -9,6 +9,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
+import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
 
 class EmailAddressPage extends StatefulWidget {
