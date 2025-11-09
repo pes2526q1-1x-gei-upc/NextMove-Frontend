@@ -49,7 +49,6 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
 
-    // Solo prellenamos con datos de Firebase Auth (si existen)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final userData = userProvider.user;
@@ -57,8 +56,6 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       if (userData != null && userData['name'] != null) {
         setState(() {
           _nombreCompletoController.text = userData['name'];
-          // Opcional: usar email como apodo inicial
-          // _apodoController.text = userData['email']?.split('@').first ?? '';
         });
       }
     });
@@ -187,7 +184,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
           ),
         );
 
-        // Limpiar stack y ir al home
+        // Limpiar stack e ir al home
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const MapHomePage()),
           (route) => false,
@@ -197,10 +194,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            //content: Text('Error al guardar: $e'),
-            content: Text(
-              AppLocalizations.of(context)!.saveChangesError + ' $e',
-            ),
+            content : Text(AppLocalizations.of(context)!.saveChangesError + ' $e'),
             backgroundColor: Colors.red,
           ),
         );
