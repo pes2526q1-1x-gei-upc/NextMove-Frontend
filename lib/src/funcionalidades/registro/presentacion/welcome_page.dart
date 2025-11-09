@@ -59,7 +59,8 @@ class WelcomePage extends StatelessWidget {
                     final client = GraphQLProvider.of(context).value;
                     final authService = AuthService(client);
 
-                    final upsertData = await authService.upsertUserFromFirebase(
+                    // Try upsert without needsToRegister first
+                    var upsertData = await authService.upsertUserFromFirebase(
                       firebaseUid: firebaseUserId,
                       email: email,
                       name: name,
@@ -70,6 +71,17 @@ class WelcomePage extends StatelessWidget {
                         SnackBar(content: Text("Error al sincronizar usuario")),
                       );
                       return;
+                    }
+
+                    // If the user is new (no email in upsertData), set needsToRegister true
+                    bool isNewUser = (upsertData['email'] == null);
+                    if (isNewUser) {
+                      await authService.upsertUserFromFirebase(
+                        firebaseUid: firebaseUserId,
+                        email: email,
+                        name: name,
+                        needsToRegister: true,
+                      );
                     }
 
                     final meData = await authService.getCurrentUser();
