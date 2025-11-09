@@ -20,6 +20,10 @@ Future<UserData> pushUserDataPreferences(
   debugPrint("Apodo: ${preferences.apodo}");
   debugPrint("Teléfono: ${preferences.numeroTelefono}");
   debugPrint("Fecha nacimiento: ${preferences.fechaNacimiento}");
+  debugPrint("Idioma preferido: ${preferences.idiomaPreferido}");
+  debugPrint("Modo preferido: ${preferences.modoPreferido}");
+  debugPrint("needs to register: ${preferences.needsToRegister}");
+  debugPrint("========================");
 
 
   final GraphQLClient client = GraphQLProvider.of(context).value;
@@ -35,6 +39,7 @@ Future<UserData> pushUserDataPreferences(
       $preferredMode: Mode
       $preferredLanguage: String
       $birthDate: String
+      $needsToRegister: Boolean
     ) {
       updateMe(
         email: $email
@@ -45,6 +50,7 @@ Future<UserData> pushUserDataPreferences(
         preferredMode: $preferredMode
         preferredLanguage: $preferredLanguage
         birthDate: $birthDate
+        needsToRegister: $needsToRegister
       ) {
         email
         name
@@ -54,6 +60,7 @@ Future<UserData> pushUserDataPreferences(
         preferredMode
         preferredLanguage
         birthDate
+        needsToRegister
       }
     }
   ''';
@@ -74,14 +81,14 @@ Future<UserData> pushUserDataPreferences(
     document: gql(updateUserMutation),
     variables: {
       'email': email,
-      'name': preferences.nombreCompleto?.trim().isEmpty == true ? null : preferences.nombreCompleto?.trim(),
-      'nickname': preferences.apodo?.trim().isEmpty == true ? null : preferences.apodo?.trim(),
+  'name': preferences.nombreCompleto.trim().isEmpty ? null : preferences.nombreCompleto.trim(),
+  'nickname': preferences.apodo.trim().isEmpty ? null : preferences.apodo.trim(),
       'phoneNumber': formatPhone(preferences.numeroTelefono),
       'bioDescription': preferences.descripcion.trim().isEmpty ? null : preferences.descripcion.trim(),
       'preferredMode': UserData.mapPreferredModeToAPI(preferences.modoPreferido),
       'preferredLanguage': UserData.mapLanguageToAPI(preferences.idiomaPreferido),
-      
       'birthDate': formatBirthDate(preferences.fechaNacimiento),
+      'needsToRegister': false,
     },
   );
 

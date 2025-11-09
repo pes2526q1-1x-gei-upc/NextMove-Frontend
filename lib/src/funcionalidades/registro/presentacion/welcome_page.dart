@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_p
 import 'package:nextmove_app/src/funcionalidades/registro/datos/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/graphql/queries.dart';
 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
@@ -52,37 +53,26 @@ class WelcomePage extends StatelessWidget {
                     if (userCredential.user == null) return;
 
                     final firebaseUserId = userCredential.user!.uid;
-                    final firebaseToken = await userCredential.user!.getIdToken();
+                    final firebaseToken = await userCredential.user!
+                        .getIdToken();
                     final email = userCredential.user!.email;
                     final name = userCredential.user!.displayName;
+
+                    // ✅ Detectar si es usuario nuevo
+                    final isNewUser =
+                        userCredential.additionalUserInfo?.isNewUser ?? false;
+                    debugPrint("¿Es usuario nuevo? $isNewUser");
 
                     final client = GraphQLProvider.of(context).value;
                     final authService = AuthService(client);
 
-                    // Try upsert without needsToRegister first
-                    var upsertData = await authService.upsertUserFromFirebase(
+                    // Hacer upsert con needsToRegister solo si es nuevo
+                    await authService.upsertUserFromFirebase(
                       firebaseUid: firebaseUserId,
                       email: email,
                       name: name,
+                      needsToRegister: isNewUser,
                     );
-
-                    if (upsertData == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Error al sincronizar usuario")),
-                      );
-                      return;
-                    }
-
-                    // If the user is new (no email in upsertData), set needsToRegister true
-                    bool isNewUser = (upsertData['email'] == null);
-                    if (isNewUser) {
-                      await authService.upsertUserFromFirebase(
-                        firebaseUid: firebaseUserId,
-                        email: email,
-                        name: name,
-                        needsToRegister: true,
-                      );
-                    }
 
                     final meData = await authService.getCurrentUser();
 
@@ -95,7 +85,11 @@ class WelcomePage extends StatelessWidget {
                     }
 
                     if (context.mounted) {
-                      final needsToRegister = meData != null && (meData['needsToRegister'] == true);
+                      // ✅ Usar operador ?? para manejar null
+                      final needsToRegister =
+                          meData?['needsToRegister'] ?? true;
+                      debugPrint("needsToRegister: $needsToRegister");
+
                       if (needsToRegister) {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(

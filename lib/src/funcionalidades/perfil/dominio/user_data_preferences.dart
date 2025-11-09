@@ -140,8 +140,7 @@ Future<void> updateUserDataPreferences(UserData preferences, BuildContext contex
     updatedUser['bioDescription'] = preferences.descripcion;
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
     updatedUser['preferredLanguage'] = UserData.mapLanguageToAPI(preferences.idiomaPreferido);
-    
-    
+    updatedUser['needsToRegister'] = false;   
     updatedUser['birthDate'] = preferences.fechaNacimiento.toIso8601String().split('T').first;
 
     userProvider.setUser(
