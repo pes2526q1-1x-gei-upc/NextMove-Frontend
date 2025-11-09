@@ -197,6 +197,7 @@ class _EditUserDataPreferencesState extends State<EditUserDataPreferences> {
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
       modoPreferido: _selectedModo ?? 'Coche',
+      needsToRegister: false,
     );
 
     try {

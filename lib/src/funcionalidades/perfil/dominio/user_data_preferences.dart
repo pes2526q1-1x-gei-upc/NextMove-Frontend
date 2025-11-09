@@ -12,6 +12,7 @@ class UserData {
   final String idiomaPreferido;
   final String descripcion;
   final String modoPreferido;
+  final bool needsToRegister;
 
   UserData({
     required this.apodo,
@@ -22,6 +23,7 @@ class UserData {
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
+    required this.needsToRegister,
   });
 
   // === FACTORY: CONVIERTE DATOS DE GRAPHQL A UI ===
@@ -41,6 +43,7 @@ class UserData {
       idiomaPreferido: mapLanguageFromAPI(data['preferredLanguage']), 
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
+      needsToRegister: data['needsToRegister'] ?? false,
     );
   }
 
@@ -137,8 +140,7 @@ Future<void> updateUserDataPreferences(UserData preferences, BuildContext contex
     updatedUser['bioDescription'] = preferences.descripcion;
     updatedUser['preferredMode'] = UserData.mapPreferredModeToAPI(preferences.modoPreferido);
     updatedUser['preferredLanguage'] = UserData.mapLanguageToAPI(preferences.idiomaPreferido);
-    
-    
+    updatedUser['needsToRegister'] = false;   
     updatedUser['birthDate'] = preferences.fechaNacimiento.toIso8601String().split('T').first;
 
     userProvider.setUser(
