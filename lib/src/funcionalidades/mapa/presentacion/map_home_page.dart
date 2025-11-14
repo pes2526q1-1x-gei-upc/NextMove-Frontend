@@ -7,8 +7,14 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../profile/presentation/bloc/user/user_bloc.dart';
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
@@ -182,9 +188,25 @@ class _MapHomePageState extends State<MapHomePage> {
       : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
 
   void _navigateToEditUser() {
+    // 1. Lee el UserRepository 
+    final userRepository = context.read<UserRepository>();
+
+    // Navega, pero envolviendo la nueva página con el BlocProvider
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const EditUserDataPreferences()),
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => UserBloc(
+            // Construye los UseCases sobre la marcha usando el repositorio
+            getUserProfileUseCase: GetUserProfileUseCase(userRepository),
+            updateUserProfileUseCase: UpdateUserProfileUseCase(userRepository),
+          )
+          // Carga los datos del perfil tan pronto como el BLoC es creado.
+          ..add(LoadUserProfile()),
+
+          child: const EditUserDataPreferencesPage(),
+        ),
+      ),
     );
   }
 
