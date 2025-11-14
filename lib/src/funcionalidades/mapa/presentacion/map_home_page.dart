@@ -7,7 +7,8 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/edit_user_data_preferences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+
 
 class MapHomePage extends StatefulWidget {
   const MapHomePage({super.key});
