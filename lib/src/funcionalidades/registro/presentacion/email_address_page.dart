@@ -39,6 +39,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   }
 
   Widget _buildBody(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -53,21 +54,20 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.whatIsYourEmailAddress,
+                    l10n.whatIsYourEmailAddress,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
-                  EmailAddressInputWidget(
-                    emailController: _emailController,
-                  ),
-                  if (context.read<AuthBloc>().state is EmailIsNewState || context.read<AuthBloc>().state is EmailExistsState) ...[
+                  EmailAddressInputWidget(emailController: _emailController),
+                  if (context.read<AuthBloc>().state is EmailIsNewState ||
+                      context.read<AuthBloc>().state is EmailExistsState) ...[
                     const SizedBox(height: 16),
                     PasswordInputWidget(
                       passwordController: _passwordController,
                     ),
                     if (context.read<AuthBloc>().state is EmailIsNewState) ...[
                       Text(
-                        AppLocalizations.of(context)!.passwordRequirements,
+                        l10n.passwordRequirements,
                         style: TextStyle(fontSize: 14),
                       ),
                     ],
@@ -79,9 +79,9 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                         await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text(AppLocalizations.of(context)!.register),
+                            title: Text(l10n.register),
                             content: Text(
-                              AppLocalizations.of(context)!.needsToRegister,
+                              l10n.needsToRegister,
                             ),
                             actions: [
                               TextButton(
@@ -98,15 +98,14 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              AppLocalizations.of(context)!.errorOccurred(
+                              l10n.errorOccurred(
                                 state.errorCode == 'invalid-email'
-                                    ? AppLocalizations.of(context)!.invalidEmail
+                                    ? l10n.invalidEmail
                                     : state.errorCode,
                               ),
                             ),
                           ),
                         );
-                      
                       }
                     },
                     child: const SizedBox.shrink(),
@@ -138,11 +137,11 @@ class ContinueButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ElevatedButton(
       onPressed: () async {
         final emailAddress = _emailController.text.trim();
         if (context.read<AuthBloc>().state is AuthInitial) {
-          // Dispatch BLoC event - the BlocListener will update UI
           context.read<AuthBloc>().add(
             CheckEmailExistenceEvent(email: emailAddress),
           );
@@ -152,20 +151,12 @@ class ContinueButton extends StatelessWidget {
             final passwordValidationResult = isPasswordValid(password);
             if (passwordValidationResult != PasswordValidationError.valid) {
               String errorMessage = switch (passwordValidationResult) {
-                PasswordValidationError.tooShort => AppLocalizations.of(
-                  context,
-                )!.passwordTooShort,
-                PasswordValidationError.needsLowercase => AppLocalizations.of(
-                  context,
-                )!.passwordNeedsLowercase,
-                PasswordValidationError.needsUppercase => AppLocalizations.of(
-                  context,
-                )!.passwordNeedsUppercase,
-                PasswordValidationError.needsNumber => AppLocalizations.of(
-                  context,
-                )!.passwordNeedsNumber,
+                PasswordValidationError.tooShort => l10n.passwordTooShort,
+                PasswordValidationError.needsLowercase => l10n.passwordNeedsLowercase,
+                PasswordValidationError.needsUppercase => l10n.passwordNeedsUppercase,
+                PasswordValidationError.needsNumber => l10n.passwordNeedsNumber,
                 PasswordValidationError.needsSpecialCharacter =>
-                  AppLocalizations.of(context)!.passwordNeedsSpecialCharacter,
+                  l10n.passwordNeedsSpecialCharacter,
                 _ => '',
               };
               ScaffoldMessenger.of(
@@ -203,15 +194,15 @@ class ContinueButton extends StatelessWidget {
               if (e.code == 'wrong-password') {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.wrongPassword),
+                    content: Text(l10n.wrongPassword),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(context)!.errorOccurred(
-                        e.message ?? AppLocalizations.of(context)!.unknownError,
+                      l10n.errorOccurred(
+                        e.message ?? l10n.unknownError,
                       ),
                     ),
                   ),
@@ -222,9 +213,9 @@ class ContinueButton extends StatelessWidget {
         }
       },
       child: switch (context.read<AuthBloc>().state) {
-        AuthInitial _ => Text(AppLocalizations.of(context)!.continue_),
-        EmailIsNewState _ => Text(AppLocalizations.of(context)!.register),
-        EmailExistsState _ => Text(AppLocalizations.of(context)!.signIn),
+        AuthInitial _ => Text(l10n.continue_),
+        EmailIsNewState _ => Text(l10n.register),
+        EmailExistsState _ => Text(l10n.signIn),
         _ => Text(''),
       },
     );
@@ -241,10 +232,11 @@ class PasswordInputWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return TextField(
       controller: _passwordController,
       decoration: InputDecoration(
-        labelText: AppLocalizations.of(context)!.password,
+        labelText: l10n.password,
         border: const OutlineInputBorder(),
       ),
       obscureText: true,
@@ -262,15 +254,16 @@ class EmailAddressInputWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return TextField(
       controller: _emailController,
       decoration: InputDecoration(
-        labelText: AppLocalizations.of(context)!.emailAddress,
+        labelText: l10n.emailAddress,
         border: OutlineInputBorder(),
       ),
       keyboardType: TextInputType.emailAddress,
-        readOnly: context.read<AuthBloc>().state is! AuthInitial,
-        style: context.read<AuthBloc>().state is! AuthInitial
+      readOnly: context.read<AuthBloc>().state is! AuthInitial,
+      style: context.read<AuthBloc>().state is! AuthInitial
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
     );
