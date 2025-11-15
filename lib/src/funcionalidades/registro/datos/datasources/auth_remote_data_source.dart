@@ -20,6 +20,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e.code == 'email-already-in-use') {
         return true;
       }
+      else if (e.code == 'invalid-email') {
+        throw AuthException(message: e.code);
+      }
       else {
         throw ServerException(e.code);
       }

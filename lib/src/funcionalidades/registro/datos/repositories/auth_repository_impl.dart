@@ -17,10 +17,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, bool>> isEmailRegistered(String email) async {
     try {
       return Right(await authRemoteDataSource.isEmailRegistered(email));
-    } on ServerException {
-      return Left(ServerFailure());
-    } on AuthException {
-      return Left(AuthFailure());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
