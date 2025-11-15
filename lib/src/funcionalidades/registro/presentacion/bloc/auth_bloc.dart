@@ -17,16 +17,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     CheckEmailExistenceEvent event,
     Emitter<AuthState> emit,
   ) async {
+    final prevState = state;
     emit(AuthLoadingState());
     final result = await authRepository.isEmailRegistered(event.email);
     result.fold(
-      (failure) => emit(
-        AuthFailureState(
-          errorCode: failure.message == 'invalid-email'
-              ? failure.message!
-              : _mapFailureToMessage(failure),
-        ),
-      ),
+      (failure) {
+        emit(
+          AuthFailureState(
+            errorCode: failure.message == 'invalid-email'
+                ? failure.message!
+                : _mapFailureToMessage(failure),
+          ),
+        );
+        emit(prevState);
+      },
       (isRegistered) =>
           emit(isRegistered ? EmailExistsState() : EmailIsNewState()),
     );

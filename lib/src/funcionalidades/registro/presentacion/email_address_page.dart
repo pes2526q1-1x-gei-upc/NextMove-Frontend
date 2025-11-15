@@ -21,8 +21,6 @@ class EmailAddressPage extends StatefulWidget {
 class _EmailAddressPageState extends State<EmailAddressPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool emailChecked = false;
-  bool needsToRegister = false;
 
   @override
   void dispose() {
@@ -59,16 +57,15 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
-                  emailAddressInputWidget(
+                  EmailAddressInputWidget(
                     emailController: _emailController,
-                    emailChecked: emailChecked,
                   ),
-                  if (emailChecked) ...[
+                  if (context.read<AuthBloc>().state is EmailIsNewState || context.read<AuthBloc>().state is EmailExistsState) ...[
                     const SizedBox(height: 16),
-                    passwordInputWidget(
+                    PasswordInputWidget(
                       passwordController: _passwordController,
                     ),
-                    if (needsToRegister) ...[
+                    if (context.read<AuthBloc>().state is EmailIsNewState) ...[
                       Text(
                         AppLocalizations.of(context)!.passwordRequirements,
                         style: TextStyle(fontSize: 14),
@@ -79,8 +76,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) async {
                       if (state is EmailIsNewState) {
-                        needsToRegister = true;
-                        emailChecked = true;
                         await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -98,8 +93,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                         );
                         setState(() {});
                       } else if (state is EmailExistsState) {
-                        needsToRegister = false;
-                        emailChecked = true;
                         setState(() {});
                       } else if (state is AuthFailureState) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -113,14 +106,13 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                           ),
                         );
+                      
                       }
                     },
                     child: const SizedBox.shrink(),
                   ),
-                  continueButton(
+                  ContinueButton(
                     emailController: _emailController,
-                    emailChecked: emailChecked,
-                    needsToRegister: needsToRegister,
                     passwordController: _passwordController,
                   ),
                 ],
@@ -133,19 +125,15 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   }
 }
 
-class continueButton extends StatelessWidget {
-  const continueButton({
+class ContinueButton extends StatelessWidget {
+  const ContinueButton({
     super.key,
     required TextEditingController emailController,
-    required this.emailChecked,
-    required this.needsToRegister,
     required TextEditingController passwordController,
   }) : _emailController = emailController,
        _passwordController = passwordController;
 
   final TextEditingController _emailController;
-  final bool emailChecked;
-  final bool needsToRegister;
   final TextEditingController _passwordController;
 
   @override
@@ -153,13 +141,13 @@ class continueButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: () async {
         final emailAddress = _emailController.text.trim();
-        if (!emailChecked) {
+        if (context.read<AuthBloc>().state is AuthInitial) {
           // Dispatch BLoC event - the BlocListener will update UI
           context.read<AuthBloc>().add(
             CheckEmailExistenceEvent(email: emailAddress),
           );
         } else {
-          if (needsToRegister) {
+          if (context.read<AuthBloc>().state is EmailIsNewState) {
             final password = _passwordController.text;
             final passwordValidationResult = isPasswordValid(password);
             if (passwordValidationResult != PasswordValidationError.valid) {
@@ -233,17 +221,18 @@ class continueButton extends StatelessWidget {
           }
         }
       },
-      child: emailChecked
-          ? (needsToRegister
-                ? Text(AppLocalizations.of(context)!.register)
-                : Text(AppLocalizations.of(context)!.signIn))
-          : Text(AppLocalizations.of(context)!.continue_),
+      child: switch (context.read<AuthBloc>().state) {
+        AuthInitial _ => Text(AppLocalizations.of(context)!.continue_),
+        EmailIsNewState _ => Text(AppLocalizations.of(context)!.register),
+        EmailExistsState _ => Text(AppLocalizations.of(context)!.signIn),
+        _ => Text(''),
+      },
     );
   }
 }
 
-class passwordInputWidget extends StatelessWidget {
-  const passwordInputWidget({
+class PasswordInputWidget extends StatelessWidget {
+  const PasswordInputWidget({
     super.key,
     required TextEditingController passwordController,
   }) : _passwordController = passwordController;
@@ -263,15 +252,13 @@ class passwordInputWidget extends StatelessWidget {
   }
 }
 
-class emailAddressInputWidget extends StatelessWidget {
-  const emailAddressInputWidget({
+class EmailAddressInputWidget extends StatelessWidget {
+  const EmailAddressInputWidget({
     super.key,
     required TextEditingController emailController,
-    required this.emailChecked,
   }) : _emailController = emailController;
 
   final TextEditingController _emailController;
-  final bool emailChecked;
 
   @override
   Widget build(BuildContext context) {
@@ -282,8 +269,8 @@ class emailAddressInputWidget extends StatelessWidget {
         border: OutlineInputBorder(),
       ),
       keyboardType: TextInputType.emailAddress,
-      readOnly: emailChecked,
-      style: emailChecked
+        readOnly: context.read<AuthBloc>().state is! AuthInitial,
+        style: context.read<AuthBloc>().state is! AuthInitial
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
     );
