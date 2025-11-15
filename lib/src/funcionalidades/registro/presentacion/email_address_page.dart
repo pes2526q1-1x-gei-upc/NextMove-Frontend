@@ -34,9 +34,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(
-        authRepository: AuthRepository(AuthRemoteDataProvider()),
-      ),
+      create: (context) =>
+          AuthBloc(authRepository: AuthRepository(AuthRemoteDataProvider())),
       child: Builder(builder: (context) => _buildBody(context)),
     );
   }
@@ -60,27 +59,14 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.emailAddress,
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    readOnly: emailChecked,
-                    style: emailChecked
-                        ? TextStyle(color: Theme.of(context).disabledColor)
-                        : null,
+                  emailAddressInputWidget(
+                    emailController: _emailController,
+                    emailChecked: emailChecked,
                   ),
                   if (emailChecked) ...[
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.password,
-                        border: const OutlineInputBorder(),
-                      ),
-                      obscureText: true,
+                    passwordInputWidget(
+                      passwordController: _passwordController,
                     ),
                     if (needsToRegister) ...[
                       Text(
@@ -131,110 +117,11 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     },
                     child: const SizedBox.shrink(),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final emailAddress = _emailController.text.trim();
-                      if (!emailChecked) {
-                        // Dispatch BLoC event - the BlocListener will update UI
-                        context.read<AuthBloc>().add(
-                          CheckEmailExistenceEvent(email: emailAddress),
-                        );
-                      } else {
-                        if (needsToRegister) {
-                          final password = _passwordController.text;
-                          final passwordValidationResult = isPasswordValid(
-                            password,
-                          );
-                          if (passwordValidationResult !=
-                              PasswordValidationError.valid) {
-                            String
-                            errorMessage = switch (passwordValidationResult) {
-                              PasswordValidationError.tooShort =>
-                                AppLocalizations.of(context)!.passwordTooShort,
-                              PasswordValidationError.needsLowercase =>
-                                AppLocalizations.of(
-                                  context,
-                                )!.passwordNeedsLowercase,
-                              PasswordValidationError.needsUppercase =>
-                                AppLocalizations.of(
-                                  context,
-                                )!.passwordNeedsUppercase,
-                              PasswordValidationError.needsNumber =>
-                                AppLocalizations.of(
-                                  context,
-                                )!.passwordNeedsNumber,
-                              PasswordValidationError.needsSpecialCharacter =>
-                                AppLocalizations.of(
-                                  context,
-                                )!.passwordNeedsSpecialCharacter,
-                              _ => '',
-                            };
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(errorMessage)),
-                            );
-                            return;
-                          }
-                          try {
-                            createUserWithEmailAndPassword(
-                              email: emailAddress,
-                              password: password,
-                            );
-                            appKey.currentState?.setLoggedIn(true);
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const UserDataPreferencesPage(),
-                              ),
-                            );
-                          } catch (e) {
-                            print(e);
-                          }
-                        } else {
-                          final password = _passwordController.text;
-                          try {
-                            await signInWithEmailAndPassword(
-                              email: emailAddress,
-                              password: password,
-                            );
-                            appKey.currentState?.setLoggedIn(true);
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => MapHomePage(),
-                              ),
-                              (route) => false,
-                            );
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == 'wrong-password') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!.wrongPassword,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!.errorOccurred(
-                                      e.message ??
-                                          AppLocalizations.of(
-                                            context,
-                                          )!.unknownError,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                          }
-                        }
-                      }
-                    },
-                    child: emailChecked
-                        ? (needsToRegister
-                              ? Text(AppLocalizations.of(context)!.register)
-                              : Text(AppLocalizations.of(context)!.signIn))
-                        : Text(AppLocalizations.of(context)!.continue_),
+                  continueButton(
+                    emailController: _emailController,
+                    emailChecked: emailChecked,
+                    needsToRegister: needsToRegister,
+                    passwordController: _passwordController,
                   ),
                 ],
               ),
@@ -242,6 +129,163 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class continueButton extends StatelessWidget {
+  const continueButton({
+    super.key,
+    required TextEditingController emailController,
+    required this.emailChecked,
+    required this.needsToRegister,
+    required TextEditingController passwordController,
+  }) : _emailController = emailController,
+       _passwordController = passwordController;
+
+  final TextEditingController _emailController;
+  final bool emailChecked;
+  final bool needsToRegister;
+  final TextEditingController _passwordController;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        final emailAddress = _emailController.text.trim();
+        if (!emailChecked) {
+          // Dispatch BLoC event - the BlocListener will update UI
+          context.read<AuthBloc>().add(
+            CheckEmailExistenceEvent(email: emailAddress),
+          );
+        } else {
+          if (needsToRegister) {
+            final password = _passwordController.text;
+            final passwordValidationResult = isPasswordValid(password);
+            if (passwordValidationResult != PasswordValidationError.valid) {
+              String errorMessage = switch (passwordValidationResult) {
+                PasswordValidationError.tooShort => AppLocalizations.of(
+                  context,
+                )!.passwordTooShort,
+                PasswordValidationError.needsLowercase => AppLocalizations.of(
+                  context,
+                )!.passwordNeedsLowercase,
+                PasswordValidationError.needsUppercase => AppLocalizations.of(
+                  context,
+                )!.passwordNeedsUppercase,
+                PasswordValidationError.needsNumber => AppLocalizations.of(
+                  context,
+                )!.passwordNeedsNumber,
+                PasswordValidationError.needsSpecialCharacter =>
+                  AppLocalizations.of(context)!.passwordNeedsSpecialCharacter,
+                _ => '',
+              };
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(errorMessage)));
+              return;
+            }
+            try {
+              createUserWithEmailAndPassword(
+                email: emailAddress,
+                password: password,
+              );
+              appKey.currentState?.setLoggedIn(true);
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const UserDataPreferencesPage(),
+                ),
+              );
+            } catch (e) {
+              print(e);
+            }
+          } else {
+            final password = _passwordController.text;
+            try {
+              await signInWithEmailAndPassword(
+                email: emailAddress,
+                password: password,
+              );
+              appKey.currentState?.setLoggedIn(true);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => MapHomePage()),
+                (route) => false,
+              );
+            } on FirebaseAuthException catch (e) {
+              if (e.code == 'wrong-password') {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context)!.wrongPassword),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.errorOccurred(
+                        e.message ?? AppLocalizations.of(context)!.unknownError,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }
+          }
+        }
+      },
+      child: emailChecked
+          ? (needsToRegister
+                ? Text(AppLocalizations.of(context)!.register)
+                : Text(AppLocalizations.of(context)!.signIn))
+          : Text(AppLocalizations.of(context)!.continue_),
+    );
+  }
+}
+
+class passwordInputWidget extends StatelessWidget {
+  const passwordInputWidget({
+    super.key,
+    required TextEditingController passwordController,
+  }) : _passwordController = passwordController;
+
+  final TextEditingController _passwordController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _passwordController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.password,
+        border: const OutlineInputBorder(),
+      ),
+      obscureText: true,
+    );
+  }
+}
+
+class emailAddressInputWidget extends StatelessWidget {
+  const emailAddressInputWidget({
+    super.key,
+    required TextEditingController emailController,
+    required this.emailChecked,
+  }) : _emailController = emailController;
+
+  final TextEditingController _emailController;
+  final bool emailChecked;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.emailAddress,
+        border: OutlineInputBorder(),
+      ),
+      keyboardType: TextInputType.emailAddress,
+      readOnly: emailChecked,
+      style: emailChecked
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
     );
   }
 }
