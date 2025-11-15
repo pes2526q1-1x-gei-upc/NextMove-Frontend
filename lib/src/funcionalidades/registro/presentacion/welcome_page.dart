@@ -3,11 +3,10 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:nextmove_app/graphql/queries.dart';
 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
@@ -58,7 +57,6 @@ class WelcomePage extends StatelessWidget {
                     final email = userCredential.user!.email;
                     final name = userCredential.user!.displayName;
 
-                    // ✅ Detectar si es usuario nuevo
                     final isNewUser =
                         userCredential.additionalUserInfo?.isNewUser ?? false;
                     debugPrint("¿Es usuario nuevo? $isNewUser");
@@ -85,7 +83,6 @@ class WelcomePage extends StatelessWidget {
                     }
 
                     if (context.mounted) {
-                      // ✅ Usar operador ?? para manejar null
                       final needsToRegister =
                           meData?['needsToRegister'] ?? true;
                       debugPrint("needsToRegister: $needsToRegister");
@@ -93,7 +90,7 @@ class WelcomePage extends StatelessWidget {
                       if (needsToRegister) {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (context) => const UserDataPreferences(),
+                            builder: (context) => const UserDataPreferencesPage(),
                           ),
                         );
                       } else {
