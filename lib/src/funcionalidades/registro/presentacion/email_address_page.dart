@@ -74,42 +74,52 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   const SizedBox(height: 24),
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) async {
-                      if (state is EmailIsNewState) {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text(l10n.register),
-                            content: Text(l10n.needsToRegister),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ),
-                        );
-                        setState(() {});
-                      } else if (state is EmailExistsState) {
-                        setState(() {});
-                      } else if (state is AuthFailureState) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(switch (state.errorCode) {
-                              'invalid-email' => l10n.invalidEmail,
-                              'wrong-password' => l10n.wrongPassword,
-                              '' => l10n.unknownError,
-                              _ => l10n.errorOccurred(state.errorCode),
-                            }),
-                          ),
-                        );
-                      } else if (state is AuthSuccessState) {
-                        appKey.currentState?.setLoggedIn(true);
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => MapHomePage(),
-                          ),
-                          (route) => false,
-                        );
+                      switch (state) {
+                        case EmailIsNewState():
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(l10n.register),
+                              content: Text(l10n.needsToRegister),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                          setState(() {});
+                        case EmailExistsState():
+                          setState(() {});
+                        case AuthFailureState():
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(switch (state.errorCode) {
+                                'invalid-email' => l10n.invalidEmail,
+                                'wrong-password' => l10n.wrongPassword,
+                                '' => l10n.unknownError,
+                                _ => l10n.errorOccurred(state.errorCode),
+                              }),
+                            ),
+                          );
+                        case AuthSuccessState():
+                          appKey.currentState?.setLoggedIn(true);
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => MapHomePage(),
+                            ),
+                            (route) => false,
+                          );
+                        case UserNeedsProfileSetupState():
+                          appKey.currentState?.setLoggedIn(true);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => UserDataPreferencesPage(),
+                            ),
+                          );
+                        default:
+                          break;
                       }
                     },
                     child: const SizedBox.shrink(),
@@ -171,15 +181,8 @@ class ContinueButton extends StatelessWidget {
               return;
             }
             try {
-              createUserWithEmailAndPassword(
-                email: emailAddress,
-                password: password,
-              );
-              appKey.currentState?.setLoggedIn(true);
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const UserDataPreferencesPage(),
-                ),
+              context.read<AuthBloc>().add(
+                SignUpWithEmailEvent(email: emailAddress, password: password),
               );
             } catch (e) {
               print(e);

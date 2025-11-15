@@ -19,6 +19,8 @@ final class GoogleUserExistsState extends AuthState {}
 
 final class AuthLoadingState extends AuthState {}
 
+final class UserNeedsProfileSetupState extends AuthState {}
+
 final class AuthSuccessState extends AuthState {}
 
 final class AuthFailureState extends AuthState {

@@ -12,6 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<CheckEmailExistenceEvent>(_onCheckEmailExistence);
     on<SignInWithEmailEvent>(_onSignInWithEmail);
+    on<SignUpWithEmailEvent>(_onSignUpWithEmail);
   }
 
   Future<void> _onCheckEmailExistence(
@@ -51,6 +52,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
       emit(prevState);
     }, (_) => emit(AuthSuccessState()));
+  }
+
+  Future<void> _onSignUpWithEmail(
+    SignUpWithEmailEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    final prevState = state;
+    emit(AuthLoadingState());
+    final result = await authRepository.signUpWithEmailAndPassword(
+      email: event.email,
+      password: event.password,
+    );
+    result.fold((failure) {
+      emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
+      emit(prevState);
+    }, (_) => emit(UserNeedsProfileSetupState()));
   }
 
   String _mapFailureToMessage(Failure failure) {
