@@ -1,8 +1,6 @@
-
-
 import 'package:dartz/dartz.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/dominio/repositories/auth_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 
 class CheckEmailExistenceUseCase {
   final AuthRepository repository;

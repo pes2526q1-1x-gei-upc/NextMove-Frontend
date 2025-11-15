@@ -202,7 +202,7 @@ class _MapHomePageState extends State<MapHomePage> {
             updateUserProfileUseCase: UpdateUserProfileUseCase(userRepository),
           )
           // Carga los datos del perfil tan pronto como el BLoC es creado.
-          ..add(LoadUserProfile()),
+          ..add(LoadUserProfile("test")), //TODO: pasar el uid real
 
           child: const EditUserDataPreferencesPage(),
         ),

@@ -1,13 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 
-abstract class AuthRemoteDataSource {
-  // Future<bool> isLoggedIn();
-  Future<bool> isEmailRegistered(String email);
-}
-
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  @override
+class AuthRemoteDataProvider {
   Future<bool> isEmailRegistered(String email) async {
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
