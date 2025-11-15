@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
@@ -80,9 +79,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text(l10n.register),
-                            content: Text(
-                              l10n.needsToRegister,
-                            ),
+                            content: Text(l10n.needsToRegister),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
@@ -97,14 +94,21 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                       } else if (state is AuthFailureState) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                              l10n.errorOccurred(
-                                state.errorCode == 'invalid-email'
-                                    ? l10n.invalidEmail
-                                    : state.errorCode,
-                              ),
-                            ),
+                            content: Text(switch (state.errorCode) {
+                              'invalid-email' => l10n.invalidEmail,
+                              'wrong-password' => l10n.wrongPassword,
+                              '' => l10n.unknownError,
+                              _ => l10n.errorOccurred(state.errorCode),
+                            }),
                           ),
+                        );
+                      } else if (state is AuthSuccessState) {
+                        appKey.currentState?.setLoggedIn(true);
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => MapHomePage(),
+                          ),
+                          (route) => false,
                         );
                       }
                     },
@@ -152,8 +156,10 @@ class ContinueButton extends StatelessWidget {
             if (passwordValidationResult != PasswordValidationError.valid) {
               String errorMessage = switch (passwordValidationResult) {
                 PasswordValidationError.tooShort => l10n.passwordTooShort,
-                PasswordValidationError.needsLowercase => l10n.passwordNeedsLowercase,
-                PasswordValidationError.needsUppercase => l10n.passwordNeedsUppercase,
+                PasswordValidationError.needsLowercase =>
+                  l10n.passwordNeedsLowercase,
+                PasswordValidationError.needsUppercase =>
+                  l10n.passwordNeedsUppercase,
                 PasswordValidationError.needsNumber => l10n.passwordNeedsNumber,
                 PasswordValidationError.needsSpecialCharacter =>
                   l10n.passwordNeedsSpecialCharacter,
@@ -180,35 +186,9 @@ class ContinueButton extends StatelessWidget {
             }
           } else {
             final password = _passwordController.text;
-            try {
-              await signInWithEmailAndPassword(
-                email: emailAddress,
-                password: password,
-              );
-              appKey.currentState?.setLoggedIn(true);
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => MapHomePage()),
-                (route) => false,
-              );
-            } on FirebaseAuthException catch (e) {
-              if (e.code == 'wrong-password') {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.wrongPassword),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      l10n.errorOccurred(
-                        e.message ?? l10n.unknownError,
-                      ),
-                    ),
-                  ),
-                );
-              }
-            }
+            context.read<AuthBloc>().add(
+              SignInWithEmailEvent(email: emailAddress, password: password),
+            );
           }
         }
       },

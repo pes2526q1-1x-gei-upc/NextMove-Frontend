@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/datasources/auth_remote_data_provider.dart';
@@ -6,10 +7,6 @@ import 'package:nextmove_app/src/funcionalidades/registro/datos/datasources/auth
 class AuthRepository {
   final AuthRemoteDataProvider authRemoteDataSource;
   AuthRepository(this.authRemoteDataSource);
-
-  // Future<bool> isLoggedIn() async {
-  //   throw UnimplementedError();
-  // }
 
   Future<Either<Failure, bool>> isEmailRegistered(String email) async {
     try {
@@ -23,4 +20,26 @@ class AuthRepository {
     } catch (e) {
       return Left(UnknownFailure());
     }
-  }}
+  }
+
+  Future<Either<Failure, void>> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await authRemoteDataSource.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      return Left(UnknownFailure());
+    }
+  }
+}
