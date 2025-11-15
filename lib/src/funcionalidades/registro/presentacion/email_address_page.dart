@@ -7,11 +7,9 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page
 import 'package:nextmove_app/src/funcionalidades/registro/datos/datasources/auth_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/dominio/usecases/check_email_existence_usecase.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
-// edit_user_data_preferences_page import removed - not used
 
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -37,9 +35,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(
-        checkEmailExistenceUseCase: CheckEmailExistenceUseCase(
-          repository: AuthRepository(AuthRemoteDataProvider()),
-        ),
+        authRepository: AuthRepository(AuthRemoteDataProvider()),
       ),
       child: Builder(builder: (context) => _buildBody(context)),
     );
