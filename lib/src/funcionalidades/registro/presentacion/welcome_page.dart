@@ -23,22 +23,23 @@ class WelcomePage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Error: ${state.errorCode}")),
               );
+            } else if (state is UserNeedsProfileSetupState) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const UserDataPreferencesPage(),
+                ),
+              );
             } else if (state is AuthSuccessState) {
-              final meData = state.meData;
-              final needsToRegister = meData?['needsToRegister'] ?? true;
-              debugPrint("needsToRegister: $needsToRegister");
-              if (needsToRegister) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const UserDataPreferencesPage(),
-                  ),
-                );
-              } else {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const MapHomePage()),
-                  (route) => false,
-                );
-              }
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const MapHomePage(),
+                ),
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const MapHomePage()),
+                (route) => false,
+              );
             }
           },
           child: Center(

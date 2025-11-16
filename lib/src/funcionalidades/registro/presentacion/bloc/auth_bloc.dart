@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 
@@ -89,6 +90,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
       (data) {
         final needsToRegister = data['needsToRegister'] as bool;
+        debugPrint("needsToRegister: $needsToRegister");
         if (needsToRegister) {
           emit(UserNeedsProfileSetupState());
         } else {
