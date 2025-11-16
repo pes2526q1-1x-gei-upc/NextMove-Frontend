@@ -8,7 +8,6 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:nextmove_app/config/graphql_config.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -17,7 +16,7 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var signInButtonsWidth = MediaQuery.of(context).size.width * (2 / 3);
     return BlocProvider(
-      create: (context) => AuthBloc(client: GraphQLConfig.client.value),
+      create: (context) => AuthBloc(),
       child: Scaffold(
         body: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {

@@ -1,13 +1,11 @@
 import 'package:dartz/dartz.dart';
-import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/datasources/auth_remote_data_provider.dart';
 
 class AuthRepository {
   final AuthRemoteDataProvider authRemoteDataProvider;
-  AuthRepository({required GraphQLClient client})
-      : authRemoteDataProvider = AuthRemoteDataProvider(client: client);
+  AuthRepository() : authRemoteDataProvider = AuthRemoteDataProvider();
 
   Future<Either<Failure, bool>> isEmailRegistered(String email) async {
     try {

@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 
@@ -10,9 +9,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
 
-  AuthBloc({required GraphQLClient client})
-      : authRepository = AuthRepository(client: client),
-        super(AuthInitial()) {
+  AuthBloc() : authRepository = AuthRepository(), super(AuthInitial()) {
     on<CheckEmailExistenceEvent>(_onCheckEmailExistence);
     on<SignInWithEmailEvent>(_onSignInWithEmail);
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);

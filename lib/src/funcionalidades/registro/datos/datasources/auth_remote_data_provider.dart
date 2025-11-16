@@ -4,11 +4,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 
 class AuthRemoteDataProvider {
-  final GraphQLClient client;
-
-  AuthRemoteDataProvider({required this.client});
+  GraphQLClient get client => GraphQLConfig.client.value;
 
   Future<bool> isEmailRegistered(String email) async {
     try {

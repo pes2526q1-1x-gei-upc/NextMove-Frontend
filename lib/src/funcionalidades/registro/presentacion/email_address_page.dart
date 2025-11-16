@@ -10,7 +10,6 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/config/graphql_config.dart';
 
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -32,9 +31,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
 
   @override
   Widget build(BuildContext context) {
-    final client = GraphQLConfig.client.value;
     return BlocProvider(
-      create: (context) => AuthBloc(client: client),
+      create: (context) => AuthBloc(),
       child: Builder(builder: (context) => _buildBody(context)),
     );
   }
