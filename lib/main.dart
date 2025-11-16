@@ -42,14 +42,12 @@ class NextMoveApp extends StatefulWidget {
 }
 
 class _NextMoveAppState extends State<NextMoveApp> {
-  // Cliente de GraphQL para hacer queries y mutations a la API
-  late final ValueNotifier<GraphQLClient> client;
   bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
 
   @override
   void initState() {
     super.initState();
-    client = GraphQLConfig.initializeClient();
+    GraphQLConfig.initializeClient();
   }
 
   void setLoggedIn(bool value) {
@@ -61,7 +59,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
   @override
   Widget build(BuildContext context) {
     return GraphQLProvider(
-      client: client,
+      client: GraphQLConfig.client,
       child: ChangeNotifierProvider(
         create: (_) => UserProvider(),
         child: MaterialApp(
@@ -83,7 +81,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           ),
           // Widget que maneja la autenticación y decide qué pantalla mostrar
-          home: AuthStateHandler(client: client, isLoggedIn: isLoggedIn),
+          home: AuthStateHandler(client: GraphQLConfig.client, isLoggedIn: isLoggedIn),
         ),
       ),
     );
