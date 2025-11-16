@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class UserEntity extends Equatable {
+  final String email;
   final String apodo;
   final String nombreCompleto;
   final DateTime fechaNacimiento;
@@ -12,6 +13,7 @@ class UserEntity extends Equatable {
   final bool needsToRegister;
 
   const UserEntity({
+    required this.email,
     required this.apodo,
     required this.nombreCompleto,
     required this.fechaNacimiento,
@@ -26,6 +28,7 @@ class UserEntity extends Equatable {
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
   factory UserEntity.fromRawData(Map<String, dynamic> data) {
     return UserEntity(
+      email: data['email'],
       apodo: data['nickname'] ?? 'Usuario',
       nombreCompleto: data['name'] ?? 'Nombre no disponible',
       fechaNacimiento: data['birthDate'] != null
@@ -47,6 +50,7 @@ class UserEntity extends Equatable {
   // Método para convertir a mapa (útil para enviar a API)
   Map<String, dynamic> toMap() {
     return {
+      'email':email,
       'nickname': apodo,
       'name': nombreCompleto,
       'birthDate': fechaNacimiento.toIso8601String().split('T').first,
@@ -112,6 +116,7 @@ class UserEntity extends Equatable {
   }
 
   UserEntity copyWith({
+    String? email,
     String? apodo,
     String? nombreCompleto,
     DateTime? fechaNacimiento,
@@ -123,6 +128,7 @@ class UserEntity extends Equatable {
     bool? needsToRegister,
   }) {
     return UserEntity(
+      email: email ?? this.email,
       apodo: apodo ?? this.apodo,
       nombreCompleto: nombreCompleto ?? this.nombreCompleto,
       fechaNacimiento: fechaNacimiento ?? this.fechaNacimiento,
@@ -137,6 +143,7 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [
+        email,
         apodo,
         nombreCompleto,
         fechaNacimiento,

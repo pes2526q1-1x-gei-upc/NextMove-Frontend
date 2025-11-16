@@ -16,6 +16,8 @@ class UserProvider with ChangeNotifier {
   Map<String, dynamic>? get user => _user;
   String? get firebaseUserId => _firebaseUserId;
   String? get firebaseToken => _firebaseToken;
+  String? get email => _email;
+  String? get pwd => _pwd;
 
   void setUser(
     Map<String, dynamic> userData, {
