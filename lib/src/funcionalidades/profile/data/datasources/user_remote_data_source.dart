@@ -138,4 +138,42 @@ class UserRemoteDataSource {
 
     return UserEntity.fromRawData(data);
   }
+
+/*
+  Future<UserEntity> createUserProfile(UserEntity userEntity, String pwd) async {
+    
+    const String createUserMutation = r'''
+      mutation UpsertUser(
+        $email: String!
+        $name: String
+        nickname: String
+      ) {
+        upsertUser(
+          id: $id
+          email: $email
+          name: $name
+        ) {
+          id
+          email
+          name
+        }
+      }
+    ''';
+
+    final MutationOptions options = MutationOptions(
+      document: gql(createUserMutation),
+      variables: {
+        'id': user.uid,
+        'email': user.email,
+        'name': userEntity.nombreCompleto.trim().isEmpty ? null : userEntity.nombreCompleto.trim(),
+        'needsToRegister': false,
+      },
+    );
+
+    final QueryResult result = await graphQLClient.mutate(options);
+
+    if (result.hasException) {
+      throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');
+    }
+  }*/
 }

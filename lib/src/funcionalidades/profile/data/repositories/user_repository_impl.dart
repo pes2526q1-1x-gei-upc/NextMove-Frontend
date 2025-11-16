@@ -43,4 +43,19 @@ class UserRepositoryImpl implements UserRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> createUserProfile(UserEntity userEntity, String pwd) async {
+    try {
+      //await remoteDataSource.createUserProfile(userEntity, pwd);
+      return const Right(true);
+    } on custom_exceptions.ServerException {
+      return Left(ServerFailure());
+    } on custom_exceptions.AuthException {
+      return Left(AuthFailure());
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+    
+  }
 }
