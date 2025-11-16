@@ -9,8 +9,7 @@ abstract class UserEvent extends Equatable {
 }
 
 class LoadUserProfile extends UserEvent {
-  final String userId;  // UID desde Firebase
-
+  final String userId;  
   const LoadUserProfile(this.userId);
 
   @override
@@ -19,9 +18,16 @@ class LoadUserProfile extends UserEvent {
 
 class UpdateUserProfile extends UserEvent {
   final UserEntity updatedUser;
-
   const UpdateUserProfile(this.updatedUser);
 
   @override
   List<Object?> get props => [updatedUser];
+}
+
+class CreateUserProfile extends UserEvent {
+  final UserEntity newUser;
+  const CreateUserProfile(this.newUser);
+
+  @override
+  List<Object?> get props => [newUser];
 }

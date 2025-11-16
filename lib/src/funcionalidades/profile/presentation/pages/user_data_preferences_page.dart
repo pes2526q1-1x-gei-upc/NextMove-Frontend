@@ -149,7 +149,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
       modoPreferido: _selectedModo ?? 'Coche',
-      needsToRegister: false,
     );
 
     context.read<UserBloc>().add(UpdateUserProfile(newUser));
