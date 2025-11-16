@@ -3,12 +3,14 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
 
-import 'package:nextmove_app/src/funcionalidades/registro/datos/datasources/auth_remote_data_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 
 class EmailAddressPage extends StatefulWidget {
   const EmailAddressPage({super.key});
@@ -30,9 +32,9 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
 
   @override
   Widget build(BuildContext context) {
+    final client = GraphQLConfig.client.value;
     return BlocProvider(
-      create: (context) =>
-          AuthBloc(authRepository: AuthRepository(AuthRemoteDataProvider())),
+      create: (context) => AuthBloc(client: client),
       child: Builder(builder: (context) => _buildBody(context)),
     );
   }
@@ -103,7 +105,14 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                               }),
                             ),
                           );
-                        case AuthSuccessState():
+                      case AuthSuccessState():
+                          if (state.meData != null) {
+                            Provider.of<UserProvider>(context, listen: false).setUser(
+                              state.meData!,
+                              firebaseUserId: state.firebaseUserId,
+                              firebaseToken: state.firebaseToken,
+                            );
+                          }
                           appKey.currentState?.setLoggedIn(true);
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(

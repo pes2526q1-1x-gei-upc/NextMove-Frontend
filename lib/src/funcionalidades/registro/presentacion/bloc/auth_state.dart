@@ -21,7 +21,20 @@ final class AuthLoadingState extends AuthState {}
 
 final class UserNeedsProfileSetupState extends AuthState {}
 
-final class AuthSuccessState extends AuthState {}
+final class AuthSuccessState extends AuthState {
+  final Map<String, dynamic>? meData;
+  final String firebaseUserId;
+  final String? firebaseToken;
+
+  const AuthSuccessState({
+    required this.meData,
+    required this.firebaseUserId,
+    required this.firebaseToken,
+  });
+
+  @override
+  List<Object> get props => [meData ?? {}, firebaseUserId, firebaseToken ?? ''];
+}
 
 final class AuthFailureState extends AuthState {
   final String errorCode;

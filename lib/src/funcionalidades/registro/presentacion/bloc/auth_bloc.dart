@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 
@@ -9,10 +10,13 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
 
-  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
+  AuthBloc({required GraphQLClient client})
+      : authRepository = AuthRepository(client: client),
+        super(AuthInitial()) {
     on<CheckEmailExistenceEvent>(_onCheckEmailExistence);
     on<SignInWithEmailEvent>(_onSignInWithEmail);
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
+    on<SignInWithGoogleEvent>(_onSignInWithGoogle);
   }
 
   Future<void> _onCheckEmailExistence(
@@ -51,7 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold((failure) {
       emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
       emit(prevState);
-    }, (_) => emit(AuthSuccessState()));
+    }, (data) => emit(AuthSuccessState(
+      meData: data['meData'] as Map<String, dynamic>?,
+      firebaseUserId: data['firebaseUserId'] as String,
+      firebaseToken: data['firebaseToken'] as String?,
+    )));
   }
 
   Future<void> _onSignUpWithEmail(
@@ -68,6 +76,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
       emit(prevState);
     }, (_) => emit(UserNeedsProfileSetupState()));
+  }
+
+  Future<void> _onSignInWithGoogle(
+    SignInWithGoogleEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    final prevState = state;
+    emit(AuthLoadingState());
+    final result = await authRepository.signInWithGoogle();
+    result.fold(
+      (failure) {
+        emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
+        emit(prevState);
+      },
+      (data) {
+        final needsToRegister = data['needsToRegister'] as bool;
+        if (needsToRegister) {
+          emit(GoogleUserIsNewState());
+        } else {
+          emit(AuthSuccessState(
+            meData: data['meData'] as Map<String, dynamic>?,
+            firebaseUserId: data['firebaseUserId'] as String,
+            firebaseToken: data['firebaseToken'] as String?,
+          ));
+        }
+      },
+    );
   }
 
   String _mapFailureToMessage(Failure failure) {
