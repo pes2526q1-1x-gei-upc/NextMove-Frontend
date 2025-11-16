@@ -10,6 +10,9 @@ class UserProvider with ChangeNotifier {
   String? _firebaseUserId;
   String? _firebaseToken;
 
+  String? _email;
+  String? _pwd;
+
   Map<String, dynamic>? get user => _user;
   String? get firebaseUserId => _firebaseUserId;
   String? get firebaseToken => _firebaseToken;
@@ -23,6 +26,20 @@ class UserProvider with ChangeNotifier {
     _firebaseUserId = firebaseUserId;
     _firebaseToken = firebaseToken;
     notifyListeners();
+  }
+
+  void setEmailPwd(
+    String? email,
+    String? pwd
+  ){
+    _email = email;
+    _pwd = pwd;
+  }
+
+  void setEmail(
+    String? email,
+  ){
+    _email = email;
   }
 
   void clearUser() {

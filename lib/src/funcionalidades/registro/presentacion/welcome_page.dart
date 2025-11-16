@@ -7,7 +7,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});

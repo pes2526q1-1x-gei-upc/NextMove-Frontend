@@ -90,7 +90,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (data) {
         final needsToRegister = data['needsToRegister'] as bool;
         if (needsToRegister) {
-          emit(GoogleUserIsNewState());
+          emit(UserNeedsProfileSetupState());
         } else {
           emit(AuthSuccessState(
             meData: data['meData'] as Map<String, dynamic>?,

@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
@@ -75,7 +78,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) async {
                       switch (state) {
-                        case EmailIsNewState():
+                        case EmailIsNewState():     // Usuario nuevo
                           await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -90,9 +93,9 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                           );
                           setState(() {});
-                        case EmailExistsState():
+                        case EmailExistsState():  // Usuario existe
                           setState(() {});
-                        case AuthFailureState():
+                        case AuthFailureState():  // Error
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(switch (state.errorCode) {
@@ -103,7 +106,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                               }),
                             ),
                           );
-                      case AuthSuccessState():
+                      case AuthSuccessState():  // Ya iniciado sesion
                           if (state.meData != null) {
                             Provider.of<UserProvider>(context, listen: false).setUser(
                               state.meData!,
@@ -118,13 +121,20 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                             (route) => false,
                           );
-                        case UserNeedsProfileSetupState():
-                          appKey.currentState?.setLoggedIn(true);
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => UserDataPreferencesPage(),
-                            ),
-                          );
+                          case UserNeedsProfileSetupState():    // Onboarding
+                            appKey.currentState?.setLoggedIn(true);
+                            final userRepository = context.read<UserRepository>();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (pageContext) => BlocProvider(
+                                  create: (blocContext) => UserBloc(
+                                    getUserProfileUseCase: GetUserProfileUseCase(userRepository),
+                                    updateUserProfileUseCase: UpdateUserProfileUseCase(userRepository),
+                                  ),
+                                  child: UserDataPreferencesPage(),
+                                ),
+                              ),
+                            );
                         default:
                           break;
                       }
@@ -188,9 +198,13 @@ class ContinueButton extends StatelessWidget {
               return;
             }
             try {
+              /*
               context.read<AuthBloc>().add(
                 SignUpWithEmailEvent(email: emailAddress, password: password),
-              );
+              );*/
+              // Ahora solo guardamos en provider el correo y contraseña para crear el usuario
+              // entero una vez finalizado el onboarding.
+              Provider.of<UserProvider>(context, listen: false).setEmailPwd(_emailController.text, _passwordController.text);
             } catch (e) {
               print(e);
             }
