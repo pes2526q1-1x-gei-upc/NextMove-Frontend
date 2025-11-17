@@ -16,24 +16,22 @@ class GraphQLQueries {
         preferredLanguage
         phoneNumber
         createdAt
-        needsToRegister
       }
     }
   ''';
 
   static const String upsertUserMutation = r'''
-    mutation UpsertUser($id: String!, $email: String, $name: String, $needsToRegister: Boolean) {
+    mutation UpsertUser($id: String!, $email: String, $name: String) {
       insert_users_one(
-        object: { id: $id, email: $email, name: $name, needsToRegister: $needsToRegister }
+        object: { id: $id, email: $email, name: $name }
         on_conflict: {
           constraint: users_pkey
-          update_columns: [email, name, updated_at, needsToRegister]
+          update_columns: [email, name, updated_at]
         }
       ) {
         id
         email
         name
-        needsToRegister
         preferredLanguage
       }
     }
@@ -43,7 +41,7 @@ class GraphQLQueries {
     query getUser($id: ID!) {
       User(id: $id) {
         id
-        nombre
+        nickname
         email
       }
     }

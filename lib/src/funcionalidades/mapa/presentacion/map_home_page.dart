@@ -9,8 +9,8 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
+//import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
+//import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

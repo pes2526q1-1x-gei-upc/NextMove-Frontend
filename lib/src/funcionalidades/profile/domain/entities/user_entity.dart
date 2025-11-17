@@ -10,7 +10,6 @@ class UserEntity extends Equatable {
   final String idiomaPreferido;
   final String descripcion;
   final String modoPreferido;
-  final bool needsToRegister;
 
   const UserEntity({
     required this.email,
@@ -22,7 +21,6 @@ class UserEntity extends Equatable {
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
-    required this.needsToRegister,
   });
 
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
@@ -43,7 +41,6 @@ class UserEntity extends Equatable {
       idiomaPreferido: mapLanguageFromAPI(data['preferredLanguage']),
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
-      needsToRegister: data['needsToRegister'] ?? false,
     );
   }
 
@@ -59,7 +56,6 @@ class UserEntity extends Equatable {
       'preferredLanguage': mapLanguageToAPI(idiomaPreferido),
       'bioDescription': descripcion,
       'preferredMode': mapPreferredModeToAPI(modoPreferido),
-      'needsToRegister': needsToRegister,
     };
   }
 
@@ -125,7 +121,6 @@ class UserEntity extends Equatable {
     String? idiomaPreferido,
     String? descripcion,
     String? modoPreferido,
-    bool? needsToRegister,
   }) {
     return UserEntity(
       email: email ?? this.email,
@@ -137,7 +132,6 @@ class UserEntity extends Equatable {
       idiomaPreferido: idiomaPreferido ?? this.idiomaPreferido,
       descripcion: descripcion ?? this.descripcion,
       modoPreferido: modoPreferido ?? this.modoPreferido,
-      needsToRegister: needsToRegister ?? this.needsToRegister,
     );
   }
 
@@ -152,6 +146,5 @@ class UserEntity extends Equatable {
         idiomaPreferido,
         descripcion,
         modoPreferido,
-        needsToRegister,
       ];
 }
