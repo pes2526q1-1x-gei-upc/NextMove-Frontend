@@ -124,7 +124,6 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
       descripcion: _descripcionController.text.trim(),
       idiomaPreferido: _selectedIdioma ?? currentUser.idiomaPreferido,
       modoPreferido: _selectedModo ?? currentUser.modoPreferido,
-      needsToRegister: false,
     );
 
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
