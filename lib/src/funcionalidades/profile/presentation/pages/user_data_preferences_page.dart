@@ -1,21 +1,27 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/dominio/user_data_preferences.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:provider/provider.dart';
 
-class UserDataPreferences extends StatefulWidget {
-  const UserDataPreferences({super.key});
+
+class UserDataPreferencesPage extends StatefulWidget {
+  const UserDataPreferencesPage({super.key});
 
   @override
-  State<UserDataPreferences> createState() => _UserDataPreferencesState();
+  State<UserDataPreferencesPage> createState() => _UserDataPreferencesPageState();
 }
 
-class _UserDataPreferencesState extends State<UserDataPreferences> {
+class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
 
   // Controladores
@@ -37,8 +43,6 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
   final List<String> _idiomas = ['Español', 'English', 'Català'];
   final List<String> _modos = ['Bici', 'Coche'];
 
-  bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -48,17 +52,11 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
 
-    // Solo prellenamos con datos de Firebase Auth (si existen)
+    // Carga inicial via BLoC
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final userData = userProvider.user;
-
-      if (userData != null && userData['name'] != null) {
-        setState(() {
-          _nombreCompletoController.text = userData['name'];
-          // Opcional: usar email como apodo inicial
-          // _apodoController.text = userData['email']?.split('@').first ?? '';
-        });
+      final user = FirebaseAuth.instance.currentUser;
+      if (user?.email != null) {
+        context.read<UserBloc>().add(LoadUserProfile(user!.email!));
       }
     });
   }
@@ -82,9 +80,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      setState(() {
-        _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
+      _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
     }
   }
 
@@ -136,7 +132,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
   }
 
   // === Guardar y Finalizar Onboarding ===
-  Future<void> _finalizarOnboarding() async {
+  void _finalizarOnboarding(UserEntity currentUser) {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
@@ -144,61 +140,18 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
       return;
     }
 
-    setState(() => _isLoading = true);
-
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final firebaseUserId = userProvider.firebaseUserId;
-
-    if (firebaseUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error: Usuario no autenticado'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    final userData = UserData(
+    final newUser = currentUser.copyWith(  
+      email: Provider.of<UserProvider>(context, listen: false).email,
       apodo: _apodoController.text.trim(),
       nombreCompleto: _nombreCompletoController.text.trim(),
       fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-      fechaRegistro: DateTime.now(),
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
       modoPreferido: _selectedModo ?? 'Coche',
-      needsToRegister: false,
     );
 
-    try {
-      await updateUserDataPreferences(userData, context);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.saveChangesFeedback)),
-        );
-
-        // Limpiar stack y ir al home
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MapHomePage()),
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            //content: Text('Error al guardar: $e'),
-            content : Text(AppLocalizations.of(context)!.saveChangesError + ' $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    context.read<UserBloc>().add(UpdateUserProfile(newUser));
   }
 
   @override
@@ -206,7 +159,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
     final l10n = AppLocalizations.of(context)!;
 
     return WillPopScope(
-      onWillPop: () async => false, // Evitar retroceder
+      onWillPop: () async => false,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -215,16 +168,45 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
           ),
           automaticallyImplyLeading: false,
         ),
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
+        body: BlocConsumer<UserBloc, UserState>(
+          listener: (context, state) {
+            if (state is UserError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              );
+            } else if (state is UserUpdated) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.saveChangesFeedback)),
+              );
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const MapHomePage()),
+                (route) => false,
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is UserLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is UserLoaded || state is UserUpdated) {
+              final user = (state is UserLoaded ? state.user : (state as UserUpdated).user);
+              // Prellena controllers si no lo están (solo primera vez)
+              if (_apodoController.text.isEmpty) {
+                _apodoController.text = user.apodo;
+                _nombreCompletoController.text = user.nombreCompleto;
+                _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(user.fechaNacimiento);
+                _telefonoController.text = user.numeroTelefono == 0 ? '' : user.numeroTelefono.toString();
+                _descripcionController.text = user.descripcion;
+                _selectedIdioma = user.idiomaPreferido;
+                _selectedModo = user.modoPreferido;
+              }
+              return SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Foto
+                      // Foto (igual)
                       Center(
                         child: GestureDetector(
                           onTap: _showImageSourceActionSheet,
@@ -293,8 +275,8 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       TextFormField(
                         controller: _telefonoController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.telephoneNumber,
-                          border: OutlineInputBorder(),
+                          labelText: l10n.telephoneNumber,
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.phone,
                         validator: (v) {
@@ -308,7 +290,7 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       TextFormField(
                         controller: _descripcionController,
                         decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.userDescription,
+                          labelText: l10n.userDescription,
                           border: const OutlineInputBorder(),
                           alignLabelWithHint: true,
                         ),
@@ -364,26 +346,24 @@ class _UserDataPreferencesState extends State<UserDataPreferences> {
                       // Botón Finalizar
                       Center(
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _finalizarOnboarding,
+                          onPressed: () => _finalizarOnboarding(user),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
-                              : Text(
-                                  'Finalizar Registro',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
+                          child: Text(
+                            'Finalizar Registro',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+              );
+            }
+            return const Center(child: Text('Error al cargar datos de usuario'));
+          },
+        ),
       ),
     );
   }

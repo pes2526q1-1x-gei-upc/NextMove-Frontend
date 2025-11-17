@@ -1,7 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/datos/email_address_page.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
-
 enum PasswordValidationError {
   valid,
   tooShort,
@@ -28,38 +24,4 @@ PasswordValidationError isPasswordValid(String password) {
     return PasswordValidationError.needsSpecialCharacter;
   }
   return PasswordValidationError.valid;
-}
-
-Future<void> createUserWithEmailAndPassword({required String email, required String password}) async {
-  try {
-    await dataCreateUserWithEmailAndPassword(email: email, password: password);
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // ignore: use_build_context_synchronously
-      final client = null; // TODO: Pass the GraphQL client here as needed
-      // ignore: unnecessary_null_comparison
-      if (client != null) {
-        final authService = AuthService(client);
-        await authService.upsertUserFromFirebase(
-          firebaseUid: user.uid,
-          email: user.email,
-          name: user.displayName,
-          needsToRegister: true,
-        );
-      }
-    }
-  } on FirebaseAuthException {
-    rethrow;
-  }
-}
-
-Future<void> signInWithEmailAndPassword({required String email, required String password}) async {
-  try {
-    await dataSignInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-  } on FirebaseAuthException {
-    rethrow;
-  }
 }
