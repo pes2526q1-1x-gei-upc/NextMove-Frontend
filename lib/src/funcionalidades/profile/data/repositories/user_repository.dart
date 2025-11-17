@@ -21,9 +21,7 @@ class UserRepository {
     } on custom_exceptions.AuthException {
       return Left(AuthFailure());
     } catch (e) {
-      // Fallback a local si remote falla
-      debugPrint('❌ Error desconocido al obtener perfil: $e. Usando fallback local.');
-      return Right(localDataProvider.getFallbackUserProfile());
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 
