@@ -125,7 +125,7 @@ class StationRemoteDataProvider {
     return null;
   }
 
-  Future<BicycleStationDetails?> getBicycleStationDetails(
+  Future<BicycleStationDetails> getBicycleStationDetails(
     String stationID,
   ) async {
     final QueryOptions options = QueryOptions(
@@ -151,10 +151,10 @@ class StationRemoteDataProvider {
       return BicycleStationDetails.fromJson(data);
     }
 
-    return null;
+    throw ServerException('Station not found');
   }
 
-  Future<EVStationDetails?> getEVStationDetails(String stationID) async {
+  Future<EVStationDetails> getEVStationDetails(String stationID) async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getEVStationDetailsQuery),
       variables: {'stationID': stationID},
@@ -175,6 +175,6 @@ class StationRemoteDataProvider {
       return EVStationDetails.fromJson(data);
     }
 
-    return null;
+    throw ServerException('Station not found');
   }
 }

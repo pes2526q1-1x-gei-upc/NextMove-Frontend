@@ -74,7 +74,7 @@ class StationRepository {
     }
   }
 
-  Future<Either<Failure, BicycleStationDetails?>> getBicycleStationDetails(
+  Future<Either<Failure, BicycleStationDetails>> getBicycleStationDetails(
     String stationID,
   ) async {
     try {
@@ -90,7 +90,7 @@ class StationRepository {
     }
   }
 
-  Future<Either<Failure, EVStationDetails?>> getEVStationDetails(
+  Future<Either<Failure, EVStationDetails>> getEVStationDetails(
     String stationID,
   ) async {
     try {
