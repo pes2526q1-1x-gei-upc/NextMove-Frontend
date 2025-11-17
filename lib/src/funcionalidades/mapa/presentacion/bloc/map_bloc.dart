@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
-  //final StationRepository stationRepository;
+  final StationRepository stationRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
   
   // Stream de ubicación
@@ -17,7 +19,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
   MapBloc({
-    //required this.stationRepository,
+    required this.stationRepository,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -38,20 +40,28 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     try {
       // Cargar estaciones en paralelo
       final results = await Future.wait([
-        getAllBicycleStationDetails(),
-        getAllEVStationDetails(),
+        stationRepository.getAllBicycleStationDetails(),
+        stationRepository.getAllEVStationDetails(),
       ]);
 
-      final bikeStations = results[0] as List<BicycleStationDetails>? ?? [];
-      final evStations = results[1] as List<EVStationDetails>? ?? [];
+      final bikeStations = results[0].fold((failure) => 
+        throw Exception('Error cargando estaciones de bicicletas: ${failure.message}')
+      ,(stations) => stations as List<BicycleStationDetails>? ?? []);
+      final evStations = results[1].fold((failure) => 
+        throw Exception('Error cargando estaciones de coches: ${failure.message}')
+      ,(stations) => stations as List<EVStationDetails>? ?? []);
+
+      
 
       // Construir marcadores iniciales para bicicletas
       final bikeMarkers = _buildMarkersForStations(
         bikeStations,
+        null,
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
       );
 
       final carMarkers = _buildMarkersForStations(
+        null,
         evStations,
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
@@ -176,10 +186,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   /// Construir marcadores para una lista de estaciones
   Set<Marker> _buildMarkersForStations(
-    List<StationDetails> stations,
+    List<BicycleStationDetails>? bikeStations,
+    List<EVStationDetails>? evStations,
     BitmapDescriptor icon,
   ) {
-    return stations.map((station) {
+    if(bikeStations == null && evStations != null){
+      return evStations.map((station) {
+      return Marker(
+        markerId: MarkerId(station.id),
+        position: LatLng(station.latitude, station.longitude),
+        icon: icon,
+        onTap: () => onMarkerTapped(station, state as MapLoadedState),
+      );
+    }).toSet();}
+    else if(evStations == null && bikeStations != null){
+      return bikeStations.map((station) {
       return Marker(
         markerId: MarkerId(station.id),
         position: LatLng(station.latitude, station.longitude),
@@ -187,6 +208,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
     }).toSet();
+    }
+
+    return {};
+    
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -36,21 +37,11 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? _mapController;
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
+  StationRepository stationRepository = StationRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
-  LatLng? _userLocation;
 
   StreamSubscription<Position>? _positionStream;
-  MapType _currentMapType = MapType.normal;
-  StationType _currentMode = StationType.bicycle; // default
-
-  // Loading / error handling
-  bool _isLoading = true;
-  String? _errorMessage;
-
-  // -----------------------------------------------------------------------
-  // Lifecycle
-  // -----------------------------------------------------------------------
 
   @override
   void dispose() {
@@ -59,15 +50,6 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  // -----------------------------------------------------------------------
-  // Initialization
-  // -----------------------------------------------------------------------
-
-
-  // -----------------------------------------------------------------------
-  // Location handling
-  // -----------------------------------------------------------------------
-  
   // -----------------------------------------------------------------------
   // Map callbacks
   // -----------------------------------------------------------------------
@@ -101,9 +83,9 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
   return BlocProvider(
     create: (context) => MapBloc(
-      //stationRepository: stationRepository,
-      onMarkerTapped: _showStationBottomSheet, // Asegúrate de tener la instancia correcta
-    )..add(const LoadMapDataEvent()), // dispara evento inicial
+      stationRepository: stationRepository,
+      onMarkerTapped: _showStationBottomSheet, 
+    )..add(const LoadMapDataEvent()), 
     child: _buildUI(context),
   );
 }
@@ -125,7 +107,6 @@ class _MapPageState extends State<MapPage> {
             }
             
             if (state is MapLoadedState) {
-              // Actualizar variables locales con el estado del BLoC
               final markersToShow = state.currentMode == StationType.bicycle
                   ? state.bikeMarkers
                   : state.carMarkers;
