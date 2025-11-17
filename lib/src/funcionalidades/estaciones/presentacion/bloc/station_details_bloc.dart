@@ -22,6 +22,10 @@ class StationDetailsBloc
     LoadStationDetailsEvent event,
     Emitter<StationDetailsState> emit,
   ) async {
+    if (event.stationDetails != null) {
+      emit(StationDetailsLoaded(event.stationDetails!));
+      return;
+    }
     final prevState = state;
     emit(StationDetailsLoading());
     final result = event.stationType == StationType.bicycle

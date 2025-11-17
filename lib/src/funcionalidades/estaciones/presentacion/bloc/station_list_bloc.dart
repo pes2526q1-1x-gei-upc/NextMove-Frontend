@@ -24,7 +24,9 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
   ) async {
     final prevState = state;
     emit(StationListLoading());
-    final result = await stationRepository.getAllBicycleStationDetails();
+    final result = event.stationType == StationType.bicycle
+        ? await stationRepository.getAllNearbyBicycleStationDetails(event.latitude, event.longitude)
+        : await stationRepository.getAllNearbyEVStationDetails(event.latitude, event.longitude);
     result.fold(
       (failure) {
         emit(StationListError(_mapFailureToMessage(failure)));

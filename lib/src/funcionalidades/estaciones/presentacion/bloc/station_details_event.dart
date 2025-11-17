@@ -6,7 +6,8 @@ sealed class StationDetailsEvent {}
 class LoadStationDetailsEvent extends StationDetailsEvent {
   final String stationId;
   final StationType stationType;
-  LoadStationDetailsEvent(this.stationId, this.stationType);
+  final StationDetails? stationDetails;
+  LoadStationDetailsEvent(this.stationId, this.stationType, [this.stationDetails]);
 }
 
 class ToggleFavoriteStatusEvent extends StationDetailsEvent {
