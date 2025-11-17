@@ -2,8 +2,8 @@ import 'package:dartz/dartz.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
-import '../datasources/user_remote_data_provider.dart';
-import '../datasources/user_local_data_provider.dart';
+import '../dataproviders/user_remote_data_provider.dart';
+import '../dataproviders/user_local_data_provider.dart';
 
 class UserRepository {
   final UserRemoteDataProvider remoteDataProvider;
@@ -38,7 +38,6 @@ class UserRepository {
     }
   }
 
-  @override
   Future<Either<Failure, bool>> createUserProfile(UserEntity userEntity, String pwd) async {
     try {
       //await remoteDataSource.createUserProfile(userEntity, pwd);
