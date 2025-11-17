@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ToggleMapModeWidget extends StatelessWidget {
   final StationType currentMode; // Viene del estado del BLoC
-  final Function(StationType) onModeChanged; // Esta es una funcion del bloc que se le pasa para que se pueda llamar desde aqui y cambiar el estado
-
+  
   const ToggleMapModeWidget({
     Key? key,
     required this.currentMode,
-    required this.onModeChanged,
   }) : super(key: key);
 
   @override
@@ -42,7 +43,7 @@ class ToggleMapModeWidget extends StatelessWidget {
                       ? Colors.blue.shade600
                       : Colors.transparent,
                   child: InkWell(
-                    onTap: () => onModeChanged(StationType.bicycle),
+                    onTap: () => context.read<MapBloc>().add(ChangeModeEvent(StationType.bicycle)),
                     child: Center(
                       child: Icon(
                         Icons.directions_bike,
@@ -67,7 +68,7 @@ class ToggleMapModeWidget extends StatelessWidget {
                       ? Colors.green.shade600
                       : Colors.transparent,
                   child: InkWell(
-                    onTap: () => onModeChanged(StationType.electricVehicle),
+                    onTap: () => context.read<MapBloc>().add(ChangeModeEvent(StationType.electricVehicle)),
                     child: Center(
                       child: Icon(
                         Icons.electric_car,

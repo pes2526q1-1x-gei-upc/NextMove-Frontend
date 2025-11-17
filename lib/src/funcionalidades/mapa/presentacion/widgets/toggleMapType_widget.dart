@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+
 
 // A diferencia de antes, ahora este widget recibe el tipo de mapa actual y una función de callback para alternar el tipo de mapa.
 // Lo que es la gestion del estado se hará en el bloc   
 class MapTypeToggleWidget extends StatelessWidget {
   final MapType currentMapType;
-  final VoidCallback onToggle;
 
   const MapTypeToggleWidget({
     Key? key,
     required this.currentMapType,
-    required this.onToggle,
   }) : super(key: key);
 
   @override
@@ -19,7 +22,7 @@ class MapTypeToggleWidget extends StatelessWidget {
       top: 250,
       right: 16,
       child: GestureDetector(
-        onTap: onToggle,
+        onTap: () => context.read<MapBloc>().add(const ToggleMapTypeEvent()),
         child: Container(
           height: 50,
           width: 50,

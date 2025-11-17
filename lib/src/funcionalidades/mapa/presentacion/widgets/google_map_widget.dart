@@ -21,7 +21,6 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  GoogleMapController? _controller;
 
   @override
   Widget build(BuildContext context) {

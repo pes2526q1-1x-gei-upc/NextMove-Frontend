@@ -27,7 +27,8 @@ class MapLoadedState extends MapState {
   final LatLng? userLocation;
   final StationType currentMode;
   final MapType currentMapType;
-  final Set<Marker> markers;
+  final Set<Marker> bikeMarkers;
+  final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
 
@@ -37,7 +38,8 @@ class MapLoadedState extends MapState {
     this.userLocation,
     required this.currentMode,
     required this.currentMapType,
-    required this.markers,
+    required this.bikeMarkers,
+    required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
   });
@@ -49,7 +51,8 @@ class MapLoadedState extends MapState {
         userLocation,
         currentMode,
         currentMapType,
-        markers,
+        bikeMarkers,
+        carMarkers,
         centerPosition,
         searchQuery,
       ];
@@ -61,7 +64,8 @@ class MapLoadedState extends MapState {
     LatLng? userLocation,
     StationType? currentMode,
     MapType? currentMapType,
-    Set<Marker>? markers,
+    Set<Marker>? bikeMarkers,
+    Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
   }) {
@@ -71,7 +75,8 @@ class MapLoadedState extends MapState {
       userLocation: userLocation ?? this.userLocation,
       currentMode: currentMode ?? this.currentMode,
       currentMapType: currentMapType ?? this.currentMapType,
-      markers: markers ?? this.markers,
+      bikeMarkers: bikeMarkers ?? this.bikeMarkers,
+      carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: searchQuery ?? this.searchQuery,
     );
@@ -95,7 +100,7 @@ class MapLocationPermissionDeniedState extends MapState {
 
   const MapLocationPermissionDeniedState({
     this.isPermanentlyDenied = false,
-  });
+  }); 
 
   @override
   List<Object?> get props => [isPermanentlyDenied];

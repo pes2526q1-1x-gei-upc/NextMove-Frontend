@@ -29,16 +29,6 @@ class ToggleMapTypeEvent extends MapEvent {
   const ToggleMapTypeEvent();
 }
 
-/// Evento: buscar estaciones por texto
-class SearchStationsEvent extends MapEvent {
-  final String query;
-
-  const SearchStationsEvent(this.query);
-
-  @override
-  List<Object?> get props => [query];
-}
-
 /// Evento: actualización de ubicación del usuario
 class UpdateUserLocationEvent extends MapEvent {
   final double latitude;
