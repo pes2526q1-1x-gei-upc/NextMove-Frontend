@@ -1,17 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
 
 
-class UserRemoteDataSource {
-  final GraphQLClient graphQLClient;
-  final FirebaseAuth firebaseAuth;
-
-  UserRemoteDataSource({
-    required this.graphQLClient,
-    required this.firebaseAuth,
-  });
+class UserRemoteDataProvider {
+  GraphQLClient get client => GraphQLConfig.client.value;
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   // Query para obtener el perfil (asumiendo una query 'getMe'; ajústala si difiere)
   Future<UserEntity> getUserProfile(String userId) async {
@@ -42,7 +38,7 @@ class UserRemoteDataSource {
       variables: {'email': user.email},
     );
 
-    final QueryResult result = await graphQLClient.query(options);
+    final QueryResult result = await client.query(options);
 
     if (result.hasException) {
       throw custom_exceptions.ServerException('Error al obtener perfil: ${result.exception}');
@@ -125,7 +121,7 @@ class UserRemoteDataSource {
       },
     );
 
-    final QueryResult result = await graphQLClient.mutate(options);
+    final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
       throw custom_exceptions.ServerException('Error al actualizar: ${result.exception}');
@@ -170,7 +166,7 @@ class UserRemoteDataSource {
       },
     );
 
-    final QueryResult result = await graphQLClient.mutate(options);
+    final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
       throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');

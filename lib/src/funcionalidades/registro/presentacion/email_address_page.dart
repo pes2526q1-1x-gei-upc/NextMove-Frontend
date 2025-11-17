@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
@@ -78,7 +75,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) async {
                       switch (state) {
-                        case EmailIsNewState():     // Usuario nuevo
+                        case EmailIsNewState(): // Usuario nuevo
                           await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -93,9 +90,9 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                           );
                           setState(() {});
-                        case EmailExistsState():  // Usuario existe
+                        case EmailExistsState(): // Usuario existe
                           setState(() {});
-                        case AuthFailureState():  // Error
+                        case AuthFailureState(): // Error
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(switch (state.errorCode) {
@@ -106,9 +103,12 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                               }),
                             ),
                           );
-                      case AuthSuccessState():  // Ya iniciado sesion
+                        case AuthSuccessState(): // Ya iniciado sesion
                           if (state.meData != null) {
-                            Provider.of<UserProvider>(context, listen: false).setUser(
+                            Provider.of<UserProvider>(
+                              context,
+                              listen: false,
+                            ).setUser(
                               state.meData!,
                               firebaseUserId: state.firebaseUserId,
                               firebaseToken: state.firebaseToken,
@@ -121,20 +121,16 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                             (route) => false,
                           );
-                          case UserNeedsProfileSetupState():    // Onboarding
-                            appKey.currentState?.setLoggedIn(true);
-                            final userRepository = context.read<UserRepository>();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (pageContext) => BlocProvider(
-                                  create: (blocContext) => UserBloc(
-                                    getUserProfileUseCase: GetUserProfileUseCase(userRepository),
-                                    updateUserProfileUseCase: UpdateUserProfileUseCase(userRepository),
-                                  ),
-                                  child: UserDataPreferencesPage(),
-                                ),
+                        case UserNeedsProfileSetupState(): // Onboarding
+                          appKey.currentState?.setLoggedIn(true);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (pageContext) => BlocProvider(
+                                create: (blocContext) => UserBloc(),
+                                child: UserDataPreferencesPage(),
                               ),
-                            );
+                            ),
+                          );
                         default:
                           break;
                       }
@@ -204,7 +200,10 @@ class ContinueButton extends StatelessWidget {
               );*/
               // Ahora solo guardamos en provider el correo y contraseña para crear el usuario
               // entero una vez finalizado el onboarding.
-              Provider.of<UserProvider>(context, listen: false).setEmailPwd(_emailController.text, _passwordController.text);
+              Provider.of<UserProvider>(
+                context,
+                listen: false,
+              ).setEmailPwd(_emailController.text, _passwordController.text);
             } catch (e) {
               print(e);
             }

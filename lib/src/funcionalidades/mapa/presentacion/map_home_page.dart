@@ -67,7 +67,10 @@ class _MapHomePageState extends State<MapHomePage> {
     try {
       await Future.wait([
         _loadStations(getAllEVStationDetails, (data) => stations = data),
-        _loadStations(getAllBicycleStationDetails, (data) => bikeStations = data),
+        _loadStations(
+          getAllBicycleStationDetails,
+          (data) => bikeStations = data,
+        ),
         _initializateLocation(),
       ]);
     } catch (e) {
@@ -129,17 +132,20 @@ class _MapHomePageState extends State<MapHomePage> {
       builder: (_) => AlertDialog(
         title: const Text('Se requiere permiso de ubicación'),
         content: const Text(
-            'Habilite la ubicación en la configuración del dispositivo'),
+          'Habilite la ubicación en la configuración del dispositivo',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Aceptar')),
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Aceptar'),
+          ),
           TextButton(
-              onPressed: () {
-                Geolocator.openAppSettings();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Abrir ajustes')),
+            onPressed: () {
+              Geolocator.openAppSettings();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Abrir ajustes'),
+          ),
         ],
       ),
     );
@@ -152,10 +158,10 @@ class _MapHomePageState extends State<MapHomePage> {
     );
     _positionStream = Geolocator.getPositionStream(locationSettings: settings)
         .listen((Position? pos) {
-      if (pos != null && mounted) {
-        setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
-      }
-    });
+          if (pos != null && mounted) {
+            setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
+          }
+        });
   }
 
   // -----------------------------------------------------------------------
@@ -190,23 +196,20 @@ class _MapHomePageState extends State<MapHomePage> {
       : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
 
   void _navigateToEditUser() {
-    // 1. Lee el UserRepository 
-    final userRepository = context.read<UserRepository>();
-    String? userUID = Provider.of<UserProvider>(context, listen: false).firebaseUserId;
+    // 1. Lee el UserRepository
+    String? userUID = Provider.of<UserProvider>(
+      context,
+      listen: false,
+    ).firebaseUserId;
 
     // Navega, pero envolviendo la nueva página con el BlocProvider
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
-          create: (context) => UserBloc(
-            // Construye los UseCases sobre la marcha usando el repositorio
-            getUserProfileUseCase: GetUserProfileUseCase(userRepository),
-            updateUserProfileUseCase: UpdateUserProfileUseCase(userRepository),
-          )
-          // Carga los datos del perfil tan pronto como el BLoC es creado.
-          
-          ..add(LoadUserProfile(userUID!)), 
+          create: (context) => UserBloc()
+            // Carga los datos del perfil tan pronto como el BLoC es creado.
+            ..add(LoadUserProfile(userUID!)),
 
           child: const EditUserDataPreferencesPage(),
         ),
@@ -237,14 +240,10 @@ class _MapHomePageState extends State<MapHomePage> {
   Widget build(BuildContext context) {
     // Loading / error UI
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (_errorMessage != null) {
-      return Scaffold(
-        body: Center(child: Text('Error: $_errorMessage')),
-      );
+      return Scaffold(body: Center(child: Text('Error: $_errorMessage')));
     }
 
     // Main UI – hide keyboard on any tap outside
@@ -257,8 +256,10 @@ class _MapHomePageState extends State<MapHomePage> {
             // ------------------- Google Map -------------------
             GoogleMap(
               onMapCreated: _onMapCreated,
-              initialCameraPosition:
-                  CameraPosition(target: _bcnCenter, zoom: 12),
+              initialCameraPosition: CameraPosition(
+                target: _bcnCenter,
+                zoom: 12,
+              ),
               markers: _buildMarkers(),
               myLocationEnabled: true,
               myLocationButtonEnabled: false,
@@ -309,7 +310,9 @@ class _MapHomePageState extends State<MapHomePage> {
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
                   ),
                   onSubmitted: (_) {
                     // TODO: implement search
@@ -372,8 +375,11 @@ class _MapHomePageState extends State<MapHomePage> {
                       ),
                     ],
                   ),
-                  child:
-                      Icon(Icons.my_location, color: Colors.grey[700], size: 28),
+                  child: Icon(
+                    Icons.my_location,
+                    color: Colors.grey[700],
+                    size: 28,
+                  ),
                 ),
               ),
             ),
@@ -453,10 +459,7 @@ class _MapHomePageState extends State<MapHomePage> {
                         ),
                       ),
                       // Separator
-                      Container(
-                        width: 1,
-                        color: Colors.grey[300],
-                      ),
+                      Container(width: 1, color: Colors.grey[300]),
                       // Car
                       Expanded(
                         child: Material(
@@ -471,8 +474,8 @@ class _MapHomePageState extends State<MapHomePage> {
                                 Icons.electric_car,
                                 color:
                                     _currentMode == StationType.electricVehicle
-                                        ? Colors.white
-                                        : Colors.grey[700],
+                                    ? Colors.white
+                                    : Colors.grey[700],
                                 size: 28,
                               ),
                             ),
@@ -525,10 +528,7 @@ class _MapHomePageState extends State<MapHomePage> {
           children: [
             Text(
               station.address,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(station.address, style: const TextStyle(fontSize: 16)),
