@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
@@ -32,12 +32,12 @@ class WelcomePage extends StatelessWidget {
             } else if (state is AuthSuccessState) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) => const MapHomePage(),
+                  builder: (context) => const MapPage(),
                 ),
               );
             } else {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const MapHomePage()),
+                MaterialPageRoute(builder: (context) => const MapPage()),
                 (route) => false,
               );
             }

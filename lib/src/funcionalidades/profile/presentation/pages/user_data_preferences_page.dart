@@ -10,7 +10,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:provider/provider.dart';
 
 
@@ -179,7 +179,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 SnackBar(content: Text(l10n.saveChangesFeedback)),
               );
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const MapHomePage()),
+                MaterialPageRoute(builder: (_) => const MapPage()),
                 (route) => false,
               );
             }
