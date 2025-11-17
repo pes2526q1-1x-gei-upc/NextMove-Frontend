@@ -26,7 +26,7 @@ class WelcomePage extends StatelessWidget {
             } else if (state is UserNeedsProfileSetupState) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) => const UserDataPreferencesPage(),
+                  builder: (context) => UserDataPreferencesPage(),
                 ),
               );
             } else if (state is AuthSuccessState) {

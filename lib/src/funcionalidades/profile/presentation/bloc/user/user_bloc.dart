@@ -9,7 +9,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc() : super(UserInitial()) {
     on<LoadUserProfile>(_onLoadUserProfile);
     on<UpdateUserProfile>(_onUpdateUserProfile);
-    //on<CreateUserProfile>(_onCreateUserProfile);
+    on<CreateUserProfile>(_onCreateUserProfile);
   }
 
   Future<void> _onLoadUserProfile(
@@ -41,17 +41,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     );
   }
 
- /*  Future<void> _onCreateUserProfile(
+   Future<void> _onCreateUserProfile(
     CreateUserProfile event,
     Emitter<UserState> emit,
   ) async {
     emit(UserLoading());
-    String? pwd = userProvider.pwd;
 
-    final result = await repository.createUserProfile(event.newUser, pwd!);
+    final result = await userRepository.createUserProfile(event.newUser);
     result.fold(
       (failure) => emit(UserError(failure.message ?? 'Error al crear perfil')),
       (_) => emit(UserUpdated(event.newUser)),
     );
-  } */
+  } 
 }

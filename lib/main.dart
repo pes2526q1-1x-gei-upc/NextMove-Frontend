@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
@@ -187,7 +186,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
         debugPrint("Datos guardados correctamente en Provider");
       } else {
-        debugPrint("No se obtuvieron datos del usuario desde GraphQL");
+        debugPrint("No se obtuvieron datos del usuario desde GraphQL, lo creamos...");
+        
       }
     } catch (e, stackTrace) {
       debugPrint("========================");
@@ -214,5 +214,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-return _isLoggedIn ? MapPage() : WelcomePage();  }
+    return WelcomePage();
+  }
 }

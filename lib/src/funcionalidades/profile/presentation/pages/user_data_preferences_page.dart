@@ -13,9 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:provider/provider.dart';
 
-
 class UserDataPreferencesPage extends StatefulWidget {
-  const UserDataPreferencesPage({super.key});
 
   @override
   State<UserDataPreferencesPage> createState() => _UserDataPreferencesPageState();
@@ -23,6 +21,9 @@ class UserDataPreferencesPage extends StatefulWidget {
 
 class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
+  
+  // Variable local para controlar la carga de Firebase antes de llamar al Bloc
+  bool _isCreatingFirebaseUser = false;
 
   // Controladores
   late final TextEditingController _apodoController;
@@ -37,8 +38,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final AssetImage _avatarImage = const AssetImage('assets/Profile_avatar_placeholder_large.png');
 
   // Dropdowns
-  String? _selectedIdioma;
-  String? _selectedModo;
+  String? _selectedIdioma = 'Español'; // Valor por defecto para evitar nulos
+  String? _selectedModo = 'Coche';     // Valor por defecto
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
   final List<String> _modos = ['Bici', 'Coche'];
@@ -51,14 +52,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     _fechaNacimientoController = TextEditingController();
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
-
-    // Carga inicial via BLoC
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user?.email != null) {
-        context.read<UserBloc>().add(LoadUserProfile(user!.email!));
-      }
-    });
+    
+    // NO cargamos usuario (LoadUserProfile) porque sabemos que es nuevo.
   }
 
   @override
@@ -131,8 +126,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     }
   }
 
-  // === Guardar y Finalizar Onboarding ===
-  void _finalizarOnboarding(UserEntity currentUser) {
+  // === Finalizar Registro: Firebase -> Backend ===
+  Future<void> _finalizarOnboarding() async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
@@ -140,18 +135,71 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       return;
     }
 
-    final newUser = currentUser.copyWith(  
-      email: Provider.of<UserProvider>(context, listen: false).email,
-      apodo: _apodoController.text.trim(),
-      nombreCompleto: _nombreCompletoController.text.trim(),
-      fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-      numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-      idiomaPreferido: _selectedIdioma ?? 'Español',
-      descripcion: _descripcionController.text.trim(),
-      modoPreferido: _selectedModo ?? 'Coche',
-    );
+    setState(() {
+      _isCreatingFirebaseUser = true;
+    });
 
-    context.read<UserBloc>().add(UpdateUserProfile(newUser));
+    try {
+      // 1. Crear usuario en Firebase Authentication
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final String? emailProvider = userProvider.email;
+      final String? pwdProvider = userProvider.pwd;
+
+      // 2. Verificamos que existan (Guard Clause)
+      if (emailProvider == null || pwdProvider == null) {
+        // Si por alguna razón son nulos, mostramos error y no intentamos crear el usuario
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error: No hay credenciales pendientes de registro.')),
+        );
+        return; 
+      }
+      // 3. Ahora que estamos seguros que no son nulos, hacemos la llamada a Firebase
+      // Dart ya sabe que no son nulos, pero si se queja, puedes usar el '!'
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailProvider, // O emailProvider!
+        password: pwdProvider, // O pwdProvider!
+      );
+
+      final firebaseUser = userCredential.user;
+      if (firebaseUser == null) throw Exception("Error creando usuario en Firebase");
+
+      // 2. Preparar la entidad para el Backend
+      // Nota: Usamos el email de firebaseUser para asegurar consistencia
+      debugPrint("Usuario Firebase creado: ${firebaseUser.email}");
+      debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
+      final newUser = UserEntity(
+        email: firebaseUser.email!,
+        apodo: _apodoController.text.trim(),
+        nombreCompleto: _nombreCompletoController.text.trim(),
+        fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+        fechaRegistro: DateTime.now(), // Fecha actual de registro
+        numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
+        idiomaPreferido: _selectedIdioma ?? 'Español',
+        descripcion: _descripcionController.text.trim(),
+        modoPreferido: _selectedModo ?? 'Coche',
+      );
+
+      // 3. Llamar al Bloc para guardar en Backend
+      // Usamos UpdateUserProfile que en tu lógica hace el upsert/create
+      if (mounted) {
+        context.read<UserBloc>().add(CreateUserProfile(newUser));
+      }
+
+    } on FirebaseAuthException catch (e) {
+      setState(() => _isCreatingFirebaseUser = false);
+      String errorMsg = 'Error de registro';
+      if (e.code == 'weak-password') errorMsg = 'La contraseña es muy débil.';
+      if (e.code == 'email-already-in-use') errorMsg = 'El email ya está en uso.';
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      setState(() => _isCreatingFirebaseUser = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error desconocido: $e"), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -159,7 +207,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return WillPopScope(
-      onWillPop: () async => false,
+      // Evitamos volver atrás en medio del registro para no dejar estados inconsistentes
+      onWillPop: () async => !_isCreatingFirebaseUser,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -171,13 +220,17 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         body: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
             if (state is UserError) {
+              // Si falla el backend, quitamos el loading
+              setState(() => _isCreatingFirebaseUser = false);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message), backgroundColor: Colors.red),
               );
             } else if (state is UserUpdated) {
+              // Éxito total (Firebase + Backend)
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.saveChangesFeedback)),
               );
+              // Navegamos al mapa
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const MapPage()),
                 (route) => false,
@@ -185,183 +238,183 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
             }
           },
           builder: (context, state) {
-            if (state is UserLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is UserLoaded || state is UserUpdated) {
-              final user = (state is UserLoaded ? state.user : (state as UserUpdated).user);
-              // Prellena controllers si no lo están (solo primera vez)
-              if (_apodoController.text.isEmpty) {
-                _apodoController.text = user.apodo;
-                _nombreCompletoController.text = user.nombreCompleto;
-                _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(user.fechaNacimiento);
-                _telefonoController.text = user.numeroTelefono == 0 ? '' : user.numeroTelefono.toString();
-                _descripcionController.text = user.descripcion;
-                _selectedIdioma = user.idiomaPreferido;
-                _selectedModo = user.modoPreferido;
-              }
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Foto (igual)
-                      Center(
-                        child: GestureDetector(
-                          onTap: _showImageSourceActionSheet,
-                          child: Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundImage: _selectedImageFile != null
-                                    ? FileImage(_selectedImageFile!)
-                                    : _avatarImage,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  child: const Icon(Icons.edit, size: 18, color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Apodo
-                      TextFormField(
-                        controller: _apodoController,
-                        decoration: InputDecoration(
-                          labelText: l10n.nickname,
-                          border: const OutlineInputBorder(),
-                          hintText: l10n.nicknameHint,
-                        ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Nombre Completo
-                      TextFormField(
-                        controller: _nombreCompletoController,
-                        decoration: InputDecoration(
-                          labelText: l10n.fullName,
-                          border: const OutlineInputBorder(),
-                        ),
-                        validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Fecha Nacimiento
-                      TextFormField(
-                        controller: _fechaNacimientoController,
-                        decoration: InputDecoration(
-                          labelText: l10n.birthdate,
-                          border: const OutlineInputBorder(),
-                          hintText: l10n.bithdateHint,
-                          suffixIcon: const Icon(Icons.calendar_today),
-                        ),
-                        readOnly: true,
-                        onTap: () => _selectDate(context),
-                        validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Teléfono
-                      TextFormField(
-                        controller: _telefonoController,
-                        decoration: InputDecoration(
-                          labelText: l10n.telephoneNumber,
-                          border: const OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Descripción
-                      TextFormField(
-                        controller: _descripcionController,
-                        decoration: InputDecoration(
-                          labelText: l10n.userDescription,
-                          border: const OutlineInputBorder(),
-                          alignLabelWithHint: true,
-                        ),
-                        maxLines: 4,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Modo e Idioma
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedModo,
-                              decoration: InputDecoration(
-                                labelText: l10n.preferredMode,
-                                border: const OutlineInputBorder(),
-                              ),
-                              icon: const Icon(Icons.arrow_drop_down),
-                              validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                              items: _modos.map((m) {
-                                final icon = m == 'Bici' ? Icons.directions_bike : Icons.electric_car;
-                                return DropdownMenuItem(
-                                  value: m,
-                                  child: Row(children: [
-                                    Icon(icon, color: Theme.of(context).primaryColor),
-                                    const SizedBox(width: 12),
-                                    Text(m),
-                                  ]),
-                                );
-                              }).toList(),
-                              onChanged: (v) => setState(() => _selectedModo = v),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedIdioma,
-                              decoration: InputDecoration(
-                                labelText: l10n.preferredLanguage,
-                                border: const OutlineInputBorder(),
-                              ),
-                              icon: const Icon(Icons.arrow_drop_down),
-                              items: _idiomas
-                                  .map((i) => DropdownMenuItem(value: i, child: Text(i)))
-                                  .toList(),
-                              onChanged: (v) => setState(() => _selectedIdioma = v),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Botón Finalizar
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () => _finalizarOnboarding(user),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
-                          ),
-                          child: Text(
-                            'Finalizar Registro',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            // Mostramos carga si estamos creando en Firebase O si el Bloc está trabajando
+            if (_isCreatingFirebaseUser || state is UserLoading) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text("Creando tu cuenta..."),
+                  ],
                 ),
               );
             }
-            return const Center(child: Text('Error al cargar datos de usuario'));
+
+            // Mostramos el formulario siempre (UserInitial, UserError, etc.)
+            // Ya no necesitamos verificar UserLoaded porque es un usuario nuevo
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Foto
+                    Center(
+                      child: GestureDetector(
+                        onTap: _showImageSourceActionSheet,
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: _selectedImageFile != null
+                                  ? FileImage(_selectedImageFile!)
+                                  : _avatarImage,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Theme.of(context).primaryColor,
+                                child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Apodo
+                    TextFormField(
+                      controller: _apodoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.nickname,
+                        border: const OutlineInputBorder(),
+                        hintText: l10n.nicknameHint,
+                      ),
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Nombre Completo
+                    TextFormField(
+                      controller: _nombreCompletoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.fullName,
+                        border: const OutlineInputBorder(),
+                      ),
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Fecha Nacimiento
+                    TextFormField(
+                      controller: _fechaNacimientoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.birthdate,
+                        border: const OutlineInputBorder(),
+                        hintText: l10n.bithdateHint,
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Teléfono
+                    TextFormField(
+                      controller: _telefonoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.telephoneNumber,
+                        border: const OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return null;
+                        return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Descripción
+                    TextFormField(
+                      controller: _descripcionController,
+                      decoration: InputDecoration(
+                        labelText: l10n.userDescription,
+                        border: const OutlineInputBorder(),
+                        alignLabelWithHint: true,
+                      ),
+                      maxLines: 4,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Modo e Idioma
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedModo,
+                            decoration: InputDecoration(
+                              labelText: l10n.preferredMode,
+                              border: const OutlineInputBorder(),
+                            ),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
+                            items: _modos.map((m) {
+                              final icon = m == 'Bici' ? Icons.directions_bike : Icons.electric_car;
+                              return DropdownMenuItem(
+                                value: m,
+                                child: Row(children: [
+                                  Icon(icon, color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 12),
+                                  Text(m),
+                                ]),
+                              );
+                            }).toList(),
+                            onChanged: (v) => setState(() => _selectedModo = v),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedIdioma,
+                            decoration: InputDecoration(
+                              labelText: l10n.preferredLanguage,
+                              border: const OutlineInputBorder(),
+                            ),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            items: _idiomas
+                                .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+                                .toList(),
+                            onChanged: (v) => setState(() => _selectedIdioma = v),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Botón Finalizar
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _finalizarOnboarding,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                        ),
+                        child: const Text(
+                          'Finalizar Registro',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           },
         ),
       ),

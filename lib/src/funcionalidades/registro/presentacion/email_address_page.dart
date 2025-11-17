@@ -76,6 +76,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     listener: (context, state) async {
                       switch (state) {
                         case EmailIsNewState(): // Usuario nuevo
+                          
                           await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -123,6 +124,13 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                           );
                         case UserNeedsProfileSetupState(): // Onboarding
                           appKey.currentState?.setLoggedIn(true);
+                          Provider.of<UserProvider>(
+                              context,
+                              listen: false,
+                            ).setEmailPwd(
+                              _emailController.text,
+                              _passwordController.text,
+                            );
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (pageContext) => BlocProvider(
@@ -204,6 +212,14 @@ class ContinueButton extends StatelessWidget {
                 context,
                 listen: false,
               ).setEmailPwd(_emailController.text, _passwordController.text);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (pageContext) => BlocProvider(
+                    create: (blocContext) => UserBloc(),
+                    child: UserDataPreferencesPage(),
+                  ),
+                ),
+              );
             } catch (e) {
               print(e);
             }

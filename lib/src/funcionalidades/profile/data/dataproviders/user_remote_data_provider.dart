@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
@@ -9,7 +10,6 @@ class UserRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  // Query para obtener el perfil (asumiendo una query 'getMe'; ajústala si difiere)
   Future<UserEntity> getUserProfile(String userId) async {
     final user = firebaseAuth.currentUser;
     if (user == null || user.email == null) {
@@ -135,41 +135,93 @@ class UserRemoteDataProvider {
     return UserEntity.fromRawData(data);
   }
 
-/*
-  Future<UserEntity> createUserProfile(UserEntity userEntity, String pwd) async {
-    
+
+  Future<UserEntity> createUserProfile(UserEntity userEntity) async {
     const String createUserMutation = r'''
-      mutation UpsertUser(
-        $email: String!
-        $name: String
-        nickname: String
-      ) {
-        upsertUser(
-          id: $id
-          email: $email
-          name: $name
-        ) {
-          id
+      mutation CreateUser($input: CreateUserInput!) {
+        createUser(createInfo: $input) {
           email
           name
+          nickname
+          phoneNumber
+          preferredMode
+          preferredLanguage
+          birthDate
+          bioDescription
         }
       }
     ''';
 
+    // 1. Formateo de Fecha (DD-MM-AAAA según tu esquema)
+    final String birthDateFormatted = DateFormat('dd-MM-yyyy').format(userEntity.fechaNacimiento);
+
+    // 2. Mapeo de Modo (Enum)
+    // Aseguramos que coincida con los valores del esquema: CAR, BIKE
+    String modeEnum = 'CAR'; 
+    if (userEntity.modoPreferido.toLowerCase().contains('bici')) {
+      modeEnum = 'BIKE';
+    }
+
+    // 3. Mapeo de Idioma (Enum)
+    // Aseguramos que coincida con: ESP, CAT, ENG
+    String langEnum = 'ESP';
+    switch (userEntity.idiomaPreferido.toLowerCase()) {
+      case 'en':
+      case 'english':
+        langEnum = 'ENG';
+        break;
+      case 'ca':
+      case 'català':
+      case 'catalan':
+        langEnum = 'CAT';
+        break;
+    }
+
+    // 4. Limpieza del Teléfono
+    // Si es 0 (valor por defecto), enviamos NULL, no "0", para evitar errores de validación en backend
+    String? phoneNumberToSend;
+    if (userEntity.numeroTelefono != 0) {
+      phoneNumberToSend = userEntity.numeroTelefono.toString();
+    }
+
+    // 5. Ejecutar mutación
     final MutationOptions options = MutationOptions(
       document: gql(createUserMutation),
       variables: {
-        'id': user.uid,
-        'email': user.email,
-        'name': userEntity.nombreCompleto.trim().isEmpty ? null : userEntity.nombreCompleto.trim(),
-        'needsToRegister': false,
+        'input': {
+          'email': userEntity.email,
+          'name': userEntity.nombreCompleto,
+          'nickname': userEntity.apodo,
+          'phoneNumber': phoneNumberToSend, // Ahora enviamos null si no hay teléfono
+          'preferredMode': modeEnum,
+          'preferredLanguage': langEnum,
+          'birthDate': birthDateFormatted,
+          'bioDescription': userEntity.descripcion,
+        }
       },
     );
 
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
+      // Imprimimos el error completo para depurar
+      print('Error GraphQL Raw: ${result.exception.toString()}');
+      
+      // Si el mensaje viene vacío, suele ser un error de servidor no controlado
+      if (result.exception!.graphqlErrors.isNotEmpty) {
+         final msg = result.exception!.graphqlErrors.first.message;
+         if (msg.isEmpty) {
+           throw custom_exceptions.ServerException('Error interno del servidor (Mensaje vacío). Revisa los logs del backend.');
+         }
+      }
+      
       throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');
     }
-  }*/
+
+    if (result.data != null && result.data!['createUser'] != null) {
+      return UserEntity.fromRawData(result.data!['createUser']);
+    } else {
+      throw custom_exceptions.ServerException('La respuesta del servidor fue nula');
+    }
+  }
 }
