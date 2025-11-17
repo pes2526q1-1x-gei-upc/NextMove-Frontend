@@ -15,6 +15,7 @@ import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
+final UserProvider userProvider = UserProvider();
 
 /// Punto de entrada principal de la aplicación
 ///
@@ -60,8 +61,8 @@ class _NextMoveAppState extends State<NextMoveApp> {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: GraphQLConfig.client,
-      child: ChangeNotifierProvider(
-        create: (_) => UserProvider(),
+      child: ChangeNotifierProvider.value(
+        value: userProvider,
         child: MaterialApp(
           // Proporciona el UserProvider a toda la app
           // Almacena y gestiona el estado del usuario actual (perfil, preferencias, etc)
@@ -147,7 +148,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       } else {
         // Usuario no autenticado - limpiar datos
         if (mounted) {
-          Provider.of<UserProvider>(context, listen: false).clearUser();
+          userProvider.clearUser();
 
           setState(() {
             _isLoggedIn = false;
@@ -177,7 +178,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         debugPrint("User Data: $meData");
         debugPrint("========================");
 
-        Provider.of<UserProvider>(context, listen: false).setUser(
+        userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,

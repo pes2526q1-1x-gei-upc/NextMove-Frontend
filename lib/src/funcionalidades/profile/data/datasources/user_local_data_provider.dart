@@ -1,9 +1,10 @@
 import '../../domain/entities/user_entity.dart';
 
-class UserLocalDataSource {
+class UserLocalDataProvider {
   // Fallback estático (como en tu código)
   UserEntity getFallbackUserProfile() {
     return UserEntity(
+      email: "Correo",
       apodo: "Usuario",
       nombreCompleto: "Nombre no disponible",
       fechaNacimiento: DateTime.now(),

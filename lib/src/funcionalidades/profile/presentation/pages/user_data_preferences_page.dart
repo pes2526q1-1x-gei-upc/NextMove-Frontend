@@ -5,11 +5,13 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:provider/provider.dart';
 
 
 class UserDataPreferencesPage extends StatefulWidget {
@@ -138,7 +140,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       return;
     }
 
-    final updatedUser = currentUser.copyWith(  // Asume copyWith en UserEntity
+    final newUser = currentUser.copyWith(  
+      email: Provider.of<UserProvider>(context, listen: false).email,
       apodo: _apodoController.text.trim(),
       nombreCompleto: _nombreCompletoController.text.trim(),
       fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
@@ -146,10 +149,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       idiomaPreferido: _selectedIdioma ?? 'Español',
       descripcion: _descripcionController.text.trim(),
       modoPreferido: _selectedModo ?? 'Coche',
-      needsToRegister: false,
     );
 
-    context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
+    context.read<UserBloc>().add(UpdateUserProfile(newUser));
   }
 
   @override

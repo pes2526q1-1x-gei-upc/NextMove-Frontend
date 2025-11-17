@@ -7,7 +7,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -24,22 +23,23 @@ class WelcomePage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Error: ${state.errorCode}")),
               );
+            } else if (state is UserNeedsProfileSetupState) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const UserDataPreferencesPage(),
+                ),
+              );
             } else if (state is AuthSuccessState) {
-              final meData = state.meData;
-              final needsToRegister = meData?['needsToRegister'] ?? true;
-              debugPrint("needsToRegister: $needsToRegister");
-              if (needsToRegister) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const UserDataPreferencesPage(),
-                  ),
-                );
-              } else {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const MapHomePage()),
-                  (route) => false,
-                );
-              }
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const MapHomePage(),
+                ),
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const MapHomePage()),
+                (route) => false,
+              );
             }
           },
           child: Center(
