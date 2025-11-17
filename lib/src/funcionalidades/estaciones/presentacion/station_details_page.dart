@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_details_bloc.dart';
 
 
 extension ConnectionTypeLocalization on ConnectionType {
@@ -42,7 +44,7 @@ extension BicycleStationStateLocalization on BicycleStationState {
     }
 }
 
-class StationDetailsPage extends StatefulWidget {
+class StationDetailsPage extends StatelessWidget {
     final StationType stationType;
     final String stationID;
     final StationDetails? stationDetails;
@@ -55,67 +57,50 @@ class StationDetailsPage extends StatefulWidget {
     });
 
     @override
-    State<StationDetailsPage> createState() => _StationDetailsPageState();
-}
-
-class _StationDetailsPageState extends State<StationDetailsPage> {
-    StationDetails? stationDetails;
-
-    bool isLoading = true;
-    String? error;
-
-    @override
-    void initState() {
-        super.initState();
-        if (widget.stationDetails != null) {
-            stationDetails = widget.stationDetails;
-            isLoading = false;
-            return;
-        }
-        _loadStationDetails();
-    }
-
-    Future<void> _loadStationDetails() async {
-    try {
-        stationDetails = await getStationDetails(widget.stationType, widget.stationID);
-        setState(() {
-            isLoading = false;
-        });
-    }
-    catch (e) {
-        setState(() {
-            error = e.toString();
-            isLoading = false;
-        });
-        }
-    }
-
-    @override
     Widget build(BuildContext context) {
-        if (isLoading) {
-            return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-            );
-        }
-        if (error != null) {
-            return Scaffold(
-                appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
-                body: Center(child: Text(error!)),
-            );
-        }
+        return BlocProvider(
+            create: (context) => StationDetailsBloc()
+                ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
+            child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
+                builder: (context, state) {
+                    if (state is StationDetailsLoading) {
+                        return const Scaffold(
+                            body: Center(child: CircularProgressIndicator()),
+                        );
+                    } else if (state is StationDetailsError) {
+                        return Scaffold(
+                            appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
+                            body: Center(child: Text(state.message)),
+                        );
+                    } else if (state is StationDetailsLoaded) {
+                        final stationDetails = state.stationDetails;
+                        return _buildDetailsPage(context, stationDetails);
+                    } else {
+                        return const Scaffold(
+                            body: Center(child: Text('Unknown state')),
+                        );
+                    }
+                },
+            ),
+        );
+    }
 
-        final String totalSlotsLabel = switch (widget.stationType) {
+    Scaffold _buildDetailsPage(BuildContext context, StationDetails stationDetails) {
+        final String totalSlotsLabel = switch (stationType) {
           StationType.bicycle => AppLocalizations.of(context)!.totalAnchors,
           StationType.electricVehicle => AppLocalizations.of(context)!.totalChargers,
         };
-        final String availableSlotsLabel = switch (widget.stationType) {
+        final String availableSlotsLabel = switch (stationType) {
           StationType.bicycle => AppLocalizations.of(context)!.availableAnchors,
           StationType.electricVehicle => AppLocalizations.of(context)!.availableChargers,
         };
 
+        final bikeDetails = stationType == StationType.bicycle ? stationDetails as BicycleStationDetails : null;
+        final evDetails = stationType == StationType.electricVehicle ? stationDetails as EVStationDetails : null;
+
         return Scaffold(
             appBar: AppBar(
-                title: Text(stationDetails!.name),
+                title: Text(stationDetails.name),
             ),
             body: Center(
                 child: SingleChildScrollView(
@@ -123,11 +108,11 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            createDetailRow(context, Icons.location_on_sharp, AppLocalizations.of(context)!.address, stationDetails!.address),
+                            createDetailRow(context, Icons.location_on_sharp, AppLocalizations.of(context)!.address, stationDetails.address),
                             const SizedBox(height: 8),
-                            createDetailRow(context, Icons.event_seat, totalSlotsLabel, stationDetails!.totalSlots.toString()),
+                            createDetailRow(context, Icons.event_seat, totalSlotsLabel, stationDetails.totalSlots.toString()),
                             const SizedBox(height: 8),
-                            createDetailRow(context, Icons.check_circle_outline, availableSlotsLabel, stationDetails!.availableSlots.toString()),
+                            createDetailRow(context, Icons.check_circle_outline, availableSlotsLabel, stationDetails.availableSlots.toString()),
                             const SizedBox(height: 8),
                             Row( // rating
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -135,33 +120,33 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                                     Icon(Icons.star),
                                     SizedBox(width: 4),
                                     Text('${AppLocalizations.of(context)!.rating}: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                    createStarRatingRow(stationDetails!.rating),
+                                    createStarRatingRow(stationDetails.rating),
                                     Text(
-                                        '(${stationDetails!.rating % 2 == 0 ? (stationDetails!.rating ~/ 2) : (stationDetails!.rating / 2)}/5)',
+                                        '(${stationDetails.rating % 2 == 0 ? (stationDetails.rating ~/ 2) : (stationDetails.rating / 2)}/5)',
                                         style: Theme.of(context).textTheme.bodyLarge,
                                     ),
                                 ],
                             ),
                             const SizedBox(height: 16),
-                            if (widget.stationType == StationType.bicycle) ...[
-                                createDetailRow(context, Icons.pedal_bike, AppLocalizations.of(context)!.availableBikes, (stationDetails as BicycleStationDetails).availableBikes.toString()),
+                            if (bikeDetails != null) ...[
+                                createDetailRow(context, Icons.pedal_bike, AppLocalizations.of(context)!.availableBikes, bikeDetails.availableBikes.toString()),
                                 const SizedBox(height: 8),
-                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, (stationDetails as BicycleStationDetails).availableMechanicalBikes.toString()),
+                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, bikeDetails.availableMechanicalBikes.toString()),
                                 const SizedBox(height: 8),
-                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, (stationDetails as BicycleStationDetails).availableElectricBikes.toString()),
+                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, bikeDetails.availableElectricBikes.toString()),
                                 const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.electric_bike, AppLocalizations.of(context)!.electricRecharge, (stationDetails as BicycleStationDetails).electricRechargeStation),
+                                createDetailRowBool(context, Icons.electric_bike, AppLocalizations.of(context)!.electricRecharge, bikeDetails.electricRechargeStation),
                                 const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.anchor, AppLocalizations.of(context)!.canAnchorBikes, (stationDetails as BicycleStationDetails).canAnchorBikes),
+                                createDetailRowBool(context, Icons.anchor, AppLocalizations.of(context)!.canAnchorBikes, bikeDetails.canAnchorBikes),
                                 const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.directions_bike, AppLocalizations.of(context)!.canRentBikes, (stationDetails as BicycleStationDetails).canRentBikes),
+                                createDetailRowBool(context, Icons.directions_bike, AppLocalizations.of(context)!.canRentBikes, bikeDetails.canRentBikes),
                                 const SizedBox(height: 8),
-                                createDetailRow(context, Icons.info_outline, AppLocalizations.of(context)!.state, (stationDetails as BicycleStationDetails).state.localized(context)),
+                                createDetailRow(context, Icons.info_outline, AppLocalizations.of(context)!.state, bikeDetails.state.localized(context)),
                             ],
-                            if (widget.stationType == StationType.electricVehicle) ...[
-                                createDetailRowBool(context, Icons.bolt, AppLocalizations.of(context)!.superFast, (stationDetails as EVStationDetails).isSuperFast),
+                            if (evDetails != null) ...[
+                                createDetailRowBool(context, Icons.bolt, AppLocalizations.of(context)!.superFast, evDetails.isSuperFast),
                                 const SizedBox(height: 8),
-                                createDetailRow(context, Icons.lock_open, AppLocalizations.of(context)!.accessType, (stationDetails as EVStationDetails).accessType),
+                                createDetailRow(context, Icons.lock_open, AppLocalizations.of(context)!.accessType, evDetails.accessType),
                                 const SizedBox(height: 16),
                                 Align(
                                   alignment: Alignment.centerLeft,
@@ -171,7 +156,7 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                ...((stationDetails as EVStationDetails).connectors.map((connector) => Card(
+                                ...(evDetails.connectors.map((connector) => Card(
                                   margin: const EdgeInsets.symmetric(vertical: 4),
                                   child: ListTile(
                                     leading: Icon(Icons.cable),

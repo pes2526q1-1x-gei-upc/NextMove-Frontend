@@ -50,14 +50,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       email: event.email,
       password: event.password,
     );
-    result.fold((failure) {
-      emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
-      emit(prevState);
-    }, (data) => emit(AuthSuccessState(
-      meData: data['meData'] as Map<String, dynamic>?,
-      firebaseUserId: data['firebaseUserId'] as String,
-      firebaseToken: data['firebaseToken'] as String?,
-    )));
+    result.fold(
+      (failure) {
+        emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
+        emit(prevState);
+      },
+      (data) => emit(
+        AuthSuccessState(
+          meData: data['meData'] as Map<String, dynamic>?,
+          firebaseUserId: data['firebaseUserId'] as String,
+          firebaseToken: data['firebaseToken'] as String?,
+        ),
+      ),
+    );
   }
 
   Future<void> _onSignUpWithEmail(
@@ -94,11 +99,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (needsToRegister) {
           emit(UserNeedsProfileSetupState());
         } else {
-          emit(AuthSuccessState(
-            meData: data['meData'] as Map<String, dynamic>?,
-            firebaseUserId: data['firebaseUserId'] as String,
-            firebaseToken: data['firebaseToken'] as String?,
-          ));
+          emit(
+            AuthSuccessState(
+              meData: data['meData'] as Map<String, dynamic>?,
+              firebaseUserId: data['firebaseUserId'] as String,
+              firebaseToken: data['firebaseToken'] as String?,
+            ),
+          );
         }
       },
     );
