@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../entities/user_entity.dart';
-import '../repositories/user_repository.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 
 class GetUserProfileUseCase {
   final UserRepository repository;

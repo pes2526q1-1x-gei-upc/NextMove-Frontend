@@ -1,6 +1,6 @@
-/*import 'package:dartz/dartz.dart';
+/* import 'package:dartz/dartz.dart';
 import '../entities/user_entity.dart';
-import '../repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 import '../../../../core/errors/failure.dart';
 
 class CreateUserProfileUseCase {
@@ -11,4 +11,4 @@ class CreateUserProfileUseCase {
   Future<Either<Failure, bool>> call(UserEntity userEntity, String userId) {
     return repository.createUserProfile(userEntity, userId);
   }
-}*/
+} */

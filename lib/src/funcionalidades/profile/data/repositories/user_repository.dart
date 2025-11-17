@@ -1,21 +1,19 @@
 import 'package:dartz/dartz.dart';
 import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/user_repository.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
 import '../datasources/user_remote_data_source.dart';
 import '../datasources/user_local_data_source.dart';
 
-class UserRepositoryImpl implements UserRepository {
+class UserRepository {
   final UserRemoteDataSource remoteDataSource;
   final UserLocalDataSource localDataSource;
 
-  UserRepositoryImpl({
+  UserRepository({
     required this.remoteDataSource,
     required this.localDataSource,
   });
 
-  @override
   Future<Either<Failure, UserEntity>> getUserProfile(String userId) async {
     try {
       final user = await remoteDataSource.getUserProfile(userId);
@@ -30,7 +28,6 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  @override
   Future<Either<Failure, bool>> updateUserProfile(UserEntity userEntity, String userId) async {
     try {
       await remoteDataSource.updateUserProfile(userEntity);

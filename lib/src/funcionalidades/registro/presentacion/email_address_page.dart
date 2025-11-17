@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/get_user_profile_use_case.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/usecases/update_user_profile_use_case.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
