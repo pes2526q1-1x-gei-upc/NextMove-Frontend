@@ -27,7 +27,7 @@ class UserRepository {
     }
   }
 
-  Future<Either<Failure, bool>> updateUserProfile(UserEntity userEntity, String userId) async {
+  Future<Either<Failure, bool>> updateUserProfile(UserEntity userEntity) async {
     try {
       await remoteDataProvider.updateUserProfile(userEntity);
       return const Right(true);
@@ -36,6 +36,7 @@ class UserRepository {
     } on custom_exceptions.AuthException {
       return Left(AuthFailure());
     } catch (e) {
+      debugPrint('❌ Error desconocido al actualizar perfil: $e');
       return Left(ServerFailure());
     }
   }

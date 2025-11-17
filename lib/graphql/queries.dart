@@ -1,51 +1,75 @@
-// Define your GraphQL queries here
-// Go to /api/gql/playground to test your queries before using them :)
-
 class GraphQLQueries {
-  static const String getMeQuery = r'''
-    query Me {
-      me {
-        email
-        name
-        nickname
-        photo
-        nickname
-        preferredMode
-        birthDate
-        bioDescription
-        preferredLanguage
-        phoneNumber
-        createdAt
-      }
+ 
+  static const String createUserMutation = r'''
+  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
+    createUser(createInfo: {
+      email: $email,
+      name: $fullN,
+      nickname: $nickN,
+      phoneNumber: $phoneNum,
+      preferredMode: $mode,
+      preferredLanguage: $preferredLanguage,
+      birthDate: $birthDate,
+      bioDescription: $bioDescription    
+    }) {
+      email
+      name
+      nickname
+      phoneNumber
+      preferredMode
+      createdAt
+      preferredLanguage
+      birthDate
+      bioDescription
     }
+  }
   ''';
 
-  static const String upsertUserMutation = r'''
-    mutation UpsertUser($id: String!, $email: String, $name: String) {
-      insert_users_one(
-        object: { id: $id, email: $email, name: $name }
-        on_conflict: {
-          constraint: users_pkey
-          update_columns: [email, name, updated_at]
-        }
-      ) {
-        id
-        email
-        name
-        preferredLanguage
-      }
+  static const String getUserProfileQuery = r'''
+  query Me {
+    me {
+      email
+      name
+      nickname
+      photo
+      preferredMode
+      birthDate
+      bioDescription
+      phoneNumber
+      preferredLanguage
+      createdAt
     }
+  }
   ''';
 
-  static const String getUserQuery = r'''
-    query getUser($id: ID!) {
-      User(id: $id) {
-        id
-        nickname
-        email
-      }
+  static const String updateUserMutation = r'''
+  mutation UpdateMe($fullName: String, $nickname: String, $preferredMode: Mode, $phoneNumber: String, $bioDescription: String, $preferredLanguage: Language, $birthDate: String) {
+    updateMe(
+      nickname: $nickname,
+      name: $fullName,
+      preferredMode: $preferredMode,
+      phoneNumber: $phoneNumber,
+      bioDescription: $bioDescription,
+      birthDate: $birthDate,
+      preferredLanguage: $preferredLanguage
+    ) {
+      email
+      name
+      phoneNumber
+      birthDate
+      
+      nickname
+      photo
+      bioDescription
+      
+      preferredMode
+      preferredLanguage
+    
+      createdAt
     }
+  }
   ''';
+
   static const String getBicycleStationDetailsQuery = r'''
     query getBicingStationDetails($stationID: ID!) {
       getEstacionDeBicing(id: $stationID) {
@@ -62,7 +86,7 @@ class GraphQLQueries {
         bicisElectricasDisponibles
       }
    }
-  '''; //TODO: afegir altres camps
+  '''; 
 
   static const String getAllBicycleStationsQuery = r'''
     query getAllBicingStations {

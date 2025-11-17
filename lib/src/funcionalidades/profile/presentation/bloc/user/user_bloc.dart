@@ -29,11 +29,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     emit(UserLoading());
-    final result = await userRepository.updateUserProfile(
-      event.updatedUser,
-      '',
-    );
-    //cuidao aqui el parametro vacio
+    final result = await userRepository.updateUserProfile(event.updatedUser,);
     result.fold(
       (failure) =>
           emit(UserError(failure.message ?? 'Error al actualizar perfil')),

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
-
+import '../../../../../graphql/queries.dart';
 
 class UserRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
@@ -62,41 +62,7 @@ class UserRemoteDataProvider {
       throw custom_exceptions.AuthException(message: 'Usuario no autenticado o email no disponible');
     }
 
-    const String updateUserMutation = r'''
-      mutation UpdateMe(
-        $email: String!
-        $name: String
-        $nickname: String
-        $phoneNumber: String
-        $bioDescription: String
-        $preferredMode: Mode
-        $preferredLanguage: String
-        $birthDate: String
-        $needsToRegister: Boolean
-      ) {
-        updateMe(
-          email: $email
-          name: $name
-          nickname: $nickname
-          phoneNumber: $phoneNumber
-          bioDescription: $bioDescription
-          preferredMode: $preferredMode
-          preferredLanguage: $preferredLanguage
-          birthDate: $birthDate
-          needsToRegister: $needsToRegister
-        ) {
-          email
-          name
-          nickname
-          phoneNumber
-          bioDescription
-          preferredMode
-          preferredLanguage
-          birthDate
-          needsToRegister
-        }
-      }
-    ''';
+    const String updateUserMutation = GraphQLQueries.updateUserMutation;
 
     // Helpers de formato (de tu código)
     String? formatBirthDate(DateTime? date) {

@@ -9,7 +9,7 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getMeQuery),
+      document: gql(GraphQLQueries.getUserProfileQuery),
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
@@ -43,7 +43,7 @@ class AuthService {
     bool? needsToRegister,
   }) async {
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.upsertUserMutation),
+      document: gql(GraphQLQueries.updateUserMutation),
       variables: {
         'id': firebaseUid,
         'email': email,
