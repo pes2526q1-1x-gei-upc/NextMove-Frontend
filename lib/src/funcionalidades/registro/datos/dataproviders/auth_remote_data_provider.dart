@@ -5,8 +5,6 @@ import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:provider/provider.dart';
 
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
