@@ -9,7 +9,7 @@ import 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   //final StationRepository stationRepository;
-  final Function(StationDetails) onMarkerTapped;
+  final Function(StationDetails, MapLoadedState) onMarkerTapped;
   
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -185,7 +185,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         markerId: MarkerId(station.id),
         position: LatLng(station.latitude, station.longitude),
         icon: icon,
-        onTap: () => onMarkerTapped(station),
+        onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
     }).toSet();
   }

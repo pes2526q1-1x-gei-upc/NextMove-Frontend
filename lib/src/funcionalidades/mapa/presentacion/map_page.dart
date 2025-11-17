@@ -191,7 +191,7 @@ class _MapPageState extends State<MapPage> {
   // Markers
   // -----------------------------------------------------------------------
 
-  void _showStationBottomSheet(StationDetails station) {
+  void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -216,7 +216,7 @@ class _MapPageState extends State<MapPage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _currentMode == StationType.bicycle
+                  backgroundColor: state.currentMode == StationType.bicycle
                       ? Colors.blue
                       : Colors.green,
                   foregroundColor: Colors.white,
@@ -226,7 +226,7 @@ class _MapPageState extends State<MapPage> {
                     MaterialPageRoute(
                       builder: (_) => StationDetailsPage(
                         stationID: station.id,
-                        stationType: _currentMode,
+                        stationType: state.currentMode,
                         stationDetails: station,
                       ),
                     ),
