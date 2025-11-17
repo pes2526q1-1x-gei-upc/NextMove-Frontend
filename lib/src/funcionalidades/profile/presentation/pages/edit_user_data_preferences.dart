@@ -49,6 +49,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
     _descripcionController = TextEditingController();
 
     // Carga inicial via BLoC
+    debugPrint("Cargando perfil de usuario para edición...");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = FirebaseAuth.instance.currentUser;
       if (user?.email != null) {

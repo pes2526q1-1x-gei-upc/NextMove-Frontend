@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
@@ -21,6 +22,7 @@ class UserRepository {
       return Left(AuthFailure());
     } catch (e) {
       // Fallback a local si remote falla
+      debugPrint('❌ Error desconocido al obtener perfil: $e. Usando fallback local.');
       return Right(localDataProvider.getFallbackUserProfile());
     }
   }

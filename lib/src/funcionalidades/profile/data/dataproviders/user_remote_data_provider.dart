@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -17,8 +18,8 @@ class UserRemoteDataProvider {
     }
 
     const String getUserQuery = r'''
-      query GetMe($email: String!) {
-        getMe(email: $email) {
+      query User($email: String!) {
+        User(email: $email) {
           email
           name
           nickname
@@ -28,7 +29,6 @@ class UserRemoteDataProvider {
           preferredLanguage
           birthDate
           createdAt
-          needsToRegister
         }
       }
     ''';
@@ -41,11 +41,14 @@ class UserRemoteDataProvider {
     final QueryResult result = await client.query(options);
 
     if (result.hasException) {
+      debugPrint('❌ Error GraphQL Raw: ${result.exception.toString()}');
       throw custom_exceptions.ServerException('Error al obtener perfil: ${result.exception}');
+      
     }
 
-    final data = result.data?['getMe'];
+    final data = result.data?['User'];
     if (data == null) {
+      debugPrint('❌ No se encontró el usuario con email: ${user.email}');
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
@@ -152,18 +155,15 @@ class UserRemoteDataProvider {
       }
     ''';
 
-    // 1. Formateo de Fecha (DD-MM-AAAA según tu esquema)
-    final String birthDateFormatted = DateFormat('dd-MM-yyyy').format(userEntity.fechaNacimiento);
+    // 1. CORRECCIÓN CRÍTICA: Formato ISO (AAAA-MM-DD) para PostgreSQL
+    final String birthDateFormatted = DateFormat('yyyy-MM-dd').format(userEntity.fechaNacimiento);
 
-    // 2. Mapeo de Modo (Enum)
-    // Aseguramos que coincida con los valores del esquema: CAR, BIKE
+    // 2. Mapeo seguro de ENUMS (Tu backend espera MAYÚSCULAS)
     String modeEnum = 'CAR'; 
     if (userEntity.modoPreferido.toLowerCase().contains('bici')) {
       modeEnum = 'BIKE';
     }
 
-    // 3. Mapeo de Idioma (Enum)
-    // Aseguramos que coincida con: ESP, CAT, ENG
     String langEnum = 'ESP';
     switch (userEntity.idiomaPreferido.toLowerCase()) {
       case 'en':
@@ -177,14 +177,13 @@ class UserRemoteDataProvider {
         break;
     }
 
-    // 4. Limpieza del Teléfono
-    // Si es 0 (valor por defecto), enviamos NULL, no "0", para evitar errores de validación en backend
+    // 3. Limpieza del teléfono (0 -> null)
     String? phoneNumberToSend;
     if (userEntity.numeroTelefono != 0) {
       phoneNumberToSend = userEntity.numeroTelefono.toString();
     }
 
-    // 5. Ejecutar mutación
+    // 4. Ejecución
     final MutationOptions options = MutationOptions(
       document: gql(createUserMutation),
       variables: {
@@ -192,7 +191,7 @@ class UserRemoteDataProvider {
           'email': userEntity.email,
           'name': userEntity.nombreCompleto,
           'nickname': userEntity.apodo,
-          'phoneNumber': phoneNumberToSend, // Ahora enviamos null si no hay teléfono
+          'phoneNumber': phoneNumberToSend, // Envía null si es 0
           'preferredMode': modeEnum,
           'preferredLanguage': langEnum,
           'birthDate': birthDateFormatted,
@@ -203,16 +202,15 @@ class UserRemoteDataProvider {
 
     final QueryResult result = await client.mutate(options);
 
+    // 5. Manejo de Errores Mejorado
     if (result.hasException) {
-      // Imprimimos el error completo para depurar
-      print('Error GraphQL Raw: ${result.exception.toString()}');
+      print('❌ Error GraphQL Raw: ${result.exception.toString()}');
       
-      // Si el mensaje viene vacío, suele ser un error de servidor no controlado
+      // Si el mensaje está vacío, es probable que sea un error de base de datos (constraints, tipos)
+      // que el backend no está transformando en mensaje legible.
       if (result.exception!.graphqlErrors.isNotEmpty) {
-         final msg = result.exception!.graphqlErrors.first.message;
-         if (msg.isEmpty) {
-           throw custom_exceptions.ServerException('Error interno del servidor (Mensaje vacío). Revisa los logs del backend.');
-         }
+          final msg = result.exception!.graphqlErrors.first.message;
+          print('❌ Mensaje del servidor: "$msg"');
       }
       
       throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');

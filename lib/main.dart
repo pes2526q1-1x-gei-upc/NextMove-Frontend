@@ -8,7 +8,7 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_p
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-//import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
@@ -214,6 +214,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return WelcomePage();
+    return _isLoggedIn ?  MapPage() : WelcomePage();
   }
 }
