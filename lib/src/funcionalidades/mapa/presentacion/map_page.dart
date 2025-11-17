@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
@@ -153,7 +154,7 @@ class _MapPageState extends State<MapPage> {
                 ),
 
                 // Avatar de perfil
-                const ProfileAvatarWidget(),
+                ProfileAvatarWidget(context: context),
 
                 // Botón de lista de estaciones
                 StationListButtonWidget(

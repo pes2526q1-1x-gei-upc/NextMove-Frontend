@@ -214,6 +214,5 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return MapPage();
-  }
+return _isLoggedIn ? MapPage() : WelcomePage();  }
 }
