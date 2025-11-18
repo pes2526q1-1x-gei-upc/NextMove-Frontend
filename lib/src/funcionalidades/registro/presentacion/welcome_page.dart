@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
-import 'package:nextmove_app/src/funcionalidades/perfil/presentacion/user_data_preferences_page.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/datos/welcome_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:nextmove_app/graphql/queries.dart';
-
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
-import 'package:provider/provider.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -19,106 +14,93 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var signInButtonsWidth = MediaQuery.of(context).size.width * (2 / 3);
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(0.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.welcomeTo('NextMove'),
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+    return BlocProvider(
+      create: (context) => AuthBloc(),
+      child: Scaffold(
+        body: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is AuthFailureState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Error: ${state.errorCode}")),
+              );
+            } else if (state is UserNeedsProfileSetupState) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => UserDataPreferencesPage(),
+                ),
+              );
+            } else if (state is AuthSuccessState) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const MapPage(),
+                ),
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const MapPage()),
+                (route) => false,
+              );
+            }
+          },
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.welcomeTo('NextMove'),
+                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  EmailSignInButton(signInButtonsWidth: signInButtonsWidth),
+                  GoogleSignInButton(signInButtonsWidth: signInButtonsWidth),
+                ],
               ),
-              SizedBox(height: 20),
-              SignInButton(
-                Buttons.Email,
-                width: signInButtonsWidth,
-                text: AppLocalizations.of(context)!.useEmail,
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => EmailAddressPage()),
-                  );
-                },
-              ),
-              SignInButton(
-                Buttons.Google,
-                width: signInButtonsWidth,
-                text: AppLocalizations.of(context)!.signInWithGoogle,
-                onPressed: () async {
-                  try {
-                    final userCredential = await signInWithGoogle();
-                    if (userCredential.user == null) return;
-
-                    final firebaseUserId = userCredential.user!.uid;
-                    final firebaseToken = await userCredential.user!
-                        .getIdToken();
-                    final email = userCredential.user!.email;
-                    final name = userCredential.user!.displayName;
-
-                    // ✅ Detectar si es usuario nuevo
-                    final isNewUser =
-                        userCredential.additionalUserInfo?.isNewUser ?? false;
-                    debugPrint("¿Es usuario nuevo? $isNewUser");
-
-                    final client = GraphQLProvider.of(context).value;
-                    final authService = AuthService(client);
-
-                    // Hacer upsert con needsToRegister solo si es nuevo
-                    await authService.upsertUserFromFirebase(
-                      firebaseUid: firebaseUserId,
-                      email: email,
-                      name: name,
-                      needsToRegister: isNewUser,
-                    );
-
-                    final meData = await authService.getCurrentUser();
-
-                    if (meData != null) {
-                      Provider.of<UserProvider>(context, listen: false).setUser(
-                        meData,
-                        firebaseUserId: firebaseUserId,
-                        firebaseToken: firebaseToken,
-                      );
-                    }
-
-                    if (context.mounted) {
-                      // ✅ Usar operador ?? para manejar null
-                      final needsToRegister =
-                          meData?['needsToRegister'] ?? true;
-                      debugPrint("needsToRegister: $needsToRegister");
-
-                      if (needsToRegister) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const UserDataPreferences(),
-                          ),
-                        );
-                      } else {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const MapHomePage(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    debugPrint("Error login: $e");
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text("Error: $e")));
-                    }
-                  }
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class GoogleSignInButton extends StatelessWidget {
+  const GoogleSignInButton({super.key, required this.signInButtonsWidth});
+
+  final double signInButtonsWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return SignInButton(
+      Buttons.Google,
+      width: signInButtonsWidth,
+      text: AppLocalizations.of(context)!.signInWithGoogle,
+      onPressed: () {
+        context.read<AuthBloc>().add(SignInWithGoogleEvent());
+      },
+    );
+  }
+}
+
+class EmailSignInButton extends StatelessWidget {
+  const EmailSignInButton({super.key, required this.signInButtonsWidth});
+
+  final double signInButtonsWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return SignInButton(
+      Buttons.Email,
+      width: signInButtonsWidth,
+      text: AppLocalizations.of(context)!.useEmail,
+      onPressed: () {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => EmailAddressPage()));
+      },
     );
   }
 }

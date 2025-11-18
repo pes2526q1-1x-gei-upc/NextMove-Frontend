@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class GraphQLConfig {
+  static ValueNotifier<GraphQLClient>? _client;
+
   static ValueNotifier<GraphQLClient> initializeClient() {
     final endpoint = dotenv.env['GRAPHQL_ENDPOINT'];
 
@@ -27,11 +29,20 @@ class GraphQLConfig {
 
     final Link link = authLink.concat(httpLink);
 
-    return ValueNotifier(
+    _client = ValueNotifier(
       GraphQLClient(
         cache: GraphQLCache(store: InMemoryStore()),
         link: link,
       ),
     );
+
+    return _client!;
+  }
+
+  static ValueNotifier<GraphQLClient> get client {
+    if (_client == null) {
+      throw Exception('GraphQL client not initialized');
+    }
+    return _client!;
   }
 }

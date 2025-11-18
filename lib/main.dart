@@ -8,13 +8,14 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_p
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_home_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
+final UserProvider userProvider = UserProvider();
 
 /// Punto de entrada principal de la aplicación
 ///
@@ -42,14 +43,12 @@ class NextMoveApp extends StatefulWidget {
 }
 
 class _NextMoveAppState extends State<NextMoveApp> {
-  // Cliente de GraphQL para hacer queries y mutations a la API
-  late final ValueNotifier<GraphQLClient> client;
   bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
 
   @override
   void initState() {
     super.initState();
-    client = GraphQLConfig.initializeClient();
+    GraphQLConfig.initializeClient();
   }
 
   void setLoggedIn(bool value) {
@@ -61,9 +60,9 @@ class _NextMoveAppState extends State<NextMoveApp> {
   @override
   Widget build(BuildContext context) {
     return GraphQLProvider(
-      client: client,
-      child: ChangeNotifierProvider(
-        create: (_) => UserProvider(),
+      client: GraphQLConfig.client,
+      child: ChangeNotifierProvider.value(
+        value: userProvider,
         child: MaterialApp(
           // Proporciona el UserProvider a toda la app
           // Almacena y gestiona el estado del usuario actual (perfil, preferencias, etc)
@@ -83,7 +82,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           ),
           // Widget que maneja la autenticación y decide qué pantalla mostrar
-          home: AuthStateHandler(client: client, isLoggedIn: isLoggedIn),
+          home: AuthStateHandler(client: GraphQLConfig.client, isLoggedIn: isLoggedIn),
         ),
       ),
     );
@@ -149,7 +148,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       } else {
         // Usuario no autenticado - limpiar datos
         if (mounted) {
-          Provider.of<UserProvider>(context, listen: false).clearUser();
+          userProvider.clearUser();
 
           setState(() {
             _isLoggedIn = false;
@@ -179,7 +178,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         debugPrint("User Data: $meData");
         debugPrint("========================");
 
-        Provider.of<UserProvider>(context, listen: false).setUser(
+        userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
@@ -187,7 +186,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
         debugPrint("Datos guardados correctamente en Provider");
       } else {
-        debugPrint("No se obtuvieron datos del usuario desde GraphQL");
+        debugPrint("No se obtuvieron datos del usuario desde GraphQL, lo creamos...");
+        
       }
     } catch (e, stackTrace) {
       debugPrint("========================");
@@ -214,6 +214,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return _isLoggedIn ? MapHomePage() : WelcomePage();
+    return _isLoggedIn ?  MapPage() : WelcomePage();
   }
 }
