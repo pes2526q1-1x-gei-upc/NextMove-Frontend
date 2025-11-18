@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
@@ -13,10 +14,18 @@ class ProfileAvatarWidget extends StatelessWidget {
 
   void _navigateToEditUser() {
     // 1. Lee el UserRepository
-    String? userUID = Provider.of<UserProvider>(
+    final userProvider = Provider.of<UserProvider>(
       context,
       listen: false,
-    ).firebaseUserId;
+    );
+    String? userUID = userProvider.firebaseUserId;
+
+    if (userProvider.user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.userNotLoadedMessage)),
+      );
+      return;
+    }
 
     // Navega, pero envolviendo la nueva página con el BlocProvider
     Navigator.push(

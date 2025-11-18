@@ -104,5 +104,6 @@
     "saveChangesError": "Error al desar els canvis.",
     "bicycle": "Bicicleta",
     "car": "Cotxe",
-    "finishRegistration": "Finalitzar registre"
+    "finishRegistration": "Finalitzar registre",
+    "userNotLoadedMessage": "L'usuari no s'ha carregat correctament."
 }

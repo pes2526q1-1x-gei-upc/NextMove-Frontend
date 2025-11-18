@@ -39,10 +39,10 @@ class UserRepository {
     }
   }
 
-  Future<Either<Failure, bool>> createUserProfile(UserEntity userEntity) async {
+  Future<Either<Failure, UserEntity>> createUserProfile(UserEntity userEntity) async {
     try {
-      await remoteDataProvider.createUserProfile(userEntity);
-      return const Right(true);
+      final createdUser = await remoteDataProvider.createUserProfile(userEntity);
+      return Right(createdUser);
     } on custom_exceptions.ServerException {
       return Left(ServerFailure());
     } on custom_exceptions.AuthException {

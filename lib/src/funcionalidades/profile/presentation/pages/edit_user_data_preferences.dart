@@ -114,6 +114,16 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
       return;
     }
 
+    // Print all fields
+    debugPrint('User Profile Fields:');
+    debugPrint('Apodo: ${_apodoController.text}');
+    debugPrint('Nombre Completo: ${_nombreCompletoController.text}');
+    debugPrint('Fecha de Nacimiento: ${_fechaNacimientoController.text}');
+    debugPrint('Teléfono: ${_telefonoController.text}');
+    debugPrint('Descripción: ${_descripcionController.text}');
+    debugPrint('Idioma Preferido: $_selectedIdioma');
+    debugPrint('Modo Preferido: $_selectedModo');
+
     final updatedUser = currentUser.copyWith(
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       descripcion: _descripcionController.text.trim(),

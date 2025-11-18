@@ -37,7 +37,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     );
   }
 
-   Future<void> _onCreateUserProfile(
+  Future<void> _onCreateUserProfile(
     CreateUserProfile event,
     Emitter<UserState> emit,
   ) async {
@@ -46,7 +46,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     final result = await userRepository.createUserProfile(event.newUser);
     result.fold(
       (failure) => emit(UserError(failure.message ?? 'Error al crear perfil')),
-      (_) => emit(UserUpdated(event.newUser)),
+      (createdUser) => emit(UserUpdated(createdUser)),
     );
   } 
 }

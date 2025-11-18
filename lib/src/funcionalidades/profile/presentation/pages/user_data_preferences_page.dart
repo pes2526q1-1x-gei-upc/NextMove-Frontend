@@ -220,17 +220,21 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         body: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
             if (state is UserError) {
-              // Si falla el backend, quitamos el loading
               setState(() => _isCreatingFirebaseUser = false);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.message), backgroundColor: Colors.red),
               );
             } else if (state is UserUpdated) {
-              // Éxito total (Firebase + Backend)
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.saveChangesFeedback)),
               );
-              // Navegamos al mapa
+              final userProvider = Provider.of<UserProvider>(context, listen: false);
+              final firebaseUserNow = FirebaseAuth.instance.currentUser;
+              userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: null);
+              () async {
+                final token = firebaseUserNow == null ? null : await firebaseUserNow.getIdToken();
+                userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: token);
+              }();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const MapPage()),
                 (route) => false,
@@ -238,7 +242,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
             }
           },
           builder: (context, state) {
-            // Mostramos carga si estamos creando en Firebase O si el Bloc está trabajando
             if (_isCreatingFirebaseUser || state is UserLoading) {
               return const Center(
                 child: Column(

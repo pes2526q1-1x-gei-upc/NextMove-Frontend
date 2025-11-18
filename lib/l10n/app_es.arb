@@ -104,5 +104,6 @@
     "saveChangesError": "Error al guardar los cambios.",
     "bicycle": "Bicicleta",
     "car": "Coche",
-    "finishRegistration": "Finalizar registro"
+    "finishRegistration": "Finalizar registro",
+    "userNotLoadedMessage": "El usuario no se ha cargado correctamente."
 }
