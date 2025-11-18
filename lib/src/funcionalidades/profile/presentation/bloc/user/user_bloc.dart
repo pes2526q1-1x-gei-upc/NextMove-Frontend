@@ -33,7 +33,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     result.fold(
       (failure) =>
           emit(UserError(failure.message ?? 'Error al actualizar perfil')),
-      (_) => emit(UserUpdated(event.updatedUser)),
+      (updatedUser) => emit(UserUpdated(updatedUser)),
     );
   }
 

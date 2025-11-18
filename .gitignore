@@ -77,3 +77,7 @@ macos/Flutter/Flutter-Generated.xcconfig
 android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
 android/.gradle/
 android/local.properties
+lib/l10n/app_localizations_ca.dart
+lib/l10n/app_localizations_en.dart
+lib/l10n/app_localizations_es.dart
+lib/l10n/app_localizations.dart
