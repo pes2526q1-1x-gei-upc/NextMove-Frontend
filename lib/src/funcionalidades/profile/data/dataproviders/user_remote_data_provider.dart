@@ -103,6 +103,8 @@ class UserRemoteDataProvider {
       debugPrint('❌ updateMe returned null data for user ${user.email}');
       throw custom_exceptions.ServerException('No se actualizó el usuario');
     }
+    
+    await client.resetStore();
 
     return UserEntity.fromRawData(data);
   }

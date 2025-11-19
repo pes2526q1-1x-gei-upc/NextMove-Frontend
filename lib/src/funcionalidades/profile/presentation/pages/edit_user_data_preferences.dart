@@ -168,7 +168,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.saveChangesFeedback), backgroundColor: Colors.green),
             );
-            Navigator.pop(context);
+            // Navigator.pop(context);
           }
         },
         builder: (context, state) {
