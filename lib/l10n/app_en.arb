@@ -105,5 +105,6 @@
     "bicycle": "Bicycle",
     "car": "Car",
     "finishRegistration": "Finish registration",
-    "userNotLoadedMessage": "The user has not been loaded correctly."
+    "userNotLoadedMessage": "The user has not been loaded correctly.",
+    "information": "Information"
 }

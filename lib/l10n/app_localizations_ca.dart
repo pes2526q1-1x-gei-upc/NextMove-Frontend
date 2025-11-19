@@ -289,4 +289,11 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get finishRegistration => 'Finalitzar registre';
+
+  @override
+  String get userNotLoadedMessage =>
+      'L\'usuari no s\'ha carregat correctament.';
+
+  @override
+  String get information => 'Informació';
 }
