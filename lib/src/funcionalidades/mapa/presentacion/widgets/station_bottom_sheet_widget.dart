@@ -77,16 +77,7 @@ class StationBottomSheet extends StatelessWidget {
   ) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            createStarRatingRow(bikeStation.rating),
-            Text(
-              '(${bikeStation.rating % 2 == 0 ? (bikeStation.rating ~/ 2) : (bikeStation.rating / 2)}/5)',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
-        ),
+        StarRatingRowBottomSheet(context: context, station: bikeStation),
         const SizedBox(height: 8),
 
         Row(
@@ -121,15 +112,52 @@ class StationBottomSheet extends StatelessWidget {
   Widget _buildEVInfo(EVStationDetails evStation, AppLocalizations l10n) {
     return Column(
       children: [
+        StarRatingRowBottomSheet(context: context, station: evStation),
+        const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Available Connectors: ${evStation.availableSlots}'),
-            Text('Total Connectors: ${evStation.totalSlots}'),
+            Icon(Icons.event_seat),
+            const SizedBox(width: 4),
+            Text('${evStation.availableSlots} / ${evStation.totalSlots}'),
           ],
         ),
         const SizedBox(height: 8),
-        Text('Super Fast: ${evStation.isSuperFast ? 'Yes' : 'No'}'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.bolt),
+            Icon(
+              evStation.isSuperFast ? Icons.check : Icons.close,
+              color: evStation.isSuperFast ? Colors.green : Colors.red,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class StarRatingRowBottomSheet extends StatelessWidget {
+  const StarRatingRowBottomSheet({
+    super.key,
+    required this.context,
+    required this.station,
+  });
+
+  final BuildContext context;
+  final StationDetails station;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        createStarRatingRow(station.rating),
+        Text(
+          '(${station.rating % 2 == 0 ? (station.rating ~/ 2) : (station.rating / 2)}/5)',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
       ],
     );
   }
