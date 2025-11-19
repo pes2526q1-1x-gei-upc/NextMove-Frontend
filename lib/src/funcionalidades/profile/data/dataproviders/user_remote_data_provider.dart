@@ -78,26 +78,29 @@ class UserRemoteDataProvider {
     final MutationOptions options = MutationOptions(
       document: gql(updateUserMutation),
       variables: {
-        'email': user.email,
-        'name': userEntity.nombreCompleto.trim().isEmpty ? null : userEntity.nombreCompleto.trim(),
+        'fullName': userEntity.nombreCompleto.trim().isEmpty ? null : userEntity.nombreCompleto.trim(),
         'nickname': userEntity.apodo.trim().isEmpty ? null : userEntity.apodo.trim(),
         'phoneNumber': formatPhone(userEntity.numeroTelefono),
         'bioDescription': userEntity.descripcion.trim().isEmpty ? null : userEntity.descripcion.trim(),
         'preferredMode': UserEntity.mapPreferredModeToAPI(userEntity.modoPreferido),
         'preferredLanguage': UserEntity.mapLanguageToAPI(userEntity.idiomaPreferido),
         'birthDate': formatBirthDate(userEntity.fechaNacimiento),
-        'needsToRegister': false,
       },
     );
 
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
+      debugPrint('❌ Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
+      if (result.exception?.graphqlErrors.isNotEmpty ?? false) {
+        debugPrint('❌ GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
+      }
       throw custom_exceptions.ServerException('Error al actualizar: ${result.exception}');
     }
 
     final data = result.data?['updateMe'];
     if (data == null) {
+      debugPrint('❌ updateMe returned null data for user ${user.email}');
       throw custom_exceptions.ServerException('No se actualizó el usuario');
     }
 

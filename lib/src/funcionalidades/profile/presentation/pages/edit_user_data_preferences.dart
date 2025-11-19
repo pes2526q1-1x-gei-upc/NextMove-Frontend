@@ -9,6 +9,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class EditUserDataPreferencesPage extends StatefulWidget {
   const EditUserDataPreferencesPage({super.key});
@@ -114,6 +116,16 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
       return;
     }
 
+    // Print all fields
+    debugPrint('User Profile Fields:');
+    debugPrint('Apodo: ${_apodoController.text}');
+    debugPrint('Nombre Completo: ${_nombreCompletoController.text}');
+    debugPrint('Fecha de Nacimiento: ${_fechaNacimientoController.text}');
+    debugPrint('Teléfono: ${_telefonoController.text}');
+    debugPrint('Descripción: ${_descripcionController.text}');
+    debugPrint('Idioma Preferido: $_selectedIdioma');
+    debugPrint('Modo Preferido: $_selectedModo');
+
     final updatedUser = currentUser.copyWith(
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       descripcion: _descripcionController.text.trim(),
@@ -142,6 +154,17 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           } else if (state is UserUpdated) {
+            // Update provider with newly updated user to avoid races
+            final userProvider = Provider.of<UserProvider>(context, listen: false);
+            final firebaseUser = FirebaseAuth.instance.currentUser;
+            // Set provider synchronously first
+            userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: null);
+            // Fetch token and update provider asynchronously
+            () async {
+              final token = firebaseUser == null ? null : await firebaseUser.getIdToken();
+              userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: token);
+            }();
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.saveChangesFeedback), backgroundColor: Colors.green),
             );

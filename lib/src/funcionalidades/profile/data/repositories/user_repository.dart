@@ -16,37 +16,37 @@ class UserRepository {
     try {
       final user = await remoteDataProvider.getUserProfile(userId);
       return Right(user);
-    } on custom_exceptions.ServerException {
+    } on custom_exceptions.ServerException catch (e) {
       return Left(ServerFailure());
-    } on custom_exceptions.AuthException {
-      return Left(AuthFailure());
+    } on custom_exceptions.AuthException catch (e) {
+      return Left(AuthFailure(message: e.toString()));
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
   }
 
-  Future<Either<Failure, bool>> updateUserProfile(UserEntity userEntity) async {
+  Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity userEntity) async {
     try {
-      await remoteDataProvider.updateUserProfile(userEntity);
-      return const Right(true);
-    } on custom_exceptions.ServerException {
-      return Left(ServerFailure());
-    } on custom_exceptions.AuthException {
-      return Left(AuthFailure());
+      final updatedUser = await remoteDataProvider.updateUserProfile(userEntity);
+      return Right(updatedUser);
+    } on custom_exceptions.ServerException catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    } on custom_exceptions.AuthException catch (e) {
+      return Left(AuthFailure(message: e.toString()));
     } catch (e) {
       debugPrint('❌ Error desconocido al actualizar perfil: $e');
       return Left(ServerFailure());
     }
   }
 
-  Future<Either<Failure, bool>> createUserProfile(UserEntity userEntity) async {
+  Future<Either<Failure, UserEntity>> createUserProfile(UserEntity userEntity) async {
     try {
-      await remoteDataProvider.createUserProfile(userEntity);
-      return const Right(true);
-    } on custom_exceptions.ServerException {
-      return Left(ServerFailure());
-    } on custom_exceptions.AuthException {
-      return Left(AuthFailure());
+      final createdUser = await remoteDataProvider.createUserProfile(userEntity);
+      return Right(createdUser);
+    } on custom_exceptions.ServerException catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    } on custom_exceptions.AuthException catch (e) {
+      return Left(AuthFailure(message: e.toString()));
     } catch (e) {
       return Left(ServerFailure());
     }

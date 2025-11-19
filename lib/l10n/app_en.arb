@@ -104,5 +104,6 @@
     "saveChangesError": "Error saving changes.",
     "bicycle": "Bicycle",
     "car": "Car",
-    "finishRegistration": "Finish registration"
+    "finishRegistration": "Finish registration",
+    "userNotLoadedMessage": "The user has not been loaded correctly."
 }

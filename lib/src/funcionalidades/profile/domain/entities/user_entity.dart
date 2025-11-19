@@ -87,10 +87,13 @@ class UserEntity extends Equatable {
   static String mapLanguageFromAPI(String? apiLang) {
     switch (apiLang?.toLowerCase()) {
       case 'es':
+      case 'esp':
         return 'Español';
       case 'en':
+      case 'eng':
         return 'English';
       case 'ca':
+      case 'cat':
         return 'Català';
       default:
         return 'Español';
@@ -101,13 +104,13 @@ class UserEntity extends Equatable {
   static String mapLanguageToAPI(String uiLang) {
     switch (uiLang) {
       case 'Español':
-        return 'es';
+        return 'ESP';
       case 'English':
-        return 'en';
+        return 'ENG';
       case 'Català':
-        return 'ca';
+        return 'CAT';
       default:
-        return 'es';
+        return 'ESP';
     }
   }
 
