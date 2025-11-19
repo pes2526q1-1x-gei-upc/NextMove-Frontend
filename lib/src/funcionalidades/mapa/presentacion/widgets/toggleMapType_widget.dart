@@ -19,7 +19,7 @@ class MapTypeToggleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 250,
+      bottom: 160,
       right: 16,
       child: GestureDetector(
         onTap: () => context.read<MapBloc>().add(const ToggleMapTypeEvent()),

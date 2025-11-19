@@ -135,7 +135,7 @@ class _MapPageState extends State<MapPage> {
                 ),
 
                 // Avatar de perfil
-                ProfileAvatarWidget(context: context),
+                //ProfileAvatarWidget(context: context),
 
                 // Botón de lista de estaciones
                 StationListButtonWidget(
