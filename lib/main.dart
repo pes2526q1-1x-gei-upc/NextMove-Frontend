@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
@@ -16,6 +17,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
+final LocaleProvider localeProvider = LocaleProvider();
 
 /// Punto de entrada principal de la aplicación
 ///
@@ -49,6 +51,20 @@ class _NextMoveAppState extends State<NextMoveApp> {
   void initState() {
     super.initState();
     GraphQLConfig.initializeClient();
+    // Listen to locale changes to force rebuild
+    localeProvider.addListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    localeProvider.removeListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void setLoggedIn(bool value) {
@@ -59,10 +75,14 @@ class _NextMoveAppState extends State<NextMoveApp> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Building MaterialApp with locale: ${localeProvider.locale}');
     return GraphQLProvider(
       client: GraphQLConfig.client,
-      child: ChangeNotifierProvider.value(
-        value: userProvider,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: userProvider),
+          ChangeNotifierProvider.value(value: localeProvider),
+        ],
         child: MaterialApp(
           // Proporciona el UserProvider a toda la app
           // Almacena y gestiona el estado del usuario actual (perfil, preferencias, etc)
@@ -70,6 +90,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
           title: 'NextMove',
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          locale: localeProvider.locale,
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale?.languageCode) {
@@ -149,6 +170,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         // Usuario no autenticado - limpiar datos
         if (mounted) {
           userProvider.clearUser();
+          localeProvider.clearLocale();
 
           setState(() {
             _isLoggedIn = false;
@@ -183,6 +205,11 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
+
+        final preferredLanguage = meData['preferredLanguage'] as String?;
+        if (preferredLanguage != null) {
+          localeProvider.setLocaleFromAPILanguage(preferredLanguage);
+        }
 
         debugPrint("Datos guardados correctamente en Provider");
       } else {

@@ -11,6 +11,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 
 class EditUserDataPreferencesPage extends StatefulWidget {
   const EditUserDataPreferencesPage({super.key});
@@ -140,7 +141,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    var l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -156,6 +157,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
           } else if (state is UserUpdated) {
             // Update provider with newly updated user to avoid races
             final userProvider = Provider.of<UserProvider>(context, listen: false);
+            final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
             final firebaseUser = FirebaseAuth.instance.currentUser;
             // Set provider synchronously first
             userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: null);
@@ -165,9 +167,14 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
               userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: token);
             }();
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.saveChangesFeedback), backgroundColor: Colors.green),
-            );
+            localeProvider.setLocaleFromLanguage(state.user.idiomaPreferido);
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final updatedL10n = AppLocalizations.of(context)!;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(updatedL10n.saveChangesFeedback), backgroundColor: Colors.green),
+              );
+            });
             // Navigator.pop(context);
           }
         },
