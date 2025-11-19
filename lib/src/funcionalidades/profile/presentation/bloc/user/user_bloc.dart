@@ -10,6 +10,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<LoadUserProfile>(_onLoadUserProfile);
     on<UpdateUserProfile>(_onUpdateUserProfile);
     on<CreateUserProfile>(_onCreateUserProfile);
+    on<LogoutUser>(_onLogoutUser);
   }
 
   Future<void> _onLoadUserProfile(
@@ -49,4 +50,19 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       (createdUser) => emit(UserUpdated(createdUser)),
     );
   } 
+
+
+  Future<void> _onLogoutUser(
+    LogoutUser event,
+    Emitter<UserState> emit,
+  ) async {
+    emit(UserLoading()); // Para mostrar spinner si es necesario
+    
+    final result = await userRepository.logoutUser();
+    
+    result.fold(
+      (failure) => emit(UserError(failure.message ?? 'Error al cerrar sesión')),
+      (_) => emit(UserLoggedOut()), // Éxito
+    );
+  }
 }

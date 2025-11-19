@@ -117,7 +117,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
       return;
     }
 
-    // Print all fields
+    // Debug logs
     debugPrint('User Profile Fields:');
     debugPrint('Apodo: ${_apodoController.text}');
     debugPrint('Nombre Completo: ${_nombreCompletoController.text}');
@@ -135,6 +135,38 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
     );
 
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
+  }
+
+  // === Cerrar Sesión ===
+  Future<void> _onLogoutPressed() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // 1. Mostrar diálogo de confirmación
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Cerrar Sesión'), 
+        content: Text('¿Estás seguro de que quieres salir?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'Salir',
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    // 2. Disparar evento al BLoC si confirma
+    if (confirm == true && mounted) {
+      context.read<UserBloc>().add(LogoutUser());
+    }
   }
 
   void _goBack() => Navigator.pop(context);
@@ -155,13 +187,15 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           } else if (state is UserUpdated) {
-            // Update provider with newly updated user to avoid races
+            // Actualizar provider con los datos nuevos
             final userProvider = Provider.of<UserProvider>(context, listen: false);
             final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
             final firebaseUser = FirebaseAuth.instance.currentUser;
-            // Set provider synchronously first
+            
+            // Set provider sincrono
             userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: null);
-            // Fetch token and update provider asynchronously
+            
+            // Fetch token y update asincrono
             () async {
               final token = firebaseUser == null ? null : await firebaseUser.getIdToken();
               userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: token);
@@ -175,7 +209,12 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
                 SnackBar(content: Text(updatedL10n.saveChangesFeedback), backgroundColor: Colors.green),
               );
             });
-            // Navigator.pop(context);
+          } 
+          // === LOGOUT ===
+          else if (state is UserLoggedOut) {
+            // CORRECCIÓN: No navegamos manualmente.
+            // El AuthStateHandler en main.dart detectará que el usuario es null
+            // y cambiará a la WelcomePage automáticamente, limpiando la pila correctamente.
           }
         },
         builder: (context, state) {
@@ -343,6 +382,30 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
                         child: Text(l10n.saveChanges, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
+
+                    // === Botón de Cerrar Sesión ===
+                    const SizedBox(height: 40),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: _onLogoutPressed,
+                        icon: const Icon(Icons.logout, color: Colors.red),
+                        label: Text(
+                          'Cerrar Sesión',
+                          style: const TextStyle(
+                            color: Colors.red, 
+                            fontSize: 16, 
+                            fontWeight: FontWeight.w600
+                          )
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),

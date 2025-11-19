@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 
 import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
@@ -54,7 +53,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                 children: [
                   Text(
                     l10n.whatIsYourEmailAddress,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
                   EmailAddressInputWidget(emailController: _emailController),
@@ -67,7 +66,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     if (context.read<AuthBloc>().state is EmailIsNewState) ...[
                       Text(
                         l10n.passwordRequirements,
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ],
@@ -104,6 +103,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                               }),
                             ),
                           );
+                        
                         case AuthSuccessState(): // Ya iniciado sesion
                           if (state.meData != null) {
                             Provider.of<UserProvider>(
@@ -116,12 +116,10 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             );
                           }
                           appKey.currentState?.setLoggedIn(true);
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => MapPage(),
-                            ),
-                            (route) => false,
-                          );
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          
+                        // =======================
+
                         case UserNeedsProfileSetupState(): // Onboarding
                           appKey.currentState?.setLoggedIn(true);
                           Provider.of<UserProvider>(
@@ -202,10 +200,6 @@ class ContinueButton extends StatelessWidget {
               return;
             }
             try {
-              /*
-              context.read<AuthBloc>().add(
-                SignUpWithEmailEvent(email: emailAddress, password: password),
-              );*/
               // Ahora solo guardamos en provider el correo y contraseña para crear el usuario
               // entero una vez finalizado el onboarding.
               Provider.of<UserProvider>(
@@ -235,7 +229,7 @@ class ContinueButton extends StatelessWidget {
         AuthInitial _ => Text(l10n.continue_),
         EmailIsNewState _ => Text(l10n.register),
         EmailExistsState _ => Text(l10n.signIn),
-        _ => Text(''),
+        _ => const Text(''),
       },
     );
   }
@@ -278,7 +272,7 @@ class EmailAddressInputWidget extends StatelessWidget {
       controller: _emailController,
       decoration: InputDecoration(
         labelText: l10n.emailAddress,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       keyboardType: TextInputType.emailAddress,
       readOnly: context.read<AuthBloc>().state is! AuthInitial,

@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
@@ -15,16 +16,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+// === IMPORTS PARA EL PERFIL ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+// ==============================
+
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
-final LocaleProvider localeProvider = LocaleProvider();
+final LocaleProvider localeProvider = LocaleProvider(); 
 
 /// Punto de entrada principal de la aplicación
-///
-/// Inicializa todos los servicios necesarios antes de arrancar la app:
-/// 1. Variables de entorno (.env)
-/// 2. Firebase (autenticación y backend)
-/// 3. Google Sign In (login con Google)
 void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,9 +36,6 @@ void main() async {
 }
 
 /// Widget raíz de la aplicación
-///
-/// Configura los providers globales y el tema de la app
-/// Es un StatefulWidget para poder cambiar el estado de login desde otras pantallas
 class NextMoveApp extends StatefulWidget {
   const NextMoveApp({super.key});
 
@@ -51,7 +50,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
   void initState() {
     super.initState();
     GraphQLConfig.initializeClient();
-    // Listen to locale changes to force rebuild
+    // Escuchar cambios de idioma para refrescar la app
     localeProvider.addListener(_onLocaleChanged);
   }
 
@@ -62,9 +61,7 @@ class _NextMoveAppState extends State<NextMoveApp> {
   }
 
   void _onLocaleChanged() {
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   void setLoggedIn(bool value) {
@@ -75,22 +72,21 @@ class _NextMoveAppState extends State<NextMoveApp> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Building MaterialApp with locale: ${localeProvider.locale}');
     return GraphQLProvider(
       client: GraphQLConfig.client,
+      // Usamos MultiProvider para inyectar Usuario e Idioma
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
         ],
         child: MaterialApp(
-          // Proporciona el UserProvider a toda la app
-          // Almacena y gestiona el estado del usuario actual (perfil, preferencias, etc)
-          // Fuente: https://pub.dev/packages/provider
           title: 'NextMove',
+          debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: localeProvider.locale,
+          // Usamos el localeProvider para gestionar el idioma dinámico
+          locale: localeProvider.locale, 
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale?.languageCode) {
@@ -101,7 +97,14 @@ class _NextMoveAppState extends State<NextMoveApp> {
           },
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+            useMaterial3: true,
           ),
+          
+          // ruta de Login para el Logout
+          routes: {
+            '/login': (context) => const WelcomePage(),
+          },
+
           // Widget que maneja la autenticación y decide qué pantalla mostrar
           home: AuthStateHandler(client: GraphQLConfig.client, isLoggedIn: isLoggedIn),
         ),
@@ -111,19 +114,6 @@ class _NextMoveAppState extends State<NextMoveApp> {
 }
 
 /// Widget que gestiona el estado de autenticación de Firebase
-///
-/// Responsabilidades:
-/// 1. Escuchar cambios en el estado de autenticación (login/logout)
-/// 2. Cargar datos del usuario desde GraphQL cuando hay sesión activa
-/// 3. Guardar los datos en el UserProvider para acceso global
-/// 4. Decidir qué pantalla mostrar (WelcomePage vs MapHomePage)
-///
-/// Si os preguntáis, para qué queremos esto? pues porque queremos simular persistencia de login.
-/// Si el usuario ya se ha logueado cuando cierre y abra la app de nuevo debe tener la sesión abierta
-/// Aquí teneis tenéis algunas fuentes donde me he basado el código si os gusta la tortura ;)
-/// https://stackoverflow.com/questions/54469191/persist-user-auth-flutter-firebase
-/// https://firebase.google.com/docs/auth/flutter/manage-users
-/// https://medium.com/@ankith159/flutter-firebase-auth-an-easy-guide-to-persist-user-state-c90c2e53f9df
 class AuthStateHandler extends StatefulWidget {
   final ValueNotifier<GraphQLClient> client;
   final bool isLoggedIn;
@@ -170,7 +160,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         // Usuario no autenticado - limpiar datos
         if (mounted) {
           userProvider.clearUser();
-          localeProvider.clearLocale();
+          localeProvider.clearLocale(); // Limpiamos locale también
 
           setState(() {
             _isLoggedIn = false;
@@ -183,29 +173,18 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
   Future<void> _loadUserData(User user) async {
     try {
-      debugPrint("========================");
-      debugPrint("Cargando datos del usuario desde GraphQL...");
-      debugPrint("Email: ${user.email}");
-      debugPrint("UID: ${user.uid}");
-      debugPrint("========================");
-
       final authService = AuthService(widget.client.value);
       final meData = await authService.getCurrentUser();
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
-        debugPrint("========================");
-        debugPrint("Datos del usuario obtenidos:");
-        debugPrint("Firebase User ID: ${user.uid}");
-        debugPrint("User Data: $meData");
-        debugPrint("========================");
-
         userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
 
+        // Sincronizar idioma guardado en backend con la app
         final preferredLanguage = meData['preferredLanguage'] as String?;
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
@@ -213,14 +192,10 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
         debugPrint("Datos guardados correctamente en Provider");
       } else {
-        debugPrint("No se obtuvieron datos del usuario desde GraphQL, lo creamos...");
-        
+        debugPrint("No se obtuvieron datos del usuario desde GraphQL");
       }
-    } catch (e, stackTrace) {
-      debugPrint("========================");
+    } catch (e) {
       debugPrint("Error cargando datos del usuario: $e");
-      debugPrint("StackTrace: $stackTrace");
-      debugPrint("========================");
     }
   }
 
@@ -231,7 +206,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: const [
               CircularProgressIndicator(),
               SizedBox(height: 16),
               Text('Cargando datos del usuario...'),
@@ -241,6 +216,130 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return _isLoggedIn ?  MapPage() : WelcomePage();
+    return _isLoggedIn ? const MainScreen() : const WelcomePage();
+    
+  }
+}
+
+// ==========================================
+//  PANTALLA PRINCIPAL CON BARRA DE NAVEGACIÓN
+// ==========================================
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  
+  // Lista de Widgets para las pestañas
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Obtenemos el UID actual de forma segura
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final String uid = currentUser?.uid ?? '';
+
+    _pages = [
+      // 1. Mapa
+      const MapPage(),
+      
+      // 2. Chats
+      const ChatsPlaceholder(), 
+      
+      // 3. Social
+      const SocialPlaceholder(), 
+      
+      // 4. Perfil - Usamos BlocProvider para inyectar UserBloc
+      if (uid.isNotEmpty) 
+        BlocProvider(
+          create: (context) => UserBloc()..add(LoadUserProfile(uid)),
+          child: const EditUserDataPreferencesPage(),
+        )
+      else 
+        // Fallback 
+        const Center(child: Text("Error: Usuario no identificado")),
+    ];
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Usamos IndexedStack para mantener el estado de las páginas 
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          indicatorColor: Colors.transparent,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.map_outlined),
+              activeIcon: Icon(Icons.map),
+              label: 'Mapa', 
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline),
+              activeIcon: Icon(Icons.chat_bubble),
+              label: 'Chats',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline),
+              activeIcon: Icon(Icons.people),
+              label: 'Social',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Perfil',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+//  PLACEHOLDERS RESTANTES
+// ==========================================
+
+class ChatsPlaceholder extends StatelessWidget {
+  const ChatsPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: const Text("Chats")), body: const Center(child: Text("Pantalla de Chats")));
+  }
+}
+
+class SocialPlaceholder extends StatelessWidget {
+  const SocialPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: const Text("Social")), body: const Center(child: Text("Pantalla Social")));
   }
 }

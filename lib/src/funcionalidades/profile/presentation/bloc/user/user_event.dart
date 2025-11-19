@@ -31,3 +31,8 @@ class CreateUserProfile extends UserEvent {
   @override
   List<Object?> get props => [newUser];
 }
+
+class LogoutUser extends UserEvent {
+  @override
+  List<Object?> get props => [];
+}
