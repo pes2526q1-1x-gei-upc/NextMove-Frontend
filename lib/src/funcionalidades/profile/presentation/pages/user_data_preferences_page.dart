@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
@@ -204,7 +205,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    var l10n = AppLocalizations.of(context)!;
 
     return WillPopScope(
       // Evitamos volver atrás en medio del registro para no dejar estados inconsistentes
@@ -225,16 +226,23 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 SnackBar(content: Text(state.message), backgroundColor: Colors.red),
               );
             } else if (state is UserUpdated) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.saveChangesFeedback)),
-              );
               final userProvider = Provider.of<UserProvider>(context, listen: false);
+              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
               final firebaseUserNow = FirebaseAuth.instance.currentUser;
               userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: null);
               () async {
                 final token = firebaseUserNow == null ? null : await firebaseUserNow.getIdToken();
                 userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: token);
               }();
+              localeProvider.setLocaleFromLanguage(state.user.idiomaPreferido);
+              
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final updatedL10n = AppLocalizations.of(context)!;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(updatedL10n.saveChangesFeedback)),
+                );
+              });
+              
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const MapPage()),
                 (route) => false,
@@ -408,9 +416,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
                         ),
-                        child: const Text(
-                          'Finalizar Registro',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        child: Text(
+                          l10n.finishRegistration,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
