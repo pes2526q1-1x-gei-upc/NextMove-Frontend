@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_details_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 
 
 extension ConnectionTypeLocalization on ConnectionType {
@@ -217,28 +218,7 @@ class StationDetailsPage extends StatelessWidget {
         );
     }
 
-    Row createStarRatingRow(int rating) {
-        List<Widget> stars = [];
-        int fullStars = rating ~/ 2;
-        bool hasHalfStar = rating % 2 == 1;
-
-        for (int i = 0; i < fullStars; i++) {
-            stars.add(const Icon(Icons.star, color: Colors.amber));
-        }
-
-        if (hasHalfStar) {
-            stars.add(const Icon(Icons.star_half, color: Colors.amber));
-        }
-        
-        while (stars.length < 5) {
-            stars.add(const Icon(Icons.star_border, color: Colors.amber));
-        }
-
-        return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: stars,
-        );
-    }
+    
 }
 
 

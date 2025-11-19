@@ -105,5 +105,6 @@
     "bicycle": "Bicicleta",
     "car": "Cotxe",
     "finishRegistration": "Finalitzar registre",
-    "userNotLoadedMessage": "L'usuari no s'ha carregat correctament."
+    "userNotLoadedMessage": "L'usuari no s'ha carregat correctament.",
+    "information": "Informació"
 }

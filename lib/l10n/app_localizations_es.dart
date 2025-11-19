@@ -289,4 +289,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get finishRegistration => 'Finalizar registro';
+
+  @override
+  String get userNotLoadedMessage =>
+      'El usuario no se ha cargado correctamente.';
+
+  @override
+  String get information => 'Información';
 }

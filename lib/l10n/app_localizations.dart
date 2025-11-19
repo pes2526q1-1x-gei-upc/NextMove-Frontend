@@ -633,6 +633,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Finish registration'**
   String get finishRegistration;
+
+  /// No description provided for @userNotLoadedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The user has not been loaded correctly.'**
+  String get userNotLoadedMessage;
+
+  /// No description provided for @information.
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get information;
 }
 
 class _AppLocalizationsDelegate
