@@ -25,7 +25,7 @@ class CenterOnUserButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 190,
+      bottom: 100,
       right: 16,
       child: GestureDetector(
         onTap: _centerOnUser,

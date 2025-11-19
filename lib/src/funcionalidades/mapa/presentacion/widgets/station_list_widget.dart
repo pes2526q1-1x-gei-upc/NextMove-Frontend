@@ -30,7 +30,7 @@ class StationListButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 130,
+      top: 70,
       right: 16,
       child: GestureDetector(
         onTap: () => _navigateToStationList(context),
