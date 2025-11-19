@@ -91,16 +91,16 @@ class UserRemoteDataProvider {
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
-      debugPrint('❌ Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
+      debugPrint('Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
       if (result.exception?.graphqlErrors.isNotEmpty ?? false) {
-        debugPrint('❌ GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
+        debugPrint('GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
       }
       throw custom_exceptions.ServerException('Error al actualizar: ${result.exception}');
     }
 
     final data = result.data?['updateMe'];
     if (data == null) {
-      debugPrint('❌ updateMe returned null data for user ${user.email}');
+      debugPrint('updateMe returned null data for user ${user.email}');
       throw custom_exceptions.ServerException('No se actualizó el usuario');
     }
     
@@ -175,13 +175,13 @@ class UserRemoteDataProvider {
 
     // 5. Manejo de Errores Mejorado
     if (result.hasException) {
-      print('❌ Error GraphQL Raw: ${result.exception.toString()}');
+      print('Error GraphQL Raw: ${result.exception.toString()}');
       
       // Si el mensaje está vacío, es probable que sea un error de base de datos (constraints, tipos)
       // que el backend no está transformando en mensaje legible.
       if (result.exception!.graphqlErrors.isNotEmpty) {
           final msg = result.exception!.graphqlErrors.first.message;
-          print('❌ Mensaje del servidor: "$msg"');
+          print('Mensaje del servidor: "$msg"');
       }
       
       throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');
@@ -191,6 +191,15 @@ class UserRemoteDataProvider {
       return UserEntity.fromRawData(result.data!['createUser']);
     } else {
       throw custom_exceptions.ServerException('La respuesta del servidor fue nula');
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      await firebaseAuth.signOut();
+      // Si usas GoogleSignIn o FacebookLogin, deberías desconectarlos aquí también
+    } catch (e) {
+      throw custom_exceptions.AuthException(message: 'Error al cerrar sesión: $e');
     }
   }
 }

@@ -38,3 +38,8 @@ class UserError extends UserState {
   @override
   List<Object?> get props => [message];
 }
+
+class UserLoggedOut extends UserState {
+  @override
+  List<Object?> get props => [];
+}

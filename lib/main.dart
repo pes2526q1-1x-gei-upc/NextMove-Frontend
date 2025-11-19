@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
@@ -14,8 +16,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+// === IMPORTS PARA EL PERFIL ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+// ==============================
+
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
+final LocaleProvider localeProvider = LocaleProvider(); 
 
 /// Punto de entrada principal de la aplicación
 void main() async {
@@ -41,6 +50,18 @@ class _NextMoveAppState extends State<NextMoveApp> {
   void initState() {
     super.initState();
     GraphQLConfig.initializeClient();
+    // Escuchar cambios de idioma para refrescar la app
+    localeProvider.addListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    localeProvider.removeListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged() {
+    if (mounted) setState(() {});
   }
 
   void setLoggedIn(bool value) {
@@ -53,13 +74,19 @@ class _NextMoveAppState extends State<NextMoveApp> {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: GraphQLConfig.client,
-      child: ChangeNotifierProvider.value(
-        value: userProvider,
+      // Usamos MultiProvider para inyectar Usuario e Idioma
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: userProvider),
+          ChangeNotifierProvider.value(value: localeProvider),
+        ],
         child: MaterialApp(
           title: 'NextMove',
           debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          // Usamos el localeProvider para gestionar el idioma dinámico
+          locale: localeProvider.locale, 
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale?.languageCode) {
@@ -72,6 +99,12 @@ class _NextMoveAppState extends State<NextMoveApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
             useMaterial3: true,
           ),
+          
+          // ruta de Login para el Logout
+          routes: {
+            '/login': (context) => const WelcomePage(),
+          },
+
           // Widget que maneja la autenticación y decide qué pantalla mostrar
           home: AuthStateHandler(client: GraphQLConfig.client, isLoggedIn: isLoggedIn),
         ),
@@ -127,6 +160,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         // Usuario no autenticado - limpiar datos
         if (mounted) {
           userProvider.clearUser();
+          localeProvider.clearLocale(); // Limpiamos locale también
 
           setState(() {
             _isLoggedIn = false;
@@ -139,39 +173,29 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
   Future<void> _loadUserData(User user) async {
     try {
-      debugPrint("========================");
-      debugPrint("Cargando datos del usuario desde GraphQL...");
-      debugPrint("Email: ${user.email}");
-      debugPrint("UID: ${user.uid}");
-      debugPrint("========================");
-
       final authService = AuthService(widget.client.value);
       final meData = await authService.getCurrentUser();
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
-        debugPrint("========================");
-        debugPrint("Datos del usuario obtenidos:");
-        debugPrint("Firebase User ID: ${user.uid}");
-        debugPrint("User Data: $meData");
-        debugPrint("========================");
-
         userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
 
+        // Sincronizar idioma guardado en backend con la app
+        final preferredLanguage = meData['preferredLanguage'] as String?;
+        if (preferredLanguage != null) {
+          localeProvider.setLocaleFromAPILanguage(preferredLanguage);
+        }
+
         debugPrint("Datos guardados correctamente en Provider");
       } else {
-        debugPrint("No se obtuvieron datos del usuario desde GraphQL, lo creamos...");
-        
+        debugPrint("No se obtuvieron datos del usuario desde GraphQL");
       }
-    } catch (e, stackTrace) {
-      debugPrint("========================");
+    } catch (e) {
       debugPrint("Error cargando datos del usuario: $e");
-      debugPrint("StackTrace: $stackTrace");
-      debugPrint("========================");
     }
   }
 
@@ -192,13 +216,13 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    // CAMBIO AQUÍ: Si está logueado, vamos a la MainScreen (con navbar), si no, al WelcomePage
-    return _isLoggedIn ? const MainScreen() : WelcomePage();
+    return _isLoggedIn ? const MainScreen() : const WelcomePage();
+    
   }
 }
 
 // ==========================================
-//  NUEVA IMPLEMENTACIÓN DE NAVEGACIÓN
+//  PANTALLA PRINCIPAL CON BARRA DE NAVEGACIÓN
 // ==========================================
 
 class MainScreen extends StatefulWidget {
@@ -210,18 +234,39 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  
+  // Lista de Widgets para las pestañas
+  late List<Widget> _pages;
 
-  // Lista de pantallas en el orden solicitado:
-  // 1. Mapa
-  // 2. Chats/Conversaciones
-  // 3. Social
-  // 4. Perfil
-  final List<Widget> _pages = [
-    MapPage(),               // Tu página existente
-    const ChatsPlaceholder(), // Placeholder (sustituir por tu página real)
-    const SocialPlaceholder(), // Placeholder (sustituir por tu página real)
-    const ProfilePlaceholder(),// Placeholder (sustituir por tu página real)
-  ];
+  @override
+  void initState() {
+    super.initState();
+    
+    // Obtenemos el UID actual de forma segura
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final String uid = currentUser?.uid ?? '';
+
+    _pages = [
+      // 1. Mapa
+      const MapPage(),
+      
+      // 2. Chats
+      const ChatsPlaceholder(), 
+      
+      // 3. Social
+      const SocialPlaceholder(), 
+      
+      // 4. Perfil - Usamos BlocProvider para inyectar UserBloc
+      if (uid.isNotEmpty) 
+        BlocProvider(
+          create: (context) => UserBloc()..add(LoadUserProfile(uid)),
+          child: const EditUserDataPreferencesPage(),
+        )
+      else 
+        // Fallback 
+        const Center(child: Text("Error: Usuario no identificado")),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -232,7 +277,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // El body cambia según el índice seleccionado
+      // Usamos IndexedStack para mantener el estado de las páginas 
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,
@@ -240,37 +285,33 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           indicatorColor: Colors.transparent,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide, // Oculta texto siempre
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         ),
         child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed, // Fixed para evitar animaciones de "shifthing" con >3 items
-          backgroundColor: Colors.white, // O el color que prefieras
-          selectedItemColor: Theme.of(context).colorScheme.primary, // Color del ícono activo
-          unselectedItemColor: Colors.grey, // Color de íconos inactivos
-          showSelectedLabels: false,   // REQUISITO: Sin texto
-          showUnselectedLabels: false, // REQUISITO: Sin texto
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           items: const <BottomNavigationBarItem>[
-            // 1. MAPA
             BottomNavigationBarItem(
               icon: Icon(Icons.map_outlined),
               activeIcon: Icon(Icons.map),
               label: 'Mapa', 
             ),
-            // 2. CHATS
             BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble_outline),
               activeIcon: Icon(Icons.chat_bubble),
               label: 'Chats',
             ),
-            // 3. SOCIAL
             BottomNavigationBarItem(
               icon: Icon(Icons.people_outline),
               activeIcon: Icon(Icons.people),
               label: 'Social',
             ),
-            // 4. PERFIL
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),
@@ -284,7 +325,7 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 // ==========================================
-//  PÁGINAS PLACEHOLDER (Borrar cuando tengas las reales)
+//  PLACEHOLDERS RESTANTES
 // ==========================================
 
 class ChatsPlaceholder extends StatelessWidget {
@@ -300,13 +341,5 @@ class SocialPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(title: const Text("Social")), body: const Center(child: Text("Pantalla Social")));
-  }
-}
-
-class ProfilePlaceholder extends StatelessWidget {
-  const ProfilePlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Perfil")), body: const Center(child: Text("Pantalla de Perfil")));
   }
 }
