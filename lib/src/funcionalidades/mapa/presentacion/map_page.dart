@@ -13,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 //imports widgets
 import 'widgets/google_map_widget.dart';
@@ -178,47 +179,7 @@ class _MapPageState extends State<MapPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              station.address,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(station.address, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: state.currentMode == StationType.bicycle
-                      ? Colors.blue
-                      : Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => StationDetailsPage(
-                        stationID: station.id,
-                        stationType: state.currentMode,
-                        stationDetails: station,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Info'),
-              ),
-            ),
-          ],
-        ),
-      ),
+      builder: (_) => StationBottomSheet(context: context, station: station, state: state),
     );
   }
 }
