@@ -1,11 +1,13 @@
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/station_model.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum StationType {
     bicycle,
     electricVehicle,
 }
 
-class StationDetails {
+class StationDetails with ClusterItem {
     final String id;
     final String name;
     final String address;
@@ -27,6 +29,11 @@ class StationDetails {
     required this.longitude,
     this.distanceKm,
     });
+
+    @override
+    LatLng get location => LatLng(latitude, longitude);
+    
+      
 }
 
 enum BicycleStationState {

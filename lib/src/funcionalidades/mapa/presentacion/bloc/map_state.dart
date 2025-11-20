@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager;
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -31,6 +32,10 @@ class MapLoadedState extends MapState {
   final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
+  //campos para los clusters, queda pendiente borrar otros si es necesario
+  final ClusterManager<BicycleStationDetails>? bikeClusterManager;
+  final ClusterManager<EVStationDetails>? evClusterManager;
+  final Set<Marker> clusteredMarkers;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -42,6 +47,9 @@ class MapLoadedState extends MapState {
     required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
+    this.bikeClusterManager,
+    this.evClusterManager,
+    required this.clusteredMarkers,
   });
 
   @override
@@ -55,6 +63,9 @@ class MapLoadedState extends MapState {
         carMarkers,
         centerPosition,
         searchQuery,
+        bikeClusterManager,
+        evClusterManager,
+        clusteredMarkers,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -68,6 +79,9 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
+    ClusterManager<BicycleStationDetails>? bikeClusterManager,
+    ClusterManager<EVStationDetails>? evClusterManager,
+    Set<Marker>? clusteredMarkers,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -79,6 +93,9 @@ class MapLoadedState extends MapState {
       carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: searchQuery ?? this.searchQuery,
+      bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
+      evClusterManager: evClusterManager ?? this.evClusterManager,
+      clusteredMarkers: clusteredMarkers ?? this.clusteredMarkers,
     );
   }
 
