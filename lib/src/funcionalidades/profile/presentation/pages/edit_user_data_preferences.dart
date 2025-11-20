@@ -147,6 +147,9 @@ class _EditUserDataPreferencesPageState
       modoPreferido: _selectedModo == l10n.bicycle ? "BIKE" : "CAR",
     );
 
+    debugPrint('Nuevo modoPreferido: ${updatedUser.modoPreferido}');
+    debugPrint('Modo seleccionado en dropdown: $_selectedModo');
+
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
   }
 
@@ -281,8 +284,8 @@ class _EditUserDataPreferencesPageState
                   : user.numeroTelefono.toString();
               _descripcionController.text = user.descripcion;
               _selectedIdioma = user.idiomaPreferido;
+              _selectedModo = user.modoPreferido == "BIKE" ? l10n.bicycle : l10n.car;
             }
-            _selectedModo = user.modoPreferido == "BIKE" ? l10n.bicycle : l10n.car;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -429,7 +432,10 @@ class _EditUserDataPreferencesPageState
                                 ),
                               );
                             }).toList(),
-                            onChanged: (v) => setState(() => _selectedModo = v),
+                            onChanged: (v) => setState(() {
+                              _selectedModo = v;
+                              debugPrint('Selected modo: $_selectedModo');
+                            }),
                           ),
                         ),
                         const SizedBox(width: 16),
