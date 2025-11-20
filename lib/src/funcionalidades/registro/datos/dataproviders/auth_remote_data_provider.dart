@@ -135,7 +135,7 @@ class AuthRemoteDataProvider {
       */
       final meData = await authService.getCurrentUser();
 
-      final needsToRegister = meData?['needsToRegister'] ?? true;
+      final needsToRegister = meData == null;
       debugPrint("needsToRegister: $needsToRegister");
 
       return {
