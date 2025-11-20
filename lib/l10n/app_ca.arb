@@ -105,5 +105,8 @@
     "car": "Cotxe",
     "finishRegistration": "Finalitzar registre",
     "userNotLoadedMessage": "L'usuari no s'ha carregat correctament.",
-    "information": "Informació"
+    "information": "Informació",
+    "logOut": "Tancar sessió",
+    "creatingYourAccount": "Creant el teu compte...",
+    "errorLoadingProfile": "Error en carregar el perfil"
 }

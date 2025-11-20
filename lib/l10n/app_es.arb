@@ -105,5 +105,8 @@
     "car": "Coche",
     "finishRegistration": "Finalizar registro",
     "userNotLoadedMessage": "El usuario no se ha cargado correctamente.",
-    "information": "Información"
+    "information": "Información",
+    "logOut": "Cerrar sesión",
+    "creatingYourAccount": "Creando tu cuenta...",
+    "errorLoadingProfile": "Error al cargar el perfil"
 }

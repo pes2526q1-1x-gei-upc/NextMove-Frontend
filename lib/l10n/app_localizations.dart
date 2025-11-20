@@ -645,6 +645,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Information'**
   String get information;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logOut;
+
+  /// No description provided for @creatingYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating your account...'**
+  String get creatingYourAccount;
+
+  /// No description provided for @errorLoadingProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading profile'**
+  String get errorLoadingProfile;
 }
 
 class _AppLocalizationsDelegate

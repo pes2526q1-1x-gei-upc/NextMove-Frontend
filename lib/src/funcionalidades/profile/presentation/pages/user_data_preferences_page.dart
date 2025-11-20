@@ -269,13 +269,13 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           },
           builder: (context, state) {
             if (_isCreatingFirebaseUser || state is UserLoading) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: 16),
-                    Text("Creando tu cuenta..."),
+                    Text(l10n.creatingYourAccount),
                   ],
                 ),
               );

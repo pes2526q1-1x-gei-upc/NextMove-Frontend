@@ -292,4 +292,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get information => 'Information';
+
+  @override
+  String get logOut => 'Log out';
+
+  @override
+  String get creatingYourAccount => 'Creating your account...';
+
+  @override
+  String get errorLoadingProfile => 'Error loading profile';
 }

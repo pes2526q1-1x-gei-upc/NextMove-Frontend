@@ -105,5 +105,8 @@
     "car": "Car",
     "finishRegistration": "Finish registration",
     "userNotLoadedMessage": "The user has not been loaded correctly.",
-    "information": "Information"
+    "information": "Information",
+    "logOut": "Log out",
+    "creatingYourAccount": "Creating your account...",
+    "errorLoadingProfile": "Error loading profile"
 }

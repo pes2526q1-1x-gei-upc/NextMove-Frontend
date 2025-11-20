@@ -297,4 +297,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get information => 'Información';
+
+  @override
+  String get logOut => 'Cerrar sesión';
+
+  @override
+  String get creatingYourAccount => 'Creando tu cuenta...';
+
+  @override
+  String get errorLoadingProfile => 'Error al cargar el perfil';
 }

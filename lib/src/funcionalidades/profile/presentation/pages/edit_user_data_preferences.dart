@@ -154,7 +154,7 @@ class _EditUserDataPreferencesPageState
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Cerrar Sesión'),
+        title: Text(l10n.logOut),
         content: Text('¿Estás seguro de que quieres salir?'),
         actions: [
           TextButton(
@@ -495,7 +495,7 @@ class _EditUserDataPreferencesPageState
               ),
             );
           }
-          return const Center(child: Text('Error al cargar datos de usuario'));
+          return Center(child: Text(l10n.errorLoadingProfile));
         },
       ),
     );
