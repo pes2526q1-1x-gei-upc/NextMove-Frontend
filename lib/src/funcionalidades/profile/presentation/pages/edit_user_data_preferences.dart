@@ -45,7 +45,8 @@ class _EditUserDataPreferencesPageState
 
   // Dropdowns
   String? _selectedIdioma;
-  String? _selectedModo;
+  String? _selectedModoUI;
+  String? _selectedModeAPI; // "BIKE" or "CAR"
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
 
@@ -138,17 +139,17 @@ class _EditUserDataPreferencesPageState
     debugPrint('Teléfono: ${_telefonoController.text}');
     debugPrint('Descripción: ${_descripcionController.text}');
     debugPrint('Idioma Preferido: $_selectedIdioma');
-    debugPrint('Modo Preferido: $_selectedModo');
+    debugPrint('Modo Preferido: $_selectedModoUI');
 
     final updatedUser = currentUser.copyWith(
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       descripcion: _descripcionController.text.trim(),
       idiomaPreferido: _selectedIdioma ?? currentUser.idiomaPreferido,
-      modoPreferido: _selectedModo == l10n.bicycle ? "BIKE" : "CAR",
+      modoPreferido: _selectedModeAPI,
     );
 
     debugPrint('Nuevo modoPreferido: ${updatedUser.modoPreferido}');
-    debugPrint('Modo seleccionado en dropdown: $_selectedModo');
+    debugPrint('Modo seleccionado en dropdown: $_selectedModoUI');
 
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
   }
@@ -284,8 +285,9 @@ class _EditUserDataPreferencesPageState
                   : user.numeroTelefono.toString();
               _descripcionController.text = user.descripcion;
               _selectedIdioma = user.idiomaPreferido;
-              _selectedModo = user.modoPreferido == "BIKE" ? l10n.bicycle : l10n.car;
+              _selectedModeAPI = user.modoPreferido;
             }
+            _selectedModoUI = _selectedModeAPI == "BIKE" ? l10n.bicycle : l10n.car;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -394,7 +396,7 @@ class _EditUserDataPreferencesPageState
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: _selectedModo,
+                            value: _selectedModoUI,
                             decoration: InputDecoration(
                               labelText: l10n.preferredMode,
                               border: const OutlineInputBorder(),
@@ -433,8 +435,9 @@ class _EditUserDataPreferencesPageState
                               );
                             }).toList(),
                             onChanged: (v) => setState(() {
-                              _selectedModo = v;
-                              debugPrint('Selected modo: $_selectedModo');
+                              _selectedModoUI = v;
+                              _selectedModeAPI = v == l10n.bicycle ? "BIKE" : "CAR";
+                              debugPrint('Selected modo: $_selectedModoUI');
                             }),
                           ),
                         ),
