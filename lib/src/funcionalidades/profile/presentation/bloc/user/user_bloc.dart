@@ -20,7 +20,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     emit(UserLoading());
     final result = await userRepository.getUserProfile(event.userId);
     result.fold(
-      (failure) => emit(UserError(failure.message ?? 'Error al cargar perfil')),
+      (failure) => emit(UserNeedsToSignUp()),
       (user) => emit(UserLoaded(user)),
     );
   }

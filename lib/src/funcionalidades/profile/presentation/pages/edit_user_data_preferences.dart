@@ -5,13 +5,14 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 
 class EditUserDataPreferencesPage extends StatefulWidget {
   const EditUserDataPreferencesPage({super.key});
@@ -117,7 +118,7 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
       return;
     }
 
-    // Debug logs
+    // Print all fields
     debugPrint('User Profile Fields:');
     debugPrint('Apodo: ${_apodoController.text}');
     debugPrint('Nombre Completo: ${_nombreCompletoController.text}');
@@ -135,38 +136,6 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
     );
 
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
-  }
-
-  // === Cerrar Sesión ===
-  Future<void> _onLogoutPressed() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    // 1. Mostrar diálogo de confirmación
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Cerrar Sesión'), 
-        content: Text('¿Estás seguro de que quieres salir?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Salir',
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    // 2. Disparar evento al BLoC si confirma
-    if (confirm == true && mounted) {
-      context.read<UserBloc>().add(LogoutUser());
-    }
   }
 
   void _goBack() => Navigator.pop(context);
@@ -187,15 +156,13 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           } else if (state is UserUpdated) {
-            // Actualizar provider con los datos nuevos
+            // Update provider with newly updated user to avoid races
             final userProvider = Provider.of<UserProvider>(context, listen: false);
             final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
             final firebaseUser = FirebaseAuth.instance.currentUser;
-            
-            // Set provider sincrono
+            // Set provider synchronously first
             userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: null);
-            
-            // Fetch token y update asincrono
+            // Fetch token and update provider asynchronously
             () async {
               final token = firebaseUser == null ? null : await firebaseUser.getIdToken();
               userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: token);
@@ -209,17 +176,14 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
                 SnackBar(content: Text(updatedL10n.saveChangesFeedback), backgroundColor: Colors.green),
               );
             });
-          } 
-          // === LOGOUT ===
-          else if (state is UserLoggedOut) {
-            // CORRECCIÓN: No navegamos manualmente.
-            // El AuthStateHandler en main.dart detectará que el usuario es null
-            // y cambiará a la WelcomePage automáticamente, limpiando la pila correctamente.
+            // Navigator.pop(context);
           }
         },
         builder: (context, state) {
           if (state is UserLoading) {
             return const Center(child: CircularProgressIndicator());
+          } else if (state is UserNeedsToSignUp) {
+            return UserDataPreferencesPage();
           } else if (state is UserLoaded || state is UserUpdated) {
             final user = (state is UserLoaded ? state.user : (state as UserUpdated).user);
             // Prellena controllers si no lo están
@@ -382,30 +346,6 @@ class _EditUserDataPreferencesPageState extends State<EditUserDataPreferencesPag
                         child: Text(l10n.saveChanges, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
-
-                    // === Botón de Cerrar Sesión ===
-                    const SizedBox(height: 40),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    
-                    Center(
-                      child: TextButton.icon(
-                        onPressed: _onLogoutPressed,
-                        icon: const Icon(Icons.logout, color: Colors.red),
-                        label: Text(
-                          'Cerrar Sesión',
-                          style: const TextStyle(
-                            color: Colors.red, 
-                            fontSize: 16, 
-                            fontWeight: FontWeight.w600
-                          )
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
                   ],
                 ),
               ),
