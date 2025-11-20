@@ -205,7 +205,7 @@ abstract class AppLocalizations {
   /// No description provided for @wrongPassword.
   ///
   /// In en, this message translates to:
-  /// **'The password is incorrect.'**
+  /// **'The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.'**
   String get wrongPassword;
 
   /// No description provided for @userDataPreferences.
@@ -645,6 +645,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Information'**
   String get information;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get logOut;
+
+  /// No description provided for @creatingYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating your account...'**
+  String get creatingYourAccount;
+
+  /// No description provided for @errorLoadingProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading profile'**
+  String get errorLoadingProfile;
+
+  /// No description provided for @loadingUserProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading user profile...'**
+  String get loadingUserProfile;
+
+  /// No description provided for @unknownState.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown state'**
+  String get unknownState;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @confirmLogOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out?'**
+  String get confirmLogOut;
 }
 
 class _AppLocalizationsDelegate

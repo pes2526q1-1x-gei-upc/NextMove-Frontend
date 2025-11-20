@@ -71,7 +71,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña debe tener al menos 1 carácter especial.';
 
   @override
-  String get wrongPassword => 'La contraseña es incorrecta.';
+  String get wrongPassword =>
+      'La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.';
 
   @override
   String get userDataPreferences => 'Acaba de completar tu perfil';
@@ -296,4 +297,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get information => 'Información';
+
+  @override
+  String get logOut => 'Cerrar sesión';
+
+  @override
+  String get creatingYourAccount => 'Creando tu cuenta...';
+
+  @override
+  String get errorLoadingProfile => 'Error al cargar el perfil';
+
+  @override
+  String get loadingUserProfile => 'Cargando datos del usuario...';
+
+  @override
+  String get unknownState => 'Estado desconocido';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get confirmLogOut => '¿Estás seguro de que quieres cerrar sesión?';
 }

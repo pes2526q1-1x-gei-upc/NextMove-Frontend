@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_pro
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +103,10 @@ class _NextMoveAppState extends State<NextMoveApp> {
           
           // ruta de Login para el Logout
           routes: {
-            '/login': (context) => const WelcomePage(),
+            '/login': (context) => BlocProvider(
+              create: (context) => AuthBloc(),
+              child: const WelcomePage(),
+            ),
           },
 
           // Widget que maneja la autenticación y decide qué pantalla mostrar
@@ -201,22 +205,28 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoadingUserData) {
       return Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Cargando datos del usuario...'),
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(l10n.loadingUserProfile),
             ],
           ),
         ),
       );
     }
 
-    return _isLoggedIn ? const MainScreen() : const WelcomePage();
+    return _isLoggedIn
+      ? const MainScreen()
+      : BlocProvider(
+        create: (context) => AuthBloc(),
+        child: const WelcomePage(),
+        );
     
   }
 }

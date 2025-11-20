@@ -24,7 +24,7 @@
     "passwordNeedsUppercase": "La contrasenya ha de tenir almenys 1 lletra majúscula.",
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
-    "wrongPassword": "La contrasenya és incorrecta.",
+    "wrongPassword": "La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.",
     "userDataPreferences": "Acaba de completar el teu perfil",
     "nickname": "Sobrenom",
     "nicknameHint": "Introdueix el teu sobrenom",
@@ -51,7 +51,6 @@
     "nicknameNonEditable": "Sobrenom",
     "fullName": "Nom complet",
     "mandatoryFullName": "El nom complet és obligatori",
-    "wrongPassword": "La contrasenya és incorrecta.",
     "errorOccurred": "Ha ocorregut un error: {error}",
     "@errorOccurred": {
         "placeholders": {
@@ -106,5 +105,12 @@
     "car": "Cotxe",
     "finishRegistration": "Finalitzar registre",
     "userNotLoadedMessage": "L'usuari no s'ha carregat correctament.",
-    "information": "Informació"
+    "information": "Informació",
+    "logOut": "Tancar sessió",
+    "creatingYourAccount": "Creant el teu compte...",
+    "errorLoadingProfile": "Error en carregar el perfil",
+    "loadingUserProfile": "Carregant dades de l'usuari...",
+    "unknownState": "Estat desconegut",
+    "cancel": "Cancel·lar",
+    "confirmLogOut": "Estàs segur que vols tancar la sessió?"
 }

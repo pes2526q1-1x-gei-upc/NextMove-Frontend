@@ -119,7 +119,7 @@ class AuthRemoteDataProvider {
       final email = userCredential.user!.email;
       final name = userCredential.user!.displayName;
 
-      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? true;
       debugPrint("¿Es usuario nuevo? $isNewUser");
 
       final authService = AuthService(client);
@@ -135,7 +135,7 @@ class AuthRemoteDataProvider {
       */
       final meData = await authService.getCurrentUser();
 
-      final needsToRegister = meData?['needsToRegister'] ?? true;
+      final needsToRegister = meData == null;
       debugPrint("needsToRegister: $needsToRegister");
 
       return {

@@ -69,7 +69,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'The password must contain at least 1 special character.';
 
   @override
-  String get wrongPassword => 'The password is incorrect.';
+  String get wrongPassword =>
+      'The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.';
 
   @override
   String get userDataPreferences => 'Finish your profile';
@@ -291,4 +292,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get information => 'Information';
+
+  @override
+  String get logOut => 'Log out';
+
+  @override
+  String get creatingYourAccount => 'Creating your account...';
+
+  @override
+  String get errorLoadingProfile => 'Error loading profile';
+
+  @override
+  String get loadingUserProfile => 'Loading user profile...';
+
+  @override
+  String get unknownState => 'Unknown state';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get confirmLogOut => 'Are you sure you want to log out?';
 }

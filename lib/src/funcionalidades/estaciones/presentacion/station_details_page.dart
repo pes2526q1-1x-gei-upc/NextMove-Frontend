@@ -59,6 +59,7 @@ class StationDetailsPage extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return BlocProvider(
             create: (context) => StationDetailsBloc()
                 ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
@@ -77,8 +78,8 @@ class StationDetailsPage extends StatelessWidget {
                         final stationDetails = state.stationDetails;
                         return _buildDetailsPage(context, stationDetails);
                     } else {
-                        return const Scaffold(
-                            body: Center(child: Text('Unknown state')),
+                        return Scaffold(
+                            body: Center(child: Text(l10n.unknownState)),
                         );
                     }
                 },
