@@ -108,5 +108,9 @@
     "information": "Informació",
     "logOut": "Tancar sessió",
     "creatingYourAccount": "Creant el teu compte...",
-    "errorLoadingProfile": "Error en carregar el perfil"
+    "errorLoadingProfile": "Error en carregar el perfil",
+    "loadingUserProfile": "Carregant dades de l'usuari...",
+    "unknownState": "Estat desconegut",
+    "cancel": "Cancel·lar",
+    "confirmLogOut": "Estàs segur que vols tancar la sessió?"
 }

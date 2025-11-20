@@ -663,6 +663,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading profile'**
   String get errorLoadingProfile;
+
+  /// No description provided for @loadingUserProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading user profile...'**
+  String get loadingUserProfile;
+
+  /// No description provided for @unknownState.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown state'**
+  String get unknownState;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @confirmLogOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out?'**
+  String get confirmLogOut;
 }
 
 class _AppLocalizationsDelegate

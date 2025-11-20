@@ -306,4 +306,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get errorLoadingProfile => 'Error al cargar el perfil';
+
+  @override
+  String get loadingUserProfile => 'Cargando datos del usuario...';
+
+  @override
+  String get unknownState => 'Estado desconocido';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get confirmLogOut => '¿Estás seguro de que quieres cerrar sesión?';
 }

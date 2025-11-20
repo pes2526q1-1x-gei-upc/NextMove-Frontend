@@ -108,5 +108,9 @@
     "information": "Información",
     "logOut": "Cerrar sesión",
     "creatingYourAccount": "Creando tu cuenta...",
-    "errorLoadingProfile": "Error al cargar el perfil"
+    "errorLoadingProfile": "Error al cargar el perfil",
+    "loadingUserProfile": "Cargando datos del usuario...",
+    "unknownState": "Estado desconocido",
+    "cancel": "Cancelar",
+    "confirmLogOut": "¿Estás seguro de que quieres cerrar sesión?"
 }

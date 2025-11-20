@@ -108,5 +108,9 @@
     "information": "Information",
     "logOut": "Log out",
     "creatingYourAccount": "Creating your account...",
-    "errorLoadingProfile": "Error loading profile"
+    "errorLoadingProfile": "Error loading profile",
+    "loadingUserProfile": "Loading user profile...",
+    "unknownState": "Unknown state",
+    "cancel": "Cancel",
+    "confirmLogOut": "Are you sure you want to log out?"
 }

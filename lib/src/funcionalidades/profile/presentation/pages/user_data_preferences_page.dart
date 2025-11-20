@@ -130,9 +130,10 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
   // === Finalizar Registro: Firebase -> Backend ===
   Future<void> _finalizarOnboarding() async {
+    var l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
+        SnackBar(content: Text(l10n.formError)),
       );
       return;
     }
@@ -170,7 +171,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         if (emailProvider == null || pwdProvider == null) {
           // Si por alguna razón son nulos, mostramos error y no intentamos crear el usuario
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error: No hay credenciales pendientes de registro.')),
+            SnackBar(content: Text(l10n.errorOccurred("No hay credenciales pendientes de registro."))),
           );
           return; 
         }

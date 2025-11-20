@@ -10,9 +10,10 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 
 class EditUserDataPreferencesPage extends StatefulWidget {
   const EditUserDataPreferencesPage({super.key});
@@ -155,15 +156,15 @@ class _EditUserDataPreferencesPageState
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.logOut),
-        content: Text('¿Estás seguro de que quieres salir?'),
+        content: Text(l10n.confirmLogOut),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Salir', style: const TextStyle(color: Colors.red)),
+            child: Text(l10n.logOut, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -242,6 +243,12 @@ class _EditUserDataPreferencesPageState
               );
             });
             // Navigator.pop(context);
+          } else if (state is UserLoggedOut) {
+            // Navigate to welcome page
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const WelcomePage()),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {

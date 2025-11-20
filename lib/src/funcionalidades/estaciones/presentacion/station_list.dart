@@ -13,6 +13,7 @@ class StationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) => StationListBloc()..add(LoadStationListEvent(stationType: stationType, latitude: latitude, longitude: longitude)),
       child: BlocBuilder<StationListBloc, StationListState>(
@@ -20,22 +21,22 @@ class StationList extends StatelessWidget {
           if (state is StationListLoading) {
             return Scaffold(
               appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.stations),
+                title: Text(l10n.stations),
               ),
               body: Center(child: CircularProgressIndicator()),
             );
           } else if (state is StationListError) {
             return Scaffold(
               appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.stations),
+                title: Text(l10n.stations),
               ),
-              body: Center(child: Text('Error: ${state.message}')),
+              body: Center(child: Text('${l10n.error}: ${state.message}')),
             );
           } else if (state is StationListLoaded) {
             final allStationDetails = state.stations;
             return Scaffold(
               appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.stations),
+                title: Text(l10n.stations),
               ),
               body: ListView.builder(
                 itemCount: allStationDetails.length,
@@ -61,9 +62,9 @@ class StationList extends StatelessWidget {
           } else {
             return Scaffold(
               appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.stations),
+                title: Text(l10n.stations),
               ),
-              body: Center(child: Text('Unknown state')),
+              body: Center(child: Text(l10n.unknownState)),
             );
           }
         },
