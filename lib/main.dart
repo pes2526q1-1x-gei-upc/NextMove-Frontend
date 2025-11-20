@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_pro
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +103,10 @@ class _NextMoveAppState extends State<NextMoveApp> {
           
           // ruta de Login para el Logout
           routes: {
-            '/login': (context) => const WelcomePage(),
+            '/login': (context) => BlocProvider(
+              create: (context) => AuthBloc(),
+              child: const WelcomePage(),
+            ),
           },
 
           // Widget que maneja la autenticación y decide qué pantalla mostrar
@@ -216,7 +220,12 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return _isLoggedIn ? const MainScreen() : const WelcomePage();
+    return _isLoggedIn
+      ? const MainScreen()
+      : BlocProvider(
+        create: (context) => AuthBloc(),
+        child: const WelcomePage(),
+        );
     
   }
 }
