@@ -71,7 +71,8 @@ class AppLocalizationsCa extends AppLocalizations {
       'La contrasenya ha de tenir almenys 1 caràcter especial.';
 
   @override
-  String get wrongPassword => 'La contrasenya és incorrecta.';
+  String get wrongPassword =>
+      'La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.';
 
   @override
   String get userDataPreferences => 'Acaba de completar el teu perfil';

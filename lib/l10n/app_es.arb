@@ -24,7 +24,7 @@
     "passwordNeedsUppercase": "La contraseña debe tener al menos 1 letra mayúscula.",
     "passwordNeedsNumber": "La contraseña debe tener al menos 1 número.",
     "passwordNeedsSpecialCharacter": "La contraseña debe tener al menos 1 carácter especial.",
-    "wrongPassword": "La contraseña es incorrecta.",
+    "wrongPassword": "La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.",
     "userDataPreferences": "Acaba de completar tu perfil",
     "nickname": "Apodo",
     "nicknameHint": "Introduce tu apodo",
@@ -51,7 +51,6 @@
     "nicknameNonEditable": "Apodo",
     "fullName": "Nombre completo",
     "mandatoryFullName": "El nombre completo es obligatorio",
-    "wrongPassword": "La contraseña es incorrecta.",
     "errorOccurred": "Ha ocurrido un error: {error}",
     "@errorOccurred": {
         "placeholders": {

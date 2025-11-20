@@ -24,7 +24,7 @@
     "passwordNeedsUppercase": "The password must contain at least 1 uppercase letter.",
     "passwordNeedsNumber": "The password must contain at least 1 number.",
     "passwordNeedsSpecialCharacter": "The password must contain at least 1 special character.",
-    "wrongPassword": "The password is incorrect.",
+    "wrongPassword": "The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.",
     "userDataPreferences": "Finish your profile",
     "nickname": "Nickname",
     "nicknameHint": "Enter your nickname",
@@ -51,7 +51,6 @@
     "nicknameNonEditable": "Nickname",
     "fullName": "Full name",
     "mandatoryFullName": "Full name is mandatory",
-    "wrongPassword": "The password is incorrect.",
     "errorOccurred": "An error has occurred: {error}",
     "@errorOccurred": {
         "placeholders": {

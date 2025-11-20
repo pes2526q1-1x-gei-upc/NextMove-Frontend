@@ -205,7 +205,7 @@ abstract class AppLocalizations {
   /// No description provided for @wrongPassword.
   ///
   /// In en, this message translates to:
-  /// **'The password is incorrect.'**
+  /// **'The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.'**
   String get wrongPassword;
 
   /// No description provided for @userDataPreferences.

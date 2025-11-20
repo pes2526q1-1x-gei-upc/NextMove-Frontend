@@ -69,7 +69,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'The password must contain at least 1 special character.';
 
   @override
-  String get wrongPassword => 'The password is incorrect.';
+  String get wrongPassword =>
+      'The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.';
 
   @override
   String get userDataPreferences => 'Finish your profile';

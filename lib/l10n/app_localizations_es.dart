@@ -71,7 +71,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña debe tener al menos 1 carácter especial.';
 
   @override
-  String get wrongPassword => 'La contraseña es incorrecta.';
+  String get wrongPassword =>
+      'La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.';
 
   @override
   String get userDataPreferences => 'Acaba de completar tu perfil';
