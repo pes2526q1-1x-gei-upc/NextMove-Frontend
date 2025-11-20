@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
@@ -47,7 +48,6 @@ class _EditUserDataPreferencesPageState
   String? _selectedModo;
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
-  final List<String> _modos = ['Bicicleta', 'Coche'];
 
   @override
   void initState() {
@@ -74,7 +74,7 @@ class _EditUserDataPreferencesPageState
 
   // === Image Picker ===
   void _showImageSourceActionSheet() {
-    final l10n = AppLocalizations.of(context)!;
+    var l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
@@ -120,10 +120,12 @@ class _EditUserDataPreferencesPageState
   }
 
   // === Guardar Cambios ===
-  void _saveChanges(UserEntity currentUser) {
+  void _saveChanges(BuildContext context, UserEntity currentUser) {
+    var l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
+        SnackBar(content: Text(l10n.formError)),
       );
       return;
     }
@@ -142,7 +144,7 @@ class _EditUserDataPreferencesPageState
       numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
       descripcion: _descripcionController.text.trim(),
       idiomaPreferido: _selectedIdioma ?? currentUser.idiomaPreferido,
-      modoPreferido: _selectedModo ?? currentUser.modoPreferido,
+      modoPreferido: _selectedModo == l10n.bicycle ? "BIKE" : "CAR",
     );
 
     context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
@@ -266,6 +268,7 @@ class _EditUserDataPreferencesPageState
             final user = (state is UserLoaded
                 ? state.user
                 : (state as UserUpdated).user);
+            var l10n = AppLocalizations.of(context)!;
             // Prellena controllers si no lo están
             if (_apodoController.text.isEmpty) {
               _apodoController.text = user.apodo;
@@ -278,8 +281,8 @@ class _EditUserDataPreferencesPageState
                   : user.numeroTelefono.toString();
               _descripcionController.text = user.descripcion;
               _selectedIdioma = user.idiomaPreferido;
-              _selectedModo = user.modoPreferido;
             }
+            _selectedModo = user.modoPreferido == "BIKE" ? l10n.bicycle : l10n.car;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -399,12 +402,14 @@ class _EditUserDataPreferencesPageState
                             ),
                             validator: (v) =>
                                 v == null ? l10n.mandatoryPreferredMode : null,
-                            items: _modos.map((modo) {
-                              final icon = modo == 'Bicicleta'
+                            items: StationType.values.map((modo) {
+                              final icon = modo == StationType.bicycle
                                   ? Icons.directions_bike
                                   : Icons.electric_car;
                               return DropdownMenuItem(
-                                value: modo,
+                                value: modo == StationType.bicycle
+                                    ? l10n.bicycle
+                                    : l10n.car,
                                 child: Row(
                                   children: [
                                     Icon(
@@ -413,7 +418,9 @@ class _EditUserDataPreferencesPageState
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      modo,
+                                      modo == StationType.bicycle
+                                          ? l10n.bicycle
+                                          : l10n.car,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -460,7 +467,7 @@ class _EditUserDataPreferencesPageState
 
                     Center(
                       child: ElevatedButton(
-                        onPressed: () => _saveChanges(user),
+                        onPressed: () => _saveChanges(context, user),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 40,
