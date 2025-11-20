@@ -32,7 +32,20 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(),
-      child: Builder(builder: (context) => _buildBody(context)),
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccessState) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+            );
+          } else if (state is AuthFailureState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorCode)),
+            );
+          }
+        },
+        child: Builder(builder: (context) => _buildBody(context)),
+      ),
     );
   }
 
@@ -105,18 +118,21 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                           );
                         
                         case AuthSuccessState(): // Ya iniciado sesion
-                          if (state.meData != null) {
-                            Provider.of<UserProvider>(
-                              context,
-                              listen: false,
-                            ).setUser(
-                              state.meData!,
-                              firebaseUserId: state.firebaseUserId,
-                              firebaseToken: state.firebaseToken,
-                            );
+                          {
+                            if (state.meData != null) {
+                              Provider.of<UserProvider>(
+                                context,
+                                listen: false,
+                              ).setUser(
+                                state.meData!,
+                                firebaseUserId: state.firebaseUserId,
+                                firebaseToken: state.firebaseToken,
+                              );
+                            }
+                            appKey.currentState?.setLoggedIn(true);
+                            // Navigation handled by BlocListener
+                            const CircularProgressIndicator();
                           }
-                          appKey.currentState?.setLoggedIn(true);
-                          Navigator.of(context).popUntil((route) => route.isFirst);
                           
                         // =======================
 
