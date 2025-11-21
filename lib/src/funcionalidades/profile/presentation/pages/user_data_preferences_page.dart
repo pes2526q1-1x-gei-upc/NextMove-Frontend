@@ -12,7 +12,6 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:provider/provider.dart';
 
 class UserDataPreferencesPage extends StatefulWidget {

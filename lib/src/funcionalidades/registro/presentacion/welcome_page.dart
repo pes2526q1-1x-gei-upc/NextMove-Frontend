@@ -4,7 +4,6 @@ import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
