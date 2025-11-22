@@ -20,7 +20,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 // === IMPORTS PARA EL PERFIL ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart'; 
 // ==============================
 
 final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
@@ -221,13 +221,22 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
+    // === AQUÍ ESTABA EL PROBLEMA, Y AQUÍ ESTÁ LA SOLUCIÓN ===
+    // En lugar de devolver MainScreen() a secas, lo envolvemos con el BlocProvider.
+    // Así, toda la app (incluido ProfileScreen) tendrá acceso al UserBloc.
     return _isLoggedIn
-      ? const MainScreen()
+      ? BlocProvider<UserBloc>(
+          create: (context) {
+            final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+            // Creamos el Bloc y lanzamos el evento de cargar perfil inmediatamente
+            return UserBloc()..add(LoadUserProfile(uid));
+          },
+          child: const MainScreen(),
+        )
       : BlocProvider(
-        create: (context) => AuthBloc(),
-        child: const WelcomePage(),
+          create: (context) => AuthBloc(),
+          child: const WelcomePage(),
         );
-    
   }
 }
 
@@ -252,10 +261,6 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     
-    // Obtenemos el UID actual de forma segura
-    final currentUser = FirebaseAuth.instance.currentUser;
-    final String uid = currentUser?.uid ?? '';
-
     _pages = [
       // 1. Mapa
       const MapPage(),
@@ -266,15 +271,8 @@ class _MainScreenState extends State<MainScreen> {
       // 3. Social
       const SocialPlaceholder(), 
       
-      // 4. Perfil - Usamos BlocProvider para inyectar UserBloc
-      if (uid.isNotEmpty) 
-        BlocProvider(
-          create: (context) => UserBloc()..add(LoadUserProfile(uid)),
-          child: const EditUserDataPreferencesPage(),
-        )
-      else 
-        // Fallback 
-        const Center(child: Text("Error: Usuario no identificado")),
+      // 4. Perfil - AHORA SÍ, usamos la nueva ProfileScreen
+      const ProfilePage(),
     ];
   }
 
