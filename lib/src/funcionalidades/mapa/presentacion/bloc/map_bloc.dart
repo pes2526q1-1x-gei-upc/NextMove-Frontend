@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
@@ -176,7 +177,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         }
       },
       onError: (error) {
-        print('Error en stream de ubicación: $error');
+        if (kDebugMode) {
+          print('Error en stream de ubicación: $error');
+        }
 
       },
       cancelOnError: false,

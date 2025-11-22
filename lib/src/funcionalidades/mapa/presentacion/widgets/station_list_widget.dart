@@ -9,10 +9,10 @@ class StationListButtonWidget extends StatelessWidget {
   final LatLng? userLocation;
 
   const StationListButtonWidget({
-    Key? key,
+    super.key,
     required this.currentMode,
     this.userLocation,
-  }) : super(key: key);
+  });
 
   void _navigateToStationList(BuildContext context) {
     Navigator.push(

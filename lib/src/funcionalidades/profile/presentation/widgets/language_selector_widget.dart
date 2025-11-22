@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
@@ -65,7 +64,7 @@ class ProfileLanguageSelector {
                       Navigator.pop(modalContext);
                     },
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),

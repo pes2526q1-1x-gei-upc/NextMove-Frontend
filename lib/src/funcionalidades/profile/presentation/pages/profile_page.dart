@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -5,14 +6,14 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/fo
 
 // === IMPORTS DE WIDGETS PERSONALIZADOS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart'; 
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/language_selector_widget.dart';
 
 // === OTROS IMPORTS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart'; 
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -27,18 +28,19 @@ class ProfilePage extends StatelessWidget {
       body: SafeArea(
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
-            
             String displayName = l10n.loading;
             String subText = l10n.waitAMoment;
-            UserEntity? currentUser; 
+            UserEntity? currentUser;
 
             if (state is UserLoaded) {
               currentUser = state.user;
-              displayName = "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
+              displayName =
+                  "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
               subText = "@${state.user.apodo}";
             } else if (state is UserUpdated) {
               currentUser = state.user;
-              displayName = "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
+              displayName =
+                  "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
               subText = "@${state.user.apodo}";
             } else if (state is UserError) {
               displayName = l10n.ops;
@@ -48,18 +50,18 @@ class ProfilePage extends StatelessWidget {
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 20.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    
+
                     // --- HEADER ---
-                    ProfileHeaderWidget(
-                      title: displayName,
-                      subtitle: subText,
-                    ),
-                    
+                    ProfileHeaderWidget(title: displayName, subtitle: subText),
+
                     const SizedBox(height: 30),
 
                     // --- SECCIÓN 1: CUENTA ---
@@ -86,7 +88,13 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.block_rounded,
                           text: l10n.bloquedUsers,
-                          onTap: () => print("Click en Bloqueados"),
+                          onTap: () => {
+                            if (kDebugMode)
+                              {
+                                // ignore: avoid_print
+                                print("Click en Bloqueados"),
+                              },
+                          },
                         ),
                       ],
                     ),
@@ -103,10 +111,15 @@ class ProfilePage extends StatelessWidget {
                           onTap: () {
                             if (currentUser != null) {
                               // Usamos el widget refactorizado para mostrar el selector
-                              ProfileLanguageSelector.show(context, currentUser);
+                              ProfileLanguageSelector.show(
+                                context,
+                                currentUser,
+                              );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.errorLoadingProfile)),
+                                SnackBar(
+                                  content: Text(l10n.errorLoadingProfile),
+                                ),
                               );
                             }
                           },
@@ -115,13 +128,19 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.notifications_none_rounded,
                           text: l10n.notifications,
-                          onTap: () => print("Click en Notificaciones"),
+                          onTap: () => {
+                            // ignore: avoid_print
+                            if (kDebugMode) {print("Click en Notificaciones")},
+                          },
                         ),
                         const ProfileMenuDivider(),
                         ProfileMenuOption(
                           icon: Icons.dark_mode_outlined,
                           text: l10n.appearance,
-                          onTap: () => print("Click en Modo Oscuro"),
+                          onTap: () => {
+                            // ignore: avoid_print
+                            if (kDebugMode) {print("Click en Modo Oscuro")},
+                          },
                         ),
                       ],
                     ),
@@ -130,7 +149,7 @@ class ProfilePage extends StatelessWidget {
 
                     // --- BOTÓN LOGOUT ---
                     const ProfileLogoutButton(),
-                    
+
                     const SizedBox(height: 20),
 
                     // --- FOOTER ---

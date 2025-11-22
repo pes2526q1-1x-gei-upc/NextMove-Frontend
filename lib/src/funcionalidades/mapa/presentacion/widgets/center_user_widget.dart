@@ -6,10 +6,10 @@ class CenterOnUserButtonWidget extends StatelessWidget {
   final GoogleMapController? mapController;
 
   const CenterOnUserButtonWidget({
-    Key? key,
+    super.key,
     this.userLocation,
     this.mapController,
-  }) : super(key: key);
+  });
 
   void _centerOnUser() {
     if (userLocation != null && mapController != null) {

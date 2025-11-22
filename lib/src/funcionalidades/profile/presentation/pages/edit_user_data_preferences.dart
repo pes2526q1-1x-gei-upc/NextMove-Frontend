@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -56,7 +57,9 @@ class _EditUserDataPreferencesPageState
     _fechaNacimientoController = TextEditingController();
     _telefonoController = TextEditingController();
     _descripcionController = TextEditingController();
-    print("Cargando perfil de usuario para edición...");
+    if (kDebugMode) {
+      print("Cargando perfil de usuario para edición...");
+    }
   }
 
   @override
