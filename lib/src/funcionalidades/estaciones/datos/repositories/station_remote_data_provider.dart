@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
@@ -85,7 +86,9 @@ class StationRemoteDataProvider {
     );
 
     if (result.hasException) {
-      print('GraphQL Exception: ${result.exception.toString()}');
+      if (kDebugMode) {
+        print('GraphQL Exception: ${result.exception.toString()}');
+      }
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
@@ -139,9 +142,11 @@ class StationRemoteDataProvider {
     );
 
     if (result.hasException) {
-      print(
+      if (kDebugMode) {
+        print(
         'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
       );
+      }
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 

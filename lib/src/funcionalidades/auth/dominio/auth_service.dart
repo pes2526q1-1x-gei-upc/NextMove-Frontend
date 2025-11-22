@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../../graphql/queries.dart';
 
@@ -17,7 +17,9 @@ class AuthService {
       final QueryResult result = await _client.query(options);
 
       if (result.hasException) {
-        debugPrint('Error al obtener usuario: ${result.exception.toString()}');
+        if (kDebugMode) {
+          print('Error al obtener usuario: ${result.exception.toString()}');
+        }
         /*
         throw Exception(
           'Error al obtener usuario: ${result.exception.toString()}',
@@ -27,10 +29,14 @@ class AuthService {
       if (result.data != null && result.data!['me'] != null) {
         return result.data!['me'] as Map<String, dynamic>;
       }
-      debugPrint('WARNING: usuario vacío');
+      if (kDebugMode) {
+        print('WARNING: usuario vacío');
+      }
       return null;
     } catch (e) {
-      debugPrint('Error al obtener usuario: $e');
+      if (kDebugMode) {
+        print('Error al obtener usuario: $e');
+      }
       //throw Exception('Error en getCurrentUser: $e');
       return null;
     }
@@ -57,13 +63,17 @@ class AuthService {
       final result = await _client.mutate(options);
 
       if (result.hasException) {
-        debugPrint('Error en upsert: ${result.exception}');
+        if (kDebugMode) {
+          print('Error en upsert: ${result.exception}');
+        }
         return null;
       }
 
       return result.data?['insert_users_one'];
     } catch (e) {
-      debugPrint('Error en upsertUser: $e');
+      if (kDebugMode) {
+        print('Error en upsertUser: $e');
+      }
       return null;
     }
   }

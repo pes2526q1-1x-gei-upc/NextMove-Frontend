@@ -148,7 +148,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
       if (firebaseUser != null) {
         // User is already authenticated (Google sign-in), skip Firebase creation
-        debugPrint("Usuario ya autenticado con Google: ${firebaseUser.email}");
+        print("Usuario ya autenticado con Google: ${firebaseUser.email}");
         newUser = UserEntity(
           email: firebaseUser.email!,
           apodo: _apodoController.text.trim(),
@@ -184,8 +184,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         final createdFirebaseUser = userCredential.user;
         if (createdFirebaseUser == null) throw Exception("Error creando usuario en Firebase");
 
-        debugPrint("Usuario Firebase creado: ${createdFirebaseUser.email}");
-        debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
+        print("Usuario Firebase creado: ${createdFirebaseUser.email}");
+        print("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
         newUser = UserEntity(
           email: createdFirebaseUser.email!,
           apodo: _apodoController.text.trim(),

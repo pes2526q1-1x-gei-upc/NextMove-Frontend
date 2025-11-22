@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class LocaleProvider with ChangeNotifier {
@@ -7,7 +8,9 @@ class LocaleProvider with ChangeNotifier {
 
   void setLocale(Locale locale) {
     if (_locale != locale) {
-      debugPrint('Changing locale from $_locale to $locale');
+      if (kDebugMode) {
+        print('Changing locale from $_locale to $locale');
+      }
       _locale = locale;
       notifyListeners();
     }
@@ -28,7 +31,9 @@ class LocaleProvider with ChangeNotifier {
       default:
         newLocale = const Locale('es');
     }
-    debugPrint('Setting locale from language: $language -> $newLocale');
+    if (kDebugMode) {
+      print('Setting locale from language: $language -> $newLocale');
+    }
     setLocale(newLocale);
   }
 
@@ -52,7 +57,9 @@ class LocaleProvider with ChangeNotifier {
 
   void clearLocale() {
     if (_locale != null) {
-      debugPrint('Clearing locale to use system default');
+      if (kDebugMode) {
+        print('Clearing locale to use system default');
+      }
       _locale = null;
       notifyListeners();
     }

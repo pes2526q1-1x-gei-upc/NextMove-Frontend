@@ -127,7 +127,7 @@ class _MapPageState extends State<MapPage> {
                   hintText: AppLocalizations.of(context)!.searchStation,
                   onChanged: (query) {
                     // TODO: Implementar búsqueda
-                    debugPrint('Searching: $query');
+                    print('Searching: $query');
                   },
                 ),
 

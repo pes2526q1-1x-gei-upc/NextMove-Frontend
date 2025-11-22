@@ -48,8 +48,6 @@ class _EditUserDataPreferencesPageState
   String? _selectedModoUI;
   String? _selectedModeAPI; 
 
-  final List<String> _idiomas = ['Español', 'English', 'Català'];
-
   @override
   void initState() {
     super.initState();
@@ -58,7 +56,7 @@ class _EditUserDataPreferencesPageState
     _fechaNacimientoController = TextEditingController();
     _telefonoController = TextEditingController();
     _descripcionController = TextEditingController();
-    debugPrint("Cargando perfil de usuario para edición...");
+    print("Cargando perfil de usuario para edición...");
   }
 
   @override
