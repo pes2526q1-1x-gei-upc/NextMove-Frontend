@@ -265,7 +265,7 @@ abstract class AppLocalizations {
   /// No description provided for @userDescription.
   ///
   /// In en, this message translates to:
-  /// **'Description (optional)'**
+  /// **'Description'**
   String get userDescription;
 
   /// No description provided for @userDescriptionHint.
@@ -687,6 +687,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to log out?'**
   String get confirmLogOut;
+
+  /// No description provided for @contactAndBioInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact and bio information'**
+  String get contactAndBioInfo;
+
+  /// No description provided for @personalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal information'**
+  String get personalInfo;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @waitAMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait a moment'**
+  String get waitAMoment;
+
+  /// No description provided for @hi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, '**
+  String get hi;
+
+  /// No description provided for @ops.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops!'**
+  String get ops;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @accountDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details'**
+  String get accountDetails;
+
+  /// No description provided for @bloquedUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked users'**
+  String get bloquedUsers;
+
+  /// No description provided for @noBloquedUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no blocked users.'**
+  String get noBloquedUsers;
+
+  /// No description provided for @unblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get unblock;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @appLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'App language'**
+  String get appLanguage;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get lightMode;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get darkMode;
+
+  /// No description provided for @preliminarVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Preliminary version'**
+  String get preliminarVersion;
 }
 
 class _AppLocalizationsDelegate

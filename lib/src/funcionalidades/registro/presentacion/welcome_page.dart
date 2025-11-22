@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
@@ -21,9 +19,10 @@ class WelcomePage extends StatelessWidget {
         listener: (context, state) {
           if (state is AuthFailureState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error: \\${state.errorCode}")),
+              SnackBar(content: Text("Error: ${state.errorCode}")),
             );
           } else if (state is UserNeedsProfileSetupState) {
+            // Aquí sí navegamos manualmente porque es una pantalla intermedia de registro
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => BlocProvider(
@@ -32,14 +31,9 @@ class WelcomePage extends StatelessWidget {
                 ),
               ),
             );
-          } else if (state is AuthSuccessState) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const MainScreen(),
-              ),
-            );
-          }
-          // Do nothing for other states
+          } 
+          // CORRECCIÓN: Eliminado el bloque AuthSuccessState que navegaba manualmente a MainScreen.
+          // Dejamos que main.dart escuche el cambio de usuario y monte la MainScreen con el Provider correcto.
         },
         child: Center(
           child: Padding(
@@ -50,10 +44,10 @@ class WelcomePage extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context)!.welcomeTo('NextMove'),
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 EmailSignInButton(signInButtonsWidth: signInButtonsWidth),
                 GoogleSignInButton(signInButtonsWidth: signInButtonsWidth),
               ],
@@ -97,7 +91,7 @@ class EmailSignInButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(
           context,
-        ).push(MaterialPageRoute(builder: (context) => EmailAddressPage()));
+        ).push(MaterialPageRoute(builder: (context) => const EmailAddressPage()));
       },
     );
   }

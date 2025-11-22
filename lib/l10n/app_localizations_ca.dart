@@ -103,7 +103,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get preferredLanguage => 'Idioma preferit';
 
   @override
-  String get userDescription => 'Descripció (opcional)';
+  String get userDescription => 'Descripció';
 
   @override
   String get userDescriptionHint => 'Introdueix una breu descripció sobre tu';
@@ -318,4 +318,58 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get confirmLogOut => 'Estàs segur que vols tancar la sessió?';
+
+  @override
+  String get contactAndBioInfo => 'Informació de contacte i biografia';
+
+  @override
+  String get personalInfo => 'Informació personal';
+
+  @override
+  String get loading => 'Carregant...';
+
+  @override
+  String get waitAMoment => 'Si us plau, espera un moment';
+
+  @override
+  String get hi => 'Hola, ';
+
+  @override
+  String get ops => 'Vaja!';
+
+  @override
+  String get account => 'Compte';
+
+  @override
+  String get accountDetails => 'Detalls del compte';
+
+  @override
+  String get bloquedUsers => 'Usuaris bloquejats';
+
+  @override
+  String get noBloquedUsers => 'No tens usuaris bloquejats.';
+
+  @override
+  String get unblock => 'Desbloquejar';
+
+  @override
+  String get settings => 'Configuració';
+
+  @override
+  String get appLanguage => 'Idioma de l\'aplicació';
+
+  @override
+  String get notifications => 'Notificacions';
+
+  @override
+  String get appearance => 'Aparença';
+
+  @override
+  String get lightMode => 'Mode clar';
+
+  @override
+  String get darkMode => 'Mode fosc';
+
+  @override
+  String get preliminarVersion => 'Versió preliminar';
 }
