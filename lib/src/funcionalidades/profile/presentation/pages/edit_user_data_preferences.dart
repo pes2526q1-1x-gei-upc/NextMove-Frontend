@@ -12,6 +12,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/sa
 
 // Otros Imports
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
@@ -143,7 +144,7 @@ class _EditUserDataPreferencesPageState
               _telefonoController.text = user.numeroTelefono == 0 ? '' : user.numeroTelefono.toString();
               _descripcionController.text = user.descripcion;
               _selectedIdioma = user.idiomaPreferido;
-              _selectedModeAPI = user.modoPreferido;
+              _selectedModeAPI = UserEntity.mapPreferredModeToAPI(user.modoPreferido);
             }
             _selectedModoUI = _selectedModeAPI == "BIKE" ? l10n.bicycle : l10n.car;
 
