@@ -43,6 +43,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllNearbyBicycleStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['getEstacionesDeBicingCercanas'];
     if (data != null) {
       return (data as List)
@@ -76,6 +79,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllNearbyEVStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['nearbyStations'];
     if (data != null) {
       return (data as List)
@@ -103,6 +109,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllBicycleStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['getEstacionesDeBicing'];
 
     if (data != null) {
@@ -128,6 +137,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllEVStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['stations']['stations'];
     if (data != null) {
       return (data as List).map((item) {
@@ -155,8 +167,8 @@ class StationRemoteDataProvider {
     if (result.hasException) {
       if (kDebugMode) {
         print(
-        'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
-      );
+          'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
+        );
       }
       throw ServerException('Error en query: ${result.exception.toString()}');
     }

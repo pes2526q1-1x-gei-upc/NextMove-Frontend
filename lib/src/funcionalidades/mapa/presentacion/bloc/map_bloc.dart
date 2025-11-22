@@ -193,19 +193,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     BitmapDescriptor icon,
   ) {
     if(bikeStations == null && evStations != null){
-      return evStations.map((station) {
+      return evStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
       return Marker(
         markerId: MarkerId(station.id),
-        position: LatLng(station.latitude, station.longitude),
+        position: LatLng(station.latitude!, station.longitude!),
         icon: icon,
         onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
     }).toSet();}
     else if(evStations == null && bikeStations != null){
-      return bikeStations.map((station) {
+      return bikeStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
       return Marker(
         markerId: MarkerId(station.id),
-        position: LatLng(station.latitude, station.longitude),
+        position: LatLng(station.latitude!, station.longitude!),
         icon: icon,
         onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
