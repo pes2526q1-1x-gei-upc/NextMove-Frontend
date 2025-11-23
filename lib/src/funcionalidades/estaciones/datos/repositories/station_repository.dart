@@ -1,7 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_remote_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/datos/dataproviders/station_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 class StationRepository {
@@ -22,6 +23,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getAllNearbyBicycleStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }
@@ -42,6 +46,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getAllNearbyEVStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }
@@ -57,6 +64,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getAllBicycleStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }
@@ -70,6 +80,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getAllEVStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }
@@ -86,6 +99,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getBicycleStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }
@@ -102,6 +118,9 @@ class StationRepository {
     } on ConnectionException {
       return Left(ConnectionFailure());
     } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getEVStationDetails: $e');
+      }
       throw UnknownFailure();
     }
   }

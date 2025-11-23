@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager, Cluster;
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
@@ -315,7 +316,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         }
       },
       onError: (error) {
-        print('Error en stream de ubicación: $error');
+        if (kDebugMode) {
+          print('Error en stream de ubicación: $error');
+        }
 
       },
       cancelOnError: false,
@@ -329,19 +332,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     BitmapDescriptor icon,
   ) {
     if(bikeStations == null && evStations != null){
-      return evStations.map((station) {
+      return evStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
       return Marker(
         markerId: MarkerId(station.id),
-        position: LatLng(station.latitude, station.longitude),
+        position: LatLng(station.latitude!, station.longitude!),
         icon: icon,
         onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
     }).toSet();}
     else if(evStations == null && bikeStations != null){
-      return bikeStations.map((station) {
+      return bikeStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
       return Marker(
         markerId: MarkerId(station.id),
-        position: LatLng(station.latitude, station.longitude),
+        position: LatLng(station.latitude!, station.longitude!),
         icon: icon,
         onTap: () => onMarkerTapped(station, state as MapLoadedState),
       );
