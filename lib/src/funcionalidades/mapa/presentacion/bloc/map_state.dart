@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager;
+import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager, Cluster;
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 

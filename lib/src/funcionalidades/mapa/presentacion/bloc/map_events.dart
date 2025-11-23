@@ -57,3 +57,12 @@ class ShowStationDetailsEvent extends MapEvent {
   @override
   List<Object?> get props => [station];
 }
+
+class UpdateClustersEvent extends MapEvent {
+  final double zoom;
+
+  const UpdateClustersEvent(this.zoom);
+
+  @override
+  List<Object?> get props => [zoom];
+}

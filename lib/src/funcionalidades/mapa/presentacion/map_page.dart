@@ -13,6 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
 
+
 //imports widgets
 import 'widgets/google_map_widget.dart';
 import 'widgets/toggleMapMode_widget.dart';
@@ -32,7 +33,7 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   // Controllers & state
   // -----------------------------------------------------------------------
-  GoogleMapController? _mapController;
+  GoogleMapController? mapController;
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
@@ -43,7 +44,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    _mapController?.dispose();
+    mapController?.dispose();
     _positionStream?.cancel();
     super.dispose();
   }
@@ -52,7 +53,7 @@ class _MapPageState extends State<MapPage> {
   // Map callbacks
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
+    mapController = controller;
     _setMapStyle();
   }
 
@@ -65,7 +66,7 @@ class _MapPageState extends State<MapPage> {
       }
     ]
     ''';
-    _mapController?.setMapStyle(style);
+    mapController?.setMapStyle(style);
   }
 
 
@@ -105,11 +106,13 @@ class _MapPageState extends State<MapPage> {
             }
             
             if (state is MapLoadedState) {
-              final markersToShow = state.currentMode == StationType.bicycle
-                  ? state.bikeMarkers
-                  : state.carMarkers;
+              final markersToShow = state.clusteredMarkers.isNotEmpty
+                  ? state.clusteredMarkers:
+                  (state.currentMode == StationType.bicycle
+                    ? state.bikeMarkers
+                    : state.carMarkers);
               
-              return  Stack(
+              return  Stack(  
               children: [
                 // Widget del mapa (fondo)
                 MapWidget(
@@ -119,14 +122,19 @@ class _MapPageState extends State<MapPage> {
                   ),
                   markers: markersToShow,
                   mapType: state.currentMapType,
-                  onMapCreated: _onMapCreated,
+                  onMapCreated: (mapController){
+                    _onMapCreated(mapController);
+                    _initializeClusters(context, state);
+                  },
+                  onCameraMove: (position) {
+                    context.read<MapBloc>().add(UpdateClustersEvent(position.zoom));
+                  },
                 ),
 
                 // Barra de búsqueda
                 SearchBarWidget(
                   hintText: AppLocalizations.of(context)!.searchStation,
                   onChanged: (query) {
-                    // TODO: Implementar búsqueda
                     debugPrint('Searching: $query');
                   },
                 ),
@@ -143,7 +151,7 @@ class _MapPageState extends State<MapPage> {
                 // Botón centrar en usuario
                 CenterOnUserButtonWidget(
                   userLocation: state.userLocation,
-                  mapController: _mapController,
+                  mapController: mapController,
                 ),
 
                 // Botón cambiar tipo de mapa
@@ -167,8 +175,20 @@ class _MapPageState extends State<MapPage> {
 
 
 // -----------------------------------------------------------------------
-  // Markers
+  // Markers and Clusters
   // -----------------------------------------------------------------------
+
+  void _initializeClusters(BuildContext context, MapLoadedState state) {
+      final clusterManager = state.currentMode == StationType.bicycle
+          ? state.bikeClusterManager
+          : state.evClusterManager;
+      
+      if(clusterManager != null && mapController != null) {
+        clusterManager.setMapId(mapController!.mapId);
+        context.read<MapBloc>().add(UpdateClustersEvent(12.0)); //zoom inicial de 12.0
+      }
+      
+  }
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
     showModalBottomSheet(
