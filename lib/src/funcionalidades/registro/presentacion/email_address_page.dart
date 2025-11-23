@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
-
-import 'package:nextmove_app/src/funcionalidades/registro/dominio/email_address_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
@@ -32,7 +30,19 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(),
-      child: Builder(builder: (context) => _buildBody(context)),
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          // CORRECCIÓN: Eliminada la navegación manual a MainScreen.
+          // Dejamos que el AuthStateHandler en main.dart maneje el flujo tras el login.
+          
+          if (state is AuthFailureState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorCode)),
+            );
+          }
+        },
+        child: Builder(builder: (context) => _buildBody(context)),
+      ),
     );
   }
 
@@ -75,7 +85,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                     listener: (context, state) async {
                       switch (state) {
                         case EmailIsNewState(): // Usuario nuevo
-                          
                           await showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -105,21 +114,24 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                           );
                         
                         case AuthSuccessState(): // Ya iniciado sesion
-                          if (state.meData != null) {
-                            Provider.of<UserProvider>(
-                              context,
-                              listen: false,
-                            ).setUser(
-                              state.meData!,
-                              firebaseUserId: state.firebaseUserId,
-                              firebaseToken: state.firebaseToken,
-                            );
+                          {
+                            if (state.meData != null) {
+                              Provider.of<UserProvider>(
+                                context,
+                                listen: false,
+                              ).setUser(
+                                state.meData!,
+                                firebaseUserId: state.firebaseUserId,
+                                firebaseToken: state.firebaseToken,
+                              );
+                            }
+                            // Notificar a la app global que estamos logueados
+                            appKey.currentState?.setLoggedIn(true);
+                            
+                            // Volver a la raíz para que main.dart muestre MainScreen
+                             Navigator.of(context).popUntil((route) => route.isFirst);
                           }
-                          appKey.currentState?.setLoggedIn(true);
-                          Navigator.of(context).popUntil((route) => route.isFirst);
                           
-                        // =======================
-
                         case UserNeedsProfileSetupState(): // Onboarding
                           appKey.currentState?.setLoggedIn(true);
                           Provider.of<UserProvider>(
@@ -180,28 +192,9 @@ class ContinueButton extends StatelessWidget {
           );
         } else {
           if (context.read<AuthBloc>().state is EmailIsNewState) {
-            final password = _passwordController.text;
-            final passwordValidationResult = isPasswordValid(password);
-            if (passwordValidationResult != PasswordValidationError.valid) {
-              String errorMessage = switch (passwordValidationResult) {
-                PasswordValidationError.tooShort => l10n.passwordTooShort,
-                PasswordValidationError.needsLowercase =>
-                  l10n.passwordNeedsLowercase,
-                PasswordValidationError.needsUppercase =>
-                  l10n.passwordNeedsUppercase,
-                PasswordValidationError.needsNumber => l10n.passwordNeedsNumber,
-                PasswordValidationError.needsSpecialCharacter =>
-                  l10n.passwordNeedsSpecialCharacter,
-                _ => '',
-              };
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(errorMessage)));
-              return;
-            }
+            // === CORRECCIÓN: Eliminada validación externa isPasswordValid ===
+            // Directamente guardamos y pasamos a la siguiente pantalla
             try {
-              // Ahora solo guardamos en provider el correo y contraseña para crear el usuario
-              // entero una vez finalizado el onboarding.
               Provider.of<UserProvider>(
                 context,
                 listen: false,

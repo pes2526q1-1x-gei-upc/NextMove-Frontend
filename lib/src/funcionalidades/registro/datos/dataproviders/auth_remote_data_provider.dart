@@ -112,14 +112,14 @@ class AuthRemoteDataProvider {
 
       final firebaseUserId = userCredential.user!.uid;
       final firebaseToken = await userCredential.user?.getIdToken();
-      print("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
-      print("📧 Email: ${userCredential.user?.email}");
-      print("👤 Display Name: ${userCredential.user?.displayName}");
+      debugPrint("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
+      debugPrint("📧 Email: ${userCredential.user?.email}");
+      debugPrint("👤 Display Name: ${userCredential.user?.displayName}");
 
       final email = userCredential.user!.email;
-      final name = userCredential.user!.displayName;
+      //final name = userCredential.user!.displayName;
 
-      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? true;
       debugPrint("¿Es usuario nuevo? $isNewUser");
 
       final authService = AuthService(client);
@@ -135,7 +135,7 @@ class AuthRemoteDataProvider {
       */
       final meData = await authService.getCurrentUser();
 
-      final needsToRegister = meData?['needsToRegister'] ?? true;
+      final needsToRegister = meData == null;
       debugPrint("needsToRegister: $needsToRegister");
 
       return {

@@ -71,7 +71,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña debe tener al menos 1 carácter especial.';
 
   @override
-  String get wrongPassword => 'La contraseña es incorrecta.';
+  String get wrongPassword =>
+      'La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.';
 
   @override
   String get userDataPreferences => 'Acaba de completar tu perfil';
@@ -102,7 +103,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get preferredLanguage => 'Idioma preferido';
 
   @override
-  String get userDescription => 'Descripción (opcional)';
+  String get userDescription => 'Descripción';
 
   @override
   String get userDescriptionHint => 'Introduce una breve descripción sobre ti';
@@ -296,4 +297,79 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get information => 'Información';
+
+  @override
+  String get logOut => 'Cerrar sesión';
+
+  @override
+  String get creatingYourAccount => 'Creando tu cuenta...';
+
+  @override
+  String get errorLoadingProfile => 'Error al cargar el perfil';
+
+  @override
+  String get loadingUserProfile => 'Cargando datos del usuario...';
+
+  @override
+  String get unknownState => 'Estado desconocido';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get confirmLogOut => '¿Estás seguro de que quieres cerrar sesión?';
+
+  @override
+  String get contactAndBioInfo => 'Información de contacto y biografía';
+
+  @override
+  String get personalInfo => 'Información personal';
+
+  @override
+  String get loading => 'Cargando...';
+
+  @override
+  String get waitAMoment => 'Espera un momento por favor';
+
+  @override
+  String get hi => 'Hola, ';
+
+  @override
+  String get ops => '¡Vaya!';
+
+  @override
+  String get account => 'Cuenta';
+
+  @override
+  String get accountDetails => 'Detalles de la cuenta';
+
+  @override
+  String get bloquedUsers => 'Usuarios bloqueados';
+
+  @override
+  String get noBloquedUsers => 'No tienes usuarios bloqueados.';
+
+  @override
+  String get unblock => 'Desbloquear';
+
+  @override
+  String get settings => 'Ajustes';
+
+  @override
+  String get appLanguage => 'Idioma de la aplicación';
+
+  @override
+  String get notifications => 'Notificaciones';
+
+  @override
+  String get appearance => 'Apariencia';
+
+  @override
+  String get lightMode => 'Modo claro';
+
+  @override
+  String get darkMode => 'Modo oscuro';
+
+  @override
+  String get preliminarVersion => 'Versión preliminar';
 }

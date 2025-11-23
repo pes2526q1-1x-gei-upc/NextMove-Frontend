@@ -69,7 +69,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'The password must contain at least 1 special character.';
 
   @override
-  String get wrongPassword => 'The password is incorrect.';
+  String get wrongPassword =>
+      'The password is incorrect. If you used this email address to sign up with Google, please sign in with Google.';
 
   @override
   String get userDataPreferences => 'Finish your profile';
@@ -99,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferredLanguage => 'Preferred language';
 
   @override
-  String get userDescription => 'Description (optional)';
+  String get userDescription => 'Description';
 
   @override
   String get userDescriptionHint => 'Enter a brief description about yourself';
@@ -291,4 +292,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get information => 'Information';
+
+  @override
+  String get logOut => 'Log out';
+
+  @override
+  String get creatingYourAccount => 'Creating your account...';
+
+  @override
+  String get errorLoadingProfile => 'Error loading profile';
+
+  @override
+  String get loadingUserProfile => 'Loading user profile...';
+
+  @override
+  String get unknownState => 'Unknown state';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get confirmLogOut => 'Are you sure you want to log out?';
+
+  @override
+  String get contactAndBioInfo => 'Contact and bio information';
+
+  @override
+  String get personalInfo => 'Personal information';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get waitAMoment => 'Please wait a moment';
+
+  @override
+  String get hi => 'Hi, ';
+
+  @override
+  String get ops => 'Oops!';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get accountDetails => 'Account details';
+
+  @override
+  String get bloquedUsers => 'Blocked users';
+
+  @override
+  String get noBloquedUsers => 'You have no blocked users.';
+
+  @override
+  String get unblock => 'Unblock';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get appLanguage => 'App language';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get lightMode => 'Light mode';
+
+  @override
+  String get darkMode => 'Dark mode';
+
+  @override
+  String get preliminarVersion => 'Preliminary version';
 }

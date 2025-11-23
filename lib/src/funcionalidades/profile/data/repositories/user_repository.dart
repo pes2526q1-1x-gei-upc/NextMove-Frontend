@@ -17,7 +17,7 @@ class UserRepository {
       final user = await remoteDataProvider.getUserProfile(userId);
       return Right(user);
     } on custom_exceptions.ServerException catch (e) {
-      return Left(ServerFailure());
+      return Left(ServerFailure(message: e.toString()));
     } on custom_exceptions.AuthException catch (e) {
       return Left(AuthFailure(message: e.toString()));
     } catch (e) {

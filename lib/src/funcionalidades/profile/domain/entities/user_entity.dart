@@ -75,8 +75,10 @@ class UserEntity extends Equatable {
   static String mapPreferredModeToAPI(String localMode) {
     switch (localMode) {
       case 'Bicicleta':
+      case 'BIKE':
         return 'BIKE';
       case 'Coche':
+      case 'CAR':
         return 'CAR';
       default:
         return 'CAR';

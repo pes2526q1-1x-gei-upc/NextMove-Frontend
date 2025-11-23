@@ -71,7 +71,8 @@ class AppLocalizationsCa extends AppLocalizations {
       'La contrasenya ha de tenir almenys 1 caràcter especial.';
 
   @override
-  String get wrongPassword => 'La contrasenya és incorrecta.';
+  String get wrongPassword =>
+      'La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.';
 
   @override
   String get userDataPreferences => 'Acaba de completar el teu perfil';
@@ -102,7 +103,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get preferredLanguage => 'Idioma preferit';
 
   @override
-  String get userDescription => 'Descripció (opcional)';
+  String get userDescription => 'Descripció';
 
   @override
   String get userDescriptionHint => 'Introdueix una breu descripció sobre tu';
@@ -296,4 +297,79 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get information => 'Informació';
+
+  @override
+  String get logOut => 'Tancar sessió';
+
+  @override
+  String get creatingYourAccount => 'Creant el teu compte...';
+
+  @override
+  String get errorLoadingProfile => 'Error en carregar el perfil';
+
+  @override
+  String get loadingUserProfile => 'Carregant dades de l\'usuari...';
+
+  @override
+  String get unknownState => 'Estat desconegut';
+
+  @override
+  String get cancel => 'Cancel·lar';
+
+  @override
+  String get confirmLogOut => 'Estàs segur que vols tancar la sessió?';
+
+  @override
+  String get contactAndBioInfo => 'Informació de contacte i biografia';
+
+  @override
+  String get personalInfo => 'Informació personal';
+
+  @override
+  String get loading => 'Carregant...';
+
+  @override
+  String get waitAMoment => 'Si us plau, espera un moment';
+
+  @override
+  String get hi => 'Hola, ';
+
+  @override
+  String get ops => 'Vaja!';
+
+  @override
+  String get account => 'Compte';
+
+  @override
+  String get accountDetails => 'Detalls del compte';
+
+  @override
+  String get bloquedUsers => 'Usuaris bloquejats';
+
+  @override
+  String get noBloquedUsers => 'No tens usuaris bloquejats.';
+
+  @override
+  String get unblock => 'Desbloquejar';
+
+  @override
+  String get settings => 'Configuració';
+
+  @override
+  String get appLanguage => 'Idioma de l\'aplicació';
+
+  @override
+  String get notifications => 'Notificacions';
+
+  @override
+  String get appearance => 'Aparença';
+
+  @override
+  String get lightMode => 'Mode clar';
+
+  @override
+  String get darkMode => 'Mode fosc';
+
+  @override
+  String get preliminarVersion => 'Versió preliminar';
 }

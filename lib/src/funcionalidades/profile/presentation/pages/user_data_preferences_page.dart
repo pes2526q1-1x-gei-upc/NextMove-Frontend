@@ -5,13 +5,13 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:provider/provider.dart';
 
 class UserDataPreferencesPage extends StatefulWidget {
@@ -129,9 +129,10 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
   // === Finalizar Registro: Firebase -> Backend ===
   Future<void> _finalizarOnboarding() async {
+    var l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.formError)),
+        SnackBar(content: Text(l10n.formError)),
       );
       return;
     }
@@ -141,47 +142,64 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     });
 
     try {
-      // 1. Crear usuario en Firebase Authentication
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final String? emailProvider = userProvider.email;
-      final String? pwdProvider = userProvider.pwd;
+      // Check if user is already authenticated (e.g., via Google sign-in)
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      UserEntity newUser;
 
-      // 2. Verificamos que existan (Guard Clause)
-      if (emailProvider == null || pwdProvider == null) {
-        // Si por alguna razón son nulos, mostramos error y no intentamos crear el usuario
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error: No hay credenciales pendientes de registro.')),
+      if (firebaseUser != null) {
+        // User is already authenticated (Google sign-in), skip Firebase creation
+        debugPrint("Usuario ya autenticado con Google: ${firebaseUser.email}");
+        newUser = UserEntity(
+          email: firebaseUser.email!,
+          apodo: _apodoController.text.trim(),
+          nombreCompleto: _nombreCompletoController.text.trim(),
+          fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+          fechaRegistro: DateTime.now(), // Fecha actual de registro
+          numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
+          idiomaPreferido: _selectedIdioma ?? 'Español',
+          descripcion: _descripcionController.text.trim(),
+          modoPreferido: _selectedModo ?? 'Coche',
         );
-        return; 
+      } else {
+        // Email/password registration flow
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final String? emailProvider = userProvider.email;
+        final String? pwdProvider = userProvider.pwd;
+
+        // Verificamos que existan (Guard Clause)
+        if (emailProvider == null || pwdProvider == null) {
+          // Si por alguna razón son nulos, mostramos error y no intentamos crear el usuario
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.errorOccurred("No hay credenciales pendientes de registro."))),
+          );
+          return; 
+        }
+
+        // Crear usuario en Firebase Authentication
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailProvider,
+          password: pwdProvider,
+        );
+
+        final createdFirebaseUser = userCredential.user;
+        if (createdFirebaseUser == null) throw Exception("Error creando usuario en Firebase");
+
+        debugPrint("Usuario Firebase creado: ${createdFirebaseUser.email}");
+        debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
+        newUser = UserEntity(
+          email: createdFirebaseUser.email!,
+          apodo: _apodoController.text.trim(),
+          nombreCompleto: _nombreCompletoController.text.trim(),
+          fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+          fechaRegistro: DateTime.now(), // Fecha actual de registro
+          numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
+          idiomaPreferido: _selectedIdioma ?? 'Español',
+          descripcion: _descripcionController.text.trim(),
+          modoPreferido: _selectedModo ?? 'Coche',
+        );
       }
-      // 3. Ahora que estamos seguros que no son nulos, hacemos la llamada a Firebase
-      // Dart ya sabe que no son nulos, pero si se queja, puedes usar el '!'
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailProvider, // O emailProvider!
-        password: pwdProvider, // O pwdProvider!
-      );
 
-      final firebaseUser = userCredential.user;
-      if (firebaseUser == null) throw Exception("Error creando usuario en Firebase");
-
-      // 2. Preparar la entidad para el Backend
-      // Nota: Usamos el email de firebaseUser para asegurar consistencia
-      debugPrint("Usuario Firebase creado: ${firebaseUser.email}");
-      debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
-      final newUser = UserEntity(
-        email: firebaseUser.email!,
-        apodo: _apodoController.text.trim(),
-        nombreCompleto: _nombreCompletoController.text.trim(),
-        fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-        fechaRegistro: DateTime.now(), // Fecha actual de registro
-        numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-        idiomaPreferido: _selectedIdioma ?? 'Español',
-        descripcion: _descripcionController.text.trim(),
-        modoPreferido: _selectedModo ?? 'Coche',
-      );
-
-      // 3. Llamar al Bloc para guardar en Backend
-      // Usamos UpdateUserProfile que en tu lógica hace el upsert/create
+      // Llamar al Bloc para guardar en Backend
       if (mounted) {
         context.read<UserBloc>().add(CreateUserProfile(newUser));
       }
@@ -244,20 +262,20 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
               });
               
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const MapPage()),
+                MaterialPageRoute(builder: (_) => const MainScreen()),
                 (route) => false,
               );
             }
           },
           builder: (context, state) {
             if (_isCreatingFirebaseUser || state is UserLoading) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: 16),
-                    Text("Creando tu cuenta..."),
+                    Text(l10n.creatingYourAccount),
                   ],
                 ),
               );
