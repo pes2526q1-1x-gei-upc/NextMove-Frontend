@@ -16,10 +16,10 @@ class AuthException extends AppException {
 
 // Excepción de conexión (e.g., timeout, no internet)
 class ConnectionException extends AppException {
-  const ConnectionException({String? message = 'Sin conexión disponible'}) : super(message: message);
+  const ConnectionException({super.message = 'Sin conexión disponible'});
 }
 
 // Excepción desconocida o genérica
 class UnknownException extends AppException {
-  const UnknownException({String? message = 'Excepción desconocida'}) : super(message: message);
+  const UnknownException({super.message = 'Excepción desconocida'});
 }

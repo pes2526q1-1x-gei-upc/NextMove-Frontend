@@ -8,9 +8,9 @@ class ToggleMapModeWidget extends StatelessWidget {
   final StationType currentMode; // Viene del estado del BLoC
   
   const ToggleMapModeWidget({
-    Key? key,
+    super.key,
     required this.currentMode,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

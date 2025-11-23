@@ -12,9 +12,9 @@ class MapTypeToggleWidget extends StatelessWidget {
   final MapType currentMapType;
 
   const MapTypeToggleWidget({
-    Key? key,
+    super.key,
     required this.currentMapType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

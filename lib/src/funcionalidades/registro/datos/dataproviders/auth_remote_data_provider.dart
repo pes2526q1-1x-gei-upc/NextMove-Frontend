@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
@@ -88,12 +88,17 @@ class AuthRemoteDataProvider {
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
+      final GoogleSignInAccount googleUser;
       // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
-          .authenticate();
-
-      if (googleUser == null) {
-        return Future.error('Sign in aborted by user');
+      try {
+        googleUser = await GoogleSignIn.instance.authenticate();
+      } on GoogleSignInException catch (e) {
+        if (e.code != GoogleSignInExceptionCode.canceled) {
+          throw AuthException(message: e.toString());
+        }
+        return {
+          'cancelled': true,
+        };
       }
 
       // Obtain the auth details from the request
@@ -112,15 +117,20 @@ class AuthRemoteDataProvider {
 
       final firebaseUserId = userCredential.user!.uid;
       final firebaseToken = await userCredential.user?.getIdToken();
-      debugPrint("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
-      debugPrint("📧 Email: ${userCredential.user?.email}");
-      debugPrint("👤 Display Name: ${userCredential.user?.displayName}");
+
+      if (kDebugMode) {
+        print("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
+        print("📧 Email: ${userCredential.user?.email}");
+        print("👤 Display Name: ${userCredential.user?.displayName}");
+      }
 
       final email = userCredential.user!.email;
       //final name = userCredential.user!.displayName;
 
       final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? true;
-      debugPrint("¿Es usuario nuevo? $isNewUser");
+      if (kDebugMode) {
+        print("¿Es usuario nuevo? $isNewUser");
+      }
 
       final authService = AuthService(client);
 
@@ -136,7 +146,9 @@ class AuthRemoteDataProvider {
       final meData = await authService.getCurrentUser();
 
       final needsToRegister = meData == null;
-      debugPrint("needsToRegister: $needsToRegister");
+      if (kDebugMode) {
+        print("needsToRegister: $needsToRegister");
+      }
 
       return {
         'needsToRegister': needsToRegister,
@@ -145,7 +157,6 @@ class AuthRemoteDataProvider {
         'firebaseToken': firebaseToken,
         'email': email,
       };
-      
     } on FirebaseAuthException catch (e) {
       throw ServerException(e.code);
     }
