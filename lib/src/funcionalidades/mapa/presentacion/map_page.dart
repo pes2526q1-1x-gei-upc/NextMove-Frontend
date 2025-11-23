@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,11 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/stati
 
 //imports widgets
 import 'widgets/google_map_widget.dart';
-import 'widgets/toggleMapMode_widget.dart';
+import 'widgets/toggle_map_mode_widget.dart';
 import 'widgets/station_list_widget.dart';
 import 'widgets/center_user_widget.dart';
 import 'widgets/search_bar_widget.dart';
-import 'widgets/toggleMapType_widget.dart';
+import 'widgets/toggle_map_type_widget.dart';
 
 
 class MapPage extends StatefulWidget {
@@ -127,7 +128,9 @@ class _MapPageState extends State<MapPage> {
                   hintText: AppLocalizations.of(context)!.searchStation,
                   onChanged: (query) {
                     // TODO: Implementar búsqueda
-                    debugPrint('Searching: $query');
+                    if (kDebugMode) {
+                      print('Searching: $query');
+                    }
                   },
                 ),
 

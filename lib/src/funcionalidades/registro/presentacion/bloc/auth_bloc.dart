@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 
@@ -94,8 +94,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(prevState);
       },
       (data) {
+        if (data['cancelled'] == true) {
+          if (kDebugMode) {
+            print('Inici de sessió amb Google cancel·lat per l\'usuari.');
+          }
+          emit(prevState);
+          return;
+        }
         final needsToRegister = data['needsToRegister'] as bool;
-        debugPrint("needsToRegister: $needsToRegister");
+        if (kDebugMode) {
+          print("needsToRegister: $needsToRegister");
+        }
         if (needsToRegister) {
           emit(UserNeedsProfileSetupState());
         } else {
