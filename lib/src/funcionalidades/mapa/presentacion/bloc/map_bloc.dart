@@ -33,6 +33,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
     on<UpdateClustersEvent>(_onUpdateClusters);
+    on<UpdateClusteredMarkersEvent>(_onUpdateClusteredMarkers);
   }
 
   Future<void> _onUpdateClusters(
@@ -88,8 +89,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
 
-      final bikeClusterManager = await _initializeBikeClusterManager(bikeStations, emit);
-      final evClusterManager = await _initializeEVClusterManager(evStations, emit);
+      final bikeClusterManager = await _initializeBikeClusterManager(bikeStations);
+      final evClusterManager = await _initializeEVClusterManager(evStations);
 
       // Emitir estado cargado
       emit(MapLoadedState(
@@ -116,11 +117,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   Future<ClusterManager<BicycleStationDetails>> _initializeBikeClusterManager(
     List<BicycleStationDetails> bikeStations,
-    Emitter<MapState> emit,
   ) async {
     final bikeClusterManager = ClusterManager<BicycleStationDetails>(
       bikeStations,
-      (markers) => _updateMarkers(markers, emit),
+      _updateMarkers,
       markerBuilder: (cluster) => _bikeMarkerBuilder(cluster),
       levels: [1, 4.25, 6.75, 8.25, 11.5, 14.5, 16.0, 16.5, 20.0], 
       extraPercent: 0.2,           
@@ -132,12 +132,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   Future<ClusterManager<EVStationDetails>> _initializeEVClusterManager(
     List<EVStationDetails> evStations,
-    Emitter<MapState> emit,
   ) async {
 
     final evClusterManager = ClusterManager<EVStationDetails>(
       evStations,
-      (markers) => _updateMarkers(markers, emit),
+      _updateMarkers,
       markerBuilder: (cluster) => _evMarkerBuilder(cluster),
       levels: [1, 4.25, 6.75, 8.25, 11.5, 14.5, 16.0, 16.5, 20.0], 
       extraPercent: 0.2,           
@@ -217,10 +216,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   return BitmapDescriptor.bytes(data!.buffer.asUint8List());
 }
 
-  void _updateMarkers(Set<Marker> markers, Emitter<MapState> emit) {
-    if (state is MapLoadedState) {
-      final currentState = state as MapLoadedState;
-      emit(currentState.copyWith(clusteredMarkers: markers));
+  void _updateMarkers(Set<Marker> markers) {
+    if (!isClosed) {
+      add(UpdateClusteredMarkersEvent(markers));
     }
 }
   
@@ -353,6 +351,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     return {};
     
+  }
+
+  void _onUpdateClusteredMarkers(
+  UpdateClusteredMarkersEvent event,
+  Emitter<MapState> emit,
+  ) {
+    if (state is MapLoadedState) {
+      final currentState = state as MapLoadedState;
+      emit(currentState.copyWith(clusteredMarkers: event.markers));
+    }
   }
 
   @override
