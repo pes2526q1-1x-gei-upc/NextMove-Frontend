@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
@@ -269,9 +271,12 @@ class _MainScreenState extends State<MainScreen> {
       const ChatsPlaceholder(), 
       
       // 3. Social
-      const SocialPlaceholder(), 
+      BlocProvider(
+        create: (context) => SocialBloc(),
+        child: const SocialPage(),
+      ), 
       
-      // 4. Perfil - AHORA SÍ, usamos la nueva ProfileScreen
+      // 4. Perfil
       const ProfilePage(),
     ];
   }

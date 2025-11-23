@@ -196,4 +196,42 @@ class GraphQLQueries {
       isSuperFast
     }
   }''';
+
+  static const String getFriends = r'''
+  query getFriends ($nickname: String!) {
+    ListFriends(nickname: $nickname){
+      name
+    }
+  }''';
+
+  static const String newFriendship = r'''
+  query newFriendship ($nickname1: String!, $nickname2: String!) {
+    AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      name
+    }
+  }''';
+
+  static const String deleteFriendship = r'''
+  query deleteFriendship ($nickname1: String!, $nickname2: String!) {
+    RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      name
+    }
+  }''';
+
+  static const String getUsersByNickname = r'''
+  query getUsersByNickname ($nickname: String!){
+    UsersByNickname(nickname: $nickname){
+        email,
+        name AS "name",
+        nickname,
+        photo,
+        birth_date AS "birthDate",
+        phone_number AS "phoneNumber",
+        preferred_mode AS "preferredMode",
+        preferred_language AS "preferredLanguage",
+        bio_description AS "bioDescription",
+        TO_CHAR(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "createdAt"
+    } 
+  }''';
+
 }
