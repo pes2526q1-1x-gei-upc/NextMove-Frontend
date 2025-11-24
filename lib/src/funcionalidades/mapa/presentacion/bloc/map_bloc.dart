@@ -19,6 +19,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
+
+  Set<Marker> carMarkers = {};
+  Set<Marker> bikeMarkers = {};
+  Set<Marker> carMarkersToShow = {};
+  Set<Marker> bikeMarkersToShow = {};
+
   
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
@@ -84,11 +90,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       await _loadEvCustomIcons();
   
       // Construir marcadores iniciales para bicicletas
-      final bikeMarkers = _buildMarkersWithClusterForBike(
+      bikeMarkers = _buildMarkersWithClusterForBike(
         bikeStations,
         bikeClusterManagerId,
         bikeIcon,
       );
+      bikeMarkersToShow = bikeMarkers;
 
       /*final carMarkers = _buildMarkersWithClusterForEv(
         evStations,
@@ -105,8 +112,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         userLocation: null,
         currentMode: StationType.bicycle,
         currentMapType: MapType.normal,
-        bikeMarkers: bikeMarkers,
-        carMarkers: {},
+        bikeMarkers: bikeMarkersToShow,
+        carMarkers: carMarkersToShow,
         centerPosition: _bcnCenter,
         searchQuery: null,
         bikeClusterManager: bikeClusterManager,
@@ -231,26 +238,28 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     final currentState = state;
     if (currentState is MapLoadedState) {
-      Set<Marker> bikeMarkers = const {};
-      Set<Marker> carMarkers = const {};
+      
 
     // ✅ Crear SOLO los marcadores del modo seleccionado
     if (event.newMode == StationType.bicycle) {
-      bikeMarkers = currentState.bikeMarkers;  // Usar los cacheados
-      carMarkers = const {};  // VACÍO
+      bikeMarkersToShow = currentState.bikeMarkers;  // Usar los cacheados
+      carMarkersToShow = const {};  // VACÍO
     } else {
-      bikeMarkers = const {};  // VACÍO
-      carMarkers = _buildMarkersWithClusterForEv(
-        currentState.evStations as List<EVStationDetails>,
-        currentState.evClusterManager!.clusterManagerId, 
-      );
+      bikeMarkersToShow = const {};  // VACÍO
+      if(carMarkers.isEmpty){ 
+          carMarkers = _buildMarkersWithClusterForEv(
+          currentState.evStations as List<EVStationDetails>,
+          currentState.evClusterManager!.clusterManagerId, 
+        );
+      }
+      carMarkersToShow = carMarkers;  // Usar los cacheados
     }
 
 
     emit(currentState.copyWith(
       currentMode: event.newMode,
-      bikeMarkers: bikeMarkers,
-      carMarkers: carMarkers,
+      bikeMarkers: bikeMarkersToShow,
+      carMarkers: carMarkersToShow,
     ));
     } 
   }
