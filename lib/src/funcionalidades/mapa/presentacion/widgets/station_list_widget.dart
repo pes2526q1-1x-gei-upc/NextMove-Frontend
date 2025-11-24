@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,17 +15,29 @@ class StationListButtonWidget extends StatelessWidget {
     this.userLocation,
   });
 
-  void _navigateToStationList(BuildContext context) {
+  void _navigateToStationList(BuildContext context) async {
+    LatLng location = userLocation ?? await _getCurrentPosition();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => StationList(
           stationType: currentMode,
-          latitude: userLocation?.latitude ?? 0,
-          longitude: userLocation?.longitude ?? 0,
+          latitude: location.latitude,
+          longitude: location.longitude,
         ),
       ),
     );
+  }
+
+  Future<LatLng> _getCurrentPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      return LatLng(position.latitude, position.longitude);
+    } catch (e) {
+      return const LatLng(0.0, 0.0);
+    }
   }
 
   @override

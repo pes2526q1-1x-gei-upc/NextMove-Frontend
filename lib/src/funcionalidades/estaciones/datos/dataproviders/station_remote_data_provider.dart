@@ -44,7 +44,9 @@ class StationRemoteDataProvider {
     }
 
     if (kDebugMode) {
-      print('getAllNearbyBicycleStationDetails result.data: ${result.data}');
+      print(
+        'getAllNearbyBicycleStationDetails result.data (from location $latitude, $longitude): ${result.data}',
+      );
     }
     final data = result.data?['getEstacionesDeBicingCercanas'];
     if (data != null) {
