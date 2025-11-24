@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/footer_widget.dart';
-import 'package:provider/provider.dart'; 
 
 // === IMPORTS DE WIDGETS PERSONALIZADOS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
@@ -104,7 +103,7 @@ class ProfilePage extends StatelessWidget {
                           onTap: () {
                             if (currentUser != null) {
                               // Usamos el widget refactorizado para mostrar el selector
-                              ProfileLanguageSelector.show(context, currentUser!);
+                              ProfileLanguageSelector.show(context, currentUser);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(l10n.errorLoadingProfile)),

@@ -1,12 +1,14 @@
 import 'dart:async'; // 1. IMPORTANTE: Necesario para usar la clase Timer
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_user_card_widget.dart';
+import 'package:provider/provider.dart';
 
 class SocialPage extends StatefulWidget {
   const SocialPage({super.key});
@@ -177,7 +179,9 @@ class _SocialPageState extends State<SocialPage> {
                                 user: user,
                                 isFriend: !showAddButton, 
                                 onAddPressed: showAddButton ? () {
-                                  context.read<SocialBloc>().add(AddFriendEvent(user.apodo));
+                                  final userProvider = Provider.of<UserProvider>(context, listen: false).user;
+                                  final currentNickname = userProvider?['nickname'];
+                                  context.read<SocialBloc>().add(AddFriendEvent(currentNickname, user.apodo));
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text("¡${user.apodo} añadido a amigos!"),

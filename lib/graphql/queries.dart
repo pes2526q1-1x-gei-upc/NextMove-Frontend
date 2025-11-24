@@ -205,14 +205,14 @@ class GraphQLQueries {
   }''';
 
   static const String newFriendship = r'''
-  query newFriendship ($nickname1: String!, $nickname2: String!) {
+  mutation newFriendship ($nickname1: String!, $nickname2: String!) {
     AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
-      name
+      
     }
   }''';
 
   static const String deleteFriendship = r'''
-  query deleteFriendship ($nickname1: String!, $nickname2: String!) {
+  mutation deleteFriendship ($nickname1: String!, $nickname2: String!) {
     RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
       name
     }

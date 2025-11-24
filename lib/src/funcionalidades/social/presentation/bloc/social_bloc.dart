@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // Para debugPrint
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/data/repositories/social_repository.dart';
 import 'social_event.dart';
@@ -6,8 +6,7 @@ import 'social_state.dart';
 
 class SocialBloc extends Bloc<SocialEvent, SocialState> {
   final SocialRepository socialRepository = SocialRepository();
-  
-  // Guardamos el nickname actual para usarlo en operaciones de añadir/borrar
+
   String? _currentNickname;
 
   SocialBloc() : super(const SocialState()) {
@@ -23,7 +22,6 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
     
     emit(state.copyWith(status: SocialStatus.loading));
     
-    // LLAMADA REAL AL REPOSITORIO
     final result = await socialRepository.getFriends(_currentNickname!);
     
     result.fold(
@@ -45,7 +43,6 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
   }
 
   Future<void> _onSearchUsers(SearchUsersEvent event, Emitter<SocialState> emit) async {
-    // Si el campo está vacío, limpiamos
     if (event.query.isEmpty) {
       add(ClearSearchEvent());
       return;
@@ -53,8 +50,7 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
 
     debugPrint("[SocialBloc] Buscando: '${event.query}'");
     emit(state.copyWith(status: SocialStatus.loading, isSearching: true));
-    
-    // LLAMADA REAL AL REPOSITORIO (Busca por email ahora)
+
     final result = await socialRepository.searchUsers(event.query);
 
     result.fold(
@@ -68,8 +64,7 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
       (users) {
         debugPrint("[SocialBloc] Resultados encontrados: ${users.length}");
         
-        // Filtramos para no mostrarnos a nosotros mismos si buscamos nuestro propio email
-        // (Asumiendo que _currentNickname tiene el apodo, comparamos apodos si están disponibles)
+        // Filtramos para no mostrarnos a nosotros mismos 
         final filteredUsers = users.where((u) => u.apodo != _currentNickname).toList();
         
         emit(state.copyWith(
@@ -87,6 +82,7 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
   }
 
   Future<void> _onAddFriend(AddFriendEvent event, Emitter<SocialState> emit) async {
+    _currentNickname = event.currentUserId;
     if (_currentNickname == null) {
       debugPrint("[SocialBloc] No se puede añadir amigo: _currentNickname es null");
       return;

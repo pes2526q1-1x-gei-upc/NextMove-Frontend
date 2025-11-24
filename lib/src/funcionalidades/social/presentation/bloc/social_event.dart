@@ -24,6 +24,7 @@ class ClearSearchEvent extends SocialEvent {}
 
 // Acción de añadir amigo
 class AddFriendEvent extends SocialEvent {
+  final String currentUserId;
   final String friendId;
-  const AddFriendEvent(this.friendId);
+  const AddFriendEvent(this.currentUserId, this.friendId);
 }

@@ -88,10 +88,11 @@ class SocialRemoteDataProvider {
         'nickname2': friendNickname,
       },
     );
-
+    debugPrint("Vamos a crear la amistad entre $myNickname y $friendNickname");
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
+      debugPrint('Error al añadir amigo: ${result.exception.toString()}');
       throw ServerException('Error al añadir amigo: ${result.exception.toString()}');
     }
   }
