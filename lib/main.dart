@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart'; 
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
@@ -20,14 +21,14 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 // === IMPORTS DE PANTALLAS Y BLOCS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart'; 
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart'; 
 // ==============================
 
-final GlobalKey<_NextMoveAppState> appKey = GlobalKey<_NextMoveAppState>();
+final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
-final LocaleProvider localeProvider = LocaleProvider(); 
+final LocaleProvider localeProvider = LocaleProvider();
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -41,10 +42,10 @@ class NextMoveApp extends StatefulWidget {
   const NextMoveApp({super.key});
 
   @override
-  State<NextMoveApp> createState() => _NextMoveAppState();
+  State<NextMoveApp> createState() => NextMoveAppState();
 }
 
-class _NextMoveAppState extends State<NextMoveApp> {
+class NextMoveAppState extends State<NextMoveApp> {
   bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
 
   @override
@@ -86,7 +87,8 @@ class _NextMoveAppState extends State<NextMoveApp> {
           debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: localeProvider.locale, 
+          // Usamos el localeProvider para gestionar el idioma dinámico
+          locale: localeProvider.locale,
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale?.languageCode) {
@@ -99,7 +101,8 @@ class _NextMoveAppState extends State<NextMoveApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
             useMaterial3: true,
           ),
-          
+
+          // ruta de Login para el Logout
           routes: {
             '/login': (context) => BlocProvider(
               create: (context) => AuthBloc(),
@@ -107,7 +110,11 @@ class _NextMoveAppState extends State<NextMoveApp> {
             ),
           },
 
-          home: AuthStateHandler(client: GraphQLConfig.client, isLoggedIn: isLoggedIn),
+          // Widget que maneja la autenticación y decide qué pantalla mostrar
+          home: AuthStateHandler(
+            client: GraphQLConfig.client,
+            isLoggedIn: isLoggedIn,
+          ),
         ),
       ),
     );
@@ -188,9 +195,19 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
+
+        if (kDebugMode) {
+          print("Datos guardados correctamente en Provider");
+        }
+      } else {
+        if (kDebugMode) {
+          print("No se obtuvieron datos del usuario desde GraphQL");
+        }
       }
     } catch (e) {
-      debugPrint("Error cargando datos del usuario: $e");
+      if (kDebugMode) {
+        print("Error cargando datos del usuario: $e");
+      }
     }
   }
 
@@ -291,7 +308,7 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.map_outlined),
               activeIcon: Icon(Icons.map),
-              label: 'Mapa', 
+              label: 'Mapa',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble_outline),
@@ -319,6 +336,9 @@ class ChatsPlaceholder extends StatelessWidget {
   const ChatsPlaceholder({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Chats")), body: const Center(child: Text("Pantalla de Chats")));
+    return Scaffold(
+      appBar: AppBar(title: const Text("Chats")),
+      body: const Center(child: Text("Pantalla de Chats")),
+    );
   }
 }

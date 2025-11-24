@@ -43,8 +43,8 @@ class StationList extends StatelessWidget {
                 itemBuilder: (context, i) {
                   final stationDetails = allStationDetails[i];
                   return ListTile(
-                    title: Text(stationDetails.address),
-                    trailing: Text('${stationDetails.distanceKm!.toStringAsFixed(2)} km'),
+                    title: Text(stationDetails.address ?? "N/A"),
+                    trailing: Text(stationDetails.distanceKm != null ? '${stationDetails.distanceKm!.toStringAsFixed(2)} km' : "N/A km"),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(

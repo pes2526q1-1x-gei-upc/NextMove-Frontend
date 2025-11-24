@@ -26,17 +26,16 @@ class StationBottomSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            station.name,
+            station.name ?? "N/A",
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          Text(station.address, style: const TextStyle(fontSize: 16)),
+          Text(station.address ?? "N/A", style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 16),
-          if (station.distanceKm != null)
-            Text(
-              'Distance: ${station.distanceKm!.toStringAsFixed(2)} km',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
+          Text(
+            station.distanceKm != null ? '${station.distanceKm!.toStringAsFixed(2)} km' : 'N/A km',
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+          ),
           const SizedBox(height: 8),
           if (station is BicycleStationDetails)
             _buildBicycleInfo(station as BicycleStationDetails, l10n)
@@ -85,15 +84,15 @@ class StationBottomSheet extends StatelessWidget {
           children: [
             Icon(Icons.pedal_bike),
             const SizedBox(width: 4),
-            Text('${bikeStation.availableBikes}'),
+            Text('${bikeStation.availableBikes ?? "N/A"}'),
             const SizedBox(width: 12),
             Text('( '),
             Icon(Icons.electric_bike),
             const SizedBox(width: 4),
-            Text('${bikeStation.availableElectricBikes} / '),
+            Text('${bikeStation.availableElectricBikes ?? "N/A"} / '),
             Icon(Icons.directions_bike),
             const SizedBox(width: 4),
-            Text('${bikeStation.availableMechanicalBikes})'),
+            Text('${bikeStation.availableMechanicalBikes ?? "N/A"})'),
           ],
         ),
         const SizedBox(height: 8),
@@ -102,7 +101,7 @@ class StationBottomSheet extends StatelessWidget {
           children: [
             Icon(Icons.event_seat),
             const SizedBox(width: 4),
-            Text('${bikeStation.availableSlots}'),
+            Text('${bikeStation.availableSlots ?? "N/A"}'),
           ],
         ),
       ],
@@ -119,7 +118,7 @@ class StationBottomSheet extends StatelessWidget {
           children: [
             Icon(Icons.event_seat),
             const SizedBox(width: 4),
-            Text('${evStation.availableSlots} / ${evStation.totalSlots}'),
+            Text('${evStation.availableSlots ?? "N/A"} / ${evStation.totalSlots ?? "N/A"}'),
           ],
         ),
         const SizedBox(height: 8),
@@ -127,10 +126,13 @@ class StationBottomSheet extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.bolt),
-            Icon(
-              evStation.isSuperFast ? Icons.check : Icons.close,
-              color: evStation.isSuperFast ? Colors.green : Colors.red,
-            ),
+            if (evStation.isSuperFast != null)
+              Icon(
+                evStation.isSuperFast! ? Icons.check : Icons.close,
+                color: evStation.isSuperFast! ? Colors.green : Colors.red,
+              )
+            else
+              Text("N/A"),
           ],
         ),
       ],
@@ -150,12 +152,20 @@ class StarRatingRowBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (station.rating == null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("N/A"),
+        ],
+      );
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        createStarRatingRow(station.rating),
+        createStarRatingRow(station.rating!),
         Text(
-          '(${station.rating % 2 == 0 ? (station.rating ~/ 2) : (station.rating / 2)}/5)',
+          '(${station.rating! % 2 == 0 ? (station.rating! ~/ 2) : (station.rating! / 2)}/5)',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ],

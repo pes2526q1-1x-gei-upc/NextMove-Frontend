@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
@@ -34,7 +34,9 @@ class UserRepository {
     } on custom_exceptions.AuthException catch (e) {
       return Left(AuthFailure(message: e.toString()));
     } catch (e) {
-      debugPrint('❌ Error desconocido al actualizar perfil: $e');
+      if (kDebugMode) {
+        print('❌ Error desconocido al actualizar perfil: $e');
+      }
       return Left(ServerFailure());
     }
   }

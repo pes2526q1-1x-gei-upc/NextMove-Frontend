@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
@@ -208,7 +209,9 @@ class ContinueButton extends StatelessWidget {
                 ),
               );
             } catch (e) {
-              print(e);
+              if (kDebugMode) {
+                print(e);
+              }
             }
           } else {
             final password = _passwordController.text;

@@ -1,9 +1,21 @@
+import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/datos/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+
+Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
+  // OJO porque ahora coge el valor del notifier retornado, no el notifier!
+  GraphQLClient client = GraphQLConfig.initializeClient().value;
+  final QueryResult result = await client.query(options);
+
+  if (result.hasException) {
+    throw Exception('Error en query: ${result.exception.toString()}');
+  }
+
+  return result;
+}
 
 class StationRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
@@ -31,6 +43,11 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print(
+        'getAllNearbyBicycleStationDetails result.data (from location $latitude, $longitude): ${result.data}',
+      );
+    }
     final data = result.data?['getEstacionesDeBicingCercanas'];
     if (data != null) {
       return (data as List)
@@ -64,6 +81,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllNearbyEVStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['nearbyStations'];
     if (data != null) {
       return (data as List)
@@ -85,10 +105,15 @@ class StationRemoteDataProvider {
     );
 
     if (result.hasException) {
-      print('GraphQL Exception: ${result.exception.toString()}');
+      if (kDebugMode) {
+        print('GraphQL Exception: ${result.exception.toString()}');
+      }
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllBicycleStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['getEstacionesDeBicing'];
 
     if (data != null) {
@@ -114,6 +139,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
+    if (kDebugMode) {
+      print('getAllEVStationDetails result.data: ${result.data}');
+    }
     final data = result.data?['stations']['stations'];
     if (data != null) {
       return (data as List).map((item) {
@@ -139,9 +167,11 @@ class StationRemoteDataProvider {
     );
 
     if (result.hasException) {
-      print(
-        'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
-      );
+      if (kDebugMode) {
+        print(
+          'GraphQL Exception for stationID $stationID: ${result.exception.toString()}',
+        );
+      }
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
