@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 
 class SocialUserCard extends StatelessWidget {
@@ -15,6 +16,7 @@ class SocialUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -79,12 +81,12 @@ class SocialUserCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.check_rounded, size: 16, color: Colors.green),
-                  SizedBox(width: 4),
+                children: [
+                  const Icon(Icons.check_rounded, size: 16, color: Colors.green),
+                  const SizedBox(width: 4),
                   Text(
-                    "Amigos",
-                    style: TextStyle(
+                    l10n.friends,
+                    style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,

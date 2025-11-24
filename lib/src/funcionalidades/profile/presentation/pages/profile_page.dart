@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/footer_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/language_selector_widget.dart';
 
 // === IMPORTS DE WIDGETS PERSONALIZADOS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart'; 
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/language_selector_widget.dart';
 
 // === OTROS IMPORTS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
@@ -31,14 +31,14 @@ class ProfilePage extends StatelessWidget {
             String displayName = l10n.loading;
             String subText = l10n.waitAMoment;
             UserEntity? currentUser; 
-
+            
             if (state is UserLoaded) {
               currentUser = state.user;
-              displayName = "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
+              displayName = "${l10n.hi} ${state.user.nombreCompleto.split(' ').first}!";
               subText = "@${state.user.apodo}";
             } else if (state is UserUpdated) {
               currentUser = state.user;
-              displayName = "${l10n.hi}${state.user.nombreCompleto.split(' ').first}!";
+              displayName = "${l10n.hi} ${state.user.nombreCompleto.split(' ').first}!";
               subText = "@${state.user.apodo}";
             } else if (state is UserError) {
               displayName = l10n.ops;
@@ -102,7 +102,6 @@ class ProfilePage extends StatelessWidget {
                           text: l10n.appLanguage,
                           onTap: () {
                             if (currentUser != null) {
-                              // Usamos el widget refactorizado para mostrar el selector
                               ProfileLanguageSelector.show(context, currentUser);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -126,15 +125,17 @@ class ProfilePage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     // --- BOTÓN LOGOUT ---
                     const ProfileLogoutButton(),
                     
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     // --- FOOTER ---
                     const AppFooter(),
+                    
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

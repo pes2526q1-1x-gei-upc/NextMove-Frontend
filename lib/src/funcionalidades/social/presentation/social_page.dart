@@ -1,6 +1,7 @@
 import 'dart:async'; // 1. IMPORTANTE: Necesario para usar la clase Timer
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
@@ -26,9 +27,14 @@ class _SocialPageState extends State<SocialPage> {
   void initState() {
     super.initState();
     final userState = context.read<UserBloc>().state;
+    
+    
+    debugPrint("Iniciamos pantalla de social");
     if (userState is UserLoaded || userState is UserUpdated) {
       final nickname = (userState as dynamic).user.apodo;
       context.read<SocialBloc>().add(LoadFriendsEvent(nickname));
+    }else {
+      debugPrint("[SocialPage] El usuario aún no está listo. Esperando BlocListener...");
     }
   }
 
@@ -53,6 +59,7 @@ class _SocialPageState extends State<SocialPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
@@ -87,7 +94,7 @@ class _SocialPageState extends State<SocialPage> {
                   controller: _searchController,
                   onChanged: _onSearchChanged, 
                   decoration: InputDecoration(
-                    hintText: "Buscar por nickname...",
+                    hintText: l10n.searchByNickname,
                     hintStyle: TextStyle(color: Colors.grey[400]),
                     prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                     border: InputBorder.none,
@@ -126,8 +133,8 @@ class _SocialPageState extends State<SocialPage> {
 
                     final usersToShow = state.isSearching ? state.searchResults : state.friends;
                     final String emptyMessage = state.isSearching 
-                        ? "No se encontró usuario con ese email."
-                        : "Aún no tienes amigos añadidos.";
+                        ? l10n.noUsersFound
+                        : l10n.noFriendsAdded;
 
                     if (usersToShow.isEmpty) {
                       return Center(
@@ -156,7 +163,7 @@ class _SocialPageState extends State<SocialPage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12.0, left: 4),
                           child: Text(
-                            state.isSearching ? "RESULTADOS" : "TUS AMIGOS",
+                            state.isSearching ? l10n.results : l10n.yourFriends,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -184,7 +191,7 @@ class _SocialPageState extends State<SocialPage> {
                                   context.read<SocialBloc>().add(AddFriendEvent(currentNickname, user.apodo));
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text("¡${user.apodo} añadido a amigos!"),
+                                      content: Text(l10n.friendAdded(user.apodo)),
                                       backgroundColor: Colors.green,
                                       duration: const Duration(seconds: 2),
                                     )

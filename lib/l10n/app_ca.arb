@@ -130,5 +130,12 @@
     "appearance": "Aparença",
     "lightMode": "Mode clar",
     "darkMode": "Mode fosc",
-    "preliminarVersion": "Versió preliminar"
+    "preliminarVersion": "Versió preliminar",
+    "searchByNickname": "Cerca per sobrenom",
+    "noUsersFound": "No s'ha trobat cap usuari amb aquest sobrenom.",
+    "noFriendsAdded": "Encara no tens amics afegits.",
+    "results": "RESULTATS",
+    "yourFriends": "ELS TEUS AMICS",
+    "friendAdded": "{nickname} s'ha afegit als teus amics.",
+    "friends": "Amics"
 }
