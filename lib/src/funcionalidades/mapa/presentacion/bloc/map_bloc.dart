@@ -141,13 +141,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   Set<Marker> _buildMarkersWithClusterForEv(
   List<EVStationDetails> stations,
   ClusterManagerId clusterManagerId,
-  BitmapDescriptor icon,
   ) {
     return stations
         .where((station) => station.latitude != null && station.longitude != null)
         .map((station) {
-          //final power = _getMaxPowerKw(station.connectors);
-          //final icon = getCarIconByPower(power);  // ← CACHEAR AQUÍ
+          final power = _getMaxPowerKw(station.connectors);
+          final icon = getCarIconByPower(power);  // ← CACHEAR AQUÍ
 
           return Marker(
             markerId: MarkerId(station.id),
@@ -244,7 +243,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       carMarkers = _buildMarkersWithClusterForEv(
         currentState.evStations as List<EVStationDetails>,
         currentState.evClusterManager!.clusterManagerId, 
-        evLowIcon!,
       );
     }
 
