@@ -9,12 +9,12 @@ class MapWidget extends StatefulWidget {
 
 
   const MapWidget({
-    Key? key,
+    super.key,
     required this.initialCameraPosition,
     required this.markers,
     required this.mapType,
     this.onMapCreated,
-  }) : super(key: key);
+  });
 
   @override
   State<MapWidget> createState() => _MapWidgetState();

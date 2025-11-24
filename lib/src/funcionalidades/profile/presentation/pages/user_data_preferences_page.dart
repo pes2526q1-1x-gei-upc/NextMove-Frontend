@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -23,12 +24,14 @@ class UserDataPreferencesPage extends StatefulWidget {
   const UserDataPreferencesPage({super.key});
 
   @override
-  State<UserDataPreferencesPage> createState() => _UserDataPreferencesPageState();
+  State<UserDataPreferencesPage> createState() =>
+      _UserDataPreferencesPageState();
 }
 
 class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
   
+  // Variable local para controlar la carga de Firebase antes de llamar al Bloc
   bool _isCreatingFirebaseUser = false;
 
   late final TextEditingController _apodoController;
@@ -38,10 +41,13 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   late final TextEditingController _nombreCompletoController;
 
   File? _selectedImageFile;
-  final AssetImage _avatarImage = const AssetImage('assets/Profile_avatar_placeholder_large.png');
+  final AssetImage _avatarImage = const AssetImage(
+    'assets/Profile_avatar_placeholder_large.png',
+  );
 
-  String? _selectedIdioma = 'Español'; 
-  String? _selectedModo = 'Coche';     
+  // Dropdowns
+  String? _selectedIdioma = 'Español'; // Valor por defecto para evitar nulos
+  String? _selectedModo = 'Coche';     // Valor por defecto
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
   final List<String> _modos = ['Bici', 'Coche'];
@@ -54,6 +60,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     _fechaNacimientoController = TextEditingController();
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
+    
+    // NO cargamos usuario (LoadUserProfile) porque sabemos que es nuevo.
   }
 
   @override
@@ -89,13 +97,60 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     }
   }
 
-  // === Finalizar Onboarding ===
+  // === Image Picker ===
+  void _showImageSourceActionSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(l10n.gallery),
+              onTap: () {
+                _pickImage(ImageSource.gallery);
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(l10n.camera),
+              onTap: () {
+                _pickImage(ImageSource.camera);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        imageQuality: 85,
+      );
+      if (pickedFile != null) {
+        setState(() => _selectedImageFile = File(pickedFile.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
+      );
+    }
+  }
+
+  // === Finalizar Registro: Firebase -> Backend ===
   Future<void> _finalizarOnboarding() async {
     var l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.formError)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.formError)));
       return;
     }
 
@@ -106,12 +161,14 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       UserEntity newUser;
 
       if (firebaseUser != null) {
+        // User is already authenticated (Google sign-in), skip Firebase creation
+        debugPrint("Usuario ya autenticado con Google: ${firebaseUser.email}");
         newUser = UserEntity(
           email: firebaseUser.email!,
           apodo: _apodoController.text.trim(),
           nombreCompleto: _nombreCompletoController.text.trim(),
           fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-          fechaRegistro: DateTime.now(),
+          fechaRegistro: DateTime.now(), // Fecha actual de registro
           numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
           idiomaPreferido: _selectedIdioma ?? 'Español',
           descripcion: _descripcionController.text.trim(),
@@ -125,25 +182,30 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
         if (emailProvider == null || pwdProvider == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.errorOccurred("Credenciales faltantes."))),
+            SnackBar(content: Text(l10n.errorOccurred("No hay credenciales pendientes de registro."))),
           );
-          return; 
+          return;
         }
 
+        // Crear usuario en Firebase Authentication
         final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailProvider,
           password: pwdProvider,
         );
 
         final createdFirebaseUser = userCredential.user;
-        if (createdFirebaseUser == null) throw Exception("Error creando usuario en Firebase");
+        if (createdFirebaseUser == null) {
+          throw Exception("Error creando usuario en Firebase");
+        }
 
+        debugPrint("Usuario Firebase creado: ${createdFirebaseUser.email}");
+        debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
         newUser = UserEntity(
           email: createdFirebaseUser.email!,
           apodo: _apodoController.text.trim(),
           nombreCompleto: _nombreCompletoController.text.trim(),
           fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
-          fechaRegistro: DateTime.now(),
+          fechaRegistro: DateTime.now(), // Fecha actual de registro
           numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
           idiomaPreferido: _selectedIdioma ?? 'Español',
           descripcion: _descripcionController.text.trim(),
@@ -155,21 +217,29 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       if (mounted) {
         context.read<UserBloc>().add(CreateUserProfile(newUser));
       }
-
     } on FirebaseAuthException catch (e) {
       setState(() => _isCreatingFirebaseUser = false);
       String errorMsg = 'Error de registro';
       if (e.code == 'weak-password') errorMsg = 'La contraseña es muy débil.';
-      if (e.code == 'email-already-in-use') errorMsg = 'El email ya está en uso.';
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
-      );
+      if (e.code == 'email-already-in-use') {
+        errorMsg = 'El email ya está en uso.';
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+        );
+      }
     } catch (e) {
       setState(() => _isCreatingFirebaseUser = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error desconocido: $e"), backgroundColor: Colors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error desconocido: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -209,20 +279,41 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
             if (state is UserError) {
               setState(() => _isCreatingFirebaseUser = false);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
               );
             } else if (state is UserUpdated) {
-              final userProvider = Provider.of<UserProvider>(context, listen: false);
-              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+              final userProvider = Provider.of<UserProvider>(
+                context,
+                listen: false,
+              );
+              final localeProvider = Provider.of<LocaleProvider>(
+                context,
+                listen: false,
+              );
               final firebaseUserNow = FirebaseAuth.instance.currentUser;
-              
               userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: null);
               () async {
-                final token = firebaseUserNow == null ? null : await firebaseUserNow.getIdToken();
-                userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: token);
+                final token = firebaseUserNow == null
+                    ? null
+                    : await firebaseUserNow.getIdToken();
+                userProvider.setUser(
+                  state.user.toMap(),
+                  firebaseUserId: firebaseUserNow?.uid,
+                  firebaseToken: token,
+                );
               }();
               
               localeProvider.setLocaleFromLanguage(state.user.idiomaPreferido);
+              
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final updatedL10n = AppLocalizations.of(context)!;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(updatedL10n.saveChangesFeedback)),
+                );
+              });
               
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -252,74 +343,95 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
-                    // --- 1. AVATAR ---
-                    ProfileAvatarSelector(
-                      selectedImageFile: _selectedImageFile,
-                      defaultImage: _avatarImage,
-                      onImagePicked: (File newFile) {
-                        setState(() => _selectedImageFile = newFile);
-                      },
-                    ),
-                    const SizedBox(height: 30),
-
-                    // --- 2. DATOS PERSONALES ---
-                    ProfileSectionLabel(text: l10n.nicknameNonEditable),
-                    ProfileStyledCard(
-                      children: [
-                        ProfileStyledTextField(
-                          controller: _apodoController,
-                          label: l10n.nickname,
-                          icon: Icons.alternate_email_rounded,
-                          showDivider: true,
-                          validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
-                        ),
-                        ProfileStyledTextField(
-                          controller: _nombreCompletoController,
-                          label: l10n.fullName,
-                          icon: Icons.person_outline_rounded,
-                          showDivider: true,
-                          validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
-                        ),
-                        GestureDetector(
-                          onTap: () => _selectDate(context),
-                          child: AbsorbPointer(
-                            child: ProfileStyledTextField(
-                              controller: _fechaNacimientoController,
-                              label: l10n.birthdate,
-                              icon: Icons.cake_outlined,
-                              showDivider: false,
-                              validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
+                    // Foto
+                    Center(
+                      child: GestureDetector(
+                        onTap: _showImageSourceActionSheet,
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: _selectedImageFile != null
+                                  ? FileImage(_selectedImageFile!)
+                                  : _avatarImage,
                             ),
-                          ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Theme.of(context).primaryColor,
+                                child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Apodo
+                    TextFormField(
+                      controller: _apodoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.nickname,
+                        border: const OutlineInputBorder(),
+                        hintText: l10n.nicknameHint,
+                      ),
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Nombre Completo
+                    TextFormField(
+                      controller: _nombreCompletoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.fullName,
+                        border: const OutlineInputBorder(),
+                      ),
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Fecha Nacimiento
+                    TextFormField(
+                      controller: _fechaNacimientoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.birthdate,
+                        border: const OutlineInputBorder(),
+                        hintText: l10n.bithdateHint,
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
                     ),
                     const SizedBox(height: 24),
 
-                    // --- 3. CONTACTO Y DETALLES ---
-                    const ProfileSectionLabel(text: "Contacto y Detalles"),
-                    ProfileStyledCard(
-                      children: [
-                        ProfileStyledTextField(
-                          controller: _telefonoController,
-                          label: l10n.telephoneNumber,
-                          icon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          showDivider: true,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) return null;
-                            return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
-                          },
-                        ),
-                        ProfileStyledTextField(
-                          controller: _descripcionController,
-                          label: l10n.userDescription,
-                          icon: Icons.notes_rounded,
-                          maxLines: 3,
-                          showDivider: false,
-                        ),
-                      ],
+                    // Teléfono
+                    TextFormField(
+                      controller: _telefonoController,
+                      decoration: InputDecoration(
+                        labelText: l10n.telephoneNumber,
+                        border: const OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return null;
+                        return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Descripción
+                    TextFormField(
+                      controller: _descripcionController,
+                      decoration: InputDecoration(
+                        labelText: l10n.userDescription,
+                        border: const OutlineInputBorder(),
+                        alignLabelWithHint: true,
+                      ),
+                      maxLines: 4,
                     ),
                     const SizedBox(height: 24),
 
@@ -327,31 +439,43 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     ProfileSectionLabel(text: l10n.preferredMode),
                     ProfileStyledCard(
                       children: [
-                        DropdownButtonFormField<String>(
-                          value: _selectedModo,
-                          decoration: cardInputDecoration(
-                            icon: _selectedModo == 'Bici' ? Icons.directions_bike : Icons.electric_car, 
-                            context: context
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedModo,
+                            decoration: InputDecoration(
+                              labelText: l10n.preferredMode,
+                              border: const OutlineInputBorder(),
+                            ),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
+                            items: _modos.map((m) {
+                              final icon = m == 'Bici' ? Icons.directions_bike : Icons.electric_car;
+                              return DropdownMenuItem(
+                                value: m,
+                                child: Row(children: [
+                                  Icon(icon, color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 12),
+                                  Text(m),
+                                ]),
+                              );
+                            }).toList(),
+                            onChanged: (v) => setState(() => _selectedModo = v),
                           ),
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                          dropdownColor: Colors.white,
-                          validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                          items: _modos.map((m) {
-                            return DropdownMenuItem(
-                              value: m,
-                              child: Text(m, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
-                            );
-                          }).toList(),
-                          onChanged: (v) => setState(() => _selectedModo = v),
                         ),
-                        const Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0), indent: 50),
-                        DropdownButtonFormField<String>(
-                          value: _selectedIdioma,
-                          decoration: cardInputDecoration(icon: Icons.language_rounded, context: context),
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                          dropdownColor: Colors.white,
-                          items: _idiomas.map((i) => DropdownMenuItem(value: i, child: Text(i, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)))).toList(),
-                          onChanged: (v) => setState(() => _selectedIdioma = v),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedIdioma,
+                            decoration: InputDecoration(
+                              labelText: l10n.preferredLanguage,
+                              border: const OutlineInputBorder(),
+                            ),
+                            icon: const Icon(Icons.arrow_drop_down),
+                            items: _idiomas
+                                .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+                                .toList(),
+                            onChanged: (v) => setState(() => _selectedIdioma = v),
+                          ),
                         ),
                       ],
                     ),
@@ -363,14 +487,11 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                       child: ElevatedButton(
                         onPressed: _finalizarOnboarding,
                         style: ElevatedButton.styleFrom(
-                          elevation: 2,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
                         ),
                         child: Text(
                           l10n.finishRegistration,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

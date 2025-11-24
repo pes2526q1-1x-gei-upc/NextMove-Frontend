@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -52,12 +53,19 @@ class UserRemoteDataProvider {
     final QueryResult result = await client.query(options);
 
     if (result.hasException) {
-      throw custom_exceptions.ServerException('Error al obtener mi perfil: ${result.exception}');
+      if (kDebugMode) {
+        print('Error GraphQL Raw: ${result.exception.toString()}');
+      }
+      throw custom_exceptions.ServerException('Error al obtener perfil: ${result.exception}');
+      
     }
 
     final data = result.data?['User'];
     if (data == null) {
-      throw custom_exceptions.ServerException('Usuario no encontrado');
+      if (kDebugMode) {
+        print('No se encontró el usuario con email: ${user.email}');
+      }
+      throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
     return UserEntity.fromRawData(data);
@@ -127,7 +135,13 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
       }
+      if (kDebugMode) {
+        print('Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
+      }
       if (result.exception?.graphqlErrors.isNotEmpty ?? false) {
+        if (kDebugMode) {
+          print('GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
+        }
         if (kDebugMode) {
           print('GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
         }
@@ -137,6 +151,9 @@ class UserRemoteDataProvider {
 
     final data = result.data?['updateMe'];
     if (data == null) {
+      if (kDebugMode) {
+        print('updateMe returned null data for user ${user.email}');
+      }
       if (kDebugMode) {
         print('updateMe returned null data for user ${user.email}');
       }
@@ -216,11 +233,17 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw: ${result.exception.toString()}');
       }
+      if (kDebugMode) {
+        print('Error GraphQL Raw: ${result.exception.toString()}');
+      }
       
       // Si el mensaje está vacío, es probable que sea un error de base de datos (constraints, tipos)
       // que el backend no está transformando en mensaje legible.
       if (result.exception!.graphqlErrors.isNotEmpty) {
           final msg = result.exception!.graphqlErrors.first.message;
+          if (kDebugMode) {
+            print('Mensaje del servidor: "$msg"');
+          }
           if (kDebugMode) {
             print('Mensaje del servidor: "$msg"');
           }
