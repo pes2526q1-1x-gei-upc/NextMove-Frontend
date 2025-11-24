@@ -222,15 +222,15 @@ class GraphQLQueries {
   query getUsersByNickname ($nickname: String!){
     UsersByNickname(nickname: $nickname){
         email,
-        name AS "name",
+        name,
         nickname,
         photo,
-        birth_date AS "birthDate",
-        phone_number AS "phoneNumber",
-        preferred_mode AS "preferredMode",
-        preferred_language AS "preferredLanguage",
-        bio_description AS "bioDescription",
-        TO_CHAR(created_at, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "createdAt"
+        birthDate,
+        phoneNumber,
+        preferredMode,
+        preferredLanguage,
+        bioDescription,
+        createdAt,
     } 
   }''';
 
