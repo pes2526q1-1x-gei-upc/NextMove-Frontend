@@ -12,6 +12,10 @@ import 'map_state.dart';
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
+  BitmapDescriptor? evLowIcon;
+  BitmapDescriptor? evMidIcon;
+  BitmapDescriptor? evHighIcon;
+  BitmapDescriptor? evSuperIcon;
   
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -22,6 +26,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
     required this.stationRepository,
     required this.onMarkerTapped,
+    this.evLowIcon,
+    this.evMidIcon,
+    this.evHighIcon,
+    this.evSuperIcon,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
@@ -44,6 +52,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         stationRepository.getAllBicycleStationDetails(),
         stationRepository.getAllEVStationDetails(),
       ]);
+
+     
 
       final bikeStations = results[0].fold((failure) => 
         throw Exception('Error cargando estaciones de bicicletas: ${failure.message}')
@@ -71,6 +81,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
       
       final bikeIcon = await _getBikeCustomIcon();
+      await _loadEvCustomIcons();
+  
       // Construir marcadores iniciales para bicicletas
       final bikeMarkers = _buildMarkersWithClusterForBike(
         bikeStations,
@@ -78,11 +90,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         bikeIcon,
       );
 
-      final carMarkers = _buildMarkersWithClusterForEv(
+      /*final carMarkers = _buildMarkersWithClusterForEv(
         evStations,
         evClusterManagerId,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
+      debugPrint('CarsMarkers created: ${carMarkers.length}');*/
 
       
 
@@ -94,7 +106,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         currentMode: StationType.bicycle,
         currentMapType: MapType.normal,
         bikeMarkers: bikeMarkers,
-        carMarkers: carMarkers,
+        carMarkers: {},
         centerPosition: _bcnCenter,
         searchQuery: null,
         bikeClusterManager: bikeClusterManager,
@@ -134,14 +146,30 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return stations
         .where((station) => station.latitude != null && station.longitude != null)
         .map((station) {
+          //final power = _getMaxPowerKw(station.connectors);
+          //final icon = getCarIconByPower(power);  // ← CACHEAR AQUÍ
+
           return Marker(
             markerId: MarkerId(station.id),
             position: LatLng(station.latitude!, station.longitude!),
-            icon: icon,
+            icon: icon, // Usar siempre el icono de baja potencia por ahora
             clusterManagerId: clusterManagerId, 
             onTap: () => onMarkerTapped(station, state as MapLoadedState),
           );
         }).toSet();
+  }
+
+  _getMaxPowerKw(List<Connector>? connectors) {
+    if (connectors == null || connectors.isEmpty) {
+      return 0.0;
+    }
+    double maxPower = 0.0;
+    for (var connector in connectors) {
+      if (connector.powerKw != null && connector.powerKw! > maxPower) {
+        maxPower = connector.powerKw!;
+      }
+    }
+    return maxPower;
   }
 
   Future<BitmapDescriptor> _getBikeCustomIcon() async {
@@ -150,6 +178,50 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         'assets/bikePin_custom.png',
       );
   }
+
+  Future<void> _loadEvCustomIcons() async {
+  
+    evLowIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/evLow_icon.png',
+    );
+    debugPrint('EV Low Icon loaded');
+
+    evMidIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/evMid_icon.png',
+    );
+    debugPrint('EV Mid Icon loaded');
+
+    evHighIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/evHigh_icon.png',
+    );
+    debugPrint('EV High Icon loaded');
+
+    evSuperIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/evSuper_icon.png',
+    );
+    debugPrint('EV Super Icon loaded');
+  
+}
+
+  BitmapDescriptor getCarIconByPower(double powerKw) {
+  if (powerKw <= 11) {
+    debugPrint('Using EV Low Icon for power: $powerKw kW');
+    return evLowIcon!;
+  } else if (powerKw <= 22) {
+    debugPrint('Using EV Mid Icon for power: $powerKw kW');
+    return evMidIcon!;
+  } else if (powerKw <= 50) {
+    debugPrint('Using EV High Icon for power: $powerKw kW');
+    return evHighIcon!;
+  } else {
+    debugPrint('Using EV Super Icon for power: $powerKw kW');
+    return evSuperIcon!;
+  }
+}
 
 
   
@@ -160,8 +232,29 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     final currentState = state;
     if (currentState is MapLoadedState) {
-      emit(currentState.copyWith(currentMode: event.newMode));
+      Set<Marker> bikeMarkers = const {};
+      Set<Marker> carMarkers = const {};
+
+    // ✅ Crear SOLO los marcadores del modo seleccionado
+    if (event.newMode == StationType.bicycle) {
+      bikeMarkers = currentState.bikeMarkers;  // Usar los cacheados
+      carMarkers = const {};  // VACÍO
+    } else {
+      bikeMarkers = const {};  // VACÍO
+      carMarkers = _buildMarkersWithClusterForEv(
+        currentState.evStations as List<EVStationDetails>,
+        currentState.evClusterManager!.clusterManagerId, 
+        evLowIcon!,
+      );
     }
+
+
+    emit(currentState.copyWith(
+      currentMode: event.newMode,
+      bikeMarkers: bikeMarkers,
+      carMarkers: carMarkers,
+    ));
+    } 
   }
 
   /// Handler: Cambiar tipo de mapa (normal/satélite)
