@@ -1,13 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 
 // === IMPORTS DE WIDGETS DE ESTILO ===
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_avatar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 
 // === OTROS IMPORTS ===
@@ -44,6 +43,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final AssetImage _avatarImage = const AssetImage(
     'assets/Profile_avatar_placeholder_large.png',
   );
+
+  // Image picker instance used in _pickImage
+  final ImagePicker _picker = ImagePicker();
 
   // Dropdowns
   String? _selectedIdioma = 'Español'; // Valor por defecto para evitar nulos

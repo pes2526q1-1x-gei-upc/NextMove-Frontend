@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -63,7 +62,7 @@ class UserRemoteDataProvider {
     final data = result.data?['User'];
     if (data == null) {
       if (kDebugMode) {
-        print('No se encontró el usuario con email: ${user.email}');
+        print('No se encontró el usuario con email: $email');
       }
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
