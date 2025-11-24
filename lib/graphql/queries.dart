@@ -198,24 +198,22 @@ class GraphQLQueries {
   }''';
 
   static const String getFriends = r'''
-  query getFriends ($nickname: String!) {
-    ListFriends(nickname: $nickname){
+  query getFriends () {
+    ListFriends(){
       name
     }
   }''';
 
   static const String newFriendship = r'''
-  mutation newFriendship ($nickname1: String!, $nickname2: String!) {
-    AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
+  mutation newFriendship ($nickname: String!) {
+    AddFriendship(nickname: $nickname){
       
     }
   }''';
 
   static const String deleteFriendship = r'''
-  mutation deleteFriendship ($nickname1: String!, $nickname2: String!) {
-    RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
-      name
-    }
+  mutation deleteFriendship ($nickname: String!) {
+    RemoveFriendship(nickname: $nickname)
   }''';
 
   static const String getUsersByNickname = r'''
@@ -234,4 +232,9 @@ class GraphQLQueries {
     } 
   }''';
 
+  static const String blockUser = r'''
+  mutation blockUser($nickname: String!) {
+    BlockUser(nickname: $nickname)
+  }
+  ''';
 }

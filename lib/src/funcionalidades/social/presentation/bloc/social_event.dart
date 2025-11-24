@@ -28,3 +28,16 @@ class AddFriendEvent extends SocialEvent {
   final String friendId;
   const AddFriendEvent(this.currentUserId, this.friendId);
 }
+
+class DeleteFriendEvent extends SocialEvent {
+  final String currentUserId;
+  final String friendId;
+  const DeleteFriendEvent(this.currentUserId, this.friendId);
+}
+
+class BlockUserEvent extends SocialEvent {
+  final String currentUserId; 
+  final String userToBlockId; 
+  
+  const BlockUserEvent(this.currentUserId, this.userToBlockId);
+}

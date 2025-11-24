@@ -14,6 +14,8 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
     on<SearchUsersEvent>(_onSearchUsers);
     on<ClearSearchEvent>(_onClearSearch);
     on<AddFriendEvent>(_onAddFriend);
+    on<DeleteFriendEvent>(_onDeleteFriend);
+    on<BlockUserEvent>(_onBlockUser);
   }
 
   Future<void> _onLoadFriends(LoadFriendsEvent event, Emitter<SocialState> emit) async {
@@ -22,7 +24,7 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
     
     emit(state.copyWith(status: SocialStatus.loading));
     
-    final result = await socialRepository.getFriends(_currentNickname!);
+    final result = await socialRepository.getFriends();
     
     result.fold(
       (failure) {
@@ -90,7 +92,7 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
 
     debugPrint("[SocialBloc] Solicitando amistad a: ${event.friendId}");
 
-    final result = await socialRepository.addFriend(_currentNickname!, event.friendId);
+    final result = await socialRepository.addFriend(event.friendId);
 
     result.fold(
       (failure) => emit(state.copyWith(errorMessage: "Error al añadir: ${failure.message}")),
@@ -99,6 +101,52 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
         // Recargamos la lista de amigos para que aparezca el nuevo
         add(LoadFriendsEvent(_currentNickname!));
         // Limpiamos la búsqueda para volver a la lista principal
+        add(ClearSearchEvent());
+      },
+    );
+  }
+
+  Future<void> _onDeleteFriend(DeleteFriendEvent event, Emitter<SocialState> emit) async {
+    _currentNickname = event.currentUserId;
+    if (_currentNickname == null) {
+      debugPrint("[SocialBloc] No se puede eliminar amigo: _currentNickname es null");
+      return;
+    }
+
+    debugPrint("[SocialBloc] Solicitando eliminación de amistad a: ${event.friendId}");
+
+    final result = await socialRepository.removeFriend(event.friendId);
+
+    result.fold(
+      (failure) => emit(state.copyWith(errorMessage: "Error al eliminar: ${failure.message}")),
+      (_) {
+        debugPrint("[SocialBloc] Amigo eliminado con éxito");
+        // Recargamos la lista de amigos para que se refleje la eliminación
+        add(LoadFriendsEvent(_currentNickname!));
+        // Limpiamos la búsqueda para volver a la lista principal
+        add(ClearSearchEvent());
+      },
+    );
+  }
+
+  Future<void> _onBlockUser(BlockUserEvent event, Emitter<SocialState> emit) async {
+    _currentNickname = event.currentUserId;
+    debugPrint("[SocialBloc] Bloqueando a: ${event.userToBlockId}");
+
+    final result = await socialRepository.blockUser(event.userToBlockId);
+
+    result.fold(
+      (failure) {
+        debugPrint("[SocialBloc] Error al bloquear: ${failure.message}");
+        emit(state.copyWith(errorMessage: "Error al bloquear: ${failure.message}"));
+      },
+      (_) {
+        debugPrint("[SocialBloc] Usuario bloqueado con éxito");
+        
+        if (_currentNickname != null) {
+           add(LoadFriendsEvent(_currentNickname!));
+        }
+
         add(ClearSearchEvent());
       },
     );

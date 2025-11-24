@@ -389,10 +389,32 @@ class AppLocalizationsEs extends AppLocalizations {
   String get yourFriends => 'TUS AMIGOS';
 
   @override
-  String friendAdded(Object nickname) {
+  String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
 
   @override
   String get friends => 'Amigos';
+
+  @override
+  String get memberSince => 'Miembro desde';
+
+  @override
+  String get deleteFriendship => 'Eliminar amistad';
+
+  @override
+  String deleteFriendConfirmation(String nickname) {
+    return '¿Estás seguro de que quieres eliminar a $nickname de tus amigos?';
+  }
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String deletedFriend(String nickname) {
+    return 'Has eliminado a $nickname de tus amigos.';
+  }
+
+  @override
+  String get deleteFriend => 'Eliminar amistad';
 }

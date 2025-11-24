@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -8,10 +9,23 @@ import '../../../../../../graphql/queries.dart';
 class SocialRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
-  Future<List<UserEntity>> getFriends(String nickname) async {
+  Future<String?> get _authHeader async {
+    final fireBaseUser = FirebaseAuth.instance.currentUser;
+    String? authHeader = '';  
+    if (fireBaseUser != null) {
+      final token = await fireBaseUser.getIdToken();
+      authHeader = 'Bearer $token';
+    }
+    return authHeader;
+  }
+  Future<List<UserEntity>> getFriends() async {
+    String? authHeader = await _authHeader;
+    //debugPrint("authHeader en getFriends: $authHeader");
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getFriends),
-      variables: {'nickname': nickname},
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': ?authHeader,
+      })),
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
@@ -35,6 +49,7 @@ class SocialRemoteDataProvider {
         idiomaPreferido: "Español",
         descripcion: "",
         modoPreferido: "BIKE",
+        photo: "",
       );
     }).toList();
   }
@@ -55,7 +70,6 @@ class SocialRemoteDataProvider {
       throw ServerException('Error en la búsqueda: ${result.exception.toString()}');
     }
 
-    // La query devuelve una LISTA bajo la clave 'UsersByNickname'
     final List<dynamic> usersData = result.data?['UsersByNickname'] ?? [];
     debugPrint("Resultados encontrados: ${usersData.length}");
 
@@ -75,20 +89,24 @@ class SocialRemoteDataProvider {
           idiomaPreferido: "Español",
           descripcion: "",
           modoPreferido: "BIKE",
+          photo: "",
         );
       }
     }).toList();
   }
 
-  Future<void> addFriend(String myNickname, String friendNickname) async {
+  Future<void> addFriend(String friendNickname) async {
+    String? authHeader = await _authHeader;
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.newFriendship),
       variables: {
-        'nickname1': myNickname,
-        'nickname2': friendNickname,
+        'nickname': friendNickname,
       },
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': ?authHeader,
+      })),
     );
-    debugPrint("Vamos a crear la amistad entre $myNickname y $friendNickname");
+    debugPrint("Vamos a crear la amistad con $friendNickname");
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
@@ -97,18 +115,58 @@ class SocialRemoteDataProvider {
     }
   }
 
-  Future<void> removeFriend(String myNickname, String friendNickname) async {
+  Future<void> removeFriend(String friendNickname) async {
+    String? authHeader = await _authHeader;
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.deleteFriendship),
       variables: {
-        'nickname1': myNickname,
-        'nickname2': friendNickname,
+        'nickname': friendNickname,
       },
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': ?authHeader,
+      })),
+    );
+    debugPrint("header en removeFriend: $authHeader");
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      if (result.exception!.graphqlErrors.isNotEmpty) {
+        debugPrint("Error GraphQL del Servidor: ${result.exception!.graphqlErrors.first.message}");
+      }
+      if (result.exception!.linkException != null) {
+        debugPrint("Error de Red/Link: ${result.exception!.linkException}");
+      }
+      
+      throw ServerException('Error al eliminar amigo: ${result.exception.toString()}');
+    }
+  }
+
+  Future<void> blockUser(String userToBlockNickname) async {
+    String? authHeader = await _authHeader;
+    debugPrint("Solicitando bloqueo de: $userToBlockNickname");
+    debugPrint("header en blockUser: $authHeader");
+
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.blockUser),
+      variables: {
+        'nickname': userToBlockNickname,
+      },
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': authHeader ?? '',
+      })),
     );
 
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
+      if (result.exception!.graphqlErrors.isNotEmpty) {
+        debugPrint("Error GraphQL del Servidor: ${result.exception!.graphqlErrors.first.message}");
+      }
+      if (result.exception!.linkException != null) {
+        debugPrint("Error de Red/Link: ${result.exception!.linkException}");
+      }
+      
       throw ServerException('Error al eliminar amigo: ${result.exception.toString()}');
     }
   }

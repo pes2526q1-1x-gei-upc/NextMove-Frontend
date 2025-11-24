@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class UserEntity extends Equatable {
   final String email;
   final String apodo;
+  final String photo;
   final String nombreCompleto;
   final DateTime fechaNacimiento;
   final DateTime fechaRegistro;
@@ -14,6 +15,7 @@ class UserEntity extends Equatable {
   const UserEntity({
     required this.email,
     required this.apodo,
+    required this.photo,
     required this.nombreCompleto,
     required this.fechaNacimiento,
     required this.fechaRegistro,
@@ -41,6 +43,7 @@ class UserEntity extends Equatable {
       idiomaPreferido: mapLanguageFromAPI(data['preferredLanguage']),
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
+      photo: data['photo'] ?? '',
     );
   }
 
@@ -137,6 +140,7 @@ class UserEntity extends Equatable {
       idiomaPreferido: idiomaPreferido ?? this.idiomaPreferido,
       descripcion: descripcion ?? this.descripcion,
       modoPreferido: modoPreferido ?? this.modoPreferido,
+      photo: photo
     );
   }
 
@@ -151,5 +155,6 @@ class UserEntity extends Equatable {
         idiomaPreferido,
         descripcion,
         modoPreferido,
+        photo
       ];
 }

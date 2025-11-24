@@ -1,15 +1,21 @@
-import 'dart:async'; // 1. IMPORTANTE: Necesario para usar la clase Timer
+import 'dart:async'; 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+
+// Imports de Blocs y Eventos
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart'; 
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_state.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
+
+// Imports de Widgets y Páginas
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_user_card_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class SocialPage extends StatefulWidget {
   const SocialPage({super.key});
@@ -20,20 +26,17 @@ class SocialPage extends StatefulWidget {
 
 class _SocialPageState extends State<SocialPage> {
   final TextEditingController _searchController = TextEditingController();
-  
   Timer? _debounce; 
 
   @override
   void initState() {
     super.initState();
     final userState = context.read<UserBloc>().state;
-    
-    
     debugPrint("Iniciamos pantalla de social");
     if (userState is UserLoaded || userState is UserUpdated) {
       final nickname = (userState as dynamic).user.apodo;
       context.read<SocialBloc>().add(LoadFriendsEvent(nickname));
-    }else {
+    } else {
       debugPrint("[SocialPage] El usuario aún no está listo. Esperando BlocListener...");
     }
   }
@@ -45,14 +48,9 @@ class _SocialPageState extends State<SocialPage> {
     super.dispose();
   }
 
-  // Lógica de "Debounce" 
   void _onSearchChanged(String query) {
-    // Si el usuario sigue escribiendo y hay un temporizador activo, lo cancelamos
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    
-    // Iniciamos un nuevo temporizador de 500 milisegundos 
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      // Buscamos si el usuario deja de escribir por medio segundo
       context.read<SocialBloc>().add(SearchUsersEvent(query));
     });
   }
@@ -60,6 +58,7 @@ class _SocialPageState extends State<SocialPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
@@ -104,7 +103,7 @@ class _SocialPageState extends State<SocialPage> {
                           icon: const Icon(Icons.close), 
                           onPressed: () {
                             _searchController.clear();
-                            _debounce?.cancel(); // Cancelamos cualquier búsqueda pendiente
+                            _debounce?.cancel(); 
                             context.read<SocialBloc>().add(ClearSearchEvent());
                             setState(() {}); 
                           },
@@ -185,6 +184,28 @@ class _SocialPageState extends State<SocialPage> {
                               return SocialUserCard(
                                 user: user,
                                 isFriend: !showAddButton, 
+                                
+                                onTap: () {
+                                  final socialBloc = context.read<SocialBloc>();
+                                  
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MultiBlocProvider(
+                                        providers: [
+                                          BlocProvider(
+                                            create: (context) => UserBloc()..add(LoadUserProfile(user.apodo)),
+                                          ),
+                                          BlocProvider.value(
+                                            value: socialBloc,
+                                          ),
+                                        ],
+                                        child: const FriendDetailsPage(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                
                                 onAddPressed: showAddButton ? () {
                                   final userProvider = Provider.of<UserProvider>(context, listen: false).user;
                                   final currentNickname = userProvider?['nickname'];

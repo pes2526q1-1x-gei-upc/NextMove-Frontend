@@ -116,6 +116,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           idiomaPreferido: _selectedIdioma ?? 'Español',
           descripcion: _descripcionController.text.trim(),
           modoPreferido: _selectedModo ?? 'Coche',
+          photo: '',
         );
       } else {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -147,6 +148,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           idiomaPreferido: _selectedIdioma ?? 'Español',
           descripcion: _descripcionController.text.trim(),
           modoPreferido: _selectedModo ?? 'Coche',
+          photo: '',
         );
       }
 

@@ -137,5 +137,36 @@
     "results": "RESULTADOS",
     "yourFriends": "TUS AMIGOS",
     "friendAdded": "{nickname} has been added to your friends.",
-    "friends": "Amigos"
+    "@friendAdded": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "friends": "Amigos",
+    "memberSince": "Miembro desde",
+    "deleteFriendship": "Eliminar amistad",
+    "deleteFriendConfirmation": "¿Estás seguro de que quieres eliminar a {nickname} de tus amigos?",
+    "@deleteFriendConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "delete": "Eliminar",
+    "deletedFriend": "Has eliminado a {nickname} de tus amigos.",
+    "@deletedFriend": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+
+    "deleteFriend": "Eliminar amistad"
 }

@@ -137,5 +137,28 @@
     "results": "RESULTATS",
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
-    "friends": "Amics"
+    "friends": "Amics",
+    "memberSince": "Membre des de",
+    "deleteFriendship": "Eliminar amistat",
+    "deleteFriendConfirmation": "Estàs segur que vols eliminar {nickname} dels teus amics?",
+    "@deleteFriendConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"   
+            }
+        }
+    },
+    "delete": "Eliminar",
+    "deletedFriend": "{nickname} ha estat eliminat dels teus amics.",
+    "@deletedFriend": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
+    "deleteFriend" : "Eliminar amistat"
+
 }

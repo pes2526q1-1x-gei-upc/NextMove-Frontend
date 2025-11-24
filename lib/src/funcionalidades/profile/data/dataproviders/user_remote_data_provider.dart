@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -11,12 +11,22 @@ class UserRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  Future<UserEntity> getUserProfile(String userId) async {
-    final user = firebaseAuth.currentUser;
-    if (user == null || user.email == null) {
-      throw custom_exceptions.AuthException(message: 'Usuario no autenticado o email no disponible');
-    }
+  Future<UserEntity> getUserProfile(String identifier) async {
+    final currentUser = firebaseAuth.currentUser;
 
+    // Cargar el perfil del usuario logeado
+    if (currentUser != null && identifier == currentUser.uid) {
+      return _fetchMyProfile(currentUser.email!);
+    } 
+    
+    // Cargar el perfil de otro usuario por su nickname
+    else {
+      return _fetchUserProfileByNickname(identifier);
+    }
+  }
+
+  
+  Future<UserEntity> _fetchMyProfile(String email) async {
     const String getUserQuery = r'''
       query User($email: String!) {
         User(email: $email) {
@@ -35,26 +45,49 @@ class UserRemoteDataProvider {
 
     final QueryOptions options = QueryOptions(
       document: gql(getUserQuery),
-      variables: {'email': user.email},
+      variables: {'email': email},
+      fetchPolicy: FetchPolicy.networkOnly,
     );
 
     final QueryResult result = await client.query(options);
 
     if (result.hasException) {
-      debugPrint('Error GraphQL Raw: ${result.exception.toString()}');
-      throw custom_exceptions.ServerException('Error al obtener perfil: ${result.exception}');
-      
+      throw custom_exceptions.ServerException('Error al obtener mi perfil: ${result.exception}');
     }
 
     final data = result.data?['User'];
     if (data == null) {
-      debugPrint('No se encontró el usuario con email: ${user.email}');
-      throw custom_exceptions.ServerException('No se encontró el usuario');
+      throw custom_exceptions.ServerException('Usuario no encontrado');
     }
 
     return UserEntity.fromRawData(data);
   }
 
+  
+  Future<UserEntity> _fetchUserProfileByNickname(String nickname) async {
+    debugPrint("Buscando perfil completo de: $nickname");
+    
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getUsersByNickname),
+      variables: {'nickname': nickname},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw custom_exceptions.ServerException('Error al obtener perfil de amigo: ${result.exception}');
+    }
+
+    final List<dynamic> data = result.data?['UsersByNickname'] ?? [];
+    
+    if (data.isEmpty) {
+      throw custom_exceptions.ServerException('Perfil de amigo no encontrado');
+    }
+
+    return UserEntity.fromRawData(data.first);
+  }
+  
   // Mutation para actualizar el perfil 
   Future<UserEntity> updateUserProfile(UserEntity userEntity) async {
     final user = firebaseAuth.currentUser;
@@ -91,16 +124,22 @@ class UserRemoteDataProvider {
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {
-      debugPrint('Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
+      if (kDebugMode) {
+        print('Error GraphQL Raw (updateUserProfile): ${result.exception.toString()}');
+      }
       if (result.exception?.graphqlErrors.isNotEmpty ?? false) {
-        debugPrint('GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
+        if (kDebugMode) {
+          print('GraphQL error message: ${result.exception!.graphqlErrors.first.message}');
+        }
       }
       throw custom_exceptions.ServerException('Error al actualizar: ${result.exception}');
     }
 
     final data = result.data?['updateMe'];
     if (data == null) {
-      debugPrint('updateMe returned null data for user ${user.email}');
+      if (kDebugMode) {
+        print('updateMe returned null data for user ${user.email}');
+      }
       throw custom_exceptions.ServerException('No se actualizó el usuario');
     }
     
@@ -108,7 +147,6 @@ class UserRemoteDataProvider {
 
     return UserEntity.fromRawData(data);
   }
-
 
   Future<UserEntity> createUserProfile(UserEntity userEntity) async {
     const String createUserMutation = r'''
@@ -175,13 +213,17 @@ class UserRemoteDataProvider {
 
     // 5. Manejo de Errores Mejorado
     if (result.hasException) {
-      print('Error GraphQL Raw: ${result.exception.toString()}');
+      if (kDebugMode) {
+        print('Error GraphQL Raw: ${result.exception.toString()}');
+      }
       
       // Si el mensaje está vacío, es probable que sea un error de base de datos (constraints, tipos)
       // que el backend no está transformando en mensaje legible.
       if (result.exception!.graphqlErrors.isNotEmpty) {
           final msg = result.exception!.graphqlErrors.first.message;
-          print('Mensaje del servidor: "$msg"');
+          if (kDebugMode) {
+            print('Mensaje del servidor: "$msg"');
+          }
       }
       
       throw custom_exceptions.ServerException('Error al crear perfil: ${result.exception}');
@@ -195,11 +237,6 @@ class UserRemoteDataProvider {
   }
 
   Future<void> logout() async {
-    try {
       await firebaseAuth.signOut();
-      // Si usas GoogleSignIn o FacebookLogin, deberías desconectarlos aquí también
-    } catch (e) {
-      throw custom_exceptions.AuthException(message: 'Error al cerrar sesión: $e');
-    }
   }
 }

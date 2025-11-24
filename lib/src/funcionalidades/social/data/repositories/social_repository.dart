@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
@@ -9,9 +10,9 @@ class SocialRepository {
 
   SocialRepository() : remoteDataProvider = SocialRemoteDataProvider();
 
-  Future<Either<Failure, List<UserEntity>>> getFriends(String nickname) async {
+  Future<Either<Failure, List<UserEntity>>> getFriends() async {
     try {
-      final friends = await remoteDataProvider.getFriends(nickname);
+      final friends = await remoteDataProvider.getFriends();
       return Right(friends);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -31,9 +32,9 @@ class SocialRepository {
     }
   }
 
-  Future<Either<Failure, void>> addFriend(String myNick, String friendNick) async {
+  Future<Either<Failure, void>> addFriend(String friendNick) async {
     try {
-      await remoteDataProvider.addFriend(myNick, friendNick);
+      await remoteDataProvider.addFriend(friendNick);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -42,13 +43,28 @@ class SocialRepository {
     }
   }
 
-  Future<Either<Failure, void>> removeFriend(String myNick, String friendNick) async {
+  Future<Either<Failure, void>> removeFriend(String friendNick) async {
     try {
-      await remoteDataProvider.removeFriend(myNick, friendNick);
+      await remoteDataProvider.removeFriend(friendNick);
       return const Right(null);
     } on ServerException catch (e) {
+      debugPrint("Error en removeFriend: ${e.toString()}");
       return Left(ServerFailure(message: e.toString()));
     } catch (e) {
+      debugPrint("Error genérico en removeFriend: ${e.toString()}");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, void>> blockUser(String userToBlockNick) async {
+    try {
+      await remoteDataProvider.blockUser(userToBlockNick);
+      return const Right(null);
+    } on ServerException catch (e) {
+      debugPrint("Error en blockUser: ${e.toString()}");
+      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      debugPrint("Error genérico en blockUser: ${e.toString()}");
       return Left(ServerFailure(message: e.toString()));
     }
   }
