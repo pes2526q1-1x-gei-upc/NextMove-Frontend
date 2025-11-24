@@ -1,16 +1,13 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager, Cluster;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'map_events.dart';
 import 'map_state.dart';
-import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
-
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
@@ -32,26 +29,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ToggleMapTypeEvent>(_onToggleMapType);
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
-    on<UpdateClustersEvent>(_onUpdateClusters);
-    on<UpdateClusteredMarkersEvent>(_onUpdateClusteredMarkers);
   }
-
-  Future<void> _onUpdateClusters(
-  UpdateClustersEvent event,
-  Emitter<MapState> emit) async {
-    final currentState = state;
-    if (currentState is MapLoadedState) {
-      // Seleccionar el ClusterManager según el modo actual
-      final clusterManager = currentState.currentMode == StationType.bicycle
-          ? currentState.bikeClusterManager
-          : currentState.evClusterManager;
-      
-      // Actualizar el mapa con el nuevo zoom
-      if (clusterManager != null) {
-        clusterManager.updateMap();
-      }
-    }
-}
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
   Future<void> _onLoadMapData(
@@ -74,23 +52,39 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         throw Exception('Error cargando estaciones de coches: ${failure.message}')
       ,(stations) => stations as List<EVStationDetails>? ?? []);
 
-      
+      final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
+      final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
 
-      // Construir marcadores iniciales para bicicletas
-      final bikeMarkers = _buildMarkersForStations(
-        bikeStations,
-        null,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      final bikeClusterManager = ClusterManager(
+          clusterManagerId: bikeClusterManagerId,
+          onClusterTap: (Cluster cluster) {
+            // Manejar toque en clúster de bicicletas
+            debugPrint('🔵 Cluster de bicicletas tapped: ${cluster.count} estaciones');
+          },
       );
 
-      final carMarkers = _buildMarkersForStations(
-        null,
+      final evClusterManager = ClusterManager(
+      clusterManagerId: evClusterManagerId,
+      onClusterTap: (Cluster cluster) {
+        debugPrint('🟢 Cluster de EV tapped: ${cluster.count} estaciones');
+      },
+    );
+      
+      final bikeIcon = await _getBikeCustomIcon();
+      // Construir marcadores iniciales para bicicletas
+      final bikeMarkers = _buildMarkersWithClusterForBike(
+        bikeStations,
+        bikeClusterManagerId,
+        bikeIcon,
+      );
+
+      final carMarkers = _buildMarkersWithClusterForEv(
         evStations,
+        evClusterManagerId,
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
 
-      final bikeClusterManager = await _initializeBikeClusterManager(bikeStations);
-      final evClusterManager = await _initializeEVClusterManager(evStations);
+      
 
       // Emitir estado cargado
       emit(MapLoadedState(
@@ -105,7 +99,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         searchQuery: null,
         bikeClusterManager: bikeClusterManager,
         evClusterManager: evClusterManager,
-        clusteredMarkers: {},
       ));
 
       // Iniciar solicitud de permisos de ubicación
@@ -115,112 +108,50 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  Future<ClusterManager<BicycleStationDetails>> _initializeBikeClusterManager(
-    List<BicycleStationDetails> bikeStations,
-  ) async {
-    final bikeClusterManager = ClusterManager<BicycleStationDetails>(
-      bikeStations,
-      _updateMarkers,
-      markerBuilder: (cluster) => _bikeMarkerBuilder(cluster),
-      levels: [1, 4.25, 6.75, 8.25, 11.5, 14.5, 16.0, 16.5, 20.0], 
-      extraPercent: 0.2,           
-      stopClusteringZoom: 17,
-    );
-
-    return bikeClusterManager;
+  Set<Marker> _buildMarkersWithClusterForBike(
+  List<BicycleStationDetails> stations,
+  ClusterManagerId clusterManagerId,
+  BitmapDescriptor icon,
+  ) {
+    return stations
+        .where((station) => station.latitude != null && station.longitude != null)
+        .map((station) {
+          return Marker(
+            markerId: MarkerId(station.id),
+            position: LatLng(station.latitude!, station.longitude!),
+            icon: icon,
+            clusterManagerId: clusterManagerId, 
+            onTap: () => onMarkerTapped(station, state as MapLoadedState),
+          );
+        }).toSet();
   }
 
-  Future<ClusterManager<EVStationDetails>> _initializeEVClusterManager(
-    List<EVStationDetails> evStations,
-  ) async {
-
-    final evClusterManager = ClusterManager<EVStationDetails>(
-      evStations,
-      _updateMarkers,
-      markerBuilder: (cluster) => _evMarkerBuilder(cluster),
-      levels: [1, 4.25, 6.75, 8.25, 11.5, 14.5, 16.0, 16.5, 20.0], 
-      extraPercent: 0.2,           
-      stopClusteringZoom: 17,
-    );
-
-    return evClusterManager;
+  Set<Marker> _buildMarkersWithClusterForEv(
+  List<EVStationDetails> stations,
+  ClusterManagerId clusterManagerId,
+  BitmapDescriptor icon,
+  ) {
+    return stations
+        .where((station) => station.latitude != null && station.longitude != null)
+        .map((station) {
+          return Marker(
+            markerId: MarkerId(station.id),
+            position: LatLng(station.latitude!, station.longitude!),
+            icon: icon,
+            clusterManagerId: clusterManagerId, 
+            onTap: () => onMarkerTapped(station, state as MapLoadedState),
+          );
+        }).toSet();
   }
 
-  Future<Marker> _bikeMarkerBuilder(Cluster<BicycleStationDetails> cluster) async {
-    if(cluster.isMultiple){
-      return Marker(
-        markerId: MarkerId(cluster.getId()),
-        position: cluster.location,
-        icon: await _getClusterMarkerBitmap(cluster.count, Colors.blue),
+  Future<BitmapDescriptor> _getBikeCustomIcon() async {
+      return await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(60, 60)),  // Tamaño ajustable
+        'assets/bikePin_custom.png',
       );
-    } else {
-      final station = cluster.items.first;
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: cluster.location,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      );
-    }
   }
 
-  Future<Marker> _evMarkerBuilder(Cluster<EVStationDetails> cluster) async {
-    if(cluster.isMultiple){
-      return Marker(
-        markerId: MarkerId(cluster.getId()),
-        position: cluster.location,
-        icon: await _getClusterMarkerBitmap(cluster.count, Colors.green),
-      );
-    } else {
-      final station = cluster.items.first;
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: cluster.location,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      );
-    }
-  }
 
-  static Future<BitmapDescriptor> _getClusterMarkerBitmap(int size, Color color) async {
-  final PictureRecorder pictureRecorder = PictureRecorder();
-  final Canvas canvas = Canvas(pictureRecorder);
-  final Paint paint1 = Paint()..color = color;
-
-  canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
-
-  
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      text: TextSpan(
-        text: size.toString(),
-        style: const TextStyle(
-          fontSize: 40,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    );
-
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        size/2 - textPainter.width / 2,   // Centrar horizontalmente
-        size/2 - textPainter.height / 2,  // Centrar verticalmente
-      ),
-    );
-  
-
-  final img = await pictureRecorder.endRecording().toImage(size, size);
-  final data = await img.toByteData(format: ImageByteFormat.png);
-
-  return BitmapDescriptor.bytes(data!.buffer.asUint8List());
-}
-
-  void _updateMarkers(Set<Marker> markers) {
-    if (!isClosed) {
-      add(UpdateClusteredMarkersEvent(markers));
-    }
-}
   
   /// Handler: Cambiar modo (bicicleta/coche)
   void _onChangeMode(
@@ -230,7 +161,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final currentState = state;
     if (currentState is MapLoadedState) {
       emit(currentState.copyWith(currentMode: event.newMode));
-      add(const UpdateClustersEvent(12.0));
     }
   }
 
@@ -323,45 +253,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
   }
 
-  /// Construir marcadores para una lista de estaciones
-  Set<Marker> _buildMarkersForStations(
-    List<BicycleStationDetails>? bikeStations,
-    List<EVStationDetails>? evStations,
-    BitmapDescriptor icon,
-  ) {
-    if(bikeStations == null && evStations != null){
-      return evStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: LatLng(station.latitude!, station.longitude!),
-        icon: icon,
-        onTap: () => onMarkerTapped(station, state as MapLoadedState),
-      );
-    }).toSet();}
-    else if(evStations == null && bikeStations != null){
-      return bikeStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: LatLng(station.latitude!, station.longitude!),
-        icon: icon,
-        onTap: () => onMarkerTapped(station, state as MapLoadedState),
-      );
-    }).toSet();
-    }
-
-    return {};
-    
-  }
-
-  void _onUpdateClusteredMarkers(
-  UpdateClusteredMarkersEvent event,
-  Emitter<MapState> emit,
-  ) {
-    if (state is MapLoadedState) {
-      final currentState = state as MapLoadedState;
-      emit(currentState.copyWith(clusteredMarkers: event.markers));
-    }
-  }
 
   @override
   Future<void> close() {

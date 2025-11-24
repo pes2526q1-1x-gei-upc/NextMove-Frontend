@@ -107,11 +107,13 @@ class _MapPageState extends State<MapPage> {
             }
             
             if (state is MapLoadedState) {
-              final markersToShow = state.clusteredMarkers.isNotEmpty
-                  ? state.clusteredMarkers:
-                  (state.currentMode == StationType.bicycle
-                    ? state.bikeMarkers
-                    : state.carMarkers);
+              final markersToShow = state.currentMode == StationType.bicycle
+                ? state.bikeMarkers
+                : state.carMarkers;
+            
+              final clusterManagerToShow = state.currentMode == StationType.bicycle
+                ? state.bikeClusterManager
+                : state.evClusterManager;           
               
               return  Stack(  
               children: [
@@ -122,14 +124,11 @@ class _MapPageState extends State<MapPage> {
                     zoom: 12,
                   ),
                   markers: markersToShow,
+                  clusterManagers: clusterManagerToShow != null 
+                      ? {clusterManagerToShow} 
+                      : {}, 
                   mapType: state.currentMapType,
-                  onMapCreated: (mapController){
-                    _onMapCreated(mapController);
-                    _initializeClusters(context, state);
-                  },
-                  onCameraMove: (position) {
-                    context.read<MapBloc>().add(UpdateClustersEvent(position.zoom));
-                  },
+                  onMapCreated: _onMapCreated,                  
                 ),
 
                 // Barra de búsqueda
@@ -181,18 +180,6 @@ class _MapPageState extends State<MapPage> {
 // -----------------------------------------------------------------------
   // Markers and Clusters
   // -----------------------------------------------------------------------
-
-  void _initializeClusters(BuildContext context, MapLoadedState state) {
-      final clusterManager = state.currentMode == StationType.bicycle
-          ? state.bikeClusterManager
-          : state.evClusterManager;
-      
-      if(clusterManager != null && mapController != null) {
-        clusterManager.setMapId(mapController!.mapId);
-        context.read<MapBloc>().add(UpdateClustersEvent(12.0)); //zoom inicial de 12.0
-      }
-      
-  }
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
     showModalBottomSheet(

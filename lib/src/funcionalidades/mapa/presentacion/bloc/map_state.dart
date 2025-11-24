@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' hide ClusterManager, Cluster;
+import 'package:google_maps_flutter/google_maps_flutter.dart' ;
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
-import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -33,9 +32,8 @@ class MapLoadedState extends MapState {
   final LatLng centerPosition;
   final String? searchQuery;
   //campos para los clusters, queda pendiente borrar otros si es necesario
-  final ClusterManager<BicycleStationDetails>? bikeClusterManager;
-  final ClusterManager<EVStationDetails>? evClusterManager;
-  final Set<Marker> clusteredMarkers;
+  final ClusterManager? bikeClusterManager;
+  final ClusterManager? evClusterManager;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -49,7 +47,6 @@ class MapLoadedState extends MapState {
     this.searchQuery,
     this.bikeClusterManager,
     this.evClusterManager,
-    required this.clusteredMarkers,
   });
 
   @override
@@ -65,7 +62,6 @@ class MapLoadedState extends MapState {
         searchQuery,
         bikeClusterManager,
         evClusterManager,
-        clusteredMarkers,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -79,9 +75,8 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
-    ClusterManager<BicycleStationDetails>? bikeClusterManager,
-    ClusterManager<EVStationDetails>? evClusterManager,
-    Set<Marker>? clusteredMarkers,
+    ClusterManager? bikeClusterManager,
+    ClusterManager? evClusterManager,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -95,7 +90,6 @@ class MapLoadedState extends MapState {
       searchQuery: searchQuery ?? this.searchQuery,
       bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
       evClusterManager: evClusterManager ?? this.evClusterManager,
-      clusteredMarkers: clusteredMarkers ?? this.clusteredMarkers,
     );
   }
 

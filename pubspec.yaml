@@ -56,10 +56,6 @@ dependencies:
   dartz: ^0.10.1
   bloc: ^9.1.0
   flutter_bloc: ^9.1.1
-  google_maps_cluster_manager:
-    git:
-      url: https://github.com/MacDeveloper1/google_maps_cluster_manager.git
-      ref: fix/cluster
 dev_dependencies:
   flutter_test:
     sdk: flutter

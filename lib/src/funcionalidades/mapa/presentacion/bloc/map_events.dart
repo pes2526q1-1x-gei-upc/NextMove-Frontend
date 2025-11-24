@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 /// Clase base abstracta para todos los eventos del mapa
@@ -57,22 +56,4 @@ class ShowStationDetailsEvent extends MapEvent {
 
   @override
   List<Object?> get props => [station];
-}
-
-class UpdateClustersEvent extends MapEvent {
-  final double zoom;
-
-  const UpdateClustersEvent(this.zoom);
-
-  @override
-  List<Object?> get props => [zoom];
-}
-
-class UpdateClusteredMarkersEvent extends MapEvent {
-  final Set<Marker> markers;
-  
-  const UpdateClusteredMarkersEvent(this.markers);
-  
-  @override
-  List<Object> get props => [markers];
 }

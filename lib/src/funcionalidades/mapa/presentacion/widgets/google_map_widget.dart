@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' hide Cluster, ClusterManager;
+import 'package:google_maps_flutter/google_maps_flutter.dart' ;
 
 class MapWidget extends StatefulWidget {
   final CameraPosition initialCameraPosition;
   final Set<Marker> markers;
   final MapType mapType;
+  final Set<ClusterManager> clusterManagers;
   final void Function(GoogleMapController)? onMapCreated;
-  final void Function(CameraPosition)? onCameraMove;
+  final VoidCallback? onCameraIdle; 
+  
 
 
   const MapWidget({
@@ -14,8 +16,9 @@ class MapWidget extends StatefulWidget {
     required this.initialCameraPosition,
     required this.markers,
     required this.mapType,
+    required this.clusterManagers,
     this.onMapCreated,
-    this.onCameraMove,
+    this.onCameraIdle,
   });
 
   @override
@@ -28,7 +31,8 @@ class _MapWidgetState extends State<MapWidget> {
   Widget build(BuildContext context) {
     return GoogleMap(
       onMapCreated: widget.onMapCreated,
-      onCameraMove: widget.onCameraMove,
+      onCameraIdle: widget.onCameraIdle,
+      clusterManagers: widget.clusterManagers,
       initialCameraPosition: widget.initialCameraPosition,
       markers: widget.markers,
       mapType: widget.mapType,

@@ -1,5 +1,3 @@
-import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 enum StationType {
@@ -7,7 +5,7 @@ enum StationType {
     electricVehicle,
 }
 
-class StationDetails with ClusterItem {
+class StationDetails {
     final String id;
     final String? name;
     final String? address;
@@ -29,9 +27,6 @@ class StationDetails with ClusterItem {
     this.longitude,
     this.distanceKm,
     });
-
-    @override
-    LatLng get location => LatLng(latitude!, longitude!);
     
       
 }
