@@ -196,4 +196,42 @@ class GraphQLQueries {
       isSuperFast
     }
   }''';
+
+  static const String getFriends = r'''
+  query getFriends ($nickname: String!) {
+    ListFriends(nickname: $nickname){
+      name
+    }
+  }''';
+
+  static const String newFriendship = r'''
+  mutation newFriendship ($nickname1: String!, $nickname2: String!) {
+    AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      
+    }
+  }''';
+
+  static const String deleteFriendship = r'''
+  mutation deleteFriendship ($nickname1: String!, $nickname2: String!) {
+    RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      name
+    }
+  }''';
+
+  static const String getUsersByNickname = r'''
+  query getUsersByNickname ($nickname: String!){
+    UsersByNickname(nickname: $nickname){
+        email,
+        name,
+        nickname,
+        photo,
+        birthDate,
+        phoneNumber,
+        preferredMode,
+        preferredLanguage,
+        bioDescription,
+        createdAt,
+    } 
+  }''';
+
 }

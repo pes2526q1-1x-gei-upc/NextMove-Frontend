@@ -236,7 +236,7 @@ class _EditUserDataPreferencesPageState
                     ProfileStyledCard(
                       children: [
                          DropdownButtonFormField<String>(
-                            value: _selectedModoUI,
+                            initialValue: _selectedModoUI,
                             decoration: cardInputDecoration(
                                 icon: _selectedModeAPI == "BIKE" 
                                     ? Icons.directions_bike 
@@ -260,16 +260,6 @@ class _EditUserDataPreferencesPageState
                               _selectedModeAPI = v == l10n.bicycle ? "BIKE" : "CAR";
                             }),
                           ),
-                          /*
-                          const Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0), indent: 50),
-                          DropdownButtonFormField<String>(
-                            value: _selectedIdioma,
-                            decoration: cardInputDecoration(icon: Icons.language_rounded, context: context),
-                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                            dropdownColor: Colors.white,
-                            items: _idiomas.map((i) => DropdownMenuItem(value: i, child: Text(i, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)))).toList(),
-                            onChanged: (v) => setState(() => _selectedIdioma = v),
-                          ),*/
                       ],
                     ),
 

@@ -5,7 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+
+// === IMPORTS DE WIDGETS DE ESTILO ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_avatar_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
+
+// === OTROS IMPORTS ===
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -25,19 +30,16 @@ class UserDataPreferencesPage extends StatefulWidget {
 
 class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
-
+  
   // Variable local para controlar la carga de Firebase antes de llamar al Bloc
   bool _isCreatingFirebaseUser = false;
 
-  // Controladores
   late final TextEditingController _apodoController;
   late final TextEditingController _telefonoController;
   late final TextEditingController _fechaNacimientoController;
   late final TextEditingController _descripcionController;
   late final TextEditingController _nombreCompletoController;
 
-  // Imagen
-  final ImagePicker _picker = ImagePicker();
   File? _selectedImageFile;
   final AssetImage _avatarImage = const AssetImage(
     'assets/Profile_avatar_placeholder_large.png',
@@ -45,7 +47,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
   // Dropdowns
   String? _selectedIdioma = 'Español'; // Valor por defecto para evitar nulos
-  String? _selectedModo = 'Coche'; // Valor por defecto
+  String? _selectedModo = 'Coche';     // Valor por defecto
 
   final List<String> _idiomas = ['Español', 'English', 'Català'];
   final List<String> _modos = ['Bici', 'Coche'];
@@ -58,7 +60,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     _fechaNacimientoController = TextEditingController();
     _descripcionController = TextEditingController();
     _nombreCompletoController = TextEditingController();
-
+    
     // NO cargamos usuario (LoadUserProfile) porque sabemos que es nuevo.
   }
 
@@ -79,6 +81,16 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       initialDate: DateTime(1990),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).primaryColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(picked);
@@ -126,13 +138,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         setState(() => _selectedImageFile = File(pickedFile.path));
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.imagePickerError),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
+      );
     }
   }
 
@@ -146,27 +154,20 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       return;
     }
 
-    setState(() {
-      _isCreatingFirebaseUser = true;
-    });
+    setState(() => _isCreatingFirebaseUser = true);
 
     try {
-      // Check if user is already authenticated (e.g., via Google sign-in)
       final firebaseUser = FirebaseAuth.instance.currentUser;
       UserEntity newUser;
 
       if (firebaseUser != null) {
         // User is already authenticated (Google sign-in), skip Firebase creation
-        if (kDebugMode) {
-          print("Usuario ya autenticado con Google: ${firebaseUser.email}");
-        }
+        debugPrint("Usuario ya autenticado con Google: ${firebaseUser.email}");
         newUser = UserEntity(
           email: firebaseUser.email!,
           apodo: _apodoController.text.trim(),
           nombreCompleto: _nombreCompletoController.text.trim(),
-          fechaNacimiento:
-              DateTime.tryParse(_fechaNacimientoController.text) ??
-              DateTime(1990),
+          fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
           fechaRegistro: DateTime.now(), // Fecha actual de registro
           numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
           idiomaPreferido: _selectedIdioma ?? 'Español',
@@ -174,51 +175,35 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           modoPreferido: _selectedModo ?? 'Coche',
         );
       } else {
-        // Email/password registration flow
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         final String? emailProvider = userProvider.email;
         final String? pwdProvider = userProvider.pwd;
 
-        // Verificamos que existan (Guard Clause)
         if (emailProvider == null || pwdProvider == null) {
-          // Si por alguna razón son nulos, mostramos error y no intentamos crear el usuario
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                l10n.errorOccurred(
-                  "No hay credenciales pendientes de registro.",
-                ),
-              ),
-            ),
+            SnackBar(content: Text(l10n.errorOccurred("No hay credenciales pendientes de registro."))),
           );
           return;
         }
 
         // Crear usuario en Firebase Authentication
-        final userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: emailProvider,
-              password: pwdProvider,
-            );
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailProvider,
+          password: pwdProvider,
+        );
 
         final createdFirebaseUser = userCredential.user;
         if (createdFirebaseUser == null) {
           throw Exception("Error creando usuario en Firebase");
         }
 
-        if (kDebugMode) {
-          print("Usuario Firebase creado: ${createdFirebaseUser.email}");
-          print(
-            "Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider",
-          );
-        }
+        debugPrint("Usuario Firebase creado: ${createdFirebaseUser.email}");
+        debugPrint("Tenemos su contraseña y email desde el Provider, contraseña: $pwdProvider");
         newUser = UserEntity(
           email: createdFirebaseUser.email!,
           apodo: _apodoController.text.trim(),
           nombreCompleto: _nombreCompletoController.text.trim(),
-          fechaNacimiento:
-              DateTime.tryParse(_fechaNacimientoController.text) ??
-              DateTime(1990),
+          fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
           fechaRegistro: DateTime.now(), // Fecha actual de registro
           numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
           idiomaPreferido: _selectedIdioma ?? 'Español',
@@ -227,7 +212,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         );
       }
 
-      // Llamar al Bloc para guardar en Backend
       if (mounted) {
         context.read<UserBloc>().add(CreateUserProfile(newUser));
       }
@@ -262,15 +246,31 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     var l10n = AppLocalizations.of(context)!;
 
     return WillPopScope(
-      // Evitamos volver atrás en medio del registro para no dejar estados inconsistentes
+      // Bloqueamos volver atrás solo si se está creando el usuario (loading)
       onWillPop: () async => !_isCreatingFirebaseUser,
       child: Scaffold(
+        backgroundColor: const Color(0xFFF5F5F7),
         appBar: AppBar(
+          backgroundColor: const Color(0xFFF5F5F7),
+          elevation: 0,
           title: Text(
             l10n.userDataPreferences,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
           ),
-          automaticallyImplyLeading: false,
+          centerTitle: true,
+          // 1. CAMBIO: Permitimos que Flutter decida si mostrar la flecha
+          automaticallyImplyLeading: true, 
+          // 2. OPCIONAL: Personalizamos el botón de atrás si queremos estilo iOS
+          leading: Navigator.canPop(context) 
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+                onPressed: () {
+                  if (!_isCreatingFirebaseUser) {
+                    Navigator.pop(context);
+                  }
+                },
+              )
+            : null, // Si no hay historial, no mostramos nada (o mostramos botón de salir si es modal)
         ),
         body: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
@@ -292,11 +292,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 listen: false,
               );
               final firebaseUserNow = FirebaseAuth.instance.currentUser;
-              userProvider.setUser(
-                state.user.toMap(),
-                firebaseUserId: firebaseUserNow?.uid,
-                firebaseToken: null,
-              );
+              userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUserNow?.uid, firebaseToken: null);
               () async {
                 final token = firebaseUserNow == null
                     ? null
@@ -307,15 +303,16 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                   firebaseToken: token,
                 );
               }();
+              
               localeProvider.setLocaleFromLanguage(state.user.idiomaPreferido);
-
+              
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 final updatedL10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(updatedL10n.saveChangesFeedback)),
                 );
               });
-
+              
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const MainScreen()),
                 (route) => false,
@@ -328,18 +325,17 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
                     Text(l10n.creatingYourAccount),
                   ],
                 ),
               );
             }
 
-            // Mostramos el formulario siempre (UserInitial, UserError, etc.)
-            // Ya no necesitamos verificar UserLoaded porque es un usuario nuevo
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -363,11 +359,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                               child: CircleAvatar(
                                 radius: 16,
                                 backgroundColor: Theme.of(context).primaryColor,
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
+                                child: const Icon(Icons.edit, size: 18, color: Colors.white),
                               ),
                             ),
                           ],
@@ -384,9 +376,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                         border: const OutlineInputBorder(),
                         hintText: l10n.nicknameHint,
                       ),
-                      validator: (v) => v?.trim().isEmpty ?? true
-                          ? l10n.mandatoryNickname
-                          : null,
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -397,9 +387,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                         labelText: l10n.fullName,
                         border: const OutlineInputBorder(),
                       ),
-                      validator: (v) => v?.trim().isEmpty ?? true
-                          ? l10n.mandatoryFullName
-                          : null,
+                      validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -414,10 +402,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                       ),
                       readOnly: true,
                       onTap: () => _selectDate(context),
-                      validator: (v) =>
-                          v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
+                      validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // Teléfono
                     TextFormField(
@@ -429,9 +416,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                       keyboardType: TextInputType.phone,
                       validator: (v) {
                         if (v == null || v.isEmpty) return null;
-                        return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v)
-                            ? null
-                            : l10n.invalidPhoneNumber;
+                        return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
                       },
                     ),
                     const SizedBox(height: 16),
@@ -446,10 +431,11 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                       ),
                       maxLines: 4,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                    // Modo e Idioma
-                    Row(
+                    // --- 4. PREFERENCIAS ---
+                    ProfileSectionLabel(text: l10n.preferredMode),
+                    ProfileStyledCard(
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
@@ -459,24 +445,16 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                               border: const OutlineInputBorder(),
                             ),
                             icon: const Icon(Icons.arrow_drop_down),
-                            validator: (v) =>
-                                v == null ? l10n.mandatoryPreferredMode : null,
+                            validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
                             items: _modos.map((m) {
-                              final icon = m == 'Bici'
-                                  ? Icons.directions_bike
-                                  : Icons.electric_car;
+                              final icon = m == 'Bici' ? Icons.directions_bike : Icons.electric_car;
                               return DropdownMenuItem(
                                 value: m,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      icon,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(m),
-                                  ],
-                                ),
+                                child: Row(children: [
+                                  Icon(icon, color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 12),
+                                  Text(m),
+                                ]),
                               );
                             }).toList(),
                             onChanged: (v) => setState(() => _selectedModo = v),
@@ -492,40 +470,31 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                             ),
                             icon: const Icon(Icons.arrow_drop_down),
                             items: _idiomas
-                                .map(
-                                  (i) => DropdownMenuItem(
-                                    value: i,
-                                    child: Text(i),
-                                  ),
-                                )
+                                .map((i) => DropdownMenuItem(value: i, child: Text(i)))
                                 .toList(),
-                            onChanged: (v) =>
-                                setState(() => _selectedIdioma = v),
+                            onChanged: (v) => setState(() => _selectedIdioma = v),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
 
-                    // Botón Finalizar
-                    Center(
+                    // --- 5. BOTÓN FINALIZAR ---
+                    SizedBox(
+                      width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _finalizarOnboarding,
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 50,
-                            vertical: 16,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
                         ),
                         child: Text(
                           l10n.finishRegistration,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
+                    
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
