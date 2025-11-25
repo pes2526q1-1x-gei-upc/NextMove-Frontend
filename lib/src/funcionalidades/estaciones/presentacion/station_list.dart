@@ -44,7 +44,29 @@ class StationList extends StatelessWidget {
                   final stationDetails = allStationDetails[i];
                   return ListTile(
                     title: Text(stationDetails.address ?? "N/A"),
-                    trailing: Text(stationDetails.distanceKm != null ? '${stationDetails.distanceKm!.toStringAsFixed(2)} km' : "N/A km"),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            (stationDetails.isFavorite ?? false) ? Icons.star : Icons.star_border,
+                            color: switch (stationDetails.isFavorite) {
+                              true => Colors.yellow[700],
+                              false => null,
+                              null => Colors.grey[350],
+                            },
+                          ),
+                          onPressed: () {
+                            context.read<StationListBloc>().add(ToggleFavoriteEvent(stationId: stationDetails.id));
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          stationDetails.distanceKm != null ? '${stationDetails.distanceKm!.toStringAsFixed(2)} km' : "N/A km",
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(

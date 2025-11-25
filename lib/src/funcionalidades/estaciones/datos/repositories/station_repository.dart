@@ -141,4 +141,20 @@ class StationRepository {
       throw UnknownFailure();
     }
   }
+
+  Future<Either<Failure, void>> setStationFavoriteStatus(String stationId, bool isFavorite) async {
+    try {
+      await stationRemoteDataProvider.setStationFavoriteStatus(stationId, isFavorite);
+      return Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in setStationFavoriteStatus: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
 }

@@ -235,4 +235,16 @@ class StationRemoteDataProvider {
 
     return [];
   }
+
+  Future<void> setStationFavoriteStatus(
+    String stationId,
+    bool isFavorite,
+  ) async {
+    // TODO: Implementar la mutación GraphQL para actualizar el estado de favorito
+    if (kDebugMode) {
+      print(
+        'setStationFavoriteStatus called for stationId: $stationId, isFavorite: $isFavorite',
+      );
+    }
+  }
 }

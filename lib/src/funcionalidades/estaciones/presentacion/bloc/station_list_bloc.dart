@@ -16,6 +16,7 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
       super(StationListInitial()) {
     on<LoadStationListEvent>(_onLoadStationListEvent);
     on<SearchStationListEvent>(_onSearchStationListEvent);
+    on<ToggleFavoriteEvent>(_onToggleFavoriteEvent);
   }
 
   Future<void> _onLoadStationListEvent(
@@ -55,5 +56,23 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
       return 'auth-error';
     }
     return 'unknown-error';
+  }
+
+  Future<void> _onToggleFavoriteEvent(
+    ToggleFavoriteEvent event,
+    Emitter<StationListState> emit,
+  ) async {
+    if (state is StationListLoaded) {
+      final currentState = state as StationListLoaded;
+      final updatedStations = currentState.stations.map((station) {
+        if (station.id == event.stationId) {
+          final isFavorite = station.isFavorite ?? false;
+          stationRepository.setStationFavoriteStatus(station.id, !isFavorite);
+          station.isFavorite = !isFavorite;
+        }
+        return station;
+      }).toList();
+      emit(StationListLoaded(updatedStations));
+    }
   }
 }

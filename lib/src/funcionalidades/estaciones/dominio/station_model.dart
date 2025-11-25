@@ -15,6 +15,7 @@ class StationDetails {
     final double? distanceKm;
     final double? latitude;
     final double? longitude;
+    bool? isFavorite;
 
     StationDetails({
     required this.id,
@@ -26,6 +27,7 @@ class StationDetails {
     this.latitude,
     this.longitude,
     this.distanceKm,
+    this.isFavorite,
     });
 }
 
