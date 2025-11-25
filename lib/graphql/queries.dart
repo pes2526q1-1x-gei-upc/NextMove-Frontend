@@ -245,13 +245,6 @@ class GraphQLQueries {
           latitude
           longitude
         }
-        distance
-        connectors {
-          type
-          powerKw
-          status
-        }
-        isSuperFast
       }
     }
   ''';

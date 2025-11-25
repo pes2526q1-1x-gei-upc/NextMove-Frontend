@@ -111,6 +111,7 @@ class SearchResultsList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     onTap: () {
+                      debugPrint('✅ Pulsado: ${station.name}');
                       final currentState = state;
                       context.read<MapBloc>().onMarkerTapped(station, currentState);
                       context.read<MapBloc>().add(const ClearSearchEvent());

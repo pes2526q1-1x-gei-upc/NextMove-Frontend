@@ -173,7 +173,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final query = event.query.trim();
 
       if(query.isEmpty){
-        emit(currentState.copyWith(searchQuery: null, searchResults: null, isSearching: false));
+        emit(currentState.copyWith(searchQuery: null, searchResults: [], isSearching: false));
         return;
       }
 
@@ -189,12 +189,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             final result = currentState.currentMode == StationType.electricVehicle ? 
             await stationRepository.searchEvStations(query) 
             : await stationRepository.searchEvStations(query);
-            debugPrint("searchEvStations result.data: ${result.fold((l) => l, (r) => r)}");
+            
 
             result.fold((failure) {
               throw Exception('Error buscando estaciones de coches: ${failure.message}');
-            }, (evstations) {
-              emit(currentState.copyWith(searchResults: evstations, isSearching: true, searchQuery: query));
+            }, (stations) {
+              emit(currentState.copyWith(searchResults: stations, isSearching: true, searchQuery: query));
             });
       } catch(e){
         // Si hay un error, emitir estado sin resultados
@@ -214,7 +214,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (currentState is MapLoadedState) {
       emit(currentState.copyWith(
         searchQuery: null,
-        searchResults: null,
+        searchResults: [],
         isSearching: false,
       ));
     }

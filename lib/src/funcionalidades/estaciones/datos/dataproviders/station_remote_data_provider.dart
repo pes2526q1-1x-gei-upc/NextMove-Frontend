@@ -208,7 +208,7 @@ class StationRemoteDataProvider {
     throw ServerException('Station not found');
   }
 
-  Future<List<EVStationDetails>> searchEvStations(String query) async {
+  Future<List<StationDetails>> searchEvStations(String query) async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getStationsBySearchQuery),
       variables: {'query': query},
@@ -229,7 +229,7 @@ class StationRemoteDataProvider {
     final data = result.data?['stationsByAddress'];
     if (data != null) {
       return (data as List)
-          .map((item) => EVStationDetails.fromJson(item))
+          .map((item) => EVStationDetails.fromJson(item) as StationDetails)
           .toList();
     }
 

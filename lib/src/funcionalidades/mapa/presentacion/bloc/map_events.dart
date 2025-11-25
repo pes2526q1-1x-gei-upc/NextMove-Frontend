@@ -75,3 +75,4 @@ class ClearSearchEvent extends MapEvent {
   @override
   List<Object?> get props => [];
 }
+

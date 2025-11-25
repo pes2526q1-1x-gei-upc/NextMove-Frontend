@@ -182,6 +182,15 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
+    _mapController?.animateCamera(
+    CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(station.latitude!, station.longitude!),
+        zoom: 16,  
+      ),
+    ),
+  );
+    
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
