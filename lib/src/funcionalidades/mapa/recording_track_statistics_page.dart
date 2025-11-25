@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
@@ -33,7 +34,11 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
             );
           }
 
-          return _buildStatisticsView(context, recordedTrack, l10n);
+          if (kDebugMode) {
+            print('Statistics page - Elapsed time: ${state.recordingElapsedTime.inSeconds} seconds');
+          }
+
+          return _buildStatisticsView(context, recordedTrack, l10n, state.recordingElapsedTime);
         },
       ),
     );
@@ -43,8 +48,9 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
     BuildContext context,
     RecordedTrack track,
     AppLocalizations l10n,
+    Duration elapsedTime,
   ) {
-    final duration = track.totalTime;
+    final duration = elapsedTime;
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
