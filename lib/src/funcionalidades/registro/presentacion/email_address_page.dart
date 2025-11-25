@@ -33,9 +33,6 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
       create: (context) => AuthBloc(),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          // CORRECCIÓN: Eliminada la navegación manual a MainScreen.
-          // Dejamos que el AuthStateHandler en main.dart maneje el flujo tras el login.
-          
           if (state is AuthFailureState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.errorCode)),
@@ -126,10 +123,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                                 firebaseToken: state.firebaseToken,
                               );
                             }
-                            // Notificar a la app global que estamos logueados
                             appKey.currentState?.setLoggedIn(true);
                             
-                            // Volver a la raíz para que main.dart muestre MainScreen
                              Navigator.of(context).popUntil((route) => route.isFirst);
                           }
                           
@@ -193,8 +188,6 @@ class ContinueButton extends StatelessWidget {
           );
         } else {
           if (context.read<AuthBloc>().state is EmailIsNewState) {
-            // === CORRECCIÓN: Eliminada validación externa isPasswordValid ===
-            // Directamente guardamos y pasamos a la siguiente pantalla
             try {
               Provider.of<UserProvider>(
                 context,

@@ -830,7 +830,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{nickname} has been added to your friends.'**
-  String friendAdded(Object nickname);
+  String friendAdded(String nickname);
 
   /// No description provided for @friends.
   ///
@@ -838,6 +838,59 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get friends;
 
+  /// No description provided for @memberSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Member since'**
+  String get memberSince;
+
+  /// No description provided for @deleteFriendship.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete friendship'**
+  String get deleteFriendship;
+
+  /// No description provided for @deleteFriendConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {nickname} from your friends?'**
+  String deleteFriendConfirmation(String nickname);
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deletedFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'You have deleted {nickname} from your friends.'**
+  String deletedFriend(String nickname);
+
+  /// No description provided for @deleteFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete friendship'**
+  String get deleteFriend;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get blockUser;
+
+  /// No description provided for @blockUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to block {nickname}? You won\'t be able to see their profile or interact with them.'**
+  String blockUserConfirmation(String nickname);
+
+  /// No description provided for @block.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get block;
   /// No description provided for @minCharsSearchHint.
   ///
   /// In en, this message translates to:

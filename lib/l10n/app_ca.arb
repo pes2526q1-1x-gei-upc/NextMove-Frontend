@@ -138,6 +138,40 @@
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
     "friends": "Amics",
+    "memberSince": "Membre des de",
+    "deleteFriendship": "Eliminar amistat",
+    "deleteFriendConfirmation": "Estàs segur que vols eliminar {nickname} dels teus amics?",
+    "@deleteFriendConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"   
+            }
+        }
+    },
+    "delete": "Eliminar",
+    "deletedFriend": "{nickname} ha estat eliminat dels teus amics.",
+    "@deletedFriend": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
+    "deleteFriend" : "Eliminar amistat",
+    "blockUser" : "Bloquejar usuari",
+    "blockUserConfirmation" : "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
+    "@blockUserConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
+    "block" : "Bloquejar"
+
     "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
     "anyStationsFound" : "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",

@@ -389,7 +389,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get yourFriends => 'ELS TEUS AMICS';
 
   @override
-  String friendAdded(Object nickname) {
+  String friendAdded(String nickname) {
     return '$nickname s\'ha afegit als teus amics.';
   }
 
@@ -397,6 +397,37 @@ class AppLocalizationsCa extends AppLocalizations {
   String get friends => 'Amics';
 
   @override
+  String get memberSince => 'Membre des de';
+
+  @override
+  String get deleteFriendship => 'Eliminar amistat';
+
+  @override
+  String deleteFriendConfirmation(String nickname) {
+    return 'Estàs segur que vols eliminar $nickname dels teus amics?';
+  }
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String deletedFriend(String nickname) {
+    return '$nickname ha estat eliminat dels teus amics.';
+  }
+
+  @override
+  String get deleteFriend => 'Eliminar amistat';
+
+  @override
+  String get blockUser => 'Bloquejar usuari';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return 'Estàs segur que vols bloquejar $nickname? Això eliminarà l\'amistat i no podreu veure els perfils mútuament.';
+  }
+
+  @override
+  String get block => 'Bloquejar';
   String get minCharsSearchHint =>
       'Si us plau, introdueix almenys 3 caràcters per cercar.';
 

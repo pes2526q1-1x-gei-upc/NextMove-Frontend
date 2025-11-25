@@ -137,6 +137,49 @@
     "results": "RESULTADOS",
     "yourFriends": "TUS AMIGOS",
     "friendAdded": "{nickname} has been added to your friends.",
+    "@friendAdded": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "friends": "Amigos",
+    "memberSince": "Miembro desde",
+    "deleteFriendship": "Eliminar amistad",
+    "deleteFriendConfirmation": "¿Estás seguro de que quieres eliminar a {nickname} de tus amigos?",
+    "@deleteFriendConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "delete": "Eliminar",
+    "deletedFriend": "Has eliminado a {nickname} de tus amigos.",
+    "@deletedFriend": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+
+    "deleteFriend": "Eliminar amistad",
+    "blockUser": "Bloquear usuario",
+    "blockUserConfirmation": "¿Estás seguro de que quieres bloquear a {nickname}? No podrás ver su perfil ni interactuar con él.",
+    "@blockUserConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "block": "Bloquear"
     "friends": "Amigos",
     "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
     "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",

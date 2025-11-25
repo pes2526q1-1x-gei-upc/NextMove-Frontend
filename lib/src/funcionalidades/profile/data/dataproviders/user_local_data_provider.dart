@@ -13,6 +13,7 @@ class UserLocalDataProvider {
       idiomaPreferido: "Español",
       descripcion: "",
       modoPreferido: "Coche",
+      photo: "",
     );
   }
 
