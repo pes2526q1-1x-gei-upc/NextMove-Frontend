@@ -46,7 +46,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     'assets/Profile_avatar_placeholder_large.png',
   );
 
-  final ImagePicker _picker = ImagePicker();
 
   // Dropdowns
   String? _selectedIdioma = 'Español'; 

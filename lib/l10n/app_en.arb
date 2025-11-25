@@ -178,7 +178,7 @@
             }
         }
     },
-    "block": "Block"
+    "block": "Block",
     "friends": "Friends",
     "minCharsSearchHint" : "Please enter at least 3 characters to search.",
     "anyStationsFound" : "No results were found for your search.",

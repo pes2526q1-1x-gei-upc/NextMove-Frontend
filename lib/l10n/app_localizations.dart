@@ -891,6 +891,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+
   /// No description provided for @minCharsSearchHint.
   ///
   /// In en, this message translates to:

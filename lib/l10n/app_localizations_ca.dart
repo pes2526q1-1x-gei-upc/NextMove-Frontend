@@ -428,6 +428,8 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get block => 'Bloquejar';
+
+  @override
   String get minCharsSearchHint =>
       'Si us plau, introdueix almenys 3 caràcters per cercar.';
 

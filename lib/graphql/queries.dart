@@ -251,7 +251,7 @@ class GraphQLQueries {
     UnBlockUser(nickname: $nickname)
   }
   ''';
-}
+
   static const String getStationsBySearchQuery = r'''
     query getStationsBySearchQuery($query: String!) {
       stationsByAddress(address: $query) {

@@ -423,6 +423,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get block => 'Block';
+
+  @override
   String get minCharsSearchHint =>
       'Please enter at least 3 characters to search.';
 
