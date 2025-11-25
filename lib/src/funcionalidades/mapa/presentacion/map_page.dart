@@ -21,6 +21,7 @@ import 'widgets/station_list_widget.dart';
 import 'widgets/center_user_widget.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/toggle_map_type_widget.dart';
+import 'widgets/record_track_widget.dart';
 
 
 class MapPage extends StatefulWidget {
@@ -158,6 +159,9 @@ class _MapPageState extends State<MapPage> {
                 ToggleMapModeWidget(
                   currentMode: state.currentMode,
                 ),
+
+                // Botón de grabación de ruta
+                const RecordTrackWidget(),
               ],
             );
           }

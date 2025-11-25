@@ -96,6 +96,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         ),
       );
 
+      if (kDebugMode) {
+        print('Polyline initialized with default polyline');
+      }
+
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
     } catch (e) {
@@ -134,6 +138,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       // Add point to route if recording
       if (currentState.isRecordingRoute) {
+        if (kDebugMode) {
+          print(
+            'Location update received while recording: ${event.latitude}, ${event.longitude}',
+          );
+        }
         add(
           AddRoutePointEvent(
             TrackPoint(
@@ -188,7 +197,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void _startLocationUpdates() async {
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 50, // Actualizar cada 50 metros
+      distanceFilter: 1, // Actualizar cada 1 metro
     );
 
     _positionStreamSubscription?.cancel();
@@ -278,6 +287,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     final currentState = state;
     if (currentState is MapLoadedState) {
+      if (kDebugMode) {
+        print('Started route recording');
+      }
+
       emit(
         currentState.copyWith(
           isRecordingRoute: true,
@@ -285,6 +298,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           routePolyline: defaultPolyline,
         ),
       );
+
+      if (kDebugMode) {
+        print('Polyline reset for route recording start');
+      }
     }
   }
 
@@ -294,18 +311,37 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     final currentState = state;
     if (currentState is MapLoadedState) {
+      if (kDebugMode) {
+        print(
+          'Stopped route recording. Total points recorded: ${currentState.recordedTrack?.points.length ?? 0}',
+        );
+      }
+
       emit(
         currentState.copyWith(
           isRecordingRoute: false,
           routePolyline: defaultPolyline,
         ),
       );
+
+      if (kDebugMode) {
+        print('Polyline reset for route recording stop');
+      }
     }
   }
 
   void _onAddRoutePoint(AddRoutePointEvent event, Emitter<MapState> emit) {
     final currentState = state;
     if (currentState is MapLoadedState && currentState.isRecordingRoute) {
+      if (kDebugMode) {
+        print(
+          'Adding route point: ${event.point.location.latitude}, ${event.point.location.longitude} at ${event.point.timestamp}',
+        );
+        print(
+          'Total points in track: ${(currentState.recordedTrack?.points.length ?? 0) + 1}',
+        );
+      }
+
       // add the new point to the recorded track
       currentState.recordedTrack!.addPoint(
         TrackPoint(
@@ -322,6 +358,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           event.point.location,
         ],
       );
+
+      if (kDebugMode) {
+        print(
+          'Polyline updated with new point (${event.point.location.latitude}, ${event.point.location.longitude}); total points: ${routePolyline.points.length}',
+        );
+      }
 
       emit(currentState.copyWith(routePolyline: routePolyline));
     }
