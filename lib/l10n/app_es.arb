@@ -180,4 +180,9 @@
         }
     },
     "block": "Bloquear"
+    "friends": "Amigos",
+    "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
+    "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",
+    "errorSavingRoute": "Error al guardar la ruta",
+    "notEnoughPointsToRecordTrack": "No se han registrado suficientes puntos para guardar la ruta grabada."
 }

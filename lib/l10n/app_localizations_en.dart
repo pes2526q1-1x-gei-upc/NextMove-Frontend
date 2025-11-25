@@ -423,4 +423,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get block => 'Block';
+  String get minCharsSearchHint =>
+      'Please enter at least 3 characters to search.';
+
+  @override
+  String get anyStationsFound => 'No results were found for your search.';
+
+  @override
+  String get errorSavingRoute => 'Error saving route';
+
+  @override
+  String get notEnoughPointsToRecordTrack =>
+      'Not enough points were recorded to save the recorded route.';
 }

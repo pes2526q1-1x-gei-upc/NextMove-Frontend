@@ -428,4 +428,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get block => 'Bloquear';
+  String get minCharsSearchHint =>
+      'Por favor, introduce al menos 3 caracteres para buscar.';
+
+  @override
+  String get anyStationsFound =>
+      'No se han encontrado resultados para tu búsqueda.';
+
+  @override
+  String get errorSavingRoute => 'Error al guardar la ruta';
+
+  @override
+  String get notEnoughPointsToRecordTrack =>
+      'No se han registrado suficientes puntos para guardar la ruta grabada.';
 }

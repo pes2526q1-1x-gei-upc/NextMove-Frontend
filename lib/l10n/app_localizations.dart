@@ -891,6 +891,29 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+  /// No description provided for @minCharsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter at least 3 characters to search.'**
+  String get minCharsSearchHint;
+
+  /// No description provided for @anyStationsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results were found for your search.'**
+  String get anyStationsFound;
+
+  /// No description provided for @errorSavingRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving route'**
+  String get errorSavingRoute;
+
+  /// No description provided for @notEnoughPointsToRecordTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough points were recorded to save the recorded route.'**
+  String get notEnoughPointsToRecordTrack;
 }
 
 class _AppLocalizationsDelegate

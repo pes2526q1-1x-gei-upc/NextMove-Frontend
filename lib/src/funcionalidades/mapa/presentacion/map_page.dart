@@ -7,11 +7,13 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 
 // Imports del BLoC
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 //imports widgets
@@ -21,7 +23,7 @@ import 'widgets/station_list_widget.dart';
 import 'widgets/center_user_widget.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/toggle_map_type_widget.dart';
-
+import 'widgets/record_track_widget.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -37,6 +39,7 @@ class _MapPageState extends State<MapPage> {
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
+  TrackRepository trackRepository = TrackRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
 
@@ -69,117 +72,147 @@ class _MapPageState extends State<MapPage> {
     _mapController?.setMapStyle(style);
   }
 
-
   // -----------------------------------------------------------------------
   // UI helpers
   // -----------------------------------------------------------------------
-  
 
   // -----------------------------------------------------------------------
   // Build
   // -----------------------------------------------------------------------
-    @override
+  @override
   Widget build(BuildContext context) {
-  return BlocProvider(
-    create: (context) => MapBloc(
-      stationRepository: stationRepository,
-      onMarkerTapped: _showStationBottomSheet, 
-    )..add(const LoadMapDataEvent()), 
-    child: _buildUI(context),
-  );
-}
+    return BlocProvider(
+      create: (context) => MapBloc(
+        stationRepository: stationRepository,
+        trackRepository: trackRepository,
+        onMarkerTapped: _showStationBottomSheet,
+      )..add(const LoadMapDataEvent()),
+      child: _buildUI(context),
+    );
+  }
 
   Widget _buildUI(BuildContext context) {
-
+    var l10n = AppLocalizations.of(context)!;
     // Main UI
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
-        body: BlocBuilder<MapBloc, MapState>(
-          builder: (context, state) {
-            if (state is MapLoadingState) {
-              return const Center(child: CircularProgressIndicator());
+        body: BlocListener<MapBloc, MapState>(
+          listener: (context, state) {
+            if (state is MapLoadedState && state.snackbarError != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: state.snackbarError == "not-enough-points"
+                      ? Text(l10n.notEnoughPointsToRecordTrack)
+                      : Text("${l10n.errorSavingRoute}: ${state.snackbarError}"),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
-            if(state is MapErrorState){
-              return Center(child: Text('Error: ${state.message}'));
-            }
-            
-            if (state is MapLoadedState) {
-              final markersToShow = state.currentMode == StationType.bicycle
-                  ? state.bikeMarkers
-                  : state.carMarkers;
-              
-              return  Stack(
-              children: [
-                // Widget del mapa (fondo)
-                MapWidget(
-                  initialCameraPosition: CameraPosition(
-                    target: _bcnCenter,
-                    zoom: 12,
-                  ),
-                  markers: markersToShow,
-                  mapType: state.currentMapType,
-                  onMapCreated: _onMapCreated,
-                ),
+          },
+          child: BlocBuilder<MapBloc, MapState>(
+            builder: (context, state) {
+              if (state is MapLoadingState) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is MapErrorState) {
+                return Center(child: Text('Error: ${state.message}'));
+              }
 
-                // Barra de búsqueda
-                SearchBarWidget(
-                  hintText: AppLocalizations.of(context)!.searchStation,
-                  onChanged: (query) {
-                    // TODO: Implementar búsqueda
-                    if (kDebugMode) {
-                      print('Searching: $query');
-                    }
-                  },
-                ),
+              if (state is MapLoadedState) {
+                final markersToShow = state.currentMode == StationType.bicycle
+                    ? state.bikeMarkers
+                    : state.carMarkers;
 
-                // Avatar de perfil
-                //ProfileAvatarWidget(context: context),
+                return Stack(
+                  children: [
+                    // Widget del mapa (fondo)
+                    MapWidget(
+                      initialCameraPosition: CameraPosition(
+                        target: _bcnCenter,
+                        zoom: 12,
+                      ),
+                      markers: markersToShow,
+                      polyline: state.routePolyline,
+                      mapType: state.currentMapType,
+                      onMapCreated: _onMapCreated,
+                    ),
 
-                // Botón de lista de estaciones
-                StationListButtonWidget(
-                  currentMode: state.currentMode,
-                  userLocation: state.userLocation,
-                ),
+                    // Barra de búsqueda
+                    SearchBarWidget(
+                      hintText: AppLocalizations.of(context)!.searchStation,
+                      onChanged: (query) {
+                        if (kDebugMode) {
+                          print('Searching: $query');
+                        }
+                      },
+                    ),
 
-                // Botón centrar en usuario
-                CenterOnUserButtonWidget(
-                  userLocation: state.userLocation,
-                  mapController: _mapController,
-                ),
+                    if (state.isSearching)
+                      Positioned(
+                        top: 130,
+                        left: 16,
+                        right: 16,
+                        child: SearchResultsList(),
+                      ),
 
-                // Botón cambiar tipo de mapa
-                MapTypeToggleWidget(
-                  currentMapType: state.currentMapType,
-                ),
+                    // Avatar de perfil
+                    //ProfileAvatarWidget(context: context),
 
-                // Selector de modo (bici/coche)
-                ToggleMapModeWidget(
-                  currentMode: state.currentMode,
-                ),
-              ],
-            );
-          }
-            return const Center(child: Text('Estado desconocido'));
-        }   
+                    // Botón de lista de estaciones
+                    StationListButtonWidget(
+                      currentMode: state.currentMode,
+                      userLocation: state.userLocation,
+                    ),
+
+                    // Botón centrar en usuario
+                    CenterOnUserButtonWidget(
+                      userLocation: state.userLocation,
+                      mapController: _mapController,
+                    ),
+
+                    // Botón cambiar tipo de mapa
+                    MapTypeToggleWidget(currentMapType: state.currentMapType),
+
+                    // Selector de modo (bici/coche)
+                    ToggleMapModeWidget(currentMode: state.currentMode),
+
+                    // Botón de grabación de ruta en bici
+                    if (state.currentMode == StationType.bicycle)
+                      const RecordTrackWidget(),
+                  ],
+                );
+              }
+              return const Center(child: Text('Estado desconocido'));
+            },
+          ),
+        ),
       ),
-    ),
     );
   }
 
-
-// -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
   // Markers
   // -----------------------------------------------------------------------
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
+    _mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(station.latitude!, station.longitude!),
+          zoom: 16,
+        ),
+      ),
+    );
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => StationBottomSheet(context: context, station: station, state: state),
+      builder: (_) =>
+          StationBottomSheet(context: context, station: station, state: state),
     );
   }
 }

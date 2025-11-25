@@ -428,4 +428,17 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get block => 'Bloquejar';
+  String get minCharsSearchHint =>
+      'Si us plau, introdueix almenys 3 caràcters per cercar.';
+
+  @override
+  String get anyStationsFound =>
+      'No s\'han trobat resultats per a la teva cerca.';
+
+  @override
+  String get errorSavingRoute => 'Error en desar la ruta';
+
+  @override
+  String get notEnoughPointsToRecordTrack =>
+      'No s\'han gravat prou punts per desar la ruta enregistrada.';
 }

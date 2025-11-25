@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 
 // === IMPORTS DE WIDGETS DE ESTILO ===
-// Asegúrate de que estos widgets existan en tu proyecto tal como en la página de edición
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 
 // === OTROS IMPORTS ===
@@ -39,6 +38,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   late final TextEditingController _fechaNacimientoController;
   late final TextEditingController _descripcionController;
   late final TextEditingController _nombreCompletoController;
+
+  final ImagePicker _picker = ImagePicker();
 
   File? _selectedImageFile;
   final AssetImage _avatarImage = const AssetImage(
