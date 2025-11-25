@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'map_events.dart';
 import 'map_state.dart';
@@ -18,6 +19,7 @@ var defaultPolyline = Polyline(
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
+  final TrackRepository trackRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -26,8 +28,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
-  MapBloc({required this.stationRepository, required this.onMarkerTapped})
-    : super(const MapInitialState()) {
+  MapBloc({
+    required this.stationRepository,
+    required this.trackRepository,
+    required this.onMarkerTapped,
+  }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
@@ -308,7 +313,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void _onStopRouteRecording(
     StopRouteRecordingEvent event,
     Emitter<MapState> emit,
-  ) {
+  ) async {
     final currentState = state;
     if (currentState is MapLoadedState) {
       currentState.recordedTrack!.endTime = DateTime.now();
@@ -319,13 +324,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         print("Route information: ${currentState.recordedTrack.toString()}");
       }
 
-      // TODO: save route somewhere
+      if (currentState.recordedTrack!.points.length < 2) {
+        if (kDebugMode) {
+          print('Not enough points recorded to save the track.');
+        }
+        emit(
+          currentState.copyWith(
+            isRecordingRoute: false,
+            routePolyline: defaultPolyline,
+          ),
+        );
+        return;
+      }
 
-      emit(
-        currentState.copyWith(
-          isRecordingRoute: false,
-          routePolyline: defaultPolyline,
-        ),
+      final saveResult = await trackRepository.saveRecordedTrack(
+        currentState.recordedTrack!,
+      );
+      saveResult.fold(
+        (failure) {
+          if (kDebugMode) {
+            print('Error saving recorded track: ${failure.message}');
+            emit(
+              MapErrorState('Error saving recorded track: ${failure.message}'),
+            );
+          }
+        },
+        (_) {
+          if (kDebugMode) {
+            print('Recorded track saved successfully.');
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+              ),
+            );
+          }
+        },
       );
     }
   }
