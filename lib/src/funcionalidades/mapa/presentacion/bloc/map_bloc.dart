@@ -311,11 +311,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   ) {
     final currentState = state;
     if (currentState is MapLoadedState) {
+      currentState.recordedTrack!.endTime = DateTime.now();
       if (kDebugMode) {
         print(
           'Stopped route recording. Total points recorded: ${currentState.recordedTrack?.points.length ?? 0}',
         );
+        print("Route information: ${currentState.recordedTrack.toString()}");
       }
+
+      // TODO: save route somewhere
 
       emit(
         currentState.copyWith(
@@ -323,10 +327,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           routePolyline: defaultPolyline,
         ),
       );
-
-      if (kDebugMode) {
-        print('Polyline reset for route recording stop');
-      }
     }
   }
 

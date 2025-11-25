@@ -161,8 +161,8 @@ class _MapPageState extends State<MapPage> {
                   currentMode: state.currentMode,
                 ),
 
-                // Botón de grabación de ruta
-                const RecordTrackWidget(),
+                // Botón de grabación de ruta en bici
+                if (state.currentMode == StationType.bicycle) const RecordTrackWidget(),
               ],
             );
           }

@@ -8,8 +8,11 @@ class TrackPoint {
   // speed between the current point and the last one; the first point has a speed of 0.
   late double speed;
 
-
-  TrackPoint({required this.location, required this.altitude, required this.timestamp});
+  TrackPoint({
+    required this.location,
+    required this.altitude,
+    required this.timestamp,
+  });
 }
 
 class RecordedTrack {
@@ -42,12 +45,24 @@ class RecordedTrack {
       speedKmH = (distanceMeters / timeDiffMillis) * 3600; // km/h
       totalDistanceMeters += distanceMeters;
       totalTime += Duration(milliseconds: timeDiffMillis);
-      averageSpeedKmH = (totalDistanceMeters / totalTime.inSeconds) * 3.6; // km/h
+      averageSpeedKmH =
+          (totalDistanceMeters / totalTime.inSeconds) * 3.6; // km/h
       if (speedKmH > maxSpeedKmH) {
         maxSpeedKmH = speedKmH;
+      }
+      final elevationDiff = newPoint.altitude - lastPoint.altitude;
+      if (elevationDiff > 0) {
+        elevationGainMeters += elevationDiff;
+      } else {
+        elevationLossMeters += -elevationDiff;
       }
     }
     newPoint.speed = speedKmH;
     points.add(newPoint);
+  }
+
+  @override
+  String toString() {
+    return 'startTime: $startTime\nendTime: $endTime\ntotalDistanceMeters: $totalDistanceMeters\naverageSpeedKmH: $averageSpeedKmH\nmaxSpeedKmH: $maxSpeedKmH\ntotalTime: $totalTime\nelevationGainMeters: $elevationGainMeters\nelevationLossMeters: $elevationLossMeters\nnumber of points: ${points.length}';
   }
 }
