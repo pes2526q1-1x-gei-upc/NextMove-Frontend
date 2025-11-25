@@ -31,9 +31,10 @@ class SearchResultsList extends StatelessWidget {
         }
 
         // Si la búsqueda no devolvió resultados
-        if (state.searchResults!.isEmpty) {
+        if (state.searchResults.isEmpty) {
+          debugPrint("Search Results : ${state.searchResults}");
           return _messageCard(
-            loc.anyStationFound,
+            loc.anyStationsFound,
             Icons.location_off,
           );
         }
@@ -85,9 +86,9 @@ class SearchResultsList extends StatelessWidget {
               ),
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: state.searchResults!.length,
+                itemCount: state.searchResults.length,
                 itemBuilder: (context, index) {
-                  final station = state.searchResults![index];
+                  final station = state.searchResults[index];
                   return ListTile(
                     leading: Icon(
                       state.currentMode == StationType.bicycle

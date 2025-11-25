@@ -134,12 +134,11 @@ class _MapPageState extends State<MapPage> {
                   },
                 ),
 
-                if (state.isSearching && state.searchResults != null)
+                if (state.isSearching)
                   Positioned(
                     top: 130,
                     left: 16,
-                    right: 16,
-                    bottom: 100, 
+                    right: 16, 
                     child: SearchResultsList(),
                 ),
 

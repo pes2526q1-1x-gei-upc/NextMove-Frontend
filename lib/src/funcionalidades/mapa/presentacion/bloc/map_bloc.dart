@@ -79,7 +79,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         carMarkers: carMarkers,
         centerPosition: _bcnCenter,
         searchQuery: null,
-        searchResults: null,
+        searchResults: [],
         isSearching: false,
       ));
 
@@ -179,22 +179,26 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       else if(query.length < 3){
         // Si la consulta es muy corta, no buscar
-        emit(currentState.copyWith(searchQuery: query, isSearching: false, searchResults: null));
+        emit(currentState.copyWith(searchQuery: query, isSearching: true, searchResults: []));
         return;
       }
 
       emit(currentState.copyWith(isSearching: true));
 
       try{
-            final result = currentState.currentMode == StationType.electricVehicle ? await stationRepository.searchEvStations(query) : await stationRepository.searchEvStations(query);
+            final result = currentState.currentMode == StationType.electricVehicle ? 
+            await stationRepository.searchEvStations(query) 
+            : await stationRepository.searchEvStations(query);
+            debugPrint("searchEvStations result.data: ${result.fold((l) => l, (r) => r)}");
+
             result.fold((failure) {
               throw Exception('Error buscando estaciones de coches: ${failure.message}');
             }, (evstations) {
-              emit(currentState.copyWith(searchResults: evstations, isSearching: false));
+              emit(currentState.copyWith(searchResults: evstations, isSearching: true, searchQuery: query));
             });
       } catch(e){
         // Si hay un error, emitir estado sin resultados
-        emit(currentState.copyWith(searchResults: null, isSearching: false));
+        emit(currentState.copyWith(searchResults: [], isSearching: false));
         return;
       }
 

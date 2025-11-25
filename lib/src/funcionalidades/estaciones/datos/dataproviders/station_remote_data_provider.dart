@@ -226,7 +226,7 @@ class StationRemoteDataProvider {
     if (kDebugMode) {
       print('searchEvStations result.data: ${result.data}');
     }
-    final data = result.data?['searchStations'];
+    final data = result.data?['stationsByAddress'];
     if (data != null) {
       return (data as List)
           .map((item) => EVStationDetails.fromJson(item))

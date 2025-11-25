@@ -397,8 +397,10 @@ class AppLocalizationsCa extends AppLocalizations {
   String get friends => 'Amics';
 
   @override
-  String get minCharsSearchHint => 'Si us plau, introdueix almenys 3 caràcters per cercar.';
-  
+  String get minCharsSearchHint =>
+      'Si us plau, introdueix almenys 3 caràcters per cercar.';
+
   @override
-  String get anyStationsFound => 'No s\'han trobat resultats per a la teva cerca.';
+  String get anyStationsFound =>
+      'No s\'han trobat resultats per a la teva cerca.';
 }

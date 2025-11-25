@@ -31,7 +31,7 @@ class MapLoadedState extends MapState {
   final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
-  final List<StationDetails>? searchResults;
+  final List<EVStationDetails> searchResults;
   final bool isSearching;
 
   const MapLoadedState({
@@ -44,7 +44,7 @@ class MapLoadedState extends MapState {
     required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
-    this.searchResults,
+    this.searchResults = const [],
     required this.isSearching,
   });
 
@@ -74,7 +74,7 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
-    List<StationDetails>? searchResults,
+    List<EVStationDetails>? searchResults,
     bool? isSearching,
   }) {
     return MapLoadedState(
