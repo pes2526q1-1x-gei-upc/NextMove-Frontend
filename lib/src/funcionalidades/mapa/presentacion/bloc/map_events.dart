@@ -98,9 +98,3 @@ class AddRoutePointEvent extends MapEvent {
   @override
   List<Object?> get props => [point];
 }
-
-/// Evento: limpiar ruta actual
-/// TODO: cal?
-class ClearRouteEvent extends MapEvent {
-  const ClearRouteEvent();
-}

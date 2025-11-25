@@ -44,7 +44,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<StartRouteRecordingEvent>(_onStartRouteRecording);
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
     on<AddRoutePointEvent>(_onAddRoutePoint);
-    on<ClearRouteEvent>(_onClearRoute);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -378,6 +377,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isRecordingRoute: true,
           recordedTrack: RecordedTrack(),
           routePolyline: defaultPolyline,
+          snackbarError: null,
         ),
       );
 
@@ -409,6 +409,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           currentState.copyWith(
             isRecordingRoute: false,
             routePolyline: defaultPolyline,
+            snackbarError: 'not-enough-points',
+          ),
+        );
+        emit(
+          currentState.copyWith(
+            isRecordingRoute: false,
+            routePolyline: defaultPolyline,
+            snackbarError: null,
           ),
         );
         return;
@@ -421,21 +429,33 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         (failure) {
           if (kDebugMode) {
             print('Error saving recorded track: ${failure.message}');
-            emit(
-              MapErrorState('Error saving recorded track: ${failure.message}'),
-            );
           }
+          emit(
+            currentState.copyWith(
+              isRecordingRoute: false,
+              routePolyline: defaultPolyline,
+              snackbarError: failure.message,
+            ),
+          );
+          emit(
+            currentState.copyWith(
+              isRecordingRoute: false,
+              routePolyline: defaultPolyline,
+              snackbarError: null,
+            ),
+          );
         },
         (_) {
           if (kDebugMode) {
             print('Recorded track saved successfully.');
-            emit(
-              currentState.copyWith(
-                isRecordingRoute: false,
-                routePolyline: defaultPolyline,
-              ),
-            );
           }
+          emit(
+            currentState.copyWith(
+              isRecordingRoute: false,
+              routePolyline: defaultPolyline,
+              snackbarError: null,
+            ),
+          );
         },
       );
     }
@@ -478,19 +498,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       emit(currentState.copyWith(routePolyline: routePolyline));
     }
-  }
-
-  void _onClearRoute(ClearRouteEvent event, Emitter<MapState> emit) {
-    /* final currentState = state;
-    if (currentState is MapLoadedState) {
-      emit(
-        currentState.copyWith(
-          isRecordingRoute: false,
-          routePolyline: defaultPolyline,
-        ),
-      );
-    } */
-    //  TODO: cal aquest esdeveniment?
   }
 
   @override
