@@ -20,10 +20,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/stati
 import 'widgets/google_map_widget.dart';
 import 'widgets/toggle_map_mode_widget.dart';
 import 'widgets/station_list_widget.dart';
-import 'widgets/center_user_widget.dart';
 import 'widgets/search_bar_widget.dart';
-import 'widgets/toggle_map_type_widget.dart';
-import 'widgets/record_track_widget.dart';
+import 'widgets/map_controls_column_widget.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -166,21 +164,15 @@ class _MapPageState extends State<MapPage> {
                       userLocation: state.userLocation,
                     ),
 
-                    // Botón centrar en usuario
-                    CenterOnUserButtonWidget(
+                    // Columna de controles del mapa (botones combinados)
+                    MapControlsColumnWidget(
                       userLocation: state.userLocation,
                       mapController: _mapController,
+                      currentMapType: state.currentMapType,
                     ),
-
-                    // Botón cambiar tipo de mapa
-                    MapTypeToggleWidget(currentMapType: state.currentMapType),
 
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
-
-                    // Botón de grabación de ruta en bici
-                    if (state.currentMode == StationType.bicycle)
-                      const RecordTrackWidget(),
                   ],
                 );
               }
