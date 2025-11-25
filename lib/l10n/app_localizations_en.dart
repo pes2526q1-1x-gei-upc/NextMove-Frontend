@@ -412,4 +412,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteFriend => 'Delete friendship';
+
+  @override
+  String get blockUser => 'Block user';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return 'Are you sure you want to block $nickname? You won\'t be able to see their profile or interact with them.';
+  }
+
+  @override
+  String get block => 'Block';
 }

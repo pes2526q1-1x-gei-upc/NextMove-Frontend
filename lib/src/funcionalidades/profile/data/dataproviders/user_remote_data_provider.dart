@@ -100,7 +100,8 @@ class UserRemoteDataProvider {
       print("UserRemoteDataProvider: No users found for nickname $nickname");
       throw custom_exceptions.ServerException('Perfil de amigo no encontrado');
     }
-
+    final currentUser = firebaseAuth.currentUser;
+    print("El usuario actual es: ${currentUser?.email}");
     print(
       "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
     );

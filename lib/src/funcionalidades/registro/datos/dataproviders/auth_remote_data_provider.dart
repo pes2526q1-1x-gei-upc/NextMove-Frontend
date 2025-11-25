@@ -119,9 +119,9 @@ class AuthRemoteDataProvider {
       final firebaseToken = await userCredential.user?.getIdToken();
 
       if (kDebugMode) {
-        print("🔑 Firebase ID Token (usa este en el header): $firebaseToken");
-        print("📧 Email: ${userCredential.user?.email}");
-        print("👤 Display Name: ${userCredential.user?.displayName}");
+        print("Firebase ID Token (usa este en el header): $firebaseToken");
+        print("Email: ${userCredential.user?.email}");
+        print("Display Name: ${userCredential.user?.displayName}");
       }
 
       final email = userCredential.user!.email;
@@ -134,15 +134,6 @@ class AuthRemoteDataProvider {
 
       final authService = AuthService(client);
 
-      // Hacer upsert con needsToRegister solo si es nuevo
-      /*
-      await authService.upsertUserFromFirebase(
-        firebaseUid: firebaseUserId,
-        email: email,
-        name: name,
-        needsToRegister: isNewUser,
-      );
-      */
       final meData = await authService.getCurrentUser();
 
       final needsToRegister = meData == null;

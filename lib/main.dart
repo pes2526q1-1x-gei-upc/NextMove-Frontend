@@ -18,13 +18,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-// === IMPORTS DE PANTALLAS Y BLOCS ===
+
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart'; 
-// ==============================
+
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -52,6 +52,10 @@ class NextMoveAppState extends State<NextMoveApp> {
   void initState() {
     super.initState();
     GraphQLConfig.initializeClient();
+    // Set user email if logged in
+    if (FirebaseAuth.instance.currentUser != null) {
+      userProvider.setEmail(FirebaseAuth.instance.currentUser!.email);
+    }
     localeProvider.addListener(_onLocaleChanged);
   }
 

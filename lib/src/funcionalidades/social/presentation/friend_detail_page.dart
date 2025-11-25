@@ -21,9 +21,9 @@ class FriendDetailsPage extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("Bloquear usuario"),
+        title: Text(l10n.blockUser),
         content: Text(
-          "¿Quieres bloquear a $userToBlock? No podrá ver tu perfil ni contactarte.",
+          l10n.blockUserConfirmation(userToBlock),
         ),
         actions: [
           TextButton(
@@ -35,8 +35,8 @@ class FriendDetailsPage extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              "Bloquear",
+            child: Text(
+              l10n.block,
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),

@@ -22,7 +22,6 @@ class WelcomePage extends StatelessWidget {
               SnackBar(content: Text("Error: ${state.errorCode}")),
             );
           } else if (state is UserNeedsProfileSetupState) {
-            // Aquí sí navegamos manualmente porque es una pantalla intermedia de registro
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => BlocProvider(
@@ -32,8 +31,6 @@ class WelcomePage extends StatelessWidget {
               ),
             );
           } 
-          // CORRECCIÓN: Eliminado el bloque AuthSuccessState que navegaba manualmente a MainScreen.
-          // Dejamos que main.dart escuche el cambio de usuario y monte la MainScreen con el Provider correcto.
         },
         child: Center(
           child: Padding(

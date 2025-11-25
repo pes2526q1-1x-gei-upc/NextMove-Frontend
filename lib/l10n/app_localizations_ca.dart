@@ -417,4 +417,15 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get deleteFriend => 'Eliminar amistat';
+
+  @override
+  String get blockUser => 'Bloquejar usuari';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return 'Estàs segur que vols bloquejar $nickname? Això eliminarà l\'amistat i no podreu veure els perfils mútuament.';
+  }
+
+  @override
+  String get block => 'Bloquejar';
 }

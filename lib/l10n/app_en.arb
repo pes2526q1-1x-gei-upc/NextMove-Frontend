@@ -167,5 +167,16 @@
             }
         }
     },
-    "deleteFriend": "Delete friendship"
+    "deleteFriend": "Delete friendship",
+    "blockUser": "Block user",
+    "blockUserConfirmation": "Are you sure you want to block {nickname}? You won't be able to see their profile or interact with them.",
+    "@blockUserConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
+    "block": "Block"
 }

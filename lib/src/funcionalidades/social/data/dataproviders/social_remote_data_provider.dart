@@ -56,10 +56,14 @@ class SocialRemoteDataProvider {
 
   Future<List<UserEntity>> searchUsers(String query) async {
     debugPrint("Buscando usuarios por nickname: '$query'");
+    String? authHeader = await _authHeader;
 
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getUsersByNickname),
       variables: {'nickname': query}, 
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': ?authHeader,
+      })),
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
@@ -78,7 +82,6 @@ class SocialRemoteDataProvider {
         return UserEntity.fromRawData(json);
       } catch (e) {
         debugPrint("Error mapeando usuario: $e");
-        // Fallback robusto por si algún campo esencial viene null
         return UserEntity(
           email: json['email'] ?? "",
           apodo: json['nickname'] ?? query,

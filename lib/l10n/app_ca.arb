@@ -159,6 +159,17 @@
             }
         }
     },
-    "deleteFriend" : "Eliminar amistat"
+    "deleteFriend" : "Eliminar amistat",
+    "blockUser" : "Bloquejar usuari",
+    "blockUserConfirmation" : "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
+    "@blockUserConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
+    "block" : "Bloquejar"
 
 }

@@ -873,6 +873,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete friendship'**
   String get deleteFriend;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get blockUser;
+
+  /// No description provided for @blockUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to block {nickname}? You won\'t be able to see their profile or interact with them.'**
+  String blockUserConfirmation(String nickname);
+
+  /// No description provided for @block.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get block;
 }
 
 class _AppLocalizationsDelegate
