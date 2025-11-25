@@ -410,4 +410,7 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'No s\'han gravat prou punts per desar la ruta enregistrada.';
+
+  @override
+  String get howToGetThere => 'Indicacions';
 }

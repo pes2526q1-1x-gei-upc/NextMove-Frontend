@@ -861,6 +861,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough points were recorded to save the recorded route.'**
   String get notEnoughPointsToRecordTrack;
+
+  /// No description provided for @howToGetThere.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get howToGetThere;
 }
 
 class _AppLocalizationsDelegate

@@ -410,4 +410,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'No se han registrado suficientes puntos para guardar la ruta grabada.';
+
+  @override
+  String get howToGetThere => 'Cómo llegar';
 }

@@ -404,4 +404,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'Not enough points were recorded to save the recorded route.';
+
+  @override
+  String get howToGetThere => 'Directions';
 }

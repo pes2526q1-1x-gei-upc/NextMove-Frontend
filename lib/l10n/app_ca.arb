@@ -141,5 +141,6 @@
     "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
     "anyStationsFound" : "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",
-    "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada."
+    "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada.",
+    "howToGetThere": "Indicacions"
 }

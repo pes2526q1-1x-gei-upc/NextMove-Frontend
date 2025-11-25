@@ -42,34 +42,52 @@ class StationBottomSheet extends StatelessWidget {
           else if (station is EVStationDetails)
             _buildEVInfo(station as EVStationDetails, l10n),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: state.currentMode == StationType.bicycle
-                    ? Colors.blue
-                    : Colors.green,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => StationDetailsPage(
-                      stationID: station.id,
-                      stationType: state.currentMode,
-                      stationDetails: station,
-                    ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: state.currentMode == StationType.bicycle
+                        ? Colors.blue
+                        : Colors.green,
+                    foregroundColor: Colors.white,
                   ),
-                );
-              },
-              child: Text(l10n.information),
-            ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => StationDetailsPage(
+                          stationID: station.id,
+                          stationType: state.currentMode,
+                          stationDetails: station,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.info_outline),
+                  label: Text(l10n.information),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    // TODO: Navegar a la pantalla de navegación
+                    // Navigator.of(context).push(...)
+                  },
+                  icon: const Icon(Icons.directions),
+                  label: Text(l10n.howToGetThere), 
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
   Widget _buildBicycleInfo(
     BicycleStationDetails bikeStation,
     AppLocalizations l10n,
