@@ -141,5 +141,20 @@
     "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
     "anyStationsFound" : "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",
-    "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada."
+    "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada.",
+    "routeStatistics": "Estadístiques de la ruta",
+    "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
+    "routeRecording": "Gravació de ruta",
+    "distance": "Distància",
+    "duration": "Durada",
+    "averageSpeed": "Velocitat mitjana",
+    "maxSpeed": "Velocitat màxima",
+    "elevation": "Elevació",
+    "elevationGain": "Guany d'elevació",
+    "elevationLoss": "Pèrdua d'elevació",
+    "environmentalImpact": "Impacte ambiental",
+    "co2Saved": "CO₂ estalviat",
+    "caloriesBurned": "Calories cremades",
+    "currentSpeed": "Velocitat actual",
+    "stopRecording": "Aturar la gravació"
 }

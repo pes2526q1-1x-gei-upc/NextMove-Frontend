@@ -410,4 +410,49 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'No se han registrado suficientes puntos para guardar la ruta grabada.';
+
+  @override
+  String get routeStatistics => 'Estadísticas de la ruta';
+
+  @override
+  String get noRouteDataAvailable => 'No hay datos de la ruta disponibles.';
+
+  @override
+  String get routeRecording => 'Grabación de la ruta';
+
+  @override
+  String get distance => 'Distancia';
+
+  @override
+  String get duration => 'Duración';
+
+  @override
+  String get averageSpeed => 'Velocidad media';
+
+  @override
+  String get maxSpeed => 'Velocidad máxima';
+
+  @override
+  String get elevation => 'Elevación';
+
+  @override
+  String get elevationGain => 'Ganancia de elevación';
+
+  @override
+  String get elevationLoss => 'Pérdida de elevación';
+
+  @override
+  String get environmentalImpact => 'Impacto ambiental';
+
+  @override
+  String get co2Saved => 'CO₂ ahorrado';
+
+  @override
+  String get caloriesBurned => 'Calorías quemadas';
+
+  @override
+  String get currentSpeed => 'Velocidad actual';
+
+  @override
+  String get stopRecording => 'Detener grabación';
 }

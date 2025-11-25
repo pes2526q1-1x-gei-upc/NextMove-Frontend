@@ -861,6 +861,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough points were recorded to save the recorded route.'**
   String get notEnoughPointsToRecordTrack;
+
+  /// No description provided for @routeStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Route statistics'**
+  String get routeStatistics;
+
+  /// No description provided for @noRouteDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No route data available.'**
+  String get noRouteDataAvailable;
+
+  /// No description provided for @routeRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Route recording'**
+  String get routeRecording;
+
+  /// No description provided for @distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get distance;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @averageSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed'**
+  String get averageSpeed;
+
+  /// No description provided for @maxSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Max speed'**
+  String get maxSpeed;
+
+  /// No description provided for @elevation.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevation'**
+  String get elevation;
+
+  /// No description provided for @elevationGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevation gain'**
+  String get elevationGain;
+
+  /// No description provided for @elevationLoss.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevation loss'**
+  String get elevationLoss;
+
+  /// No description provided for @environmentalImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'Environmental impact'**
+  String get environmentalImpact;
+
+  /// No description provided for @co2Saved.
+  ///
+  /// In en, this message translates to:
+  /// **'CO₂ saved'**
+  String get co2Saved;
+
+  /// No description provided for @caloriesBurned.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories burned'**
+  String get caloriesBurned;
+
+  /// No description provided for @currentSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Current speed'**
+  String get currentSpeed;
+
+  /// No description provided for @stopRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop recording'**
+  String get stopRecording;
 }
 
 class _AppLocalizationsDelegate

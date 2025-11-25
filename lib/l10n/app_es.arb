@@ -141,5 +141,20 @@
     "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
     "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",
     "errorSavingRoute": "Error al guardar la ruta",
-    "notEnoughPointsToRecordTrack": "No se han registrado suficientes puntos para guardar la ruta grabada."
+    "notEnoughPointsToRecordTrack": "No se han registrado suficientes puntos para guardar la ruta grabada.",
+    "routeStatistics": "Estadísticas de la ruta",
+    "noRouteDataAvailable": "No hay datos de la ruta disponibles.",
+    "routeRecording": "Grabación de la ruta",
+    "distance": "Distancia",
+    "duration": "Duración",
+    "averageSpeed": "Velocidad media",
+    "maxSpeed": "Velocidad máxima",
+    "elevation": "Elevación",
+    "elevationGain": "Ganancia de elevación",
+    "elevationLoss": "Pérdida de elevación",
+    "environmentalImpact": "Impacto ambiental",
+    "co2Saved": "CO₂ ahorrado",
+    "caloriesBurned": "Calorías quemadas",
+    "currentSpeed": "Velocidad actual",
+    "stopRecording": "Detener grabación"
 }
