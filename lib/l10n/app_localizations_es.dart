@@ -395,4 +395,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get friends => 'Amigos';
+
+  @override
+  String get minCharsSearchHint =>
+      'Por favor, introduce al menos 3 caracteres para buscar.';
+
+  @override
+  String get anyStationsFound =>
+      'No se han encontrado resultados para tu búsqueda.';
 }

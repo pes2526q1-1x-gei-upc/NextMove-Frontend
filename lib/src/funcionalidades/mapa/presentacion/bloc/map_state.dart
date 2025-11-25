@@ -31,6 +31,8 @@ class MapLoadedState extends MapState {
   final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
+  final List<StationDetails> searchResults;
+  final bool isSearching;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -42,6 +44,8 @@ class MapLoadedState extends MapState {
     required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
+    this.searchResults = const [],
+    required this.isSearching,
   });
 
   @override
@@ -55,6 +59,8 @@ class MapLoadedState extends MapState {
         carMarkers,
         centerPosition,
         searchQuery,
+        searchResults,
+        isSearching,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -68,6 +74,8 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
+    List<StationDetails>? searchResults,
+    bool? isSearching,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -79,6 +87,8 @@ class MapLoadedState extends MapState {
       carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: searchQuery ?? this.searchQuery,
+      searchResults: searchResults ?? this.searchResults,
+      isSearching: isSearching ?? this.isSearching,
     );
   }
 

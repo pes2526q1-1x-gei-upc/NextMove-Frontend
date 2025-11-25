@@ -137,5 +137,7 @@
     "results": "RESULTADOS",
     "yourFriends": "TUS AMIGOS",
     "friendAdded": "{nickname} has been added to your friends.",
-    "friends": "Amigos"
+    "friends": "Amigos",
+    "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
+    "anyStationsFound" : "No se han encontrado resultados para tu búsqueda."
 }

@@ -137,5 +137,7 @@
     "results": "RESULTATS",
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
-    "friends": "Amics"
+    "friends": "Amics",
+    "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
+    "anyStationsFound" : "No s'han trobat resultats per a la teva cerca."
 }
