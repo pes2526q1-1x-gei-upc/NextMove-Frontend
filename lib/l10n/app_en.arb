@@ -139,5 +139,7 @@
     "friendAdded": "{nickname} has been added to your friends.",
     "friends": "Friends",
     "minCharsSearchHint" : "Please enter at least 3 characters to search.",
-    "anyStationsFound" : "No results were found for your search."
+    "anyStationsFound" : "No results were found for your search.",
+    "errorSavingRoute": "Error saving route",
+    "notEnoughPointsToRecordTrack": "Not enough points were recorded to save the recorded route."
 }

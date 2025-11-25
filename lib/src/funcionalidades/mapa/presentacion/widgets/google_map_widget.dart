@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class MapWidget extends StatefulWidget {
   final CameraPosition initialCameraPosition;
   final Set<Marker> markers;
+  final Polyline polyline;
   final MapType mapType;
   final void Function(GoogleMapController)? onMapCreated;
 
@@ -12,6 +13,7 @@ class MapWidget extends StatefulWidget {
     super.key,
     required this.initialCameraPosition,
     required this.markers,
+    required this.polyline,
     required this.mapType,
     this.onMapCreated,
   });
@@ -28,6 +30,7 @@ class _MapWidgetState extends State<MapWidget> {
       onMapCreated: widget.onMapCreated,
       initialCameraPosition: widget.initialCameraPosition,
       markers: widget.markers,
+      polylines: {widget.polyline},
       mapType: widget.mapType,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
 /// Clase base abstracta para todos los eventos del mapa
 abstract class MapEvent extends Equatable {
@@ -33,14 +34,16 @@ class ToggleMapTypeEvent extends MapEvent {
 class UpdateUserLocationEvent extends MapEvent {
   final double latitude;
   final double longitude;
+  final double altitude;
 
   const UpdateUserLocationEvent({
     required this.latitude,
     required this.longitude,
+    required this.altitude,
   });
 
   @override
-  List<Object?> get props => [latitude, longitude];
+  List<Object?> get props => [latitude, longitude, altitude];
 }
 
 /// Evento: solicitar permisos de ubicación
@@ -76,3 +79,22 @@ class ClearSearchEvent extends MapEvent {
   List<Object?> get props => [];
 }
 
+/// Evento: iniciar grabación de ruta
+class StartRouteRecordingEvent extends MapEvent {
+  const StartRouteRecordingEvent();
+}
+
+/// Evento: detener grabación de ruta
+class StopRouteRecordingEvent extends MapEvent {
+  const StopRouteRecordingEvent();
+}
+
+/// Evento: agregar punto a la ruta actual
+class AddRoutePointEvent extends MapEvent {
+  final TrackPoint point;
+
+  const AddRoutePointEvent(this.point);
+
+  @override
+  List<Object?> get props => [point];
+}

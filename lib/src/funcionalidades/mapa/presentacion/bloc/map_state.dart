@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -33,6 +34,10 @@ class MapLoadedState extends MapState {
   final String? searchQuery;
   final List<StationDetails> searchResults;
   final bool isSearching;
+  final bool isRecordingRoute;
+  final RecordedTrack? recordedTrack;
+  final Polyline routePolyline;
+  final String? snackbarError;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -46,6 +51,10 @@ class MapLoadedState extends MapState {
     this.searchQuery,
     this.searchResults = const [],
     required this.isSearching,
+    this.isRecordingRoute = false,
+    this.recordedTrack,
+    required this.routePolyline,
+    this.snackbarError,
   });
 
   @override
@@ -61,6 +70,10 @@ class MapLoadedState extends MapState {
         searchQuery,
         searchResults,
         isSearching,
+        isRecordingRoute,
+        recordedTrack,
+        routePolyline,
+        snackbarError,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -76,6 +89,10 @@ class MapLoadedState extends MapState {
     String? searchQuery,
     List<StationDetails>? searchResults,
     bool? isSearching,
+    bool? isRecordingRoute,
+    RecordedTrack? recordedTrack,
+    Polyline? routePolyline,
+    String? snackbarError,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -89,6 +106,10 @@ class MapLoadedState extends MapState {
       searchQuery: searchQuery ?? this.searchQuery,
       searchResults: searchResults ?? this.searchResults,
       isSearching: isSearching ?? this.isSearching,
+      isRecordingRoute: isRecordingRoute ?? this.isRecordingRoute,
+      recordedTrack: recordedTrack ?? this.recordedTrack,
+      routePolyline: routePolyline ?? this.routePolyline,
+      snackbarError: snackbarError ?? this.snackbarError,
     );
   }
 

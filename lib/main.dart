@@ -52,6 +52,10 @@ class NextMoveAppState extends State<NextMoveApp> {
   void initState() {
     super.initState();
     GraphQLConfig.initializeClient();
+    // Set user email if logged in
+    if (FirebaseAuth.instance.currentUser != null) {
+      userProvider.setEmail(FirebaseAuth.instance.currentUser!.email);
+    }
     localeProvider.addListener(_onLocaleChanged);
   }
 

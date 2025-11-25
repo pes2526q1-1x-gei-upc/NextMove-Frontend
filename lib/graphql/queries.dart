@@ -1,5 +1,4 @@
 class GraphQLQueries {
- 
   static const String createUserMutation = r'''
   mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
     createUser(createInfo: {
@@ -86,7 +85,7 @@ class GraphQLQueries {
         bicisElectricasDisponibles
       }
    }
-  '''; 
+  ''';
 
   static const String getAllBicycleStationsQuery = r'''
     query getAllBicingStations {
@@ -249,4 +248,39 @@ class GraphQLQueries {
     }
   ''';
 
+
+  static const String createTrackMutation = r'''
+    mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
+    createRecorrido(input: {
+      user_email: $userEmail,
+      distancia: $distance
+      velocidad_media: $averageSpeed,
+      co2: $co2,
+      kcal: $kcal,
+      origen:  {
+         latitude: $originLat,
+         longitude: $originLon
+      },
+      destino:  {
+         latitude: $destinationLat,
+         longitude: $destinationLon
+      },
+      fecha_recorrido: $timestamp
+    }) {
+      user_email
+      distancia
+      velocidad_media
+      co2
+      kcal
+      origen {
+        latitude
+        longitude
+      }
+      destino {
+        latitude
+        longitude
+      }
+      fecha_recorrido
+    }
+  }''';
 }

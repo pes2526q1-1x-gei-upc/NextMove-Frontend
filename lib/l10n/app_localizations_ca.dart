@@ -403,4 +403,11 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get anyStationsFound =>
       'No s\'han trobat resultats per a la teva cerca.';
+
+  @override
+  String get errorSavingRoute => 'Error en desar la ruta';
+
+  @override
+  String get notEnoughPointsToRecordTrack =>
+      'No s\'han gravat prou punts per desar la ruta enregistrada.';
 }
