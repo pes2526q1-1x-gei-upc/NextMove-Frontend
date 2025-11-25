@@ -13,6 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_re
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 //imports widgets
@@ -132,11 +133,18 @@ class _MapPageState extends State<MapPage> {
                 SearchBarWidget(
                   hintText: AppLocalizations.of(context)!.searchStation,
                   onChanged: (query) {
-                    // TODO: Implementar búsqueda
                     if (kDebugMode) {
                       print('Searching: $query');
                     }
                   },
+                ),
+
+                if (state.isSearching)
+                  Positioned(
+                    top: 130,
+                    left: 16,
+                    right: 16, 
+                    child: SearchResultsList(),
                 ),
 
                 // Avatar de perfil
@@ -182,6 +190,15 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
+    _mapController?.animateCamera(
+    CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: LatLng(station.latitude!, station.longitude!),
+        zoom: 16,  
+      ),
+    ),
+  );
+    
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(

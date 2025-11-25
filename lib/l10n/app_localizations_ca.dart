@@ -372,4 +372,35 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get preliminarVersion => 'Versió preliminar';
+
+  @override
+  String get searchByNickname => 'Cerca per sobrenom';
+
+  @override
+  String get noUsersFound => 'No s\'ha trobat cap usuari amb aquest sobrenom.';
+
+  @override
+  String get noFriendsAdded => 'Encara no tens amics afegits.';
+
+  @override
+  String get results => 'RESULTATS';
+
+  @override
+  String get yourFriends => 'ELS TEUS AMICS';
+
+  @override
+  String friendAdded(Object nickname) {
+    return '$nickname s\'ha afegit als teus amics.';
+  }
+
+  @override
+  String get friends => 'Amics';
+
+  @override
+  String get minCharsSearchHint =>
+      'Si us plau, introdueix almenys 3 caràcters per cercar.';
+
+  @override
+  String get anyStationsFound =>
+      'No s\'han trobat resultats per a la teva cerca.';
 }

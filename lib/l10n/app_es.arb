@@ -130,5 +130,14 @@
     "appearance": "Apariencia",
     "lightMode": "Modo claro",
     "darkMode": "Modo oscuro",
-    "preliminarVersion": "Versión preliminar"
+    "preliminarVersion": "Versión preliminar",
+    "searchByNickname": "Buscar por apodo",
+    "noUsersFound": "No se encontró ningún usuario con ese apodo.",
+    "noFriendsAdded": "Aún no tienes amigos añadidos.",
+    "results": "RESULTADOS",
+    "yourFriends": "TUS AMIGOS",
+    "friendAdded": "{nickname} has been added to your friends.",
+    "friends": "Amigos",
+    "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
+    "anyStationsFound" : "No se han encontrado resultados para tu búsqueda."
 }

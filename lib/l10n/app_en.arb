@@ -130,5 +130,14 @@
     "appearance" : "Appearance",
     "lightMode" : "Light mode",
     "darkMode" : "Dark mode",
-    "preliminarVersion": "Preliminary version"
+    "preliminarVersion": "Preliminary version",
+    "searchByNickname": "Search by nickname",
+    "noUsersFound": "No user found with that nickname.",
+    "noFriendsAdded": "You have no friends added yet.",
+    "results": "RESULTS",
+    "yourFriends": "YOUR FRIENDS",
+    "friendAdded": "{nickname} has been added to your friends.",
+    "friends": "Friends",
+    "minCharsSearchHint" : "Please enter at least 3 characters to search.",
+    "anyStationsFound" : "No results were found for your search."
 }

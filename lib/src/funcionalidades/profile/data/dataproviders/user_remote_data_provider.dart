@@ -42,7 +42,7 @@ class UserRemoteDataProvider {
 
     if (result.hasException) {
       if (kDebugMode) {
-        print('❌ Error GraphQL Raw: ${result.exception.toString()}');
+        print('Error GraphQL Raw: ${result.exception.toString()}');
       }
       throw custom_exceptions.ServerException('Error al obtener perfil: ${result.exception}');
       
@@ -51,7 +51,7 @@ class UserRemoteDataProvider {
     final data = result.data?['User'];
     if (data == null) {
       if (kDebugMode) {
-        print('❌ No se encontró el usuario con email: ${user.email}');
+        print('No se encontró el usuario con email: ${user.email}');
       }
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }

@@ -32,6 +32,8 @@ class MapLoadedState extends MapState {
   final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
+  final List<StationDetails> searchResults;
+  final bool isSearching;
   final bool isRecordingRoute;
   final RecordedTrack? recordedTrack;
   final Polyline routePolyline;
@@ -46,6 +48,8 @@ class MapLoadedState extends MapState {
     required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
+    this.searchResults = const [],
+    required this.isSearching,
     this.isRecordingRoute = false,
     this.recordedTrack,
     required this.routePolyline,
@@ -62,6 +66,8 @@ class MapLoadedState extends MapState {
         carMarkers,
         centerPosition,
         searchQuery,
+        searchResults,
+        isSearching,
         isRecordingRoute,
         recordedTrack,
         routePolyline,
@@ -78,6 +84,8 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
+    List<StationDetails>? searchResults,
+    bool? isSearching,
     bool? isRecordingRoute,
     RecordedTrack? recordedTrack,
     Polyline? routePolyline,
@@ -92,6 +100,8 @@ class MapLoadedState extends MapState {
       carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: searchQuery ?? this.searchQuery,
+      searchResults: searchResults ?? this.searchResults,
+      isSearching: isSearching ?? this.isSearching,
       isRecordingRoute: isRecordingRoute ?? this.isRecordingRoute,
       recordedTrack: recordedTrack ?? this.recordedTrack,
       routePolyline: routePolyline ?? this.routePolyline,

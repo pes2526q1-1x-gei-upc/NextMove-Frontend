@@ -795,6 +795,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preliminary version'**
   String get preliminarVersion;
+
+  /// No description provided for @searchByNickname.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by nickname'**
+  String get searchByNickname;
+
+  /// No description provided for @noUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No user found with that nickname.'**
+  String get noUsersFound;
+
+  /// No description provided for @noFriendsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no friends added yet.'**
+  String get noFriendsAdded;
+
+  /// No description provided for @results.
+  ///
+  /// In en, this message translates to:
+  /// **'RESULTS'**
+  String get results;
+
+  /// No description provided for @yourFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR FRIENDS'**
+  String get yourFriends;
+
+  /// No description provided for @friendAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{nickname} has been added to your friends.'**
+  String friendAdded(Object nickname);
+
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// No description provided for @minCharsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter at least 3 characters to search.'**
+  String get minCharsSearchHint;
+
+  /// No description provided for @anyStationsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results were found for your search.'**
+  String get anyStationsFound;
 }
 
 class _AppLocalizationsDelegate

@@ -39,6 +39,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ToggleMapTypeEvent>(_onToggleMapType);
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
+    on<SearchStationsEvent>(_onSearchStations);
+    on<ClearSearchEvent>(_onClearSearch);
     on<StartRouteRecordingEvent>(_onStartRouteRecording);
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
     on<AddRoutePointEvent>(_onAddRoutePoint);
@@ -97,13 +99,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           carMarkers: carMarkers,
           centerPosition: _bcnCenter,
           searchQuery: null,
+          searchResults: [],
+          isSearching: false,
           routePolyline: defaultPolyline,
         ),
       );
-
-      if (kDebugMode) {
-        print('Polyline initialized with default polyline');
-      }
 
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
@@ -195,6 +195,83 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } catch (e) {
       // Si falla la solicitud de permisos, continuar sin ubicación
       return;
+    }
+  }
+
+  /// Handler: Buscar estaciones según consulta
+  Future<void> _onSearchStations(
+    SearchStationsEvent event,
+    Emitter<MapState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(isSearching: true, searchQuery: event.query));
+
+      final query = event.query.trim();
+
+      if (query.isEmpty) {
+        emit(
+          currentState.copyWith(
+            searchQuery: null,
+            searchResults: [],
+            isSearching: false,
+          ),
+        );
+        return;
+      } else if (query.length < 3) {
+        // Si la consulta es muy corta, no buscar
+        emit(
+          currentState.copyWith(
+            searchQuery: query,
+            isSearching: true,
+            searchResults: [],
+          ),
+        );
+        return;
+      }
+
+      emit(currentState.copyWith(isSearching: true));
+
+      try {
+        final result = currentState.currentMode == StationType.electricVehicle
+            ? await stationRepository.searchEvStations(query)
+            : await stationRepository.searchEvStations(query);
+
+        result.fold(
+          (failure) {
+            throw Exception(
+              'Error buscando estaciones de coches: ${failure.message}',
+            );
+          },
+          (stations) {
+            emit(
+              currentState.copyWith(
+                searchResults: stations,
+                isSearching: true,
+                searchQuery: query,
+              ),
+            );
+          },
+        );
+      } catch (e) {
+        // Si hay un error, emitir estado sin resultados
+        emit(currentState.copyWith(searchResults: [], isSearching: false));
+        return;
+      }
+    }
+  }
+
+  /// Handler: Limpiar resultados de búsqueda
+  void _onClearSearch(ClearSearchEvent event, Emitter<MapState> emit) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(
+        currentState.copyWith(
+          searchQuery: null,
+          searchResults: [],
+          isSearching: false,
+        ),
+      );
     }
   }
 

@@ -372,4 +372,35 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get preliminarVersion => 'Versión preliminar';
+
+  @override
+  String get searchByNickname => 'Buscar por apodo';
+
+  @override
+  String get noUsersFound => 'No se encontró ningún usuario con ese apodo.';
+
+  @override
+  String get noFriendsAdded => 'Aún no tienes amigos añadidos.';
+
+  @override
+  String get results => 'RESULTADOS';
+
+  @override
+  String get yourFriends => 'TUS AMIGOS';
+
+  @override
+  String friendAdded(Object nickname) {
+    return '$nickname has been added to your friends.';
+  }
+
+  @override
+  String get friends => 'Amigos';
+
+  @override
+  String get minCharsSearchHint =>
+      'Por favor, introduce al menos 3 caracteres para buscar.';
+
+  @override
+  String get anyStationsFound =>
+      'No se han encontrado resultados para tu búsqueda.';
 }

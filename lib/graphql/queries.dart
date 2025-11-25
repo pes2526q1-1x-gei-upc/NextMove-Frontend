@@ -196,6 +196,59 @@ class GraphQLQueries {
     }
   }''';
 
+  static const String getFriends = r'''
+  query getFriends ($nickname: String!) {
+    ListFriends(nickname: $nickname){
+      name
+    }
+  }''';
+
+  static const String newFriendship = r'''
+  mutation newFriendship ($nickname1: String!, $nickname2: String!) {
+    AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      
+    }
+  }''';
+
+  static const String deleteFriendship = r'''
+  mutation deleteFriendship ($nickname1: String!, $nickname2: String!) {
+    RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
+      name
+    }
+  }''';
+
+  static const String getUsersByNickname = r'''
+  query getUsersByNickname ($nickname: String!){
+    UsersByNickname(nickname: $nickname){
+        email,
+        name,
+        nickname,
+        photo,
+        birthDate,
+        phoneNumber,
+        preferredMode,
+        preferredLanguage,
+        bioDescription,
+        createdAt,
+    } 
+  }''';
+
+  static const String getStationsBySearchQuery = r'''
+    query getStationsBySearchQuery($query: String!) {
+      stationsByAddress(address: $query) {
+        id
+        name
+        address
+        city
+        coordinates {
+          latitude
+          longitude
+        }
+      }
+    }
+  ''';
+
+
   static const String createTrackMutation = r'''
     mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
     createRecorrido(input: {
