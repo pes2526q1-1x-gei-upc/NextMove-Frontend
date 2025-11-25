@@ -120,6 +120,7 @@ class _MapPageState extends State<MapPage> {
                     zoom: 12,
                   ),
                   markers: markersToShow,
+                  polyline: state.routePolyline,
                   mapType: state.currentMapType,
                   onMapCreated: _onMapCreated,
                 ),
