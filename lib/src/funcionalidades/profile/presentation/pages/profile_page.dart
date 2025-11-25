@@ -15,6 +15,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -88,12 +90,16 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.block_rounded,
                           text: l10n.bloquedUsers,
-                          onTap: () => {
-                            if (kDebugMode)
-                              {
-                                // ignore: avoid_print
-                                print("Click en Bloqueados"),
-                              },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => SocialBloc(),
+                                  child: const BlockedUsersPage(),
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ],

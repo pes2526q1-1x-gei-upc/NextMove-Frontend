@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nextmove_app/l10n/app_localizations.dart'; 
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
@@ -22,29 +22,40 @@ class FriendDetailsPage extends StatelessWidget {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text("Bloquear usuario"),
-        content: Text("¿Quieres bloquear a $userToBlock? No podrá ver tu perfil ni contactarte."),
+        content: Text(
+          "¿Quieres bloquear a $userToBlock? No podrá ver tu perfil ni contactarte.",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Bloquear", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text(
+              "Bloquear",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
 
     if (confirm == true && context.mounted) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false).user;
+      final userProvider = Provider.of<UserProvider>(
+        context,
+        listen: false,
+      ).user;
       final myNickname = userProvider?['nickname'];
 
       if (myNickname != null) {
         context.read<SocialBloc>().add(BlockUserEvent(myNickname, userToBlock));
-        
+
         Navigator.pop(context); // Cerramos la página de detalles
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Has bloqueado a $userToBlock"),
@@ -58,6 +69,12 @@ class FriendDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    try {
+      final userBloc = context.read<UserBloc>();
+      print("FriendDetailsPage: Found UserBloc ${userBloc.hashCode}");
+    } catch (e) {
+      print("FriendDetailsPage: Could not find UserBloc: $e");
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
@@ -65,18 +82,25 @@ class FriendDetailsPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF5F5F7),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
-        
+
         // === BOTÓN DE BLOQUEO EN APPBAR ===
         actions: [
           BlocBuilder<UserBloc, UserState>(
             builder: (context, state) {
               if (state is UserLoaded) {
                 return IconButton(
-                  icon: const Icon(Icons.block_rounded, color: Colors.redAccent),
+                  icon: const Icon(
+                    Icons.block_rounded,
+                    color: Colors.redAccent,
+                  ),
                   tooltip: "Bloquear usuario",
                   onPressed: () => _onBlockPressed(context, state.user.apodo),
                 );
@@ -84,16 +108,19 @@ class FriendDetailsPage extends StatelessWidget {
               return const SizedBox.shrink();
             },
           ),
-          const SizedBox(width: 8), 
+          const SizedBox(width: 8),
         ],
       ),
-      
+
       body: BlocListener<SocialBloc, SocialState>(
         listener: (context, state) {
           if (state.errorMessage != null) {
-             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red),
-             );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
         },
         child: Column(
@@ -111,7 +138,11 @@ class FriendDetailsPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                            const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.redAccent,
+                            ),
                             const SizedBox(height: 16),
                             Text(
                               "${l10n.errorLoadingProfile}\n${state.message}",
@@ -129,7 +160,7 @@ class FriendDetailsPage extends StatelessWidget {
                 },
               ),
             ),
-            
+
             // --- BOTÓN DE ELIMINAR AMIGO ---
             BlocBuilder<UserBloc, UserState>(
               builder: (context, userState) {
@@ -138,16 +169,17 @@ class FriendDetailsPage extends StatelessWidget {
 
                   return BlocBuilder<SocialBloc, SocialState>(
                     builder: (context, socialState) {
-                      
                       // Verificamos si está en la lista de amigos
                       final isFriend = socialState.friends.any(
-                        (friend) => friend.apodo == viewedUser.apodo
+                        (friend) => friend.apodo == viewedUser.apodo,
                       );
 
                       if (isFriend) {
-                        return _DeleteFriendButton(friendNickname: viewedUser.apodo);
+                        return _DeleteFriendButton(
+                          friendNickname: viewedUser.apodo,
+                        );
                       }
-                      
+
                       return const SizedBox.shrink();
                     },
                   );
@@ -170,7 +202,7 @@ class _DeleteFriendButton extends StatelessWidget {
 
   Future<void> _onRemovePressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -180,28 +212,39 @@ class _DeleteFriendButton extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.delete, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: Text(
+              l10n.delete,
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
 
     if (confirm == true && context.mounted) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false).user;
+      final userProvider = Provider.of<UserProvider>(
+        context,
+        listen: false,
+      ).user;
       final myNickname = userProvider?['nickname'];
 
       if (myNickname != null) {
-        context.read<SocialBloc>().add(DeleteFriendEvent(myNickname, friendNickname));
-        
-        Navigator.pop(context); 
+        context.read<SocialBloc>().add(
+          DeleteFriendEvent(myNickname, friendNickname),
+        );
+
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.deletedFriend(friendNickname)),
-            backgroundColor: const Color(0xFF333333), 
+            backgroundColor: const Color(0xFF333333),
           ),
         );
       }
@@ -212,7 +255,7 @@ class _DeleteFriendButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 40), 
+      padding: const EdgeInsets.fromLTRB(24, 10, 24, 40),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -235,7 +278,11 @@ class _DeleteFriendButton extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person_remove_rounded, color: Colors.redAccent, size: 22),
+                  const Icon(
+                    Icons.person_remove_rounded,
+                    color: Colors.redAccent,
+                    size: 22,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     l10n.deleteFriend,

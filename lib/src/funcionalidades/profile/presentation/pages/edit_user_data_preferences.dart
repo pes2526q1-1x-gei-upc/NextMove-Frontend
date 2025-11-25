@@ -90,10 +90,10 @@ class _EditUserDataPreferencesPageState
         ),
         title: Text(
           l10n.editProfile,
-          style: const TextStyle(
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
             color: Color(0xFF1A1A1A),
-            fontSize: 18, 
-            fontWeight: FontWeight.bold
           ),
         ),
       ),

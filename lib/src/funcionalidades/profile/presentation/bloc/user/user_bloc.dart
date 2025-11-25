@@ -17,11 +17,20 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     LoadUserProfile event,
     Emitter<UserState> emit,
   ) async {
+    print("UserBloc: Loading profile for ${event.userId}");
     emit(UserLoading());
     final result = await userRepository.getUserProfile(event.userId);
     result.fold(
-      (failure) => emit(UserNeedsToSignUp()),
-      (user) => emit(UserLoaded(user)),
+      (failure) {
+        print("UserBloc: Failed to load profile: ${failure.message}");
+        emit(UserNeedsToSignUp());
+      },
+      (user) {
+        print(
+          "UserBloc: Loaded profile for ${user.apodo} (Email: ${user.email})",
+        );
+        emit(UserLoaded(user));
+      },
     );
   }
 
@@ -30,7 +39,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     emit(UserLoading());
-    final result = await userRepository.updateUserProfile(event.updatedUser,);
+    final result = await userRepository.updateUserProfile(event.updatedUser);
     result.fold(
       (failure) =>
           emit(UserError(failure.message ?? 'Error al actualizar perfil')),
@@ -49,17 +58,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       (failure) => emit(UserError(failure.message ?? 'Error al crear perfil')),
       (createdUser) => emit(UserUpdated(createdUser)),
     );
-  } 
+  }
 
-
-  Future<void> _onLogoutUser(
-    LogoutUser event,
-    Emitter<UserState> emit,
-  ) async {
+  Future<void> _onLogoutUser(LogoutUser event, Emitter<UserState> emit) async {
     emit(UserLoading()); // Para mostrar spinner si es necesario
-    
+
     final result = await userRepository.logoutUser();
-    
+
     result.fold(
       (failure) => emit(UserError(failure.message ?? 'Error al cerrar sesión')),
       (_) => emit(UserLoggedOut()), // Éxito

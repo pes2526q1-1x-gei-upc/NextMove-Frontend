@@ -68,4 +68,28 @@ class SocialRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  Future<Either<Failure, List<UserEntity>>> getBlockedUsers() async {
+    try {
+      final blockedUsers = await remoteDataProvider.getBlockedUsers();
+      return Right(blockedUsers);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, void>> unblockUser(String userToUnblockNick) async {
+    try {
+      await remoteDataProvider.unblockUser(userToUnblockNick);
+      return const Right(null);
+    } on ServerException catch (e) {
+      debugPrint("Error en unblockUser: ${e.toString()}");
+      return Left(ServerFailure(message: e.toString()));
+    } catch (e) {
+      debugPrint("Error genérico en unblockUser: ${e.toString()}");
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

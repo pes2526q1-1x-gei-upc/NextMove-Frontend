@@ -237,4 +237,19 @@ class GraphQLQueries {
     BlockUser(nickname: $nickname)
   }
   ''';
+
+  static const String getBlockList = r'''
+  query getBlockList {
+    BlockList {
+      blocked
+      photo
+    }
+  }
+  ''';
+
+  static const String unBlockUser = r'''
+  mutation unBlockUser($nickname: String!) {
+    UnBlockUser(nickname: $nickname)
+  }
+  ''';
 }

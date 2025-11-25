@@ -41,3 +41,10 @@ class BlockUserEvent extends SocialEvent {
   
   const BlockUserEvent(this.currentUserId, this.userToBlockId);
 }
+
+class LoadBlockedUsersEvent extends SocialEvent {}
+
+class UnblockUserEvent extends SocialEvent {
+  final String userToUnblockId;
+  const UnblockUserEvent(this.userToUnblockId);
+}

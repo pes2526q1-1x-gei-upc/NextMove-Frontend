@@ -167,7 +167,64 @@ class SocialRemoteDataProvider {
         debugPrint("Error de Red/Link: ${result.exception!.linkException}");
       }
       
-      throw ServerException('Error al eliminar amigo: ${result.exception.toString()}');
+      throw ServerException('Error al bloquear usuario: ${result.exception.toString()}');
+    }
+  }
+
+  Future<List<UserEntity>> getBlockedUsers() async {
+    String? authHeader = await _authHeader;
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getBlockList),
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': authHeader ?? '',
+      })),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error al cargar usuarios bloqueados: ${result.exception.toString()}');
+    }
+
+    final List<dynamic> data = result.data?['BlockList'] ?? [];
+
+    return data.map((json) {
+      final blockedNick = json['blocked'] ?? 'Desconocido';
+      final photo = json['photo'] ?? '';
+      return UserEntity(
+        email: "", 
+        apodo: blockedNick,
+        nombreCompleto: blockedNick, 
+        fechaNacimiento: DateTime.now(),
+        fechaRegistro: DateTime.now(),
+        numeroTelefono: 0,
+        idiomaPreferido: "Español",
+        descripcion: "",
+        modoPreferido: "BIKE",
+        photo: photo,
+      );
+    }).toList();
+  }
+
+  Future<void> unblockUser(String userToUnblockNickname) async {
+    String? authHeader = await _authHeader;
+    debugPrint("Solicitando desbloqueo de: $userToUnblockNickname");
+
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.unBlockUser),
+      variables: {
+        'nickname': userToUnblockNickname,
+      },
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': authHeader ?? '',
+      })),
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw ServerException('Error al desbloquear usuario: ${result.exception.toString()}');
     }
   }
 }
