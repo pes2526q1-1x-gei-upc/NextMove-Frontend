@@ -1,33 +1,43 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'map_events.dart';
 import 'map_state.dart';
+
+var defaultPolyline = Polyline(
+  polylineId: const PolylineId('current_track'),
+  color: Colors.red,
+  width: 5,
+);
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
-  
+
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
-  
+
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
-  MapBloc({
-    required this.stationRepository,
-    required this.onMarkerTapped,
-  }) : super(const MapInitialState()) {
+  MapBloc({required this.stationRepository, required this.onMarkerTapped})
+    : super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
     on<ToggleMapTypeEvent>(_onToggleMapType);
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
+    on<StartRouteRecordingEvent>(_onStartRouteRecording);
+    on<StopRouteRecordingEvent>(_onStopRouteRecording);
+    on<AddRoutePointEvent>(_onAddRoutePoint);
+    on<ClearRouteEvent>(_onClearRoute);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -44,14 +54,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         stationRepository.getAllEVStationDetails(),
       ]);
 
-      final bikeStations = results[0].fold((failure) => 
-        throw Exception('Error cargando estaciones de bicicletas: ${failure.message}')
-      ,(stations) => stations as List<BicycleStationDetails>? ?? []);
-      final evStations = results[1].fold((failure) => 
-        throw Exception('Error cargando estaciones de coches: ${failure.message}')
-      ,(stations) => stations as List<EVStationDetails>? ?? []);
-
-      
+      final bikeStations = results[0].fold(
+        (failure) => throw Exception(
+          'Error cargando estaciones de bicicletas: ${failure.message}',
+        ),
+        (stations) => stations as List<BicycleStationDetails>? ?? [],
+      );
+      final evStations = results[1].fold(
+        (failure) => throw Exception(
+          'Error cargando estaciones de coches: ${failure.message}',
+        ),
+        (stations) => stations as List<EVStationDetails>? ?? [],
+      );
 
       // Construir marcadores iniciales para bicicletas
       final bikeMarkers = _buildMarkersForStations(
@@ -67,17 +81,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
 
       // Emitir estado cargado
-      emit(MapLoadedState(
-        bikeStations: bikeStations,
-        evStations: evStations,
-        userLocation: null,
-        currentMode: StationType.bicycle,
-        currentMapType: MapType.normal,
-        bikeMarkers: bikeMarkers,
-        carMarkers: carMarkers,
-        centerPosition: _bcnCenter,
-        searchQuery: null,
-      ));
+      emit(
+        MapLoadedState(
+          bikeStations: bikeStations,
+          evStations: evStations,
+          userLocation: null,
+          currentMode: StationType.bicycle,
+          currentMapType: MapType.normal,
+          bikeMarkers: bikeMarkers,
+          carMarkers: carMarkers,
+          centerPosition: _bcnCenter,
+          searchQuery: null,
+          routePolyline: defaultPolyline,
+        ),
+      );
 
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
@@ -87,10 +104,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   /// Handler: Cambiar modo (bicicleta/coche)
-  void _onChangeMode(
-    ChangeModeEvent event,
-    Emitter<MapState> emit,
-  ) {
+  void _onChangeMode(ChangeModeEvent event, Emitter<MapState> emit) {
     final currentState = state;
     if (currentState is MapLoadedState) {
       emit(currentState.copyWith(currentMode: event.newMode));
@@ -98,10 +112,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   /// Handler: Cambiar tipo de mapa (normal/satélite)
-  void _onToggleMapType(
-    ToggleMapTypeEvent event,
-    Emitter<MapState> emit,
-  ) {
+  void _onToggleMapType(ToggleMapTypeEvent event, Emitter<MapState> emit) {
     final currentState = state;
     if (currentState is MapLoadedState) {
       final newMapType = currentState.currentMapType == MapType.normal
@@ -120,6 +131,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final currentState = state;
     if (currentState is MapLoadedState) {
       final newLocation = LatLng(event.latitude, event.longitude);
+
+      // Add point to route if recording
+      if (currentState.isRecordingRoute) {
+        add(
+          AddRoutePointEvent(
+            TrackPoint(
+              location: newLocation,
+              altitude: event.altitude,
+              timestamp: DateTime.now(),
+            ),
+          ),
+        );
+      }
+
       emit(currentState.copyWith(userLocation: newLocation));
     }
   }
@@ -142,7 +167,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
 
       if (permission == LocationPermission.denied) {
-        emit(const MapLocationPermissionDeniedState(isPermanentlyDenied: false));
+        emit(
+          const MapLocationPermissionDeniedState(isPermanentlyDenied: false),
+        );
         return;
       }
 
@@ -158,32 +185,51 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   /// Iniciar actualizaciones de ubicación
-  void _startLocationUpdates() {
+  void _startLocationUpdates() async {
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 50, // Actualizar cada 50 metros
     );
 
     _positionStreamSubscription?.cancel();
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: settings,
-    ).listen(
-      (Position? pos) {
-        if(pos != null && !isClosed){
-          add(UpdateUserLocationEvent(
-            latitude: pos.latitude,
-            longitude: pos.longitude,
-          ));
-        }
-      },
-      onError: (error) {
-        if (kDebugMode) {
-          print('Error en stream de ubicación: $error');
-        }
+    _positionStreamSubscription =
+        Geolocator.getPositionStream(locationSettings: settings).listen(
+          (Position? pos) {
+            if (pos != null && !isClosed) {
+              add(
+                UpdateUserLocationEvent(
+                  latitude: pos.latitude,
+                  longitude: pos.longitude,
+                  altitude: pos.altitude,
+                ),
+              );
+            }
+          },
+          onError: (error) {
+            if (kDebugMode) {
+              print('Error en stream de ubicación: $error');
+            }
+          },
+          cancelOnError: false,
+        );
 
-      },
-      cancelOnError: false,
-    );
+    // Get the current position immediately
+    try {
+      Position currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      add(
+        UpdateUserLocationEvent(
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
+          altitude: currentPosition.altitude,
+        ),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting current position: $e');
+      }
+    }
   }
 
   /// Construir marcadores para una lista de estaciones
@@ -192,28 +238,106 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     List<EVStationDetails>? evStations,
     BitmapDescriptor icon,
   ) {
-    if(bikeStations == null && evStations != null){
-      return evStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: LatLng(station.latitude!, station.longitude!),
-        icon: icon,
-        onTap: () => onMarkerTapped(station, state as MapLoadedState),
-      );
-    }).toSet();}
-    else if(evStations == null && bikeStations != null){
-      return bikeStations.where((station) => station.latitude != null && station.longitude != null).map((station) {
-      return Marker(
-        markerId: MarkerId(station.id),
-        position: LatLng(station.latitude!, station.longitude!),
-        icon: icon,
-        onTap: () => onMarkerTapped(station, state as MapLoadedState),
-      );
-    }).toSet();
+    if (bikeStations == null && evStations != null) {
+      return evStations
+          .where(
+            (station) => station.latitude != null && station.longitude != null,
+          )
+          .map((station) {
+            return Marker(
+              markerId: MarkerId(station.id),
+              position: LatLng(station.latitude!, station.longitude!),
+              icon: icon,
+              onTap: () => onMarkerTapped(station, state as MapLoadedState),
+            );
+          })
+          .toSet();
+    } else if (evStations == null && bikeStations != null) {
+      return bikeStations
+          .where(
+            (station) => station.latitude != null && station.longitude != null,
+          )
+          .map((station) {
+            return Marker(
+              markerId: MarkerId(station.id),
+              position: LatLng(station.latitude!, station.longitude!),
+              icon: icon,
+              onTap: () => onMarkerTapped(station, state as MapLoadedState),
+            );
+          })
+          .toSet();
     }
 
     return {};
-    
+  }
+
+  /// Handler: Iniciar grabación de ruta
+  void _onStartRouteRecording(
+    StartRouteRecordingEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(
+        currentState.copyWith(
+          isRecordingRoute: true,
+          recordedTrack: RecordedTrack(),
+          routePolyline: defaultPolyline,
+        ),
+      );
+    }
+  }
+
+  void _onStopRouteRecording(
+    StopRouteRecordingEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(
+        currentState.copyWith(
+          isRecordingRoute: false,
+          routePolyline: defaultPolyline,
+        ),
+      );
+    }
+  }
+
+  void _onAddRoutePoint(AddRoutePointEvent event, Emitter<MapState> emit) {
+    final currentState = state;
+    if (currentState is MapLoadedState && currentState.isRecordingRoute) {
+      // add the new point to the recorded track
+      currentState.recordedTrack!.addPoint(
+        TrackPoint(
+          location: event.point.location,
+          altitude: event.point.altitude,
+          timestamp: DateTime.now(),
+        ),
+      );
+
+      // add the new point to the polyline
+      final routePolyline = currentState.routePolyline.copyWith(
+        pointsParam: [
+          ...currentState.routePolyline.points,
+          event.point.location,
+        ],
+      );
+
+      emit(currentState.copyWith(routePolyline: routePolyline));
+    }
+  }
+
+  void _onClearRoute(ClearRouteEvent event, Emitter<MapState> emit) {
+    /* final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(
+        currentState.copyWith(
+          isRecordingRoute: false,
+          routePolyline: defaultPolyline,
+        ),
+      );
+    } */
+    //  TODO: cal aquest esdeveniment?
   }
 
   @override

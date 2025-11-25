@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -31,6 +32,9 @@ class MapLoadedState extends MapState {
   final Set<Marker> carMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
+  final bool isRecordingRoute;
+  final RecordedTrack? recordedTrack;
+  final Polyline routePolyline;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -42,6 +46,9 @@ class MapLoadedState extends MapState {
     required this.carMarkers,
     required this.centerPosition,
     this.searchQuery,
+    this.isRecordingRoute = false,
+    this.recordedTrack,
+    required this.routePolyline,
   });
 
   @override
@@ -55,6 +62,9 @@ class MapLoadedState extends MapState {
         carMarkers,
         centerPosition,
         searchQuery,
+        isRecordingRoute,
+        recordedTrack,
+        routePolyline,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -68,6 +78,9 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
+    bool? isRecordingRoute,
+    RecordedTrack? recordedTrack,
+    Polyline? routePolyline,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -79,6 +92,9 @@ class MapLoadedState extends MapState {
       carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: searchQuery ?? this.searchQuery,
+      isRecordingRoute: isRecordingRoute ?? this.isRecordingRoute,
+      recordedTrack: recordedTrack ?? this.recordedTrack,
+      routePolyline: routePolyline ?? this.routePolyline,
     );
   }
 
