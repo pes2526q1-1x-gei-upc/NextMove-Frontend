@@ -28,6 +28,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ToggleMapTypeEvent>(_onToggleMapType);
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
+    on<SearchStationsEvent>(_onSearchStations);
+    on<ClearSearchEvent>(_onClearSearch);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -77,6 +79,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         carMarkers: carMarkers,
         centerPosition: _bcnCenter,
         searchQuery: null,
+        searchResults: null,
+        isSearching: false,
       ));
 
       // Iniciar solicitud de permisos de ubicación
@@ -154,6 +158,61 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     } catch (e) {
       // Si falla la solicitud de permisos, continuar sin ubicación
       return;
+    }
+  }
+
+  /// Handler: Buscar estaciones según consulta
+  Future<void> _onSearchStations(
+    SearchStationsEvent event,
+    Emitter<MapState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(isSearching: true, searchQuery: event.query));
+
+      final query = event.query.trim();
+
+      if(query.isEmpty){
+        emit(currentState.copyWith(searchQuery: null, searchResults: null, isSearching: false));
+        return;
+      }
+
+      else if(query.length < 3){
+        // Si la consulta es muy corta, no buscar
+        emit(currentState.copyWith(searchQuery: query, isSearching: false, searchResults: null));
+        return;
+      }
+
+      emit(currentState.copyWith(isSearching: true));
+
+      try{
+            final result = currentState.currentMode == StationType.electricVehicle ? await stationRepository.searchEvStations(query) : await stationRepository.searchEvStations(query);
+            result.fold((failure) {
+              throw Exception('Error buscando estaciones de coches: ${failure.message}');
+            }, (evstations) {
+              emit(currentState.copyWith(searchResults: evstations, isSearching: false));
+            });
+      } catch(e){
+        // Si hay un error, emitir estado sin resultados
+        emit(currentState.copyWith(searchResults: null, isSearching: false));
+        return;
+      }
+
+    }
+  }
+
+  /// Handler: Limpiar resultados de búsqueda
+  void _onClearSearch(
+    ClearSearchEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(
+        searchQuery: null,
+        searchResults: null,
+        isSearching: false,
+      ));
     }
   }
 

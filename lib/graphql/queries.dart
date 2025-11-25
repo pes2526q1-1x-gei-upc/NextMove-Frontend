@@ -234,4 +234,26 @@ class GraphQLQueries {
     } 
   }''';
 
+  static const String getStationsBySearchQuery = r'''
+    query getStationsBySearchQuery($query: String!) {
+      stationsByAddress(address: $query) {
+        id
+        name
+        address
+        city
+        coordinates {
+          latitude
+          longitude
+        }
+        distance
+        connectors {
+          type
+          powerKw
+          status
+        }
+        isSuperFast
+      }
+    }
+  ''';
+
 }

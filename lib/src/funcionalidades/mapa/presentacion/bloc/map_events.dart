@@ -57,3 +57,21 @@ class ShowStationDetailsEvent extends MapEvent {
   @override
   List<Object?> get props => [station];
 }
+
+//Evento: Consulta de estaciones al backend según la barra de búsqueda
+class SearchStationsEvent extends MapEvent {
+  final String query;
+
+  const SearchStationsEvent(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+class ClearSearchEvent extends MapEvent {
+  
+  const ClearSearchEvent();
+
+  @override
+  List<Object?> get props => [];
+}

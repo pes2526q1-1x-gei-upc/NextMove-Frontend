@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 //imports widgets
@@ -127,11 +128,19 @@ class _MapPageState extends State<MapPage> {
                 SearchBarWidget(
                   hintText: AppLocalizations.of(context)!.searchStation,
                   onChanged: (query) {
-                    // TODO: Implementar búsqueda
                     if (kDebugMode) {
                       print('Searching: $query');
                     }
                   },
+                ),
+
+                if (state.isSearching && state.searchResults != null)
+                  Positioned(
+                    top: 130,
+                    left: 16,
+                    right: 16,
+                    bottom: 100, 
+                    child: SearchResultsList(),
                 ),
 
                 // Avatar de perfil

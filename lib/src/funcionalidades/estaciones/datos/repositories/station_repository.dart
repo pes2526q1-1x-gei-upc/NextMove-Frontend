@@ -124,4 +124,21 @@ class StationRepository {
       throw UnknownFailure();
     }
   }
+
+  Future<Either<Failure, List<StationDetails>>> searchEvStations(String query) async{
+    try {
+      return Right(
+        await stationRemoteDataProvider.searchEvStations(query),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in searchEvStations: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
 }

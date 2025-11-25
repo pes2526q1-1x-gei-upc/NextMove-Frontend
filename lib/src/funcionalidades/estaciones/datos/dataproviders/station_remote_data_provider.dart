@@ -207,4 +207,32 @@ class StationRemoteDataProvider {
 
     throw ServerException('Station not found');
   }
+
+  Future<List<EVStationDetails>> searchEvStations(String query) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getStationsBySearchQuery),
+      variables: {'query': query},
+    );
+
+    final QueryResult result = await getGraphQLQuery(
+      GraphQLQueries.getStationsBySearchQuery,
+      options,
+    );
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    if (kDebugMode) {
+      print('searchEvStations result.data: ${result.data}');
+    }
+    final data = result.data?['searchStations'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => EVStationDetails.fromJson(item))
+          .toList();
+    }
+
+    return [];
+  }
 }
