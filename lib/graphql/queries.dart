@@ -344,15 +344,13 @@ class GraphQLQueries {
     }''';
 
   static const String createAssessmentQuery = r'''
-    mutation createAssessmentQuery (station_id: String!, score: Int!, comments: String){
-      createAssessment(station_id: $station_id, score: $score, $comments: comments){
-      
-      }
+    mutation CreateAssessment($station_id: String!, $score: Int!, $comments: String) {
+      createAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
 
   static const String deleteAssessmentQuery = r'''
-    mutation deleteAssessmentQuery (station_id: String!){
+    mutation deleteAssessmentQuery ($station_id: String!){
       deleteAssessment(station_id: $station_id){
       
       }
@@ -360,7 +358,7 @@ class GraphQLQueries {
   ''';
 
   static const String editAssessmentQuery = r'''
-    mutation editAssessmentQuery (station_id: String!, score: Int!, comments: String){
+    mutation editAssessmentQuery ($station_id: String!, $score: Int!, $comments: String){
       editAssessment(station_id: $station_id, score: $score, $comments: comments){
       
       }

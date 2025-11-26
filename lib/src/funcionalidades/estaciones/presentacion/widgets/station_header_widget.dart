@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+// IMPORT NECESARIO PARA LEER EL BLOC
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
+// IMPORT DEL BLOC DE VALORACIONES
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
@@ -101,13 +105,21 @@ class StationHeaderWidget extends StatelessWidget {
             // 3. BOTÓN "VALORAR"
             InkWell(
               onTap: () {
+                // CAMBIO AQUÍ: Capturamos el bloc del contexto actual
+                final assessmentBloc = context.read<AssessmentBloc>();
+                
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (context) => RateStationBottomSheet(
-                    stationName: station.name ?? l10n.station,
-                    themeColor: themeColor,
+                  // CAMBIO AQUÍ: Usamos BlocProvider.value para pasar el bloc a la nueva ruta
+                  builder: (context) => BlocProvider.value(
+                    value: assessmentBloc,
+                    child: RateStationBottomSheet(
+                      stationId: station.id,
+                      stationName: station.name ?? l10n.station,
+                      themeColor: themeColor,
+                    ),
                   ),
                 );
               },

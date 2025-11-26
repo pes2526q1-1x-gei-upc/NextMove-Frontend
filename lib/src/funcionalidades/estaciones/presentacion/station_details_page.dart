@@ -8,6 +8,9 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_header_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_shared_widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_stats_widget.dart';
+// IMPORTS NUEVOS PARA EL BLOC DE VALORACIONES
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 
 class StationDetailsPage extends StatelessWidget {
   final StationType stationType;
@@ -27,9 +30,19 @@ class StationDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
-    return BlocProvider(
-      create: (context) => StationDetailsBloc()
-        ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
+    // CAMBIO AQUI: Usamos MultiBlocProvider para inyectar ambos Blocs
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => StationDetailsBloc()
+            ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
+        ),
+        BlocProvider(
+          create: (context) => AssessmentBloc(
+            assessmentRepository: AssessmentRepository(),
+          ),
+        ),
+      ],
       child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
         builder: (context, state) {
           if (state is StationDetailsLoading) {

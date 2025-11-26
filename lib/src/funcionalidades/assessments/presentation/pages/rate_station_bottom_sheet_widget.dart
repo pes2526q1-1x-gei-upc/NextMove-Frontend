@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 
 class RateStationBottomSheet extends StatefulWidget {
+  final String stationId;
   final String stationName;
   final Color themeColor;
 
   const RateStationBottomSheet({
     super.key,
+    required this.stationId,
     required this.stationName,
     required this.themeColor,
   });
@@ -16,7 +21,7 @@ class RateStationBottomSheet extends StatefulWidget {
 }
 
 class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
-  int _selectedScore = 0; // 0 significa ninguna seleccionada
+  int _selectedScore = 0; 
   final TextEditingController _commentController = TextEditingController();
 
   @override
@@ -146,16 +151,23 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               onPressed: _selectedScore == 0
                   ? null // Bloqueado si no hay estrellas
                   : () {
-                      // LOGICA DE CREAR VALORACION 
-                      debugPrint("Score: $_selectedScore");
-                      debugPrint("Comentario: ${_commentController.text}");
-                      
-                      Navigator.pop(context); 
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.thankYouForYourReview)),
-                      );
-                    },
+                    String id = widget.stationId;
+                    debugPrint("station id: $id");
+                    debugPrint("Score: $_selectedScore");
+                    debugPrint("Comentario: ${_commentController.text}");
+                    context.read<AssessmentBloc>().add(
+                      CreateAssessmentEvent(
+                        stationId: widget.stationId, 
+                        score: _selectedScore,
+                        comment: _commentController.text,
+                      ),
+                    );
+                    
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.thankYouForYourReview)),
+                    );
+                  },
               child: Text(
                 l10n.sendReview, 
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
