@@ -445,6 +445,18 @@ class AppLocalizationsCa extends AppLocalizations {
       'No s\'han gravat prou punts per desar la ruta enregistrada.';
 
   @override
+  String get routeHistory => 'Historial de recorreguts enregistrats';
+
+  @override
+  String get noRoutesFound => 'No s\'han trobat recorreguts enregistrats.';
+
+  @override
+  String get distance => 'Distància';
+
+  @override
+  String get avgSpeed => 'Velocitat mitjana';
+
+  @override
   String get routeStatistics => 'Estadístiques de la ruta';
 
   @override
@@ -452,9 +464,6 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get routeRecording => 'Gravació de ruta';
-
-  @override
-  String get distance => 'Distància';
 
   @override
   String get duration => 'Durada';

@@ -439,6 +439,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not enough points were recorded to save the recorded route.';
 
   @override
+  String get routeHistory => 'Recorded route history';
+
+  @override
+  String get noRoutesFound => 'No recorded routes were found.';
+
+  @override
+  String get distance => 'Distance';
+
+  @override
+  String get avgSpeed => 'Average speed';
+
+  @override
   String get routeStatistics => 'Route statistics';
 
   @override
@@ -446,9 +458,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routeRecording => 'Route recording';
-
-  @override
-  String get distance => 'Distance';
 
   @override
   String get duration => 'Duration';

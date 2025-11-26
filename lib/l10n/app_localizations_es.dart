@@ -445,6 +445,18 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se han registrado suficientes puntos para guardar la ruta grabada.';
 
   @override
+  String get routeHistory => 'Historial de recorridos grabados';
+
+  @override
+  String get noRoutesFound => 'No se han encontrado rutas grabadas.';
+
+  @override
+  String get distance => 'Distancia';
+
+  @override
+  String get avgSpeed => 'Velocidad media';
+
+  @override
   String get routeStatistics => 'Estadísticas de la ruta';
 
   @override
@@ -452,9 +464,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get routeRecording => 'Grabación de la ruta';
-
-  @override
-  String get distance => 'Distancia';
 
   @override
   String get duration => 'Duración';
