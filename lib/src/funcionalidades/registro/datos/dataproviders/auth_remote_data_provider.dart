@@ -88,18 +88,21 @@ class AuthRemoteDataProvider {
 
   Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
+      debugPrint("Starting Google sign-in...");
       final GoogleSignInAccount googleUser;
       // Trigger the authentication flow
       try {
         googleUser = await GoogleSignIn.instance.authenticate();
       } on GoogleSignInException catch (e) {
         if (e.code != GoogleSignInExceptionCode.canceled) {
+          debugPrint("GoogleSignInException: ${e.code}");
           throw AuthException(message: e.toString());
         }
         return {
           'cancelled': true,
         };
       }
+      debugPrint("Google user obtained: ${googleUser.email}");
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
@@ -113,7 +116,10 @@ class AuthRemoteDataProvider {
         credential,
       );
 
-      if (userCredential.user == null) throw AuthException(message: 'no-user');
+      if (userCredential.user == null) {
+        debugPrint("UserCredential user is null");
+        throw AuthException(message: 'no-user');
+      }
 
       final firebaseUserId = userCredential.user!.uid;
       final firebaseToken = await userCredential.user?.getIdToken();
@@ -133,9 +139,9 @@ class AuthRemoteDataProvider {
       }
 
       final authService = AuthService(client);
-
+      debugPrint("Upserting user from Firebase...");
       final meData = await authService.getCurrentUser();
-
+      debugPrint("meData after Google sign-in: $meData");
       final needsToRegister = meData == null;
       if (kDebugMode) {
         print("needsToRegister: $needsToRegister");
@@ -149,6 +155,7 @@ class AuthRemoteDataProvider {
         'email': email,
       };
     } on FirebaseAuthException catch (e) {
+      debugPrint("FirebaseAuthException: ${e.code}");
       throw ServerException(e.code);
     }
   }
