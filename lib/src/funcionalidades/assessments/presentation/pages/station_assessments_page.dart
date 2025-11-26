@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/review_card_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/widgets/review_card_widget.dart';
 
 class StationReviewsPage extends StatelessWidget {
   final String stationName;

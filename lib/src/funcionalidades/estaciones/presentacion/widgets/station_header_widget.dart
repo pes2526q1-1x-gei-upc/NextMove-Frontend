@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_assessments_page.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/rate_station_bottom_sheet_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
