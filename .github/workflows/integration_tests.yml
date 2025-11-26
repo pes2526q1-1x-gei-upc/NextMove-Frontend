@@ -1,0 +1,93 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.9.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Flutter analyzer
+        run: flutter analyze
+
+      - name: Run unit tests
+        run: flutter test
+
+      - name: Start Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            flutter test integration_test/app_test.dart
+            flutter test integration_test/features_test.dart
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            build/reports/
+            coverage/
+
+  integration-test-ios:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.9.2'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Start iOS simulator
+        run: |
+          xcrun simctl boot "iPhone 14" || true
+          xcrun simctl list
+
+      - name: Run integration tests on iOS
+        run: |
+          flutter test integration_test/app_test.dart -d iPhone
+          flutter test integration_test/features_test.dart -d iPhone
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results-ios
+          path: |
+            build/reports/
+            coverage/
