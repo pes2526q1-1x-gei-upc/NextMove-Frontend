@@ -72,7 +72,7 @@ class RouteHistoryList extends StatelessWidget {
                     ),
                     subtitle: Text(
                       '${l10n.distance}: ${recorrido.distance.toStringAsFixed(2)} km\n'
-                      '${l10n.avgSpeed}: ${recorrido.averageSpeed!.toStringAsFixed(1)} km/h\n',
+                      '${l10n.averageSpeed}: ${recorrido.averageSpeed!.toStringAsFixed(1)} km/h\n',
                     ),
                     isThreeLine: true,
                     onTap: () {
