@@ -25,7 +25,6 @@ class TrackDataProvider {
         'timestamp': track.startTime.toIso8601String(),
       },
     );
-
     final QueryResult result = await client.mutate(options);
 
     if (result.hasException) {

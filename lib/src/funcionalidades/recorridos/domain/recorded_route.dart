@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 class RecordedRoute {
   final String id;
@@ -45,7 +46,9 @@ class RecordedRoute {
               (data['destino']['longitude'] as num).toDouble(),
             )
           : null,
-      timestamp: DateTime.parse(data['fecha_recorrido'] as String),
-    );
+      timestamp: DateFormat("dd/MM/yyyy HH:mm:ss").parse(
+        (data['fecha_recorrido'] as String).replaceAll(' (UTC)', '')
+      ),    
+      );
   }
 }
