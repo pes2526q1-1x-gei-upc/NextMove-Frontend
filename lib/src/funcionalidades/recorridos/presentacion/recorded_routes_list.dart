@@ -71,7 +71,7 @@ class RouteHistoryList extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     subtitle: Text(
-                      '${l10n.distance}: ${recorrido.distance.toStringAsFixed(2)} km\n'
+                      '${l10n.distance}: ${((recorrido.distance)/1000).toStringAsFixed(2)} km\n'
                       '${l10n.averageSpeed}: ${recorrido.averageSpeed!.toStringAsFixed(1)} km/h\n',
                     ),
                     isThreeLine: true,
