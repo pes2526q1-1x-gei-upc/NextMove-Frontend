@@ -1,19 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:nextmove_app/config/graphql_config.dart';
-import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart'
     as custom_exceptions;
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 
 class TrackDataProvider {
-  GraphQLClient get client => GraphQLConfig.client.value;
-  Future<void> saveRecordedTrack(RecordedTrack track) async {
+  final GraphQLClient client;
+
+  TrackDataProvider(this.client);
+
+  Future<void> saveRecordedTrack(RecordedTrack track, String userEmail) async {
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.createTrackMutation),
       variables: {
-        'userEmail': userProvider.email,
+        'userEmail': userEmail,
         'distance': track.totalDistanceMeters,
         'averageSpeed': track.averageSpeedKmH,
         'co2': track.co2SavedKG,

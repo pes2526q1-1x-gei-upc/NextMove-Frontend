@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 
 // Imports del BLoC
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
@@ -39,7 +40,7 @@ class _MapPageState extends State<MapPage> {
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
-  TrackRepository trackRepository = TrackRepository();
+  TrackRepository trackRepository = TrackRepository(GraphQLConfig.client.value);
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
