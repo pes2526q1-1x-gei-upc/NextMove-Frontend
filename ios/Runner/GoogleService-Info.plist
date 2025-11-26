@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>518328761715-2e1vvdv780v3mvjutf7rd7jbgce4a51k.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDicUnlcYPIR_V3BfIbk-h1ivtZznLQbVw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>518328761715</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.nextmoveApp</string>
+	<key>PROJECT_ID</key>
+	<string>nextmove-69c37</string>
+	<key>STORAGE_BUCKET</key>
+	<string>nextmove-69c37.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:518328761715:ios:31e988fd619420cb32d906</string>
+</dict>
+</plist>

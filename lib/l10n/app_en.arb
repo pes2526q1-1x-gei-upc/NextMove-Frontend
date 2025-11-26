@@ -187,5 +187,20 @@
     "routeHistory": "Recorded route history",
     "noRoutesFound": "No recorded routes were found.",
     "distance": "Distance",
-    "avgSpeed": "Average speed"
+    "avgSpeed": "Average speed",
+    "routeStatistics": "Route statistics",
+    "noRouteDataAvailable": "No route data available.",
+    "routeRecording": "Route recording",
+    "distance": "Distance",
+    "duration": "Duration",
+    "averageSpeed": "Average speed",
+    "maxSpeed": "Max speed",
+    "elevation": "Elevation",
+    "elevationGain": "Elevation gain",
+    "elevationLoss": "Elevation loss",
+    "environmentalImpact": "Environmental impact",
+    "co2Saved": "CO₂ saved",
+    "caloriesBurned": "Calories burned",
+    "currentSpeed": "Current speed",
+    "stopRecording": "Stop recording"
 }

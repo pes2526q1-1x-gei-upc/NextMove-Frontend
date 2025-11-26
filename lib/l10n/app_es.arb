@@ -188,5 +188,20 @@
     "routeHistory": "Historial de recorridos grabados",
     "noRoutesFound": "No se han encontrado rutas grabadas.",
     "distance": "Distancia",
-    "avgSpeed": "Velocidad media"
+    "avgSpeed": "Velocidad media",
+    "routeStatistics": "Estadísticas de la ruta",
+    "noRouteDataAvailable": "No hay datos de la ruta disponibles.",
+    "routeRecording": "Grabación de la ruta",
+    "distance": "Distancia",
+    "duration": "Duración",
+    "averageSpeed": "Velocidad media",
+    "maxSpeed": "Velocidad máxima",
+    "elevation": "Elevación",
+    "elevationGain": "Ganancia de elevación",
+    "elevationLoss": "Pérdida de elevación",
+    "environmentalImpact": "Impacto ambiental",
+    "co2Saved": "CO₂ ahorrado",
+    "caloriesBurned": "Calorías quemadas",
+    "currentSpeed": "Velocidad actual",
+    "stopRecording": "Detener grabación"
 }

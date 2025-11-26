@@ -35,7 +35,7 @@ class UserRepository {
       return Left(AuthFailure(message: e.toString()));
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Error desconocido al actualizar perfil: $e');
+        print('Error desconocido al actualizar perfil: $e');
       }
       return Left(ServerFailure());
     }

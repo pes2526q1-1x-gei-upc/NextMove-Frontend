@@ -179,5 +179,20 @@
     "routeHistory": "Historial de recorreguts enregistrats",
     "noRoutesFound": "No s'han trobat recorreguts enregistrats.",
     "distance": "Distància",
-    "avgSpeed": "Velocitat mitjana"
+    "avgSpeed": "Velocitat mitjana",
+    "routeStatistics": "Estadístiques de la ruta",
+    "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
+    "routeRecording": "Gravació de ruta",
+    "distance": "Distància",
+    "duration": "Durada",
+    "averageSpeed": "Velocitat mitjana",
+    "maxSpeed": "Velocitat màxima",
+    "elevation": "Elevació",
+    "elevationGain": "Guany d'elevació",
+    "elevationLoss": "Pèrdua d'elevació",
+    "environmentalImpact": "Impacte ambiental",
+    "co2Saved": "CO₂ estalviat",
+    "caloriesBurned": "Calories cremades",
+    "currentSpeed": "Velocitat actual",
+    "stopRecording": "Aturar la gravació"
 }
