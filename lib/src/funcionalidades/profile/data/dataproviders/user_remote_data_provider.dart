@@ -106,7 +106,7 @@ class UserRemoteDataProvider {
       "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
     );
 
-    // Buscar coincidencia exacta (case-insensitive)
+    // Buscar coincidencia exacta
     final exactMatch = data.firstWhere(
       (userJson) =>
           (userJson['nickname'] as String).toLowerCase() ==
@@ -141,7 +141,6 @@ class UserRemoteDataProvider {
 
     const String updateUserMutation = GraphQLQueries.updateUserMutation;
 
-    // Helpers de formato (de tu código)
     String? formatBirthDate(DateTime? date) {
       if (date == null) return null;
       return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -237,12 +236,10 @@ class UserRemoteDataProvider {
       }
     ''';
 
-    // 1. CORRECCIÓN CRÍTICA: Formato ISO (AAAA-MM-DD) para PostgreSQL
     final String birthDateFormatted = DateFormat(
       'yyyy-MM-dd',
     ).format(userEntity.fechaNacimiento);
 
-    // 2. Mapeo seguro de ENUMS (Tu backend espera MAYÚSCULAS)
     String modeEnum = 'CAR';
     if (userEntity.modoPreferido.toLowerCase().contains('bici')) {
       modeEnum = 'BIKE';
@@ -261,13 +258,11 @@ class UserRemoteDataProvider {
         break;
     }
 
-    // 3. Limpieza del teléfono (0 -> null)
     String? phoneNumberToSend;
     if (userEntity.numeroTelefono != 0) {
       phoneNumberToSend = userEntity.numeroTelefono.toString();
     }
 
-    // 4. Ejecución
     final MutationOptions options = MutationOptions(
       document: gql(createUserMutation),
       variables: {
@@ -286,7 +281,6 @@ class UserRemoteDataProvider {
 
     final QueryResult result = await client.mutate(options);
 
-    // 5. Manejo de Errores Mejorado
     if (result.hasException) {
       if (kDebugMode) {
         print('Error GraphQL Raw: ${result.exception.toString()}');
@@ -294,9 +288,6 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw: ${result.exception.toString()}');
       }
-
-      // Si el mensaje está vacío, es probable que sea un error de base de datos (constraints, tipos)
-      // que el backend no está transformando en mensaje legible.
       if (result.exception!.graphqlErrors.isNotEmpty) {
         final msg = result.exception!.graphqlErrors.first.message;
         if (kDebugMode) {

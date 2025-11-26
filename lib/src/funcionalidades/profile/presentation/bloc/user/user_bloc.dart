@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 import 'user_event.dart';
 import 'user_state.dart';
@@ -38,12 +39,22 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     UpdateUserProfile event,
     Emitter<UserState> emit,
   ) async {
+    debugPrint(
+      "UserBloc: Received UpdateUserProfile event for ${event.updatedUser.apodo}",
+    );
     emit(UserLoading());
+    debugPrint("UserBloc: Emitted UserLoading state");
+    debugPrint("UserBloc: Calling userRepository.updateUserProfile...");
     final result = await userRepository.updateUserProfile(event.updatedUser);
     result.fold(
-      (failure) =>
-          emit(UserError(failure.message ?? 'Error al actualizar perfil')),
-      (updatedUser) => emit(UserUpdated(updatedUser)),
+      (failure) {
+        debugPrint("UserBloc: Update failed with error: ${failure.message}");
+        emit(UserError(failure.message ?? 'Error al actualizar perfil'));
+      },
+      (updatedUser) {
+        debugPrint("UserBloc: Update successful. Emitting UserUpdated state.");
+        emit(UserUpdated(updatedUser));
+      },
     );
   }
 
@@ -51,12 +62,23 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     CreateUserProfile event,
     Emitter<UserState> emit,
   ) async {
+    debugPrint(
+      "UserBloc: Received CreateUserProfile event for ${event.newUser.email}",
+    );
     emit(UserLoading());
+    debugPrint("UserBloc: Emitted UserLoading state");
 
+    debugPrint("UserBloc: Calling userRepository.createUserProfile...");
     final result = await userRepository.createUserProfile(event.newUser);
     result.fold(
-      (failure) => emit(UserError(failure.message ?? 'Error al crear perfil')),
-      (createdUser) => emit(UserUpdated(createdUser)),
+      (failure) {
+        debugPrint("UserBloc: Create failed with error: ${failure.message}");
+        emit(UserError(failure.message ?? 'Error al crear perfil'));
+      },
+      (createdUser) {
+        debugPrint("UserBloc: Create successful. Emitting UserUpdated state.");
+        emit(UserUpdated(createdUser));
+      },
     );
   }
 
