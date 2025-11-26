@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-// IMPORT NECESARIO PARA LEER EL BLOC
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
-// IMPORT DEL BLOC DE VALORACIONES
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 
 class StationHeaderWidget extends StatelessWidget {
@@ -59,15 +57,19 @@ class StationHeaderWidget extends StatelessWidget {
           runSpacing: 8,
           children: [
             // 1. Estrellas y Puntuación
-            if (station.rating != null) ...[
-              createStarRatingRow(station.rating!),
-              Text(
-                '(${station.rating! % 2 == 0 ? (station.rating! ~/ 2) : (station.rating! / 2).toStringAsFixed(1)})',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              
-              // SEPARADOR VERTICAL
-              Container(width: 1, height: 16, color: Colors.grey[300]),
+              if (station.rating != null) ...[
+
+                createStarRatingRow((station.rating! * 2).round()),
+                
+                const SizedBox(width: 6),
+
+                Text(
+                  '(${station.rating!.toStringAsFixed(1)})',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                
+                // SEPARADOR VERTICAL
+                Container(width: 1, height: 16, color: Colors.grey[300]),
 
               // 2. BOTÓN "VER OPINIONES" 
               InkWell(
@@ -76,6 +78,7 @@ class StationHeaderWidget extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => StationReviewsPage(
+                        stationId: station.id,
                         stationName: station.name ?? l10n.station,
                         themeColor: themeColor,
                       ),
@@ -105,14 +108,12 @@ class StationHeaderWidget extends StatelessWidget {
             // 3. BOTÓN "VALORAR"
             InkWell(
               onTap: () {
-                // CAMBIO AQUÍ: Capturamos el bloc del contexto actual
                 final assessmentBloc = context.read<AssessmentBloc>();
                 
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  // CAMBIO AQUÍ: Usamos BlocProvider.value para pasar el bloc a la nueva ruta
                   builder: (context) => BlocProvider.value(
                     value: assessmentBloc,
                     child: RateStationBottomSheet(

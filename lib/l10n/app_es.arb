@@ -228,5 +228,8 @@
     "good": "Buena",
     "regular": "Regular",
     "bad": "Mala",
-    "thankYouForYourReview": "¡Gracias por tu valoración!"
+    "thankYouForYourReview": "¡Gracias por tu valoración!",
+    "errorLoadingReviews": "Error al cargar las valoraciones",
+    "retry": "Reintentar",
+    "FirstToReview": "¡Sé el primero en valorar esta estación!"
 }

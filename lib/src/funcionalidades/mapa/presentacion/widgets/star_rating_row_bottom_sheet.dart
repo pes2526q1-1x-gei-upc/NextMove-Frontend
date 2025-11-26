@@ -12,16 +12,16 @@ class StarRatingRowBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Si no hay rating, retornamos un widget vacío para no ocupar espacio
     if (station.rating == null) return const SizedBox.shrink();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        createStarRatingRow(station.rating!),
+        createStarRatingRow((station.rating! * 2).round()),
+        
         const SizedBox(width: 8),
         Text(
-          '(${station.rating! % 2 == 0 ? (station.rating! ~/ 2) : (station.rating! / 2).toStringAsFixed(1)})',
+          '(${station.rating!.toStringAsFixed(1)})',
           style: TextStyle(
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,

@@ -84,11 +84,11 @@ class ReviewCard extends StatelessWidget {
               // Estrellas 
               Transform.scale(
                 scale: 0.8, 
-                alignment: Alignment.centerRight, 
+                alignment: Alignment.centerRight,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    createStarRatingRow(rating.round()),
+                    createStarRatingRow((rating * 2).round()), 
                   ],
                 ),
               ),

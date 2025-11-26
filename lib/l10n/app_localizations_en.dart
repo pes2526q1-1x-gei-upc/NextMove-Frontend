@@ -554,4 +554,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get thankYouForYourReview => 'Thank you for your review!';
+
+  @override
+  String get errorLoadingReviews => 'Error loading reviews';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
 }

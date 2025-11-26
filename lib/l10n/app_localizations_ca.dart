@@ -560,4 +560,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get thankYouForYourReview => 'Gràcies per la teva valoració!';
+
+  @override
+  String get errorLoadingReviews => 'Error en carregar les valoracions';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
 }

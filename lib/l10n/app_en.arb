@@ -227,5 +227,8 @@
     "good": "Good",
     "regular": "Fair",
     "bad": "Poor",
-    "thankYouForYourReview": "Thank you for your review!"
+    "thankYouForYourReview": "Thank you for your review!",
+    "errorLoadingReviews": "Error loading reviews",
+    "retry": "Retry",
+    "firstToReview": "Be the first to review this station!"
 }

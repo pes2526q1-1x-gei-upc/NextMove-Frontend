@@ -219,6 +219,9 @@
     "good": "Bé",
     "regular": "Regular",
     "bad": "Malament",
-    "thankYouForYourReview": "Gràcies per la teva valoració!"
+    "thankYouForYourReview": "Gràcies per la teva valoració!",
+    "errorLoadingReviews": "Error en carregar les valoracions",
+    "retry": "Reintentar",
+    "FirstToReview": "Sigues el primer a valorar aquesta estació!"
     
 }

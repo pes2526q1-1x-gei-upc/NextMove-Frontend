@@ -8,8 +8,9 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_header_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_shared_widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_stats_widget.dart';
-// IMPORTS NUEVOS PARA EL BLOC DE VALORACIONES
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 
 class StationDetailsPage extends StatelessWidget {
@@ -30,7 +31,6 @@ class StationDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
-    // CAMBIO AQUI: Usamos MultiBlocProvider para inyectar ambos Blocs
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -40,7 +40,7 @@ class StationDetailsPage extends StatelessWidget {
         BlocProvider(
           create: (context) => AssessmentBloc(
             assessmentRepository: AssessmentRepository(),
-          ),
+          )..add(GetStationAssessmentInfoEvent(stationId: stationID)),
         ),
       ],
       child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
@@ -97,11 +97,19 @@ class StationDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Header
-              StationHeaderWidget(
-                station: stationDetails,
-                themeColor: themeColor,
+              BlocBuilder<AssessmentBloc, AssessmentState>(
+                builder: (context, assessmentState) {
+                  final displayStation = (assessmentState.totalAssessments > 0)
+                      ? stationDetails.copyWith(rating: assessmentState.averageScore)
+                      : stationDetails;
+
+                  return StationHeaderWidget(
+                    station: displayStation,
+                    themeColor: themeColor,
+                  );
+                },
               ),
+              
               const SizedBox(height: 20),
 
               // 2. Stats Grid

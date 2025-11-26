@@ -560,4 +560,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get thankYouForYourReview => '¡Gracias por tu valoración!';
+
+  @override
+  String get errorLoadingReviews => 'Error al cargar las valoraciones';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
 }

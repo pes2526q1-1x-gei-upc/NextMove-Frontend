@@ -1149,6 +1149,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thank you for your review!'**
   String get thankYouForYourReview;
+
+  /// No description provided for @errorLoadingReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading reviews'**
+  String get errorLoadingReviews;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @firstToReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to review this station!'**
+  String get firstToReview;
 }
 
 class _AppLocalizationsDelegate

@@ -1,9 +1,11 @@
-import 'dart:async'; // Necesario para TimeoutException
-import 'dart:io';    // Necesario para SocketException
+import 'dart:async';
+import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/data/dataproviders/assessments_remote_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
 
 class AssessmentRepository {
   final AssessmentRemoteDataProvider remoteDataProvider;
@@ -19,18 +21,38 @@ class AssessmentRepository {
     try {
       await remoteDataProvider.createAssessment(stationId, score, comment);
       return const Right(null);
-      
     } on SocketException {
-      return Left(ConnectionFailure(message: "No hay conexión a internet"));
-      
-    } on TimeoutException {
-      return Left(ConnectionFailure(message: "El servidor tardó demasiado en responder"));
-      
+      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
-      
     } catch (e) {
-      return Left(ServerFailure(message: "Ocurrió un error inesperado: ${e.toString()}"));
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<AssessmentEntity>>> getAssessmentsByStation(String stationId) async {
+    try {
+      final assessments = await remoteDataProvider.getAssessmentsByStation(stationId);
+      return Right(assessments);
+    } on SocketException {
+      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+Future<Either<Failure, AssessmentInfoEntity>> getStationAssessmentInfo(String stationId) async {
+    try {
+      final info = await remoteDataProvider.getStationAssessmentInfo(stationId);
+      return Right(info);
+    } on SocketException {
+      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 }
