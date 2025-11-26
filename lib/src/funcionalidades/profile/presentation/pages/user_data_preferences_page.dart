@@ -297,12 +297,12 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     return WillPopScope(
       onWillPop: () async => !_isCreatingFirebaseUser,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F7), // Fondo estilo EditPage
+        backgroundColor: const Color(0xFFF5F5F7), 
         appBar: AppBar(
           backgroundColor: const Color(0xFFF5F5F7),
           elevation: 0,
           centerTitle: true,
-          automaticallyImplyLeading: false, // Controlamos manual
+          automaticallyImplyLeading: false, 
           leading: Navigator.canPop(context)
               ? IconButton(
                   icon: const Icon(
@@ -318,7 +318,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           title: Text(
             l10n.userDataPreferences,
             style: const TextStyle(
-              fontSize: 24, // Ajustado para ser grande pero caber
+              fontSize: 24, 
               fontWeight: FontWeight.bold,
               color: Color(0xFF1A1A1A),
             ),
@@ -513,7 +513,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     ProfileSectionLabel(text: "Preferencias"),
                     ProfileStyledCard(
                       children: [
-                        // SOLUCIÓN RENDERFLEX: Usar Row con Expanded
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
