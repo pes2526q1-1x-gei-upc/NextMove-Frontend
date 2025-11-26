@@ -253,7 +253,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponible';
+  String get available => 'Disponibles';
 
   @override
   String get occupied => 'Ocupat';
@@ -497,4 +497,67 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get stopRecording => 'Aturar la gravació';
+
+  @override
+  String get opinions => 'Opinions';
+
+  @override
+  String get station => 'Estació';
+
+  @override
+  String get seeOpinions => 'Veure valoracions';
+
+  @override
+  String get withoutOpinions => 'Sense valoracions';
+
+  @override
+  String get rate => 'Valorar';
+
+  @override
+  String get yes => 'Sí';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mecànicas';
+
+  @override
+  String get electric => 'Elèctriques';
+
+  @override
+  String get free => 'Lliures';
+
+  @override
+  String get charge => 'Càrrega';
+
+  @override
+  String get reviewStation => 'Valorar Estació';
+
+  @override
+  String get writeYourOpinion => 'Escriu la teva opinió (opcional)';
+
+  @override
+  String get sendReview => 'Enviar valoració';
+
+  @override
+  String get excellent => 'Excel·lent';
+
+  @override
+  String get veryGood => 'Molt bé';
+
+  @override
+  String get good => 'Bé';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get bad => 'Malament';
+
+  @override
+  String get thankYouForYourReview => 'Gràcies per la teva valoració!';
 }

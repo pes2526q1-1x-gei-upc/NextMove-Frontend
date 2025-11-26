@@ -1023,6 +1023,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stop recording'**
   String get stopRecording;
+
+  /// No description provided for @opinions.
+  ///
+  /// In en, this message translates to:
+  /// **'Opinions'**
+  String get opinions;
+
+  /// No description provided for @station.
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get station;
+
+  /// No description provided for @seeOpinions.
+  ///
+  /// In en, this message translates to:
+  /// **'See reviews'**
+  String get seeOpinions;
+
+  /// No description provided for @withoutOpinions.
+  ///
+  /// In en, this message translates to:
+  /// **'Without reviews'**
+  String get withoutOpinions;
+
+  /// No description provided for @rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get rate;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @normal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normal;
+
+  /// No description provided for @mechanical.
+  ///
+  /// In en, this message translates to:
+  /// **'Mechanical'**
+  String get mechanical;
+
+  /// No description provided for @electric.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric'**
+  String get electric;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @charge.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge'**
+  String get charge;
+
+  /// No description provided for @reviewStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Station'**
+  String get reviewStation;
+
+  /// No description provided for @writeYourOpinion.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your opinion (optional)'**
+  String get writeYourOpinion;
+
+  /// No description provided for @sendReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit review'**
+  String get sendReview;
+
+  /// No description provided for @excellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get excellent;
+
+  /// No description provided for @veryGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Very good'**
+  String get veryGood;
+
+  /// No description provided for @good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// No description provided for @regular.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get regular;
+
+  /// No description provided for @bad.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get bad;
+
+  /// No description provided for @thankYouForYourReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your review!'**
+  String get thankYouForYourReview;
 }
 
 class _AppLocalizationsDelegate

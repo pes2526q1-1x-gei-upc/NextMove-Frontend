@@ -491,4 +491,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stopRecording => 'Stop recording';
+
+  @override
+  String get opinions => 'Opinions';
+
+  @override
+  String get station => 'Station';
+
+  @override
+  String get seeOpinions => 'See reviews';
+
+  @override
+  String get withoutOpinions => 'Without reviews';
+
+  @override
+  String get rate => 'Rate';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mechanical';
+
+  @override
+  String get electric => 'Electric';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get charge => 'Charge';
+
+  @override
+  String get reviewStation => 'Review Station';
+
+  @override
+  String get writeYourOpinion => 'Write your opinion (optional)';
+
+  @override
+  String get sendReview => 'Submit review';
+
+  @override
+  String get excellent => 'Excellent';
+
+  @override
+  String get veryGood => 'Very good';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get regular => 'Fair';
+
+  @override
+  String get bad => 'Poor';
+
+  @override
+  String get thankYouForYourReview => 'Thank you for your review!';
 }

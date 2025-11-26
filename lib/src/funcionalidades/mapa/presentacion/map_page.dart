@@ -16,13 +16,13 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
 
-//imports widgets
 import 'widgets/google_map_widget.dart';
 import 'widgets/toggle_map_mode_widget.dart';
-import 'widgets/station_list_widget.dart';
+
 import 'widgets/search_bar_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_list_widget.dart';
 import 'widgets/map_controls_column_widget.dart';
 
 class MapPage extends StatefulWidget {
@@ -129,7 +129,7 @@ class _MapPageState extends State<MapPage> {
 
                 return Stack(
                   children: [
-                    // Widget del mapa (fondo)
+                    // Widget del mapa 
                     MapWidget(
                       initialCameraPosition: CameraPosition(
                         target: _bcnCenter,
