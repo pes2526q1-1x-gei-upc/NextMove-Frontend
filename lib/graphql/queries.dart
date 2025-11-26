@@ -302,4 +302,27 @@ class GraphQLQueries {
       fecha_recorrido
     }
   }''';
+
+  static const String getRecorridosByUserQuery = r'''
+    query GetRecorridosByUser($userEmail: String!) {
+      recorridosByUser(user_email: $userEmail) {
+        id
+        user_email
+        distancia
+        velocidad_media
+        co2
+        kcal
+        origen {
+          latitude
+          longitude
+        }
+        destino {
+          latitude
+          longitude
+        }
+        fecha_recorrido
+      }
+    }
+  ''';
+
 }

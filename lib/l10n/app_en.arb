@@ -183,5 +183,9 @@
     "minCharsSearchHint" : "Please enter at least 3 characters to search.",
     "anyStationsFound" : "No results were found for your search.",
     "errorSavingRoute": "Error saving route",
-    "notEnoughPointsToRecordTrack": "Not enough points were recorded to save the recorded route."
+    "notEnoughPointsToRecordTrack": "Not enough points were recorded to save the recorded route.",
+    "routeHistory": "Recorded route history",
+    "noRoutesFound": "No recorded routes were found.",
+    "distance": "Distance",
+    "avgSpeed": "Average speed"
 }

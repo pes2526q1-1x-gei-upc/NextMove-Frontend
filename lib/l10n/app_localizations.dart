@@ -915,6 +915,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough points were recorded to save the recorded route.'**
   String get notEnoughPointsToRecordTrack;
+
+  /// No description provided for @routeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded route history'**
+  String get routeHistory;
+
+  /// No description provided for @noRoutesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded routes were found.'**
+  String get noRoutesFound;
+
+  /// No description provided for @distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get distance;
+
+  /// No description provided for @avgSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed'**
+  String get avgSpeed;
 }
 
 class _AppLocalizationsDelegate

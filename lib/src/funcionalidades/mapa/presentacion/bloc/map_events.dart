@@ -98,3 +98,4 @@ class AddRoutePointEvent extends MapEvent {
   @override
   List<Object?> get props => [point];
 }
+

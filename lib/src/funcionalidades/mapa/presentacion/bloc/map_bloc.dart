@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'map_events.dart';
 import 'map_state.dart';
@@ -20,6 +21,7 @@ var defaultPolyline = Polyline(
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
+  final RecordedRoutesRepository recordedRoutesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -31,6 +33,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
+    required this.recordedRoutesRepository,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -273,6 +276,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
     }
   }
+
+  
 
   /// Iniciar actualizaciones de ubicación
   void _startLocationUpdates() async {
