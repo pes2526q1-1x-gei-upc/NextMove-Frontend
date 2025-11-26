@@ -98,9 +98,7 @@ class AuthRemoteDataProvider {
           debugPrint("GoogleSignInException: ${e.code}");
           throw AuthException(message: e.toString());
         }
-        return {
-          'cancelled': true,
-        };
+        return {'cancelled': true};
       }
       debugPrint("Google user obtained: ${googleUser.email}");
 
@@ -125,6 +123,7 @@ class AuthRemoteDataProvider {
       final firebaseToken = await userCredential.user?.getIdToken();
 
       if (kDebugMode) {
+        print("Firebase ID Token (usa este en el header): $firebaseToken");
         print("Email: ${userCredential.user?.email}");
         print("Display Name: ${userCredential.user?.displayName}");
       }
