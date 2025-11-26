@@ -325,4 +325,45 @@ class GraphQLQueries {
     }
   ''';
 
+  static const String getAssessmentsByStationIdQuery = r'''
+    query getAssessmentsByStationIdQuery ($id: String!){
+      getAssessmentsByStationId(id: $id){
+        nickname
+        score
+        comments
+        created_at
+      }
+    }''';
+
+  static const String getStationAssessmentInfoQuery = r'''
+    query getStationAssessmentInfoQuery ($id: String!){
+      getStationAssessmentInfo(id: $id){
+        averageScore
+        totalAssessments
+      }
+    }''';
+
+  static const String createAssessmentQuery = r'''
+    mutation createAssessmentQuery (station_id: String!, score: Int!, comments: String){
+      createAssessment(station_id: $station_id, score: $score, $comments: comments){
+      
+      }
+    }
+  ''';
+
+  static const String deleteAssessmentQuery = r'''
+    mutation deleteAssessmentQuery (station_id: String!){
+      deleteAssessment(station_id: $station_id){
+      
+      }
+    }
+  ''';
+
+  static const String editAssessmentQuery = r'''
+    mutation editAssessmentQuery (station_id: String!, score: Int!, comments: String){
+      editAssessment(station_id: $station_id, score: $score, $comments: comments){
+      
+      }
+    }
+  ''';
 }
