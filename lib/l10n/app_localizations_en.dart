@@ -437,4 +437,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'Not enough points were recorded to save the recorded route.';
+
+  @override
+  String get routeStatistics => 'Route statistics';
+
+  @override
+  String get noRouteDataAvailable => 'No route data available.';
+
+  @override
+  String get routeRecording => 'Route recording';
+
+  @override
+  String get distance => 'Distance';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get averageSpeed => 'Average speed';
+
+  @override
+  String get maxSpeed => 'Max speed';
+
+  @override
+  String get elevation => 'Elevation';
+
+  @override
+  String get elevationGain => 'Elevation gain';
+
+  @override
+  String get elevationLoss => 'Elevation loss';
+
+  @override
+  String get environmentalImpact => 'Environmental impact';
+
+  @override
+  String get co2Saved => 'CO₂ saved';
+
+  @override
+  String get caloriesBurned => 'Calories burned';
+
+  @override
+  String get currentSpeed => 'Current speed';
+
+  @override
+  String get stopRecording => 'Stop recording';
 }

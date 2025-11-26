@@ -443,4 +443,49 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get notEnoughPointsToRecordTrack =>
       'No s\'han gravat prou punts per desar la ruta enregistrada.';
+
+  @override
+  String get routeStatistics => 'Estadístiques de la ruta';
+
+  @override
+  String get noRouteDataAvailable => 'No hi ha dades de ruta disponibles.';
+
+  @override
+  String get routeRecording => 'Gravació de ruta';
+
+  @override
+  String get distance => 'Distància';
+
+  @override
+  String get duration => 'Durada';
+
+  @override
+  String get averageSpeed => 'Velocitat mitjana';
+
+  @override
+  String get maxSpeed => 'Velocitat màxima';
+
+  @override
+  String get elevation => 'Elevació';
+
+  @override
+  String get elevationGain => 'Guany d\'elevació';
+
+  @override
+  String get elevationLoss => 'Pèrdua d\'elevació';
+
+  @override
+  String get environmentalImpact => 'Impacte ambiental';
+
+  @override
+  String get co2Saved => 'CO₂ estalviat';
+
+  @override
+  String get caloriesBurned => 'Calories cremades';
+
+  @override
+  String get currentSpeed => 'Velocitat actual';
+
+  @override
+  String get stopRecording => 'Aturar la gravació';
 }
