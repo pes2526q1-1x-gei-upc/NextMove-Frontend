@@ -105,6 +105,7 @@ class _EditUserDataPreferencesPageState
             );
           } else if (state is UserUpdated) {
             final userProvider = Provider.of<UserProvider>(context, listen: false);
+          
             final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
             final firebaseUser = FirebaseAuth.instance.currentUser;
             

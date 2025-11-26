@@ -48,9 +48,12 @@ class ProfileLogoutButton extends StatelessWidget {
           debugPrint(
             "ProfileLogoutButton: User logged out, navigating to login...",
           );
+          // Pop all routes to return to the root (AuthStateHandler)
+          // which will detect the logout and show WelcomePage
           Navigator.of(
             context,
-          ).pushNamedAndRemoveUntil('/login', (route) => false);
+            rootNavigator: true,
+          ).popUntil((route) => route.isFirst);
         }
       },
       child: Container(
