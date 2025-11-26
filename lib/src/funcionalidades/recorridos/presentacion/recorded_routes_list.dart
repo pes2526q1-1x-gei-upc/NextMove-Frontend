@@ -4,7 +4,6 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_bloc.dart';
 import 'bloc/route_events.dart';
 import 'bloc/route_state.dart';
-import 'bloc/route_bloc.dart';
 
 class RouteHistoryList extends StatelessWidget {
   const RouteHistoryList({super.key});
