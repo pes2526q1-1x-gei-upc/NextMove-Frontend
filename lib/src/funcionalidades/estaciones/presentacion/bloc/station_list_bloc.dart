@@ -26,15 +26,18 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
     final prevState = state;
     emit(StationListLoading());
     final result = event.stationType == StationType.bicycle
-        ? await stationRepository.getAllNearbyBicycleStationDetails(event.latitude, event.longitude)
-        : await stationRepository.getAllNearbyEVStationDetails(event.latitude, event.longitude);
-    result.fold(
-      (failure) {
-        emit(StationListError(_mapFailureToMessage(failure)));
-        emit(prevState);
-      },
-      (stations) => emit(StationListLoaded(stations ?? [])),
-    );
+        ? await stationRepository.getAllNearbyBicycleStationDetails(
+            event.latitude,
+            event.longitude,
+          )
+        : await stationRepository.getAllNearbyEVStationDetails(
+            event.latitude,
+            event.longitude,
+          );
+    result.fold((failure) {
+      emit(StationListError(_mapFailureToMessage(failure)));
+      emit(prevState);
+    }, (stations) => emit(StationListLoaded(stations ?? [])));
   }
 
   Future<void> _onSearchStationListEvent(
@@ -64,14 +67,30 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
   ) async {
     if (state is StationListLoaded) {
       final currentState = state as StationListLoaded;
-      final updatedStations = currentState.stations.map((station) {
-        if (station.id == event.stationId) {
-          final isFavorite = station.isFavorite ?? false;
-          stationRepository.setStationFavoriteStatus(station.id, !isFavorite);
-          station.isFavorite = !isFavorite;
-        }
-        return station;
-      }).toList();
+      final updatedStations = await Future.wait(
+        currentState.stations.map((station) async {
+          if (station.id == event.stationId) {
+            final isFavorite = station.isFavorite ?? false;
+            final stationType = station is BicycleStationDetails
+                ? StationType.bicycle
+                : StationType.electricVehicle;
+            final result = await stationRepository.setStationFavoriteStatus(
+              station.id,
+              stationType,
+              !isFavorite,
+            );
+            await result.fold(
+              (failure) async {
+                emit(StationListToggleError(_mapFailureToMessage(failure), currentState.stations));
+              },
+              (success) async {
+                station.isFavorite = !isFavorite;
+              },
+            );
+          }
+          return station;
+        }).toList(),
+      );
       emit(StationListLoaded(updatedStations));
     }
   }

@@ -239,6 +239,7 @@ class StationRemoteDataProvider {
 
   Future<void> setStationFavoriteStatus(
     String stationId,
+    StationType stationType,
     bool isFavorite,
   ) async {
     if (kDebugMode) {
@@ -246,14 +247,34 @@ class StationRemoteDataProvider {
         'setStationFavoriteStatus called for stationId: $stationId, isFavorite: $isFavorite',
       );
     }
-     String? authHeader = await AuthRemoteDataProvider().authHeader;
-    //debugPrint("authHeader en getFriends: $authHeader");
-    final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getFriends),
-      context: Context().withEntry(HttpLinkHeaders(headers: {
-        'Authorization': ?authHeader,
-      })),
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    final MutationOptions options = MutationOptions(
+      document: gql(
+        isFavorite
+            ? GraphQLQueries.addFavStation
+            : GraphQLQueries.deleteFavStation,
+      ),
+      variables: {
+        'stationId': stationId,
+        'stationType': stationType == StationType.bicycle ? 'BIKE' : 'CAR',
+      },
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': ?authHeader}),
+      ),
       fetchPolicy: FetchPolicy.networkOnly,
     );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print(
+          'GraphQL Exception in setStationFavoriteStatus for stationId $stationId: ${result.exception.toString()}',
+        );
+      }
+      throw ServerException(
+        'Error en mutation: ${result.exception.toString()}',
+      );
+    }
   }
 }

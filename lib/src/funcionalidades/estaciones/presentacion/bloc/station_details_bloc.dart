@@ -42,7 +42,19 @@ class StationDetailsBloc
     ToggleFavoriteEvent event,
     Emitter<StationDetailsState> emit,
   ) async {
-    throw UnimplementedError();
+    if (state is StationDetailsLoaded) {
+      final currentState = state as StationDetailsLoaded;
+      final isFavorite = currentState.stationDetails.isFavorite ?? false;
+      stationRepository.setStationFavoriteStatus(
+        currentState.stationDetails.id,
+        currentState.stationDetails is BicycleStationDetails
+            ? StationType.bicycle
+            : StationType.electricVehicle,
+        !isFavorite,
+      );
+      currentState.stationDetails.isFavorite = !isFavorite;
+      emit(StationDetailsLoaded(currentState.stationDetails));
+    }
   }
 
   String _mapFailureToMessage(Failure failure) {

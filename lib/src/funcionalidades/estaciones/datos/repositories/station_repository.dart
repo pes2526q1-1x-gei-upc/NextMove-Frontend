@@ -142,9 +142,9 @@ class StationRepository {
     }
   }
 
-  Future<Either<Failure, void>> setStationFavoriteStatus(String stationId, bool isFavorite) async {
+  Future<Either<Failure, void>> setStationFavoriteStatus(String stationId, StationType stationType, bool isFavorite) async {
     try {
-      await stationRemoteDataProvider.setStationFavoriteStatus(stationId, isFavorite);
+      await stationRemoteDataProvider.setStationFavoriteStatus(stationId, stationType, isFavorite);
       return Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
