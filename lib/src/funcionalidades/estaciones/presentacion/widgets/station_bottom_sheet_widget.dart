@@ -11,6 +11,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 
 class StationBottomSheet extends StatelessWidget {
   const StationBottomSheet({
@@ -163,10 +164,21 @@ class StationBottomSheet extends StatelessWidget {
                   ),
 
                   // --- STATS ---
-                  if (station is BicycleStationDetails)
-                    BicycleStatsWidget(station: station as BicycleStationDetails)
-                  else if (station is EVStationDetails)
-                    EVStatsWidget(station: station as EVStationDetails),
+                  BlocProvider<StationListBloc>(
+                    create: (context) => StationListBloc()
+                      ..add(
+                        LoadStationListEvent(
+                          stationType: state.currentMode,
+                          latitude: state.userLocation?.latitude ?? 41.3851,
+                          longitude: state.userLocation?.longitude ?? 2.1734,
+                        ),
+                      ),
+                    child: station is BicycleStationDetails
+                        ? BicycleStatsWidget(station: station as BicycleStationDetails)
+                        : station is EVStationDetails
+                            ? EVStatsWidget(station: station as EVStationDetails)
+                            : const SizedBox.shrink(),
+                  ),
 
                   const SizedBox(height: 24),
 
