@@ -46,6 +46,8 @@ jobs:
           channel: "stable"
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Create .env file to avoid asset missing error
+        run: touch .env
       - name: Run tests with coverage information
         run: flutter test --coverage
       - name: Upload coverage reports for coverage job
