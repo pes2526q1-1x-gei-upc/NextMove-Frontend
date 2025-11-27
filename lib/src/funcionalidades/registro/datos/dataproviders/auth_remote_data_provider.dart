@@ -9,6 +9,16 @@ import 'package:nextmove_app/config/graphql_config.dart';
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
+  Future<String?> get authHeader async {
+    final fireBaseUser = FirebaseAuth.instance.currentUser;
+    String? authHeader = '';  
+    if (fireBaseUser != null) {
+      final token = await fireBaseUser.getIdToken();
+      authHeader = 'Bearer $token';
+    }
+    return authHeader;
+  }
+
   Future<bool> isEmailRegistered(String email) async {
     try {
       final credential = await FirebaseAuth.instance

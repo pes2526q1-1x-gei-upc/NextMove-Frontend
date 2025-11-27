@@ -6,23 +6,15 @@ import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 
 
 class AssessmentRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
-  Future<String?> get _authHeader async {
-    final fireBaseUser = FirebaseAuth.instance.currentUser;
-    if (fireBaseUser != null) {
-      final token = await fireBaseUser.getIdToken();
-      return 'Bearer $token';
-    }
-    return null;
-  }
-
   Future<void> createAssessment(String stationId, int score, String description) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final MutationOptions options = MutationOptions(
         document: gql(GraphQLQueries.createAssessmentQuery), 
@@ -57,7 +49,7 @@ class AssessmentRemoteDataProvider {
 
   Future<List<AssessmentEntity>> getAssessmentsByStation(String stationId) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final QueryOptions options = QueryOptions(
         document: gql(GraphQLQueries.getAssessmentsByStationIdQuery), 
@@ -104,7 +96,7 @@ class AssessmentRemoteDataProvider {
   
   Future<AssessmentInfoEntity> getStationAssessmentInfo(String stationId) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final QueryOptions options = QueryOptions(
         document: gql(GraphQLQueries.getStationAssessmentInfoQuery), 
@@ -147,7 +139,7 @@ class AssessmentRemoteDataProvider {
   // --- ACTUALIZAR VALORACIÓN ---
   Future<void> updateAssessment(String stationId, int score, String description) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
       
       final MutationOptions options = MutationOptions(
         document: gql(GraphQLQueries.editAssessmentQuery),
@@ -182,7 +174,7 @@ class AssessmentRemoteDataProvider {
   // --- ELIMINAR VALORACIÓN ---
   Future<void> deleteAssessment(String stationId) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
       
       final MutationOptions options = MutationOptions(
         document: gql(GraphQLQueries.deleteAssessmentQuery),

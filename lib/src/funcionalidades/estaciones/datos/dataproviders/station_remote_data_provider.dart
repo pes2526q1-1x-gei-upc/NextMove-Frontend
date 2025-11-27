@@ -4,6 +4,7 @@ import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 
 Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
   // OJO porque ahora coge el valor del notifier retornado, no el notifier!
@@ -240,11 +241,19 @@ class StationRemoteDataProvider {
     String stationId,
     bool isFavorite,
   ) async {
-    // TODO: Implementar la mutación GraphQL para actualizar el estado de favorito
     if (kDebugMode) {
       print(
         'setStationFavoriteStatus called for stationId: $stationId, isFavorite: $isFavorite',
       );
     }
+     String? authHeader = await AuthRemoteDataProvider().authHeader;
+    //debugPrint("authHeader en getFriends: $authHeader");
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getFriends),
+      context: Context().withEntry(HttpLinkHeaders(headers: {
+        'Authorization': ?authHeader,
+      })),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
   }
 }
