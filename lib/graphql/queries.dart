@@ -267,10 +267,39 @@ class GraphQLQueries {
           latitude
           longitude
         }
+        distance
+      connectors {
+        type
+        powerKw
+        status
+      }
+      isSuperFast
       }
     }
   ''';
 
+    static const String getBicingStationsBySearchQuery = r'''
+      query SearchBicingStations($address: String!) {
+        getEstacionesDeBicingPorDireccion(address: $address) {
+          id
+          nombre
+          direccion
+          coordenadas {
+            latitude
+            longitude
+          }
+          plazasTotales
+          estacionCargaElectrica
+          sePuedenAlquilarBicis
+          sePuedeAnclarBicis
+          plazasOcupadas
+          anclajesDisponibles
+          estado
+          bicisMecanicasDisponibles
+          bicisElectricasDisponibles
+        }
+      }
+    ''';
 
   static const String createTrackMutation = r'''
     mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
