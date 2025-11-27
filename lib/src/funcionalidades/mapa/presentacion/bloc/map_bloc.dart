@@ -241,7 +241,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       try {
         final result = currentState.currentMode == StationType.electricVehicle
             ? await stationRepository.searchEvStations(query)
-            : await stationRepository.searchEvStations(query);
+            : await stationRepository.searchBicycleStations(query);
 
         result.fold(
           (failure) {
