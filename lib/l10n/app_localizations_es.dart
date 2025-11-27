@@ -253,7 +253,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get closed => 'Cerrado';
 
   @override
-  String get available => 'Disponible';
+  String get available => 'Disponibles';
 
   @override
   String get occupied => 'Ocupado';
@@ -497,4 +497,92 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get stopRecording => 'Detener grabación';
+
+  @override
+  String get opinions => 'Valoraciones';
+
+  @override
+  String get station => 'Estación';
+
+  @override
+  String get seeOpinions => 'Ver reviews';
+
+  @override
+  String get withoutOpinions => 'Sin reviews';
+
+  @override
+  String get rate => 'Valorar';
+
+  @override
+  String get yes => 'Sí';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mecánicas';
+
+  @override
+  String get electric => 'Eléctricas';
+
+  @override
+  String get free => 'Libres';
+
+  @override
+  String get charge => 'Charge';
+
+  @override
+  String get reviewStation => 'Valorar estación';
+
+  @override
+  String get writeYourOpinion => 'Escribe tu opinión (opcional)';
+
+  @override
+  String get sendReview => 'Enviar valoración';
+
+  @override
+  String get excellent => 'Excelente';
+
+  @override
+  String get veryGood => 'Muy buena';
+
+  @override
+  String get good => 'Buena';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get bad => 'Mala';
+
+  @override
+  String get thankYouForYourReview => '¡Gracias por tu valoración!';
+
+  @override
+  String get errorLoadingReviews => 'Error al cargar las valoraciones';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
+
+  @override
+  String get editReview => 'Editar valoración';
+
+  @override
+  String get sureActionConfirmation =>
+      'Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?';
+
+  @override
+  String get deletedReview => 'Has eliminado tu valoración.';
+
+  @override
+  String get updateReview => 'Actualizar valoración';
+
+  @override
+  String get updatedReview => 'Tu valoración ha sido actualizada.';
 }

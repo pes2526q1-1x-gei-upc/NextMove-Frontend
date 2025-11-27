@@ -49,8 +49,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/googl
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_bar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_list_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';

@@ -491,4 +491,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stopRecording => 'Stop recording';
+
+  @override
+  String get opinions => 'Reviews';
+
+  @override
+  String get station => 'Station';
+
+  @override
+  String get seeOpinions => 'See reviews';
+
+  @override
+  String get withoutOpinions => 'Without reviews';
+
+  @override
+  String get rate => 'Rate';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mechanical';
+
+  @override
+  String get electric => 'Electric';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get charge => 'Charge';
+
+  @override
+  String get reviewStation => 'Review Station';
+
+  @override
+  String get writeYourOpinion => 'Write your opinion (optional)';
+
+  @override
+  String get sendReview => 'Submit review';
+
+  @override
+  String get excellent => 'Excellent';
+
+  @override
+  String get veryGood => 'Very good';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get regular => 'Fair';
+
+  @override
+  String get bad => 'Poor';
+
+  @override
+  String get thankYouForYourReview => 'Thank you for your review!';
+
+  @override
+  String get errorLoadingReviews => 'Error loading reviews';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
+
+  @override
+  String get editReview => 'Edit review';
+
+  @override
+  String get sureActionConfirmation =>
+      'This action cannot be undone. Are you sure you want to proceed?';
+
+  @override
+  String get deletedReview => 'You have deleted your review.';
+
+  @override
+  String get updateReview => 'Update review';
+
+  @override
+  String get updatedReview => 'Your review has been updated.';
 }
