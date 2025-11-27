@@ -204,7 +204,7 @@
     "caloriesBurned": "Calorías quemadas",
     "currentSpeed": "Velocidad actual",
     "stopRecording": "Detener grabación",
-    "opinions": "Opiniones",
+    "opinions": "Valoraciones",
     "unknown": "Desconocido",
     "unknownPower": "Potencia desconocida",
     "station": "Estación",
@@ -231,5 +231,10 @@
     "thankYouForYourReview": "¡Gracias por tu valoración!",
     "errorLoadingReviews": "Error al cargar las valoraciones",
     "retry": "Reintentar",
-    "FirstToReview": "¡Sé el primero en valorar esta estación!"
+    "FirstToReview": "¡Sé el primero en valorar esta estación!",
+    "editReview": "Editar valoración",
+    "sureActionConfirmation": "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?",
+    "deletedReview": "Has eliminado tu valoración.",
+    "updateReview": "Actualizar valoración",
+    "updatedReview": "Tu valoración ha sido actualizada."
 }

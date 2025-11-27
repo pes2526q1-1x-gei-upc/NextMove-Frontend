@@ -203,7 +203,7 @@
     "caloriesBurned": "Calories burned",
     "currentSpeed": "Current speed",
     "stopRecording": "Stop recording",
-    "opinions": "Opinions",
+    "opinions": "Reviews",
     "unknown": "Unknown",
     "unknownPower": "Unknown power",
     "station": "Station",
@@ -230,5 +230,10 @@
     "thankYouForYourReview": "Thank you for your review!",
     "errorLoadingReviews": "Error loading reviews",
     "retry": "Retry",
-    "firstToReview": "Be the first to review this station!"
+    "firstToReview": "Be the first to review this station!",
+    "editReview": "Edit review",
+    "sureActionConfirmation": "This action cannot be undone. Are you sure you want to proceed?",
+    "deletedReview": "You have deleted your review.",
+    "updateReview": "Update review",
+    "updatedReview": "Your review has been updated."
 }

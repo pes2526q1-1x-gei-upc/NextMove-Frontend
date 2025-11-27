@@ -499,7 +499,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get stopRecording => 'Aturar la gravació';
 
   @override
-  String get opinions => 'Opinions';
+  String get opinions => 'Valoracions';
 
   @override
   String get station => 'Estació';
@@ -569,4 +569,20 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get firstToReview => 'Be the first to review this station!';
+
+  @override
+  String get editReview => 'Editar valoració';
+
+  @override
+  String get sureActionConfirmation =>
+      'Aquesta acció no es pot desfer. Estàs segur que vols continuar?';
+
+  @override
+  String get deletedReview => 'Has eliminat la teva valoració.';
+
+  @override
+  String get updateReview => 'Actualitzar valoració';
+
+  @override
+  String get updatedReview => 'La teva valoració ha estat actualitzada.';
 }

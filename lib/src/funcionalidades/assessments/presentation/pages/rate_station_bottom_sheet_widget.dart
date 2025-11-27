@@ -3,17 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 
 class RateStationBottomSheet extends StatefulWidget {
   final String stationId;
   final String stationName;
   final Color themeColor;
+  final AssessmentEntity? existingAssessment;
 
   const RateStationBottomSheet({
     super.key,
     required this.stationId,
     required this.stationName,
     required this.themeColor,
+    this.existingAssessment,
   });
 
   @override
@@ -21,8 +24,19 @@ class RateStationBottomSheet extends StatefulWidget {
 }
 
 class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
-  int _selectedScore = 0; 
-  final TextEditingController _commentController = TextEditingController();
+  int _selectedScore = 0;
+  late TextEditingController _commentController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingAssessment != null) {
+      _selectedScore = widget.existingAssessment!.score;
+      _commentController = TextEditingController(text: widget.existingAssessment!.description);
+    } else {
+      _commentController = TextEditingController();
+    }
+  }
 
   @override
   void dispose() {
@@ -30,11 +44,23 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
     super.dispose();
   }
 
+  // Helper para textos de estrellas
+  String _getRatingLabel(int score, AppLocalizations l10n) {
+    switch (score) {
+      case 1: return l10n.bad;     
+      case 2: return l10n.regular;
+      case 3: return l10n.good;
+      case 4: return l10n.veryGood;
+      case 5: return l10n.excellent;
+      default: return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Usamos MediaQuery para saber cuanto espacio ocupa el teclado
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final isEditing = widget.existingAssessment != null;
 
     return Container(
       decoration: const BoxDecoration(
@@ -58,14 +84,64 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           ),
           const SizedBox(height: 24),
 
-          // --- Título ---
-          Text(
-            l10n.reviewStation, 
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          // --- HEADER CON BOTÓN ELIMINAR (Solo en edición) ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Espaciador invisible para centrar el título si hay icono de borrar
+              if (isEditing) const SizedBox(width: 48), 
+              
+              Text(
+                isEditing ? l10n.editReview : l10n.reviewStation, 
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              if (isEditing)
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+                  tooltip: l10n.delete,
+                  onPressed: () {
+                    // DIÁLOGO DE CONFIRMACIÓN
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(l10n.delete),
+                        content: Text(l10n.sureActionConfirmation),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx), 
+                            child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey))
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(ctx); // Cerrar alerta
+                              
+                              // Evento BLoC: Eliminar
+                              context.read<AssessmentBloc>().add(
+                                DeleteAssessmentEvent(stationId: widget.stationId)
+                              );
+                              
+                              Navigator.pop(context); // Cerrar BottomSheet
+                              
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(l10n.deletedReview)),
+                              );
+                            },
+                            child: Text(l10n.delete, style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                )
+              else
+                const SizedBox(width: 0),
+            ],
           ),
+
           const SizedBox(height: 8),
           Text(
             widget.stationName,
@@ -75,7 +151,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
 
           const SizedBox(height: 30),
 
-          // --- Selector de Estrellas ---
+          // --- SELECTOR DE ESTRELLAS ---
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
@@ -103,7 +179,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           ),
           const SizedBox(height: 10),
           Text(
-            _getRatingLabel(_selectedScore),
+            _getRatingLabel(_selectedScore, l10n),
             style: TextStyle(
               color: _selectedScore > 0 ? Colors.amber[800] : Colors.transparent,
               fontWeight: FontWeight.bold,
@@ -113,7 +189,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
 
           const SizedBox(height: 30),
 
-          // --- Campo de Descripción ---
+          // --- CAMPO DE COMENTARIOS ---
           Container(
             decoration: BoxDecoration(
               color: const Color(0xFFF5F5F7), 
@@ -133,7 +209,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
 
           const SizedBox(height: 24),
 
-          // --- Botón Enviar ---
+          // --- BOTÓN DE ACCIÓN (CREAR O ACTUALIZAR) ---
           SizedBox(
             width: double.infinity,
             height: 54,
@@ -145,50 +221,49 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                // Deshabilitar visualmente si no ha seleccionado estrellas
                 disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
               ),
               onPressed: _selectedScore == 0
-                  ? null // Bloqueado si no hay estrellas
+                  ? null
                   : () {
-                    String id = widget.stationId;
-                    debugPrint("station id: $id");
-                    debugPrint("Score: $_selectedScore");
-                    debugPrint("Comentario: ${_commentController.text}");
-                    context.read<AssessmentBloc>().add(
-                      CreateAssessmentEvent(
-                        stationId: widget.stationId, 
-                        score: _selectedScore,
-                        comment: _commentController.text,
-                      ),
-                    );
-                    
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.thankYouForYourReview)),
-                    );
-                  },
+                      if (isEditing) {
+                        // MODO EDICIÓN: Evento Update
+                        context.read<AssessmentBloc>().add(
+                          UpdateAssessmentEvent(
+                            stationId: widget.stationId,
+                            score: _selectedScore,
+                            comment: _commentController.text,
+                          ),
+                        );
+                      } else {
+                        // MODO CREACIÓN: Evento Create
+                        context.read<AssessmentBloc>().add(
+                          CreateAssessmentEvent(
+                            stationId: widget.stationId,
+                            score: _selectedScore,
+                            comment: _commentController.text,
+                          ),
+                        );
+                      }
+                      
+                      Navigator.pop(context); // Cerrar
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(isEditing 
+                            ? l10n.updatedReview
+                            : l10n.thankYouForYourReview),
+                        ),
+                      );
+                    },
               child: Text(
-                l10n.sendReview, 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                isEditing ? l10n.updateReview: l10n.sendReview, 
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  // Helper para mostrar texto según las estrellas 
-  String _getRatingLabel(int score) {
-    final l10n = AppLocalizations.of(context)!;
-    switch (score) {
-      case 1: return l10n.bad;
-      case 2: return l10n.regular;
-      case 3: return l10n.good;
-      case 4: return l10n.veryGood;
-      case 5: return l10n.excellent;
-      default: return "";
-    }
   }
 }

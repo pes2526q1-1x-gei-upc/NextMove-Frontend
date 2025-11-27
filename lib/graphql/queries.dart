@@ -350,18 +350,14 @@ class GraphQLQueries {
   ''';
 
   static const String deleteAssessmentQuery = r'''
-    mutation deleteAssessmentQuery ($station_id: String!){
-      deleteAssessment(station_id: $station_id){
-      
-      }
+    mutation DeleteAssessment($station_id: String!) {
+      deleteAssessment(station_id: $station_id)
     }
   ''';
 
   static const String editAssessmentQuery = r'''
-    mutation editAssessmentQuery ($station_id: String!, $score: Int!, $comments: String){
-      editAssessment(station_id: $station_id, score: $score, $comments: comments){
-      
-      }
+    mutation EditAssessment($station_id: String!, $score: Int!, $comments: String) {
+      editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 
 class ReviewCard extends StatelessWidget {
   final String userName;
   final String date;
-  final int rating;
+  final double rating;
   final String comment;
   final Color themeColor;
+  final VoidCallback? onEditPressed;
 
   const ReviewCard({
     super.key,
@@ -15,10 +17,12 @@ class ReviewCard extends StatelessWidget {
     required this.rating,
     required this.comment,
     required this.themeColor,
+    this.onEditPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -35,11 +39,11 @@ class ReviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- ENCABEZADO: Avatar + Info + Estrellas ---
+          // --- ENCABEZADO ---
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Avatar con inicial
+              // Avatar
               CircleAvatar(
                 backgroundColor: themeColor.withOpacity(0.1),
                 radius: 18,
@@ -81,17 +85,36 @@ class ReviewCard extends StatelessWidget {
                 ),
               ),
 
-              // Estrellas 
+              // Estrellas
               Transform.scale(
                 scale: 0.8, 
-                alignment: Alignment.centerRight,
+                alignment: Alignment.centerRight, 
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    createStarRatingRow((rating * 2).round()), 
+                    createStarRatingRow((rating * 2).round()),
                   ],
                 ),
               ),
+
+            
+              if (onEditPressed != null) ...[
+                const SizedBox(width: 4),
+                Container(
+                  margin: const EdgeInsets.only(left: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.edit_rounded, size: 18, color: themeColor),
+                    padding: const EdgeInsets.all(8),
+                    constraints: const BoxConstraints(), // Hace el botón compacto
+                    onPressed: onEditPressed,
+                    tooltip: l10n.editReview,
+                  ),
+                ),
+              ],
             ],
           ),
           
@@ -103,7 +126,7 @@ class ReviewCard extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey[800],
                 fontSize: 14,
-                height: 1.4,
+                height: 1.4, 
               ),
             ),
           ],

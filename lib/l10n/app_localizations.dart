@@ -1027,7 +1027,7 @@ abstract class AppLocalizations {
   /// No description provided for @opinions.
   ///
   /// In en, this message translates to:
-  /// **'Opinions'**
+  /// **'Reviews'**
   String get opinions;
 
   /// No description provided for @station.
@@ -1167,6 +1167,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Be the first to review this station!'**
   String get firstToReview;
+
+  /// No description provided for @editReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit review'**
+  String get editReview;
+
+  /// No description provided for @sureActionConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. Are you sure you want to proceed?'**
+  String get sureActionConfirmation;
+
+  /// No description provided for @deletedReview.
+  ///
+  /// In en, this message translates to:
+  /// **'You have deleted your review.'**
+  String get deletedReview;
+
+  /// No description provided for @updateReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Update review'**
+  String get updateReview;
+
+  /// No description provided for @updatedReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been updated.'**
+  String get updatedReview;
 }
 
 class _AppLocalizationsDelegate

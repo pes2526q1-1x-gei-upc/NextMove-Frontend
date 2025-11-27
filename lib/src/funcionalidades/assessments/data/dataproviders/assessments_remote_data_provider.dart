@@ -143,4 +143,72 @@ class AssessmentRemoteDataProvider {
       throw ServerException('Error interno: $e');
     }    
   }
+
+  // --- ACTUALIZAR VALORACIÓN ---
+  Future<void> updateAssessment(String stationId, int score, String description) async {
+    try {
+      final authHeader = await _authHeader;
+      
+      final MutationOptions options = MutationOptions(
+        document: gql(GraphQLQueries.editAssessmentQuery),
+        variables: {
+          'station_id': stationId,
+          'score': score,
+          'comments': description, 
+        },
+        context: Context().withEntry(
+          HttpLinkHeaders(headers: {
+            'Authorization': authHeader ?? '',
+          }),
+        ),
+      );
+
+      debugPrint("Editando valoración...");
+      final QueryResult result = await client.mutate(options);
+
+      if (result.hasException) {
+        debugPrint('Excepción GraphQL al editar: ${result.exception.toString()}');
+        throw ServerException('Error al editar valoración: ${result.exception.toString()}');
+      }
+      
+      debugPrint("Valoración editada con éxito. Nuevo promedio: ${result.data?['editAssessment']}");
+
+    } catch (e) {
+      debugPrint("Error crítico al editar: $e");
+      throw ServerException('Error interno: $e');
+    }
+  }
+
+  // --- ELIMINAR VALORACIÓN ---
+  Future<void> deleteAssessment(String stationId) async {
+    try {
+      final authHeader = await _authHeader;
+      
+      final MutationOptions options = MutationOptions(
+        document: gql(GraphQLQueries.deleteAssessmentQuery),
+        variables: {
+          'station_id': stationId,
+        },
+        context: Context().withEntry(
+          HttpLinkHeaders(headers: {
+            'Authorization': authHeader ?? '',
+          }),
+        ),
+      );
+
+      debugPrint("Eliminando valoración...");
+      final QueryResult result = await client.mutate(options);
+
+      if (result.hasException) {
+        debugPrint('Excepción GraphQL al eliminar: ${result.exception.toString()}');
+        throw ServerException('Error al eliminar valoración: ${result.exception.toString()}');
+      }
+
+       debugPrint("Valoración eliminada con éxito. Nuevo promedio: ${result.data?['deleteAssessment']}");
+
+    } catch (e) {
+      debugPrint("Error crítico al eliminar: $e");
+      throw ServerException('Error interno: $e');
+    }
+  }
 }

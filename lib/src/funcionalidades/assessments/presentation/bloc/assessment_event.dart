@@ -38,3 +38,19 @@ class GetStationAssessmentInfoEvent extends AssessmentEvent {
   @override
   List<Object?> get props => [stationId];
 }
+
+class UpdateAssessmentEvent extends AssessmentEvent {
+  final String stationId;
+  final int score;
+  final String comment;
+  const UpdateAssessmentEvent({required this.stationId, required this.score, required this.comment});
+  @override
+  List<Object?> get props => [stationId, score, comment];
+}
+
+class DeleteAssessmentEvent extends AssessmentEvent {
+  final String stationId;
+  const DeleteAssessmentEvent({required this.stationId});
+  @override
+  List<Object?> get props => [stationId];
+}

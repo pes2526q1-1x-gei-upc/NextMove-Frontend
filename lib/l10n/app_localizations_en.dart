@@ -493,7 +493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stopRecording => 'Stop recording';
 
   @override
-  String get opinions => 'Opinions';
+  String get opinions => 'Reviews';
 
   @override
   String get station => 'Station';
@@ -563,4 +563,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get firstToReview => 'Be the first to review this station!';
+
+  @override
+  String get editReview => 'Edit review';
+
+  @override
+  String get sureActionConfirmation =>
+      'This action cannot be undone. Are you sure you want to proceed?';
+
+  @override
+  String get deletedReview => 'You have deleted your review.';
+
+  @override
+  String get updateReview => 'Update review';
+
+  @override
+  String get updatedReview => 'Your review has been updated.';
 }

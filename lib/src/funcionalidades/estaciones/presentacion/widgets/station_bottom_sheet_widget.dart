@@ -34,153 +34,184 @@ class StationBottomSheet extends StatelessWidget {
       create: (context) => AssessmentBloc(
         assessmentRepository: AssessmentRepository(),
       )..add(GetStationAssessmentInfoEvent(stationId: station.id)),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 30),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- BARRA SUPERIOR ---
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // --- CABECERA (Nombre y Distancia) ---
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Builder(
+        builder: (context) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          station.name ?? l10n.unknown,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          station.address ?? l10n.unknown,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                  // --- BARRA SUPERIOR ---
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                  // Badge de distancia
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: themeColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.directions_walk_rounded,
-                            size: 16, color: themeColor),
-                        const SizedBox(width: 4),
-                        Text(
-                          station.distanceKm != null
-                              ? '${station.distanceKm!.toStringAsFixed(1)} km'
-                              : '- km',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: themeColor,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                  const SizedBox(height: 20),
 
-              const SizedBox(height: 16),
-
-              BlocBuilder<AssessmentBloc, AssessmentState>(
-                builder: (context, assessmentState) {
-                  final displayStation = (assessmentState.totalAssessments > 0)
-                      ? station.copyWith(rating: assessmentState.averageScore)
-                      : station;
-
-                  if (displayStation.rating != null) {
-                    return Column(
-                      children: [
-                        StarRatingRowBottomSheet(station: displayStation),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-
-              // --- TARJETAS DE INFORMACIÓN ---
-              if (station is BicycleStationDetails)
-                BicycleStatsWidget(station: station as BicycleStationDetails)
-              else if (station is EVStationDetails)
-                EVStatsWidget(station: station as EVStationDetails),
-
-              const SizedBox(height: 24),
-
-              // --- BOTÓN DE ACCIÓN ---
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: themeColor,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => StationDetailsPage(
-                          stationID: station.id,
-                          stationType: state.currentMode,
-                          stationDetails: station,
+                  // --- CABECERA ---
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              station.name ?? l10n.unknown,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              station.address ?? l10n.unknown,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                  child: Text(
-                    l10n.information,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: themeColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.directions_walk_rounded,
+                                size: 16, color: themeColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              station.distanceKm != null
+                                  ? '${station.distanceKm!.toStringAsFixed(1)} km'
+                                  : '- km',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: themeColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                ),
+
+                  const SizedBox(height: 16),
+
+                  // --- RATING ACTUALIZADO ---
+                  BlocBuilder<AssessmentBloc, AssessmentState>(
+                    builder: (context, assessmentState) {
+                      double? realRating;
+                      if (assessmentState.totalAssessments > 0) {
+                        realRating = assessmentState.averageScore;
+                      } else if (assessmentState.status == AssessmentStatus.success) {
+                        realRating = null; 
+                      } else {
+                        realRating = station.rating;
+                      }
+
+                      final displayStation = station.copyWith(rating: realRating);
+
+                      if (displayStation.rating != null) {
+                        return Column(
+                          children: [
+                            StarRatingRowBottomSheet(station: displayStation),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.star_outline_rounded, size: 18, color: Colors.grey[400]),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.withoutOpinions,
+                                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  ),
+
+                  // --- STATS ---
+                  if (station is BicycleStationDetails)
+                    BicycleStatsWidget(station: station as BicycleStationDetails)
+                  else if (station is EVStationDetails)
+                    EVStatsWidget(station: station as EVStationDetails),
+
+                  const SizedBox(height: 24),
+
+                  // --- BOTÓN DE ACCIÓN ---
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => StationDetailsPage(
+                              stationID: station.id,
+                              stationType: state.currentMode,
+                              stationDetails: station,
+                            ),
+                          ),
+                        );
+                        
+                        if (context.mounted) {
+                          context.read<AssessmentBloc>().add(
+                            GetStationAssessmentInfoEvent(stationId: station.id)
+                          );
+                        }
+                      },
+                      child: Text(
+                        l10n.information,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
       ),
     );
   }
