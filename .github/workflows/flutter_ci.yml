@@ -1,12 +1,12 @@
 name: Flutter CI Light
-# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase. 
+# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase.
 # Prob de no detectar errores <= 10%. Mas adelante se hara más pesado, ahora buscamos compilación rápida.
 # Se ejecuta en push o PR a dev y main.
 on:
   push:
-    branches: [ dev, main ]
+    branches: [dev, main]
   pull_request:
-    branches: [ dev, main ]
+    branches: [dev, main]
 
 jobs:
   # Job unificado para análisis
@@ -14,21 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-    - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.35.4'
-        channel: 'stable'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.4"
+          channel: "stable"
 
-    # Instala dependencias.
-    - run: flutter pub get
+      # Instala dependencias.
+      - run: flutter pub get
 
-    # Verifica el entorno Flutter (como flutter doctor local).
-    - run: flutter doctor -v
+      # Verifica el entorno Flutter (como flutter doctor local).
+      - run: flutter doctor -v
 
-    # Analiza el código (ignora warnings por ahora).
-    - run: flutter analyze || true
+      # Analiza el código (ignora warnings por ahora).
+      - run: flutter analyze || true
 
   test:
     runs-on: ubuntu-latest
@@ -42,15 +42,14 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.4'
-          channel: 'stable'
+          flutter-version: "3.35.4"
+          channel: "stable"
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
       - name: Run tests with coverage information
         run: flutter test --coverage
       - name: Calculate and output coverage percentage
         run: genhtml coverage/lcov.info -o coverage/html | grep "lines.......:"
-  
 
     # Builds:
     # Para Android: flutter build apk --debug
