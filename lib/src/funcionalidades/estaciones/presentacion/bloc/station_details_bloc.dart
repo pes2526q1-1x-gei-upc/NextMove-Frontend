@@ -15,7 +15,7 @@ class StationDetailsBloc
     : stationRepository = StationRepository(),
       super(StationDetailsInitial()) {
     on<LoadStationDetailsEvent>(_onLoadStationDetailsEvent);
-    on<ToggleFavoriteStatusEvent>(_onToggleFavoriteStatusEvent);
+    on<ToggleFavoriteEvent>(_onToggleFavoriteEvent);
   }
 
   Future<void> _onLoadStationDetailsEvent(
@@ -38,8 +38,8 @@ class StationDetailsBloc
     }, (station) => emit(StationDetailsLoaded(station)));
   }
 
-  Future<void> _onToggleFavoriteStatusEvent(
-    ToggleFavoriteStatusEvent event,
+  Future<void> _onToggleFavoriteEvent(
+    ToggleFavoriteEvent event,
     Emitter<StationDetailsState> emit,
   ) async {
     throw UnimplementedError();
