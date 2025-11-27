@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - uses: subosito/flutter-action@v2
       with:
@@ -30,7 +30,28 @@ jobs:
     # Analiza el código (ignora warnings por ahora).
     - run: flutter analyze || true
 
-    # Comentado: Tests y builds hasta que lo necesitemos
-    # - run: flutter test
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v6
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.4'
+          channel: 'stable'
+      - name: Generate test file with all imports to include untested files in coverage
+        run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Run tests with coverage information
+        run: flutter test --coverage
+      - name: Calculate and output coverage percentage
+        run: genhtml coverage/lcov.info -o coverage/html | grep "lines.......:"
+  
+
+    # Builds:
     # Para Android: flutter build apk --debug
     # Para iOS: flutter build ios --debug --no-codesign (requiere macos-latest)
