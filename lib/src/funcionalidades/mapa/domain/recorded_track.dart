@@ -17,7 +17,7 @@ class TrackPoint {
 
 class RecordedTrack {
   final DateTime startTime = DateTime.now(); // set at the beginning
-  late DateTime endTime; // set at the end
+  late DateTime endTime = startTime;
 
   // points are being added as the route is recorded; same for the calculation of statistics
   List<TrackPoint> points = [];
@@ -49,14 +49,14 @@ class RecordedTrack {
       final timeDiffMillis = newPoint.timestamp
           .difference(lastPoint.timestamp)
           .inMilliseconds;
-      speedKmH = (distanceMeters / timeDiffMillis) * 3600; // km/h
+      speedKmH = timeDiffMillis == 0 ? 0.0 : (distanceMeters / timeDiffMillis) * 3600; // km/h
 
       totalDistanceMeters += distanceMeters;
 
       totalTime += Duration(milliseconds: timeDiffMillis);
 
       averageSpeedKmH =
-          (totalDistanceMeters / totalTime.inSeconds) * 3.6; // km/h
+          totalTime.inSeconds == 0 ? 0.0 : (totalDistanceMeters / totalTime.inSeconds) * 3.6; // km/h
 
       if (speedKmH > maxSpeedKmH) {
         maxSpeedKmH = speedKmH;
@@ -74,6 +74,7 @@ class RecordedTrack {
     }
     newPoint.speed = speedKmH;
     points.add(newPoint);
+    endTime = newPoint.timestamp;
   }
 
   @override

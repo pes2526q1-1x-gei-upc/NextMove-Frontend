@@ -82,3 +82,4 @@ lib/l10n/app_localizations_en.dart
 lib/l10n/app_localizations_es.dart
 lib/l10n/app_localizations.dart
 .vscode/settings.json
+untranslated_messages.txt
