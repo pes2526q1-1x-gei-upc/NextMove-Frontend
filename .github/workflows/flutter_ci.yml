@@ -16,10 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.35.4"
           channel: "stable"
+          cache: true
 
       # Instala dependencias.
       - run: flutter pub get
@@ -39,11 +47,18 @@ jobs:
     steps:
       - name: Check out the repository to the runner
         uses: actions/checkout@v6
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.35.4"
           channel: "stable"
+          cache: true
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
       - name: Create .env file to avoid asset missing error
