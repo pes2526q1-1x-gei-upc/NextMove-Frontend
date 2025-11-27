@@ -532,7 +532,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get free => 'Libres';
 
   @override
-  String get charge => 'Charge';
+  String get charge => 'Carga';
 
   @override
   String get reviewStation => 'Valorar estación';
@@ -568,7 +568,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retry => 'Reintentar';
 
   @override
-  String get firstToReview => 'Be the first to review this station!';
+  String get firstToReview => '¡Sé el primero en valorar esta estación!';
 
   @override
   String get editReview => 'Editar valoración';

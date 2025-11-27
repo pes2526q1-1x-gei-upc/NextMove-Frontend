@@ -222,7 +222,7 @@
     "thankYouForYourReview": "Gràcies per la teva valoració!",
     "errorLoadingReviews": "Error en carregar les valoracions",
     "retry": "Reintentar",
-    "FirstToReview": "Sigues el primer a valorar aquesta estació!",
+    "firstToReview": "Sigues el primer a valorar aquesta estació!",
     "editReview": "Editar valoració",
     "sureActionConfirmation": "Aquesta acció no es pot desfer. Estàs segur que vols continuar?",
     "deletedReview": "Has eliminat la teva valoració.",

@@ -568,7 +568,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get retry => 'Reintentar';
 
   @override
-  String get firstToReview => 'Be the first to review this station!';
+  String get firstToReview => 'Sigues el primer a valorar aquesta estació!';
 
   @override
   String get editReview => 'Editar valoració';
