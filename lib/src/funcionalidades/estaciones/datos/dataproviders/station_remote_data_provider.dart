@@ -254,7 +254,7 @@ class StationRemoteDataProvider {
     if (kDebugMode) {
       print('searchBicycleStations result.data: ${result.data}');
     }
-    final data = result.data?['estacionesDeBicingPorDireccion'];
+    final data = result.data?['getEstacionesDeBicingPorDireccion'];
     if (data != null) {
       return (data as List)
           .map((item) => BicycleStationDetails.fromJson(item))
