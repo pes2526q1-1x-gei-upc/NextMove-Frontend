@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
@@ -9,7 +10,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
@@ -55,14 +56,48 @@ class StationHeaderWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- NOMBRE DE LA ESTACIÓN ---
-        Text(
-          station.name ?? l10n.unknown,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-            height: 1.2,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                station.name ?? l10n.unknown,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            BlocBuilder<StationListBloc, StationListState>(
+              builder: (context, state) {
+                final currentStation = (state is StationListLoaded || state is StationListToggleError)
+                    ? (state is StationListLoaded ? state.stations : (state as StationListToggleError).stations)
+                        .where((s) => s.id == station.id)
+                        .firstOrNull
+                    : null;
+                final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
+                final starColor = switch (isFavorite) {
+                  true => Colors.yellow[700],
+                  false => null,
+                  null => Colors.grey[300],
+                };
+                return IconButton(
+                  icon: Icon(
+                    (isFavorite ?? false) ? Icons.star : Icons.star_border,
+                    color: starColor,
+                  ),
+                  onPressed: () {
+                    context.read<StationListBloc>().add(
+                      ToggleFavoriteEvent(stationId: station.id),
+                    );
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                );
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         
