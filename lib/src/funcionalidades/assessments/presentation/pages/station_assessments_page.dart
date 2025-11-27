@@ -29,11 +29,11 @@ class StationReviewsPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: Text(
-          l10n.opinions, 
+          l10n.opinions,
           style: const TextStyle(
-            color: Colors.black, 
-            fontWeight: FontWeight.bold, 
-            fontSize: 20
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
         backgroundColor: Colors.white,
@@ -50,26 +50,32 @@ class StationReviewsPage extends StatelessWidget {
           if (state.status == AssessmentStatus.loading) {
             return Center(child: CircularProgressIndicator(color: themeColor));
           }
-          
+
           // --- FAILURE ---
           if (state.status == AssessmentStatus.failure) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline_rounded, size: 48, color: Colors.red[300]),
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 48,
+                    color: Colors.red[300],
+                  ),
                   const SizedBox(height: 16),
                   Text(state.errorMessage ?? l10n.error),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: themeColor),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeColor,
+                    ),
                     onPressed: () {
                       context.read<AssessmentBloc>().add(
                         GetAssessmentsByStationEvent(stationId: stationId),
                       );
                     },
                     child: Text(l10n.retry),
-                  )
+                  ),
                 ],
               ),
             );
@@ -84,7 +90,11 @@ class StationReviewsPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey[300]),
+                    Icon(
+                      Icons.rate_review_outlined,
+                      size: 64,
+                      color: Colors.grey[300],
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       l10n.withoutOpinions,
@@ -151,6 +161,7 @@ class _AsyncReviewItem extends StatefulWidget {
 class _AsyncReviewItemState extends State<_AsyncReviewItem> {
   bool _isMine = false;
   bool _isLoadingOwnership = true;
+  String? _userPhotoUrl; // <--- NUEVA VARIABLE DE ESTADO
 
   @override
   void initState() {
@@ -161,21 +172,31 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
   Future<void> _checkOwnership() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null || currentUser.email == null) {
-      if (mounted) setState(() => _isLoadingOwnership = false);
-      return;
     }
-
-    if (widget.review.nickname == currentUser.displayName) {
-       if (mounted) setState(() { _isMine = true; });
+    if (currentUser != null && widget.review.nickname == currentUser.displayName) {
+      if (mounted)
+        setState(() {
+          _isMine = true;
+        });
     }
 
     try {
       final repo = context.read<AssessmentBloc>().assessmentRepository;
-      final emailFromBackend = await repo.getUserEmailByNickname(widget.review.nickname);
+      final userReview = await repo.getUserEmailByNickname(
+        widget.review.nickname,
+      );
+      final emailFromBackend = userReview?.email;
+      final photoUser = userReview?.photo; 
 
       if (mounted) {
         setState(() {
-          _isMine = (emailFromBackend != null && emailFromBackend == currentUser.email);
+          _userPhotoUrl = photoUser; 
+
+          // Verificamos propiedad real
+          if (currentUser != null && emailFromBackend != null) {
+            _isMine = (emailFromBackend == currentUser.email);
+          }
+          
           _isLoadingOwnership = false;
         });
       }
@@ -191,30 +212,34 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
 
     return ReviewCard(
       userName: widget.review.nickname,
-      date: "${widget.review.created_at.day}/${widget.review.created_at.month}/${widget.review.created_at.year}",
+      date:
+          "${widget.review.created_at.day}/${widget.review.created_at.month}/${widget.review.created_at.year}",
       rating: widget.review.score.toDouble(),
       comment: widget.review.description,
       themeColor: widget.themeColor,
-      
+      userPhotoUrl: _userPhotoUrl,
+
       // Si canEdit es true, pasamos la función para abrir el modal
-      onEditPressed: canEdit ? () {
-          final assessmentBloc = context.read<AssessmentBloc>();
-          
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => BlocProvider.value(
-              value: assessmentBloc,
-              child: RateStationBottomSheet(
-                stationId: widget.stationId,
-                stationName: widget.stationName,
-                themeColor: widget.themeColor,
-                existingAssessment: widget.review,
-              ),
-            ),
-          );
-      } : null,
+      onEditPressed: canEdit
+          ? () {
+              final assessmentBloc = context.read<AssessmentBloc>();
+
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => BlocProvider.value(
+                  value: assessmentBloc,
+                  child: RateStationBottomSheet(
+                    stationId: widget.stationId,
+                    stationName: widget.stationName,
+                    themeColor: widget.themeColor,
+                    existingAssessment: widget.review,
+                  ),
+                ),
+              );
+            }
+          : null,
     );
   }
 }

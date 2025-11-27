@@ -20,7 +20,6 @@ class SocialRemoteDataProvider {
   }
   Future<List<UserEntity>> getFriends() async {
     String? authHeader = await _authHeader;
-    //debugPrint("authHeader en getFriends: $authHeader");
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getFriends),
       context: Context().withEntry(HttpLinkHeaders(headers: {
@@ -49,7 +48,7 @@ class SocialRemoteDataProvider {
         idiomaPreferido: "Español",
         descripcion: "",
         modoPreferido: "BIKE",
-        photo: "",
+        photo: json['photo'] ?? "",
       );
     }).toList();
   }

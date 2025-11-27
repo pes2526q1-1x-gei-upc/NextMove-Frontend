@@ -7,18 +7,19 @@ import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_e
 import 'package:nextmove_app/src/funcionalidades/assessments/data/dataproviders/assessments_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 
 class AssessmentRepository {
-final AssessmentRemoteDataProvider remoteDataProvider;
+  final AssessmentRemoteDataProvider remoteDataProvider;
   final UserRepository userRepository;
-  
 
-AssessmentRepository({
+  AssessmentRepository({
     AssessmentRemoteDataProvider? remoteDataProvider,
     UserRepository? userRepository,
-  })  : remoteDataProvider = remoteDataProvider ?? AssessmentRemoteDataProvider(),
-        userRepository = userRepository ?? UserRepository(); 
-    
+  }) : remoteDataProvider =
+           remoteDataProvider ?? AssessmentRemoteDataProvider(),
+       userRepository = userRepository ?? UserRepository();
+
   Future<Either<Failure, void>> createAssessment({
     required String stationId,
     required int score,
@@ -28,7 +29,9 @@ AssessmentRepository({
       await remoteDataProvider.createAssessment(stationId, score, comment);
       return const Right(null);
     } on SocketException {
-      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+      return const Left(
+        ConnectionFailure(message: "No hay conexión a internet"),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {
@@ -36,12 +39,18 @@ AssessmentRepository({
     }
   }
 
-  Future<Either<Failure, List<AssessmentEntity>>> getAssessmentsByStation(String stationId) async {
+  Future<Either<Failure, List<AssessmentEntity>>> getAssessmentsByStation(
+    String stationId,
+  ) async {
     try {
-      final assessments = await remoteDataProvider.getAssessmentsByStation(stationId);
+      final assessments = await remoteDataProvider.getAssessmentsByStation(
+        stationId,
+      );
       return Right(assessments);
     } on SocketException {
-      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+      return const Left(
+        ConnectionFailure(message: "No hay conexión a internet"),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {
@@ -49,12 +58,16 @@ AssessmentRepository({
     }
   }
 
-Future<Either<Failure, AssessmentInfoEntity>> getStationAssessmentInfo(String stationId) async {
+  Future<Either<Failure, AssessmentInfoEntity>> getStationAssessmentInfo(
+    String stationId,
+  ) async {
     try {
       final info = await remoteDataProvider.getStationAssessmentInfo(stationId);
       return Right(info);
     } on SocketException {
-      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+      return const Left(
+        ConnectionFailure(message: "No hay conexión a internet"),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {
@@ -62,7 +75,11 @@ Future<Either<Failure, AssessmentInfoEntity>> getStationAssessmentInfo(String st
     }
   }
 
-  Future<Either<Failure, void>> updateAssessment({required String stationId, required int score, required String comment}) async {
+  Future<Either<Failure, void>> updateAssessment({
+    required String stationId,
+    required int score,
+    required String comment,
+  }) async {
     try {
       await remoteDataProvider.updateAssessment(stationId, score, comment);
       return const Right(null);
@@ -80,7 +97,7 @@ Future<Either<Failure, AssessmentInfoEntity>> getStationAssessmentInfo(String st
     }
   }
 
-Future<String?> getUserEmailByNickname(String nickname) async {
+  Future<UserEntity?> getUserEmailByNickname(String nickname) async {
     final result = await userRepository.getUserProfile(nickname);
 
     return result.fold(
@@ -88,7 +105,7 @@ Future<String?> getUserEmailByNickname(String nickname) async {
         return null;
       },
       (userEntity) {
-        return userEntity.email;
+        return userEntity;
       },
     );
   }

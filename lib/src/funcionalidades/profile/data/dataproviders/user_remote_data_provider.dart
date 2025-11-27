@@ -233,6 +233,7 @@ class UserRemoteDataProvider {
         createUser(createInfo: $input) {
           email
           name
+          photo
           nickname
           phoneNumber
           preferredMode
@@ -277,6 +278,7 @@ class UserRemoteDataProvider {
           'email': userEntity.email,
           'name': userEntity.nombreCompleto,
           'nickname': userEntity.apodo,
+          'photo': userEntity.photo,
           'phoneNumber': phoneNumberToSend, // Envía null si es 0
           'preferredMode': modeEnum,
           'preferredLanguage': langEnum,
