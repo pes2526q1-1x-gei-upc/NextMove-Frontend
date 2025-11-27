@@ -214,17 +214,11 @@ class _SocialPageState extends State<SocialPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) {
-                                        print(
-                                          "SocialPage: Creating local UserBloc for ${user.apodo}",
-                                        );
                                         return MultiBlocProvider(
                                           providers: [
                                             BlocProvider<UserBloc>(
                                               create: (context) {
                                                 final bloc = UserBloc();
-                                                print(
-                                                  "SocialPage: Created UserBloc ${bloc.hashCode}",
-                                                );
                                                 bloc.add(
                                                   LoadUserProfile(user.apodo),
                                                 );

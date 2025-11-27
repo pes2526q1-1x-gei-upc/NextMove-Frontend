@@ -9,6 +9,7 @@ class ReviewCard extends StatelessWidget {
   final String comment;
   final Color themeColor;
   final VoidCallback? onEditPressed;
+  final String? userPhotoUrl; 
 
   const ReviewCard({
     super.key,
@@ -18,11 +19,14 @@ class ReviewCard extends StatelessWidget {
     required this.comment,
     required this.themeColor,
     this.onEditPressed,
+    this.userPhotoUrl, 
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final hasPhoto = userPhotoUrl != null && userPhotoUrl!.isNotEmpty;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -39,25 +43,27 @@ class ReviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- ENCABEZADO ---
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Avatar
+              // --- AVATAR CON LOGICA DE FOTO ---
               CircleAvatar(
                 backgroundColor: themeColor.withOpacity(0.1),
                 radius: 18,
-                child: Text(
-                  userName.isNotEmpty ? userName[0].toUpperCase() : "?",
-                  style: TextStyle(
-                    color: themeColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
+                backgroundImage: hasPhoto ? NetworkImage(userPhotoUrl!) : null,
+                child: !hasPhoto
+                    ? Text(
+                        userName.isNotEmpty ? userName[0].toUpperCase() : "?",
+                        style: TextStyle(
+                          color: themeColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(width: 12),
-              
+
               // Nombre y Fecha
               Expanded(
                 child: Column(
@@ -87,8 +93,8 @@ class ReviewCard extends StatelessWidget {
 
               // Estrellas
               Transform.scale(
-                scale: 0.8, 
-                alignment: Alignment.centerRight, 
+                scale: 0.8,
+                alignment: Alignment.centerRight,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -97,7 +103,7 @@ class ReviewCard extends StatelessWidget {
                 ),
               ),
 
-            
+              // Botón de editar
               if (onEditPressed != null) ...[
                 const SizedBox(width: 4),
                 Container(
@@ -109,7 +115,7 @@ class ReviewCard extends StatelessWidget {
                   child: IconButton(
                     icon: Icon(Icons.edit_rounded, size: 18, color: themeColor),
                     padding: const EdgeInsets.all(8),
-                    constraints: const BoxConstraints(), // Hace el botón compacto
+                    constraints: const BoxConstraints(),
                     onPressed: onEditPressed,
                     tooltip: l10n.editReview,
                   ),
@@ -117,8 +123,8 @@ class ReviewCard extends StatelessWidget {
               ],
             ],
           ),
-          
-          // --- COMENTARIO ---
+
+          // Comentario
           if (comment.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
@@ -126,7 +132,7 @@ class ReviewCard extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey[800],
                 fontSize: 14,
-                height: 1.4, 
+                height: 1.4,
               ),
             ),
           ],
