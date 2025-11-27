@@ -1,19 +1,22 @@
 class GraphQLQueries {
   static const String createUserMutation = r'''
-  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
+  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $photo: String, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
     createUser(createInfo: {
       email: $email,
       name: $fullN,
       nickname: $nickN,
+      photo: $photo,
       phoneNumber: $phoneNum,
       preferredMode: $mode,
       preferredLanguage: $preferredLanguage,
       birthDate: $birthDate,
       bioDescription: $bioDescription    
+
     }) {
       email
       name
       nickname
+      photo
       phoneNumber
       preferredMode
       createdAt
@@ -200,6 +203,7 @@ class GraphQLQueries {
   query getFriends () {
     ListFriends(){
       name
+      photo
     }
   }''';
 

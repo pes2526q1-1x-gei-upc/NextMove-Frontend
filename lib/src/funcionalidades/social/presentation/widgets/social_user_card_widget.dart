@@ -20,6 +20,8 @@ class SocialUserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
+    final hasPhoto = user.photo.isNotEmpty;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -43,16 +45,20 @@ class SocialUserCard extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                // Avatar
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.person, color: Colors.grey),
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: hasPhoto ? NetworkImage(user.photo) : null,
+                  child: !hasPhoto
+                      ? const Icon(Icons.person, color: Colors.grey)
+                      : null,
+                  onBackgroundImageError: hasPhoto 
+                      ? (exception, stackTrace) {
+                          debugPrint('Error cargando avatar en lista: $exception');
+                        }
+                      : null,
                 ),
+                
                 const SizedBox(width: 16),
                 
                 // Info del Usuario
@@ -80,7 +86,7 @@ class SocialUserCard extends StatelessWidget {
                   ),
                 ),
 
-              
+                // Botón de estado (Amigo o Añadir)
                 if (isFriend)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

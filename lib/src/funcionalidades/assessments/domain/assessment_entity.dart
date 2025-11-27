@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class AssessmentEntity extends Equatable{
+class AssessmentEntity extends Equatable {
   final String nickname;
   final String station_id;
   final int score;
@@ -13,7 +13,7 @@ class AssessmentEntity extends Equatable{
     required this.score,
     required this.description,
     required this.created_at,
-  }); 
+  });
 
   AssessmentEntity copyWith({
     String? nickname,
@@ -27,16 +27,16 @@ class AssessmentEntity extends Equatable{
       station_id: station_id ?? this.station_id,
       score: score ?? this.score,
       description: description ?? this.description,
-      created_at: created_at ?? this.created_at
+      created_at: created_at ?? this.created_at,
     );
   }
 
   @override
   List<Object?> get props => [
-        nickname,
-        station_id,
-        score,
-        description,
-        created_at
-      ];
+    nickname,
+    station_id,
+    score,
+    description,
+    created_at,
+  ];
 }

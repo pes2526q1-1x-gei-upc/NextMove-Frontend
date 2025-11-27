@@ -5,12 +5,14 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class ProfileAvatarSelector extends StatefulWidget {
   final File? selectedImageFile;
+  final String? imageUrl;
   final AssetImage defaultImage;
   final Function(File) onImagePicked;
 
   const ProfileAvatarSelector({
     super.key,
     required this.selectedImageFile,
+    this.imageUrl,
     required this.defaultImage,
     required this.onImagePicked,
   });
@@ -70,7 +72,9 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.imagePickerError),
+          ),
         );
       }
     }
@@ -78,6 +82,15 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider? imageProvider;
+    if (widget.selectedImageFile != null) {
+      imageProvider = FileImage(widget.selectedImageFile!);
+    } else if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
+      imageProvider = NetworkImage(widget.imageUrl!);
+    } else {
+      imageProvider = widget.defaultImage;
+    }
+
     return Center(
       child: GestureDetector(
         onTap: () => _showImageSourceActionSheet(context),
@@ -98,9 +111,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
               CircleAvatar(
                 radius: 55,
                 backgroundColor: Colors.grey[200],
-                backgroundImage: widget.selectedImageFile != null
-                    ? FileImage(widget.selectedImageFile!)
-                    : widget.defaultImage,
+                backgroundImage: imageProvider,
               ),
               Positioned(
                 bottom: 0,
@@ -112,11 +123,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
-                  child: const Icon(
-                    Icons.edit,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
                 ),
               ),
             ],

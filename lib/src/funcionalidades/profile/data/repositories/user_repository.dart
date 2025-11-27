@@ -2,15 +2,19 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
+import 'package:nextmove_app/src/core/errors/exceptions.dart'
+    as custom_exceptions;
 import '../dataproviders/user_remote_data_provider.dart';
 import '../dataproviders/user_local_data_provider.dart';
+import 'dart:io';
 
 class UserRepository {
   final UserRemoteDataProvider remoteDataProvider;
   final UserLocalDataProvider localDataProvider;
 
-  UserRepository() : remoteDataProvider = UserRemoteDataProvider(), localDataProvider = UserLocalDataProvider();
+  UserRepository()
+    : remoteDataProvider = UserRemoteDataProvider(),
+      localDataProvider = UserLocalDataProvider();
 
   Future<Either<Failure, UserEntity>> getUserProfile(String userId) async {
     try {
@@ -25,9 +29,13 @@ class UserRepository {
     }
   }
 
-  Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity userEntity) async {
+  Future<Either<Failure, UserEntity>> updateUserProfile(
+    UserEntity userEntity,
+  ) async {
     try {
-      final updatedUser = await remoteDataProvider.updateUserProfile(userEntity);
+      final updatedUser = await remoteDataProvider.updateUserProfile(
+        userEntity,
+      );
       return Right(updatedUser);
     } on custom_exceptions.ServerException catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -41,9 +49,13 @@ class UserRepository {
     }
   }
 
-  Future<Either<Failure, UserEntity>> createUserProfile(UserEntity userEntity) async {
+  Future<Either<Failure, UserEntity>> createUserProfile(
+    UserEntity userEntity,
+  ) async {
     try {
-      final createdUser = await remoteDataProvider.createUserProfile(userEntity);
+      final createdUser = await remoteDataProvider.createUserProfile(
+        userEntity,
+      );
       return Right(createdUser);
     } on custom_exceptions.ServerException catch (e) {
       return Left(ServerFailure(message: e.toString()));
@@ -52,9 +64,7 @@ class UserRepository {
     } catch (e) {
       return Left(ServerFailure());
     }
-    
   }
-
 
   Future<Either<Failure, void>> logoutUser() async {
     try {
@@ -65,5 +75,16 @@ class UserRepository {
     }
   }
 
-
+  Future<Either<Failure, String>> uploadProfilePhoto(File file) async {
+    try {
+      final imageUrl = await remoteDataProvider.uploadProfilePhoto(file);
+      return Right(imageUrl);
+    } on custom_exceptions.ServerException catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    } on custom_exceptions.AuthException catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }
