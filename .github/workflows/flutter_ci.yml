@@ -1,12 +1,12 @@
 name: Flutter CI Light
-# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase. 
+# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase.
 # Prob de no detectar errores <= 10%. Mas adelante se hara más pesado, ahora buscamos compilación rápida.
 # Se ejecuta en push o PR a dev y main.
 on:
   push:
-    branches: [ dev, main ]
+    branches: [dev, main]
   pull_request:
-    branches: [ dev, main ]
+    branches: [dev, main]
 
 jobs:
   # Job unificado para análisis
@@ -14,23 +14,87 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-    - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.35.4'
-        channel: 'stable'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
-    # Instala dependencias.
-    - run: flutter pub get
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.4"
+          channel: "stable"
+          cache: true
 
-    # Verifica el entorno Flutter (como flutter doctor local).
-    - run: flutter doctor -v
+      # Instala dependencias.
+      - run: flutter pub get
 
-    # Analiza el código (ignora warnings por ahora).
-    - run: flutter analyze || true
+      # Verifica el entorno Flutter (como flutter doctor local).
+      - run: flutter doctor -v
 
-    # Comentado: Tests y builds hasta que lo necesitemos
-    # - run: flutter test
+      # Analiza el código (ignora warnings por ahora).
+      - run: flutter analyze || true
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v6
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.4"
+          channel: "stable"
+          cache: true
+      - name: Generate test file with all imports to include untested files in coverage
+        run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Create .env file to avoid asset missing error
+        run: touch .env
+      - name: Run tests with coverage information
+        run: flutter test --coverage
+      - name: Upload coverage reports for coverage job
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage
+          path: coverage/
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v6
+      - name: Download coverage reports from test job
+        uses: actions/download-artifact@v5
+        with:
+          name: coverage
+          path: coverage/
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v4
+        with:
+          coverage-files: coverage/lcov.info
+          minimum-coverage: 0 # The job will pass with no minimum coverage for now
+          artifact-name: "" # We skip the artifact upload
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true
+    # Builds:
     # Para Android: flutter build apk --debug
     # Para iOS: flutter build ios --debug --no-codesign (requiere macos-latest)

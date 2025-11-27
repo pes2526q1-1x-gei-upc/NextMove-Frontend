@@ -137,11 +137,58 @@
     "results": "RESULTADOS",
     "yourFriends": "TUS AMIGOS",
     "friendAdded": "{nickname} has been added to your friends.",
+    "@friendAdded": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "friends": "Amigos",
+    "memberSince": "Miembro desde",
+    "deleteFriendship": "Eliminar amistad",
+    "deleteFriendConfirmation": "¿Estás seguro de que quieres eliminar a {nickname} de tus amigos?",
+    "@deleteFriendConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "delete": "Eliminar",
+    "deletedFriend": "Has eliminado a {nickname} de tus amigos.",
+    "@deletedFriend": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+
+    "deleteFriend": "Eliminar amistad",
+    "blockUser": "Bloquear usuario",
+    "blockUserConfirmation": "¿Estás seguro de que quieres bloquear a {nickname}? No podrás ver su perfil ni interactuar con él.",
+    "@blockUserConfirmation": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "Juan"
+            }
+        }
+    },
+    "block": "Bloquear",
     "friends": "Amigos",
     "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
     "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",
     "errorSavingRoute": "Error al guardar la ruta",
     "notEnoughPointsToRecordTrack": "No se han registrado suficientes puntos para guardar la ruta grabada.",
+    "routeHistory": "Historial de recorridos grabados",
+    "noRoutesFound": "No se han encontrado rutas grabadas.",
+    "distance": "Distancia",
+    "avgSpeed": "Velocidad media",
     "routeStatistics": "Estadísticas de la ruta",
     "noRouteDataAvailable": "No hay datos de la ruta disponibles.",
     "routeRecording": "Grabación de la ruta",
@@ -156,5 +203,39 @@
     "co2Saved": "CO₂ ahorrado",
     "caloriesBurned": "Calorías quemadas",
     "currentSpeed": "Velocidad actual",
-    "stopRecording": "Detener grabación"
+    "stopRecording": "Detener grabación",
+    "opinions": "Valoraciones",
+    "unknown": "Desconocido",
+    "unknownPower": "Potencia desconocida",
+    "station": "Estación",
+    "seeOpinions": "Ver reviews",
+    "withoutOpinions": "Sin reviews",
+    "rate": "Valorar",
+    "yes": "Sí",
+    "no": "No",
+    "fast": "Rápido",
+    "normal": "Normal",
+    "mechanical": "Mecánicas",
+    "electric": "Eléctricas",
+    "free": "Libres",
+    "available": "Disponibles",
+    "carga": "Carga",
+    "reviewStation": "Valorar estación",
+    "writeYourOpinion": "Escribe tu opinión (opcional)",
+    "sendReview": "Enviar valoración",
+    "excellent": "Excelente",
+    "veryGood": "Muy buena",
+    "good": "Buena",
+    "regular": "Regular",
+    "bad": "Mala",
+    "thankYouForYourReview": "¡Gracias por tu valoración!",
+    "errorLoadingReviews": "Error al cargar las valoraciones",
+    "retry": "Reintentar",
+    "firstToReview": "¡Sé el primero en valorar esta estación!",
+    "editReview": "Editar valoración",
+    "sureActionConfirmation": "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?",
+    "deletedReview": "Has eliminado tu valoración.",
+    "updateReview": "Actualizar valoración",
+    "updatedReview": "Tu valoración ha sido actualizada.",
+    "charge": "Carga"
 }

@@ -197,24 +197,22 @@ class GraphQLQueries {
   }''';
 
   static const String getFriends = r'''
-  query getFriends ($nickname: String!) {
-    ListFriends(nickname: $nickname){
+  query getFriends () {
+    ListFriends(){
       name
     }
   }''';
 
   static const String newFriendship = r'''
-  mutation newFriendship ($nickname1: String!, $nickname2: String!) {
-    AddFriendship(nickname1: $nickname1, nickname2: $nickname2){
+  mutation newFriendship ($nickname: String!) {
+    AddFriendship(nickname: $nickname){
       
     }
   }''';
 
   static const String deleteFriendship = r'''
-  mutation deleteFriendship ($nickname1: String!, $nickname2: String!) {
-    RemoveFriendship(nickname1: $nickname1, nickname2: $nickname2){
-      name
-    }
+  mutation deleteFriendship ($nickname: String!) {
+    RemoveFriendship(nickname: $nickname)
   }''';
 
   static const String getUsersByNickname = r'''
@@ -232,6 +230,27 @@ class GraphQLQueries {
         createdAt,
     } 
   }''';
+
+  static const String blockUser = r'''
+  mutation blockUser($nickname: String!) {
+    BlockUser(nickname: $nickname)
+  }
+  ''';
+
+  static const String getBlockList = r'''
+  query getBlockList {
+    BlockList {
+      blocked
+      photo
+    }
+  }
+  ''';
+
+  static const String unBlockUser = r'''
+  mutation unBlockUser($nickname: String!) {
+    UnBlockUser(nickname: $nickname)
+  }
+  ''';
 
   static const String getStationsBySearchQuery = r'''
     query getStationsBySearchQuery($query: String!) {
@@ -283,4 +302,62 @@ class GraphQLQueries {
       fecha_recorrido
     }
   }''';
+
+  static const String getRecorridosByUserQuery = r'''
+    query GetRecorridosByUser($userEmail: String!) {
+      recorridosByUser(user_email: $userEmail) {
+        id
+        user_email
+        distancia
+        velocidad_media
+        co2
+        kcal
+        origen {
+          latitude
+          longitude
+        }
+        destino {
+          latitude
+          longitude
+        }
+        fecha_recorrido
+      }
+    }
+  ''';
+
+  static const String getAssessmentsByStationIdQuery = r'''
+    query getAssessmentsByStationIdQuery ($id: String!){
+      getAssessmentsByStationId(id: $id){
+        nickname
+        score
+        comments
+        created_at
+      }
+    }''';
+
+  static const String getStationAssessmentInfoQuery = r'''
+    query getStationAssessmentInfoQuery ($id: String!){
+      getStationAssessmentInfo(id: $id){
+        averageScore
+        totalAssessments
+      }
+    }''';
+
+  static const String createAssessmentQuery = r'''
+    mutation CreateAssessment($station_id: String!, $score: Int!, $comments: String) {
+      createAssessment(station_id: $station_id, score: $score, comments: $comments)
+    }
+  ''';
+
+  static const String deleteAssessmentQuery = r'''
+    mutation DeleteAssessment($station_id: String!) {
+      deleteAssessment(station_id: $station_id)
+    }
+  ''';
+
+  static const String editAssessmentQuery = r'''
+    mutation EditAssessment($station_id: String!, $score: Int!, $comments: String) {
+      editAssessment(station_id: $station_id, score: $score, comments: $comments)
+    }
+  ''';
 }

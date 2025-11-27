@@ -10,6 +10,7 @@ void main() {
         'direccion': 'Address 1',
         'coordenadas': {'latitude': 41.3851, 'longitude': 2.1734},
         'plazasTotales': 20,
+        'rating': 5,
         'anclajesDisponibles': 15,
         'bicisMecanicasDisponibles': 10,
         'bicisElectricasDisponibles': 5,
@@ -46,6 +47,7 @@ void main() {
         'direccion': null,
         'coordenadas': null,
         'plazasTotales': null,
+        'rating': null,
         'anclajesDisponibles': null,
         'bicisMecanicasDisponibles': null,
         'bicisElectricasDisponibles': null,
@@ -73,7 +75,7 @@ void main() {
       expect(station.availableMechanicalBikes, null);
       expect(station.availableElectricBikes, null);
       expect(station.distanceKm, null);
-      expect(station.rating, 5);
+      expect(station.rating, null);
     });
 
     test('should parse closed station state', () {
@@ -156,7 +158,7 @@ void main() {
 
       expect(station.id, '9');
       expect(station.name, null);
-      expect(station.rating, 5);
+      expect(station.rating, null);
     });
 
     test('should ignore extra fields in JSON', () {
@@ -183,6 +185,7 @@ void main() {
         'coordinates': {'latitude': 41.3851, 'longitude': 2.1734},
         'isSuperFast': true,
         'accessType': 'public',
+        'rating': 5,
         'distance': 1.5,
         'connectors': [
           {
@@ -229,6 +232,7 @@ void main() {
         'accessType': null,
         'distance': null,
         'connectors': null,
+        'rating': null,
       };
 
       final station = EVStationDetails.fromJson(jsonData);
@@ -244,7 +248,7 @@ void main() {
       expect(station.connectors, null);
       expect(station.totalSlots, null);
       expect(station.availableSlots, 0);
-      expect(station.rating, 5);
+      expect(station.rating, null);
     });
 
     test('should handle invalid connector type', () {
@@ -331,7 +335,7 @@ void main() {
       expect(station.id, 'EV8');
       expect(station.name, null);
       expect(station.connectors, null);
-      expect(station.rating, 5);
+      expect(station.rating, null);
     });
   });
 }

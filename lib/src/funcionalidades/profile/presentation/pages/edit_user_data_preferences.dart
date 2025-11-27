@@ -90,10 +90,10 @@ class _EditUserDataPreferencesPageState
         ),
         title: Text(
           l10n.editProfile,
-          style: const TextStyle(
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
             color: Color(0xFF1A1A1A),
-            fontSize: 18, 
-            fontWeight: FontWeight.bold
           ),
         ),
       ),
@@ -105,6 +105,7 @@ class _EditUserDataPreferencesPageState
             );
           } else if (state is UserUpdated) {
             final userProvider = Provider.of<UserProvider>(context, listen: false);
+          
             final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
             final firebaseUser = FirebaseAuth.instance.currentUser;
             

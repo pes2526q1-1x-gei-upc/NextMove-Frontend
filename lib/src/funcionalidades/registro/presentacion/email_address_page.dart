@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
@@ -33,13 +32,10 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
       create: (context) => AuthBloc(),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          // CORRECCIÓN: Eliminada la navegación manual a MainScreen.
-          // Dejamos que el AuthStateHandler en main.dart maneje el flujo tras el login.
-          
           if (state is AuthFailureState) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorCode)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorCode)));
           }
         },
         child: Builder(builder: (context) => _buildBody(context)),
@@ -64,7 +60,10 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                 children: [
                   Text(
                     l10n.whatIsYourEmailAddress,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   EmailAddressInputWidget(emailController: _emailController),
@@ -113,7 +112,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                               }),
                             ),
                           );
-                        
+
                         case AuthSuccessState(): // Ya iniciado sesion
                           {
                             if (state.meData != null) {
@@ -126,28 +125,26 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                                 firebaseToken: state.firebaseToken,
                               );
                             }
-                            // Notificar a la app global que estamos logueados
                             appKey.currentState?.setLoggedIn(true);
-                            
-                            // Volver a la raíz para que main.dart muestre MainScreen
-                             Navigator.of(context).popUntil((route) => route.isFirst);
+
+                            Navigator.of(
+                              context,
+                            ).popUntil((route) => route.isFirst);
                           }
-                          
+
                         case UserNeedsProfileSetupState(): // Onboarding
                           appKey.currentState?.setLoggedIn(true);
                           Provider.of<UserProvider>(
-                              context,
-                              listen: false,
-                            ).setEmailPwd(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
+                            context,
+                            listen: false,
+                          ).setEmailPwd(
+                            _emailController.text,
+                            _passwordController.text,
+                          );
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (pageContext) => BlocProvider(
-                                create: (blocContext) => UserBloc(),
-                                child: UserDataPreferencesPage(),
-                              ),
+                              builder: (pageContext) =>
+                                  const UserDataPreferencesPage(),
                             ),
                           );
                         default:
@@ -193,8 +190,6 @@ class ContinueButton extends StatelessWidget {
           );
         } else {
           if (context.read<AuthBloc>().state is EmailIsNewState) {
-            // === CORRECCIÓN: Eliminada validación externa isPasswordValid ===
-            // Directamente guardamos y pasamos a la siguiente pantalla
             try {
               Provider.of<UserProvider>(
                 context,
@@ -202,10 +197,7 @@ class ContinueButton extends StatelessWidget {
               ).setEmailPwd(_emailController.text, _passwordController.text);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (pageContext) => BlocProvider(
-                    create: (blocContext) => UserBloc(),
-                    child: UserDataPreferencesPage(),
-                  ),
+                  builder: (pageContext) => const UserDataPreferencesPage(),
                 ),
               );
             } catch (e) {

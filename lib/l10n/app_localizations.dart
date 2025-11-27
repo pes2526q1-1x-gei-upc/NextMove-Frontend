@@ -830,13 +830,67 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{nickname} has been added to your friends.'**
-  String friendAdded(Object nickname);
+  String friendAdded(String nickname);
 
   /// No description provided for @friends.
   ///
   /// In en, this message translates to:
   /// **'Friends'**
   String get friends;
+
+  /// No description provided for @memberSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Member since'**
+  String get memberSince;
+
+  /// No description provided for @deleteFriendship.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete friendship'**
+  String get deleteFriendship;
+
+  /// No description provided for @deleteFriendConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {nickname} from your friends?'**
+  String deleteFriendConfirmation(String nickname);
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deletedFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'You have deleted {nickname} from your friends.'**
+  String deletedFriend(String nickname);
+
+  /// No description provided for @deleteFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete friendship'**
+  String get deleteFriend;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get blockUser;
+
+  /// No description provided for @blockUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to block {nickname}? You won\'t be able to see their profile or interact with them.'**
+  String blockUserConfirmation(String nickname);
+
+  /// No description provided for @block.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get block;
 
   /// No description provided for @minCharsSearchHint.
   ///
@@ -862,6 +916,30 @@ abstract class AppLocalizations {
   /// **'Not enough points were recorded to save the recorded route.'**
   String get notEnoughPointsToRecordTrack;
 
+  /// No description provided for @routeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded route history'**
+  String get routeHistory;
+
+  /// No description provided for @noRoutesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded routes were found.'**
+  String get noRoutesFound;
+
+  /// No description provided for @distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get distance;
+
+  /// No description provided for @avgSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed'**
+  String get avgSpeed;
+
   /// No description provided for @routeStatistics.
   ///
   /// In en, this message translates to:
@@ -879,12 +957,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Route recording'**
   String get routeRecording;
-
-  /// No description provided for @distance.
-  ///
-  /// In en, this message translates to:
-  /// **'Distance'**
-  String get distance;
 
   /// No description provided for @duration.
   ///
@@ -951,6 +1023,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stop recording'**
   String get stopRecording;
+
+  /// No description provided for @opinions.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get opinions;
+
+  /// No description provided for @station.
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get station;
+
+  /// No description provided for @seeOpinions.
+  ///
+  /// In en, this message translates to:
+  /// **'See reviews'**
+  String get seeOpinions;
+
+  /// No description provided for @withoutOpinions.
+  ///
+  /// In en, this message translates to:
+  /// **'Without reviews'**
+  String get withoutOpinions;
+
+  /// No description provided for @rate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get rate;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @normal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normal;
+
+  /// No description provided for @mechanical.
+  ///
+  /// In en, this message translates to:
+  /// **'Mechanical'**
+  String get mechanical;
+
+  /// No description provided for @electric.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric'**
+  String get electric;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @charge.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge'**
+  String get charge;
+
+  /// No description provided for @reviewStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Station'**
+  String get reviewStation;
+
+  /// No description provided for @writeYourOpinion.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your opinion (optional)'**
+  String get writeYourOpinion;
+
+  /// No description provided for @sendReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit review'**
+  String get sendReview;
+
+  /// No description provided for @excellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get excellent;
+
+  /// No description provided for @veryGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Very good'**
+  String get veryGood;
+
+  /// No description provided for @good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// No description provided for @regular.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get regular;
+
+  /// No description provided for @bad.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get bad;
+
+  /// No description provided for @thankYouForYourReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your review!'**
+  String get thankYouForYourReview;
+
+  /// No description provided for @errorLoadingReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading reviews'**
+  String get errorLoadingReviews;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @firstToReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to review this station!'**
+  String get firstToReview;
+
+  /// No description provided for @editReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit review'**
+  String get editReview;
+
+  /// No description provided for @sureActionConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. Are you sure you want to proceed?'**
+  String get sureActionConfirmation;
+
+  /// No description provided for @deletedReview.
+  ///
+  /// In en, this message translates to:
+  /// **'You have deleted your review.'**
+  String get deletedReview;
+
+  /// No description provided for @updateReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Update review'**
+  String get updateReview;
+
+  /// No description provided for @updatedReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review has been updated.'**
+  String get updatedReview;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ class SocialState extends Equatable {
   final SocialStatus status;
   final List<UserEntity> friends;       // Lista de amigos actuales
   final List<UserEntity> searchResults; // Resultados de la búsqueda
+  final List<UserEntity> blockedUsers;  // Lista de usuarios bloqueados
   final bool isSearching;               // ¿Está el usuario buscando activamente?
   final String? errorMessage;
 
@@ -14,6 +15,7 @@ class SocialState extends Equatable {
     this.status = SocialStatus.initial,
     this.friends = const [],
     this.searchResults = const [],
+    this.blockedUsers = const [],
     this.isSearching = false,
     this.errorMessage,
   });
@@ -22,6 +24,7 @@ class SocialState extends Equatable {
     SocialStatus? status,
     List<UserEntity>? friends,
     List<UserEntity>? searchResults,
+    List<UserEntity>? blockedUsers,
     bool? isSearching,
     String? errorMessage,
   }) {
@@ -29,11 +32,12 @@ class SocialState extends Equatable {
       status: status ?? this.status,
       friends: friends ?? this.friends,
       searchResults: searchResults ?? this.searchResults,
+      blockedUsers: blockedUsers ?? this.blockedUsers,
       isSearching: isSearching ?? this.isSearching,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
   @override
-  List<Object?> get props => [status, friends, searchResults, isSearching, errorMessage];
+  List<Object?> get props => [status, friends, searchResults, blockedUsers, isSearching, errorMessage];
 }
