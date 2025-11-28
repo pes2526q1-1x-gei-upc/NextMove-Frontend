@@ -227,4 +227,40 @@ class AssessmentRemoteDataProvider {
       throw ServerException('Error interno: $e');
     }
   }
+
+  // --- CHECK IF USER HAS ASSESSED ---
+  Future<bool> checkAssessed(String stationId) async {
+    try {
+      final authHeader = await _authHeader;
+
+      final QueryOptions options = QueryOptions(
+        document: gql(GraphQLQueries.checkAssessed),
+        variables: {'station_id': stationId},
+        fetchPolicy: FetchPolicy.networkOnly,
+        context: Context().withEntry(
+          HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+        ),
+      );
+
+      debugPrint("Checking if user has assessed station $stationId...");
+      final QueryResult result = await client.query(options);
+
+      if (result.hasException) {
+        debugPrint(
+          'Exception checking assessment: ${result.exception.toString()}',
+        );
+        throw ServerException(
+          'Error checking assessment: ${result.exception.toString()}',
+        );
+      }
+
+      final bool hasAssessed = result.data?['checkAssessed'] ?? false;
+      debugPrint("User has assessed: $hasAssessed");
+
+      return hasAssessed;
+    } catch (e) {
+      debugPrint("Critical error checking assessment: $e");
+      throw ServerException('Internal error: $e');
+    }
+  }
 }

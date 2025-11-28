@@ -109,4 +109,19 @@ class AssessmentRepository {
       },
     );
   }
+
+  Future<Either<Failure, bool>> checkAssessed(String stationId) async {
+    try {
+      final hasAssessed = await remoteDataProvider.checkAssessed(stationId);
+      return Right(hasAssessed);
+    } on SocketException {
+      return const Left(
+        ConnectionFailure(message: "No hay conexión a internet"),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

@@ -397,4 +397,10 @@ class GraphQLQueries {
       editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
+
+  static const String checkAssessed = r'''
+    query checkAssessed($station_id: String!){
+      checkAssessed(station_id: $station_id)
+    } 
+  ''';
 }
