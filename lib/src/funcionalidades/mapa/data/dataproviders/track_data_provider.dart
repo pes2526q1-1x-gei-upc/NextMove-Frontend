@@ -31,7 +31,9 @@ class TrackDataProvider {
         },
         'tiempo_inicio': track.startTime.toIso8601String(),
         'tiempo_fin': track.endTime.toIso8601String(),
-        'fecha_recorrido': track.startTime.toLocal().toIso8601String().substring(0, 10),
+        'fecha_recorrido': track.startTime
+            .toLocal()
+            .toIso8601String()
       },
     );
     final QueryResult result = await client.mutate(options);
