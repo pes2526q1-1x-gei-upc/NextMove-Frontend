@@ -50,7 +50,7 @@ class UserEntity extends Equatable {
   // Método para convertir a mapa (útil para enviar a API)
   Map<String, dynamic> toMap() {
     return {
-      'email':email,
+      'email': email,
       'nickname': apodo,
       'name': nombreCompleto,
       'birthDate': fechaNacimiento.toIso8601String().split('T').first,
@@ -129,6 +129,7 @@ class UserEntity extends Equatable {
     String? idiomaPreferido,
     String? descripcion,
     String? modoPreferido,
+    String? photo,
   }) {
     return UserEntity(
       email: email ?? this.email,
@@ -136,25 +137,25 @@ class UserEntity extends Equatable {
       nombreCompleto: nombreCompleto ?? this.nombreCompleto,
       fechaNacimiento: fechaNacimiento ?? this.fechaNacimiento,
       fechaRegistro: fechaRegistro ?? this.fechaRegistro,
-      numeroTelefono: numeroTelefono ?? this.numeroTelefono,    
+      numeroTelefono: numeroTelefono ?? this.numeroTelefono,
       idiomaPreferido: idiomaPreferido ?? this.idiomaPreferido,
       descripcion: descripcion ?? this.descripcion,
       modoPreferido: modoPreferido ?? this.modoPreferido,
-      photo: photo
+      photo: photo ?? this.photo,
     );
   }
 
   @override
   List<Object?> get props => [
-        email,
-        apodo,
-        nombreCompleto,
-        fechaNacimiento,
-        fechaRegistro,
-        numeroTelefono,
-        idiomaPreferido,
-        descripcion,
-        modoPreferido,
-        photo
-      ];
+    email,
+    apodo,
+    nombreCompleto,
+    fechaNacimiento,
+    fechaRegistro,
+    numeroTelefono,
+    idiomaPreferido,
+    descripcion,
+    modoPreferido,
+    photo,
+  ];
 }

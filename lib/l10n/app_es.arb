@@ -231,10 +231,11 @@
     "thankYouForYourReview": "¡Gracias por tu valoración!",
     "errorLoadingReviews": "Error al cargar las valoraciones",
     "retry": "Reintentar",
-    "FirstToReview": "¡Sé el primero en valorar esta estación!",
+    "firstToReview": "¡Sé el primero en valorar esta estación!",
     "editReview": "Editar valoración",
     "sureActionConfirmation": "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?",
     "deletedReview": "Has eliminado tu valoración.",
     "updateReview": "Actualizar valoración",
-    "updatedReview": "Tu valoración ha sido actualizada."
+    "updatedReview": "Tu valoración ha sido actualizada.",
+    "charge": "Carga"
 }

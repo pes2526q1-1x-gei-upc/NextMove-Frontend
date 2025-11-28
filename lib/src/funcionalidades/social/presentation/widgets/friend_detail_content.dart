@@ -20,6 +20,7 @@ class FriendDetailsContent extends StatelessWidget {
   Widget build(BuildContext context) {
   
     final l10n = AppLocalizations.of(context)!;
+    final hasPhoto = user.photo.isNotEmpty;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -33,6 +34,8 @@ class FriendDetailsContent extends StatelessWidget {
             child: Column(
               children: [
                 Container(
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
@@ -43,29 +46,21 @@ class FriendDetailsContent extends StatelessWidget {
                         offset: const Offset(0, 5),
                       ),
                     ],
+                    color: Colors.grey[200],
+                    image: hasPhoto 
+                        ? DecorationImage(
+                            image: NetworkImage(user.photo),
+                            fit: BoxFit.cover,
+                            onError: (exception, stackTrace) {
+                               debugPrint("Error cargando foto detalle: $exception");
+                            },
+                          )
+                        : null,
                   ),
-                  child: ClipOval(
-                    child: Container(
-                      width: 120, 
-                      height: 120,
-                      color: Colors.grey[200], 
-
-                      // Si user.photoUrl no es nulo/vacío, usa Image.network.
-                      // De lo contrario, muestra el icono por defecto.
-                      child: user.photo.isNotEmpty 
-                          ? Image.network(
-                              user.photo, 
-                              fit: BoxFit.cover,
-                              width: 120,
-                              height: 120,
-                              errorBuilder: (context, error, stackTrace) {
-                                // Fallback si la URL falla
-                                return const Icon(Icons.person, size: 60, color: Colors.grey);
-                              },
-                            )
-                          : const Icon(Icons.person, size: 60, color: Colors.grey), 
-                    ),
-                  ),
+                  // Si no hay foto o falla, mostramos el icono
+                  child: !hasPhoto 
+                      ? const Icon(Icons.person, size: 60, color: Colors.grey) 
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(

@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_e
 import 'package:nextmove_app/src/funcionalidades/assessments/data/dataproviders/assessments_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 
 class AssessmentRepository {
   final AssessmentRemoteDataProvider remoteDataProvider;
@@ -96,7 +97,7 @@ class AssessmentRepository {
     }
   }
 
-  Future<String?> getUserEmailByNickname(String nickname) async {
+  Future<UserEntity?> getUserEmailByNickname(String nickname) async {
     final result = await userRepository.getUserProfile(nickname);
 
     return result.fold(
@@ -104,7 +105,7 @@ class AssessmentRepository {
         return null;
       },
       (userEntity) {
-        return userEntity.email;
+        return userEntity;
       },
     );
   }
