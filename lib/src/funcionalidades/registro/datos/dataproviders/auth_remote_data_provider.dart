@@ -43,9 +43,7 @@ class AuthRemoteDataProvider {
         print('Error en upsert: ${result.exception}');
       }
     }
-
-    userProvider.dispose();
-    
+    userProvider.clearUser();
   }
 
   Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(

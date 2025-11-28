@@ -602,4 +602,8 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get errorDeletingAccount => 'Error en eliminar el compte.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'El compte s\'ha eliminat correctament.';
 }

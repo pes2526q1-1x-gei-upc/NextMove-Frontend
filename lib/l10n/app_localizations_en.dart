@@ -596,4 +596,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorDeletingAccount => 'Error deleting account.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'The account has been deleted successfully.';
 }

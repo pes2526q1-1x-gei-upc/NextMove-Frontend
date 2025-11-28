@@ -1227,6 +1227,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error deleting account.'**
   String get errorDeletingAccount;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'The account has been deleted successfully.'**
+  String get accountDeletedSuccessfully;
 }
 
 class _AppLocalizationsDelegate

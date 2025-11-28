@@ -233,5 +233,5 @@
     "deleteAccountConfirmation": "Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.",
     "accountDeleted": "El teu compte ha estat eliminat correctament.",
     "errorDeletingAccount": "Error en eliminar el compte.",
-    "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
+    "accountDeletedSuccessfully": "El compte s'ha eliminat correctament."
 }
