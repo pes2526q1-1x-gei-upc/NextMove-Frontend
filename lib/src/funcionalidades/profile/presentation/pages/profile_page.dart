@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/delete_account_button_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/delete_account_dialog_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/footer_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/language_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
@@ -172,8 +174,12 @@ class ProfilePage extends StatelessWidget {
                     // --- BOTÓN LOGOUT ---
                     const ProfileLogoutButton(),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 15),
+                    // --- BOTÓN ELIMINAR CUENTA ---
 
+                    const DeleteAccountButton(),
+                    
+                    const SizedBox(height: 30),
                     // --- FOOTER ---
                     const AppFooter(),
 

@@ -583,4 +583,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get needsToSignInWithGoogle =>
       'This email is registered with Google. Please sign in with Google.';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.';
+
+  @override
+  String get accountDeleted => 'Your account has been successfully deleted.';
+
+  @override
+  String get errorDeletingAccount => 'Error deleting account.';
 }

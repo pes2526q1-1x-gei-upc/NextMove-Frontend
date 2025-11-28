@@ -228,5 +228,9 @@
     "deletedReview": "Has eliminat la teva valoració.",
     "updateReview": "Actualitzar valoració",
     "updatedReview": "La teva valoració ha estat actualitzada.",
-    "needsToSignInWithGoogle": "Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google."
+    "needsToSignInWithGoogle": "Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.",
+    "deleteAccount": "Eliminar compte",
+    "deleteAccountConfirmation": "Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.",
+    "accountDeleted": "El teu compte ha estat eliminat correctament.",
+    "errorDeletingAccount": "Error en eliminar el compte."
 }
