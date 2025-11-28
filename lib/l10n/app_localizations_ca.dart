@@ -606,4 +606,7 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get accountDeletedSuccessfully =>
       'El compte s\'ha eliminat correctament.';
+
+  @override
+  String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
 }

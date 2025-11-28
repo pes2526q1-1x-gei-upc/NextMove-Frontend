@@ -97,7 +97,11 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              _errorMessage!,
+                              switch (_errorMessage!) {
+                                "wrong-password" => l10n.wrongPassword,
+                                "user-mismatch" => l10n.userMismatch,
+                                _ => _errorMessage!,
+                              },
                               style: const TextStyle(color: Colors.red, fontSize: 12),
                             ),
                           ),
@@ -120,9 +124,12 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                       decoration: InputDecoration(
                         labelText: l10n.password,
                         isDense: true,
-                        // Aquí inyectamos el mensaje de error:
-                        errorText: _errorMessage,
-                        errorMaxLines: 2,
+                        errorText: switch (_errorMessage) {
+                          "wrong-password" => l10n.wrongPassword,
+                          null => null,
+                          _ => _errorMessage,
+                        },
+                        errorMaxLines: 6,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

@@ -1233,6 +1233,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The account has been deleted successfully.'**
   String get accountDeletedSuccessfully;
+
+  /// No description provided for @userMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The user does not match the current user.'**
+  String get userMismatch;
 }
 
 class _AppLocalizationsDelegate
