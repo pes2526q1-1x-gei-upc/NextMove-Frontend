@@ -28,6 +28,20 @@ class AuthRemoteDataProvider {
     } on FirebaseAuthException catch (e) {
       throw AuthException(message: e.code);
     }
+
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.deleteUserMutation),
+      variables: {'email': user.email!},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print('Error en upsert: ${result.exception}');
+      }
+    }
   }
 
   Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(
@@ -50,7 +64,9 @@ class AuthRemoteDataProvider {
 
     final data = result.data?['ExistsUser'];
     final exists = data['exists'] as bool;
-    final isRegWithGoogle = data['isRegWithGoogle'] == null ? null : data['isRegWithGoogle'] as bool;
+    final isRegWithGoogle = data['isRegWithGoogle'] == null
+        ? null
+        : data['isRegWithGoogle'] as bool;
     return Tuple2(exists, isRegWithGoogle);
   }
 
