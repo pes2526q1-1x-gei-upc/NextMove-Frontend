@@ -214,6 +214,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
       debugPrint("UserDataPreferencesPage: Creando UserEntity. Foto final: '$finalPhotoUrl'");
 
+      var regWithGoogle = firebaseUser.providerData.any((info) => info.providerId == 'google.com');
+
       newUser = UserEntity(
         email: firebaseUser.email!,
         apodo: _apodoController.text.trim(),
@@ -225,7 +227,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         descripcion: _descripcionController.text.trim(),
         modoPreferido: _selectedModo ?? 'Coche',
         photo: finalPhotoUrl ?? "",
-        regWithGoogle: firebaseUser.providerData.any((info) => info.providerId == 'google.com'),
+        regWithGoogle: regWithGoogle,
       );
 
       if (kDebugMode) {

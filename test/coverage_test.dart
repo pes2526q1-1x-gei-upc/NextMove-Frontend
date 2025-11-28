@@ -4,7 +4,6 @@ import 'package:nextmove_app/l10n/app_localizations_en.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/l10n/app_localizations_es.dart';
 import 'package:nextmove_app/main.dart';
-import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/firebase_options.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';

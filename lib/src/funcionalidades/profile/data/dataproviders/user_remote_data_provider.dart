@@ -268,6 +268,7 @@ class UserRemoteDataProvider {
           'preferredLanguage': langEnum,
           'birthDate': birthDateFormatted,
           'bioDescription': userEntity.descripcion,
+          'regWithGoogle': userEntity.regWithGoogle ?? false,
         },
       },
     );

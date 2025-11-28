@@ -11,7 +11,7 @@ class UserEntity extends Equatable {
   final String idiomaPreferido;
   final String descripcion;
   final String modoPreferido;
-  final bool regWithGoogle;
+  final bool? regWithGoogle;
 
   const UserEntity({
     required this.email,
@@ -24,7 +24,7 @@ class UserEntity extends Equatable {
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
-    required this.regWithGoogle,
+    this.regWithGoogle,
   });
 
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad

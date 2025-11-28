@@ -79,6 +79,7 @@ class AuthRemoteDataProvider {
           email: user.email,
           name: user.displayName,
           needsToRegister: true,
+          regWithGoogle: false,
         );
       }
     } on FirebaseAuthException catch (e) {

@@ -11,6 +11,7 @@ class GraphQLQueries {
           preferredLanguage
           birthDate
           bioDescription
+          regWithGoogle
         }
       }
   ''';
