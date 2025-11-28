@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithEmailEvent>(_onSignInWithEmail);
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
     on<SignInWithGoogleEvent>(_onSignInWithGoogle);
+    on<DeleteAccountEvent>(_onDeleteAccount);
   }
 
   Future<void> _onCheckEmailExistence(
@@ -132,6 +133,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
+      },
+    );
+  }
+
+  Future<void> _onDeleteAccount(
+    DeleteAccountEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    final prevState = state;
+    emit(AuthLoadingState());
+    final result = await authRepository.deleteAccount(event.password);
+    result.fold(
+      (failure) {
+        emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
+        emit(prevState);
+      },
+      (_) {
+        emit(AccountDeletedState());
       },
     );
   }

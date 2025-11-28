@@ -12,6 +12,24 @@ import 'package:email_validator/email_validator.dart';
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
+  Future<void> deleteAccount(String password) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw AuthException(message: 'no-user');
+    }
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(message: e.code);
+    }
+  }
+
   Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(
     String email,
   ) async {
@@ -140,7 +158,6 @@ class AuthRemoteDataProvider {
       }
 
       final email = userCredential.user!.email;
-      //final name = userCredential.user!.displayName;
 
       final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? true;
       if (kDebugMode) {
@@ -148,7 +165,6 @@ class AuthRemoteDataProvider {
       }
 
       final authService = AuthService(client);
-      debugPrint("Upserting user from Firebase...");
       final meData = await authService.getCurrentUser();
       debugPrint("meData after Google sign-in: $meData");
       final needsToRegister = meData == null;
