@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/recorded_routes_list.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/recorded_routes_list.dart';
 
 class RouteHistoryButtonWidget extends StatelessWidget {
   const RouteHistoryButtonWidget({

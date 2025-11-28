@@ -337,26 +337,31 @@ class GraphQLQueries {
   }''';
 
   static const String getRecorridosByUserQuery = r'''
-    query GetRecorridosByUser($userEmail: String!) {
-      recorridosByUser(user_email: $userEmail) {
-        id
-        user_email
-        distancia
-        velocidad_media
-        co2
-        kcal
-        origen {
-          latitude
-          longitude
-        }
-        destino {
-          latitude
-          longitude
-        }
-        fecha_recorrido
+  query GetRecorridosByUser($userEmail: String!) {
+    recorridosByUser(user_email: $userEmail) {
+      id
+      user_email
+      distancia
+      velocidad_media
+      velocidad_maxima
+      co2
+      kcal
+      elevacion_positiva
+      elevacion_negativa
+      origen {
+        latitude
+        longitude
       }
+      destino {
+        latitude
+        longitude
+      }
+      tiempo_inicio
+      tiempo_fin
+      fecha_recorrido
     }
-  ''';
+  }
+''';
 
   static const String getAssessmentsByStationIdQuery = r'''
     query getAssessmentsByStationIdQuery ($id: String!){
