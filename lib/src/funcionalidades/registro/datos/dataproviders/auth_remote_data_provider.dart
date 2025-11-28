@@ -19,20 +19,51 @@ class AuthRemoteDataProvider {
       throw AuthException(message: 'no-user');
     }
 
+    // Store email before deletion
+    final userEmail = user.email!;
+
+    // Check if user signed in with Google
+    final isGoogleUser = user.providerData.any(
+      (info) => info.providerId == 'google.com',
+    );
+
+    // Step 1: Re-authenticate user based on provider
     try {
-      final credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: password,
-      );
-      await user.reauthenticateWithCredential(credential);
-      await user.delete();
+      if (isGoogleUser) {
+        // Re-authenticate with Google
+        final GoogleSignInAccount googleUser;
+        try {
+          googleUser = await GoogleSignIn.instance.authenticate();
+        } on GoogleSignInException catch (e) {
+          if (e.code == GoogleSignInExceptionCode.canceled) {
+            throw AuthException(message: 'google-signin-cancelled');
+          }
+          throw AuthException(message: e.toString());
+        }
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+      } else {
+        // Re-authenticate with email/password
+        if (password.isEmpty) {
+          throw AuthException(message: 'password-required');
+        }
+        final credential = EmailAuthProvider.credential(
+          email: userEmail,
+          password: password,
+        );
+        await user.reauthenticateWithCredential(credential);
+      }
     } on FirebaseAuthException catch (e) {
       throw AuthException(message: e.code);
     }
 
+    // Step 2: Delete from GraphQL backend FIRST
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.deleteUserMutation),
-      variables: {'email': user.email!},
+      variables: {'email': userEmail},
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
@@ -40,12 +71,26 @@ class AuthRemoteDataProvider {
 
     if (result.hasException) {
       if (kDebugMode) {
-        print('Error en upsert: ${result.exception}');
+        print('Error deleting user from backend: ${result.exception}');
+      }
+      throw ServerException('Failed to delete user from backend');
+    }
+
+    // Step 3: Delete from Firebase Auth LAST
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      // User deleted from backend but not Firebase
+      // This is less critical - log and continue
+      if (kDebugMode) {
+        print(
+          'Warning: User deleted from backend but Firebase deletion failed: ${e.code}',
+        );
       }
     }
 
-    userProvider.dispose();
-    
+    // Step 4: Clear user data properly
+    userProvider.clearUser();
   }
 
   Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(

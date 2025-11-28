@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/delete_account_dialog_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
 
 class DeleteAccountButton extends StatelessWidget {
   const DeleteAccountButton({super.key});
@@ -13,7 +11,7 @@ class DeleteAccountButton extends StatelessWidget {
 
     return Center(
       child: FractionallySizedBox(
-        widthFactor: 0.5, 
+        widthFactor: 0.5,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -30,20 +28,17 @@ class DeleteAccountButton extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                final authBloc = context.read<AuthBloc>();
                 showDialog(
                   context: context,
-                  builder: (context) {
-                    return BlocProvider.value(
-                      value: authBloc,
-                      child: const DeleteAccountDialog(),
-                    );
-                  }
+                  builder: (context) => const DeleteAccountDialog(),
                 );
               },
               borderRadius: BorderRadius.circular(16),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 10.0),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14.0,
+                  horizontal: 10.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
