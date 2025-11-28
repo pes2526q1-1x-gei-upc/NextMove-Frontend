@@ -13,16 +13,25 @@ class TrackDataProvider {
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.createTrackMutation),
       variables: {
-        'userEmail': userProvider.email,
-        'distance': track.totalDistanceMeters,
-        'averageSpeed': track.averageSpeedKmH,
+        'user_email': userProvider.email,
+        'distancia': track.totalDistanceMeters,
+        'velocidad_media': track.averageSpeedKmH,
+        'velocidad_maxima': track.maxSpeedKmH,
         'co2': track.co2SavedKG,
         'kcal': track.kcalBurned,
-        'originLat': track.startPoint.location.latitude,
-        'originLon': track.startPoint.location.longitude,
-        'destinationLat': track.endPoint.location.latitude,
-        'destinationLon': track.endPoint.location.longitude,
-        'timestamp': track.startTime.toIso8601String(),
+        'elevacion_positiva': track.elevationGainMeters,
+        'elevacion_negativa': track.elevationLossMeters,
+        'origen': {
+          'latitude': track.startPoint.location.latitude,
+          'longitude': track.startPoint.location.longitude,
+        },
+        'destino': {
+          'latitude': track.endPoint.location.latitude,
+          'longitude': track.endPoint.location.longitude,
+        },
+        'tiempo_inicio': track.startTime.toIso8601String(),
+        'tiempo_fin': track.endTime.toIso8601String(),
+        'fecha_recorrido': track.startTime.toLocal().toIso8601String().substring(0, 10),
       },
     );
     final QueryResult result = await client.mutate(options);
