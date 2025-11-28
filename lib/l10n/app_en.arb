@@ -240,5 +240,6 @@
     "deleteAccount": "Delete account",
     "deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.",
     "accountDeleted": "Your account has been successfully deleted.",
-    "errorDeletingAccount": "Error deleting account."
+    "errorDeletingAccount": "Error deleting account.",
+    "accountDeletedSuccessfully": "The account has been deleted successfully."
 }

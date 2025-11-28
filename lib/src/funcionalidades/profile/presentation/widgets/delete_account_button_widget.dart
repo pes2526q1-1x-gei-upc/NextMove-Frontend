@@ -31,7 +31,6 @@ class DeleteAccountButton extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 final authBloc = context.read<AuthBloc>();
-
                 showDialog(
                   context: context,
                   builder: (context) {
