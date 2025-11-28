@@ -8,6 +8,21 @@ class AuthRepository {
   final AuthRemoteDataProvider authRemoteDataProvider;
   AuthRepository() : authRemoteDataProvider = AuthRemoteDataProvider();
 
+  Future<Either<Failure, void>> deleteAccount(String password) async {
+    try {
+      await authRemoteDataProvider.deleteAccount(password);
+      return Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on AuthException catch (e) {
+      return Left(AuthFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      return Left(UnknownFailure());
+    }
+  }
+
   Future<Either<Failure, Tuple2<bool, bool?>>> isEmailRegisteredAndWithGoogle(String email) async {
     try {
       return Right(await authRemoteDataProvider.isEmailRegisteredAndWithGoogle(email));

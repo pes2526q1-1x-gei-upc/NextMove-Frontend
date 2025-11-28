@@ -1203,6 +1203,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This email is registered with Google. Please sign in with Google.'**
   String get needsToSignInWithGoogle;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.'**
+  String get deleteAccountConfirmation;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been successfully deleted.'**
+  String get accountDeleted;
+
+  /// No description provided for @errorDeletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting account.'**
+  String get errorDeletingAccount;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'The account has been deleted successfully.'**
+  String get accountDeletedSuccessfully;
+
+  /// No description provided for @userMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The user does not match the current user.'**
+  String get userMismatch;
 }
 
 class _AppLocalizationsDelegate

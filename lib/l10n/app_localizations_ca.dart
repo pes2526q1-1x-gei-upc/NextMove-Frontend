@@ -589,4 +589,24 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get needsToSignInWithGoogle =>
       'Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.';
+
+  @override
+  String get deleteAccount => 'Eliminar compte';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.';
+
+  @override
+  String get accountDeleted => 'El teu compte ha estat eliminat correctament.';
+
+  @override
+  String get errorDeletingAccount => 'Error en eliminar el compte.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'El compte s\'ha eliminat correctament.';
+
+  @override
+  String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
 }

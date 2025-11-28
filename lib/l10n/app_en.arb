@@ -236,5 +236,11 @@
     "deletedReview": "You have deleted your review.",
     "updateReview": "Update review",
     "updatedReview": "Your review has been updated.",
-    "needsToSignInWithGoogle": "This email is registered with Google. Please sign in with Google."
+    "needsToSignInWithGoogle": "This email is registered with Google. Please sign in with Google.",
+    "deleteAccount": "Delete account",
+    "deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.",
+    "accountDeleted": "Your account has been successfully deleted.",
+    "errorDeletingAccount": "Error deleting account.",
+    "accountDeletedSuccessfully": "The account has been deleted successfully.",
+    "userMismatch": "The user does not match the current user."
 }

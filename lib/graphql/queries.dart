@@ -16,6 +16,12 @@ class GraphQLQueries {
       }
   ''';
 
+  static const String deleteUserMutation = r'''
+    mutation deleteUser($email: String!) {
+      deleteUser(email: $email)
+    }
+  ''';
+
   static const String getUserProfileQuery = r'''
   query Me {
     me {

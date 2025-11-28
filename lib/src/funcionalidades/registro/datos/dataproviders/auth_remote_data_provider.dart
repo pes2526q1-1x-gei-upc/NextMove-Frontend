@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/graphql/queries.dart';
+import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -11,6 +12,86 @@ import 'package:email_validator/email_validator.dart';
 
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
+
+  Future<void> deleteAccount(String password) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw AuthException(message: 'no-user');
+    }
+
+    // Store email before deletion
+    final userEmail = user.email!;
+
+    // Check if user signed in with Google
+    final isGoogleUser = user.providerData.any(
+      (info) => info.providerId == 'google.com',
+    );
+
+    // Step 1: Re-authenticate user based on provider
+    try {
+      if (isGoogleUser) {
+        // Re-authenticate with Google
+        final GoogleSignInAccount googleUser;
+        try {
+          googleUser = await GoogleSignIn.instance.authenticate();
+        } on GoogleSignInException catch (e) {
+          if (e.code == GoogleSignInExceptionCode.canceled) {
+            throw AuthException(message: 'google-signin-cancelled');
+          }
+          throw AuthException(message: e.toString());
+        }
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+        await user.reauthenticateWithCredential(credential);
+      } else {
+        // Re-authenticate with email/password
+        if (password.isEmpty) {
+          throw AuthException(message: 'password-required');
+        }
+        final credential = EmailAuthProvider.credential(
+          email: userEmail,
+          password: password,
+        );
+        await user.reauthenticateWithCredential(credential);
+      }
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(message: e.code);
+    }
+
+    // Step 2: Delete from GraphQL backend FIRST
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.deleteUserMutation),
+      variables: {'email': userEmail},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print('Error deleting user from backend: ${result.exception}');
+      }
+      throw ServerException('Failed to delete user from backend');
+    }
+
+    // Step 3: Delete from Firebase Auth LAST
+    try {
+      await user.delete();
+    } on FirebaseAuthException catch (e) {
+      // User deleted from backend but not Firebase
+      // This is less critical - log and continue
+      if (kDebugMode) {
+        print(
+          'Warning: User deleted from backend but Firebase deletion failed: ${e.code}',
+        );
+      }
+    }
+
+    // Step 4: Clear user data properly
+    userProvider.clearUser();
+  }
 
   Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(
     String email,
@@ -32,7 +113,9 @@ class AuthRemoteDataProvider {
 
     final data = result.data?['ExistsUser'];
     final exists = data['exists'] as bool;
-    final isRegWithGoogle = data['isRegWithGoogle'] == null ? null : data['isRegWithGoogle'] as bool;
+    final isRegWithGoogle = data['isRegWithGoogle'] == null
+        ? null
+        : data['isRegWithGoogle'] as bool;
     return Tuple2(exists, isRegWithGoogle);
   }
 
@@ -140,7 +223,6 @@ class AuthRemoteDataProvider {
       }
 
       final email = userCredential.user!.email;
-      //final name = userCredential.user!.displayName;
 
       final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? true;
       if (kDebugMode) {
@@ -148,7 +230,6 @@ class AuthRemoteDataProvider {
       }
 
       final authService = AuthService(client);
-      debugPrint("Upserting user from Firebase...");
       final meData = await authService.getCurrentUser();
       debugPrint("meData after Google sign-in: $meData");
       final needsToRegister = meData == null;
