@@ -237,5 +237,6 @@
     "deletedReview": "Has eliminado tu valoración.",
     "updateReview": "Actualizar valoración",
     "updatedReview": "Tu valoración ha sido actualizada.",
-    "charge": "Carga"
+    "charge": "Carga",
+    "needsToSignInWithGoogle": "Este correo electrónico está registrado con Google. Por favor, inicia sesión con Google."
 }

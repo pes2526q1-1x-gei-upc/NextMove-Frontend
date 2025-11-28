@@ -227,6 +227,6 @@
     "sureActionConfirmation": "Aquesta acció no es pot desfer. Estàs segur que vols continuar?",
     "deletedReview": "Has eliminat la teva valoració.",
     "updateReview": "Actualitzar valoració",
-    "updatedReview": "La teva valoració ha estat actualitzada."
-    
+    "updatedReview": "La teva valoració ha estat actualitzada.",
+    "needsToSignInWithGoogle": "Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google."
 }

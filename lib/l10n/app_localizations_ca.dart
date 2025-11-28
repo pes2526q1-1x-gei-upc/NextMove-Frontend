@@ -585,4 +585,8 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get updatedReview => 'La teva valoració ha estat actualitzada.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.';
 }

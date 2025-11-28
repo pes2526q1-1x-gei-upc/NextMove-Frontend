@@ -579,4 +579,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatedReview => 'Your review has been updated.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'This email is registered with Google. Please sign in with Google.';
 }

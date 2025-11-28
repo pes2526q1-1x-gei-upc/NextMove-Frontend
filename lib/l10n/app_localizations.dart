@@ -1197,6 +1197,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your review has been updated.'**
   String get updatedReview;
+
+  /// No description provided for @needsToSignInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is registered with Google. Please sign in with Google.'**
+  String get needsToSignInWithGoogle;
 }
 
 class _AppLocalizationsDelegate

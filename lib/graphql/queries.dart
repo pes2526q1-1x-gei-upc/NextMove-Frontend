@@ -1,30 +1,19 @@
 class GraphQLQueries {
   static const String createUserMutation = r'''
-  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $photo: String, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
-    createUser(createInfo: {
-      email: $email,
-      name: $fullN,
-      nickname: $nickN,
-      photo: $photo,
-      phoneNumber: $phoneNum,
-      preferredMode: $mode,
-      preferredLanguage: $preferredLanguage,
-      birthDate: $birthDate,
-      bioDescription: $bioDescription    
-
-    }) {
-      email
-      name
-      nickname
-      photo
-      phoneNumber
-      preferredMode
-      createdAt
-      preferredLanguage
-      birthDate
-      bioDescription
-    }
-  }
+  mutation CreateUser($input: CreateUserInput!) {
+        createUser(createInfo: $input) {
+          email
+          name
+          photo
+          nickname
+          phoneNumber
+          preferredMode
+          preferredLanguage
+          birthDate
+          bioDescription
+          regWithGoogle
+        }
+      }
   ''';
 
   static const String getUserProfileQuery = r'''
@@ -278,7 +267,7 @@ class GraphQLQueries {
     }
   ''';
 
-    static const String getBicingStationsBySearchQuery = r'''
+  static const String getBicingStationsBySearchQuery = r'''
       query SearchBicingStations($address: String!) {
         getEstacionesDeBicingPorDireccion(address: $address) {
           id
@@ -302,7 +291,7 @@ class GraphQLQueries {
     ''';
 
   static const String createTrackMutation = r'''
-    mutation createTrackMutation($user_email: String!, $distancia: Float!, $velocidad_media: Float!, $velocidad_maxima: Float!, $co2: Float!, $kcal: Float!, $elevacion_positiva: Float!, $elevacion_negativa: Float!, $origen: Coordinates!, $destino: Coordinates!, $tiempo_inicio: String!, $tiempo_fin: String!, $fecha_recorrido: String!) {
+    mutation createTrackMutation($user_email: String!, $distancia: Float!, $velocidad_media: Float!, $velocidad_maxima: Float!, $co2: Float!, $kcal: Float!, $elevacion_positiva: Float!, $elevacion_negativa: Float!, $origen: CoordinatesInput!, $destino: CoordinatesInput!, $tiempo_inicio: String!, $tiempo_fin: String!, $fecha_recorrido: String!) {
     createRecorrido(input: {
       user_email: $user_email,
       distancia: $distancia,
@@ -403,4 +392,12 @@ class GraphQLQueries {
       checkAssessed(station_id: $station_id)
     } 
   ''';
+
+  static const String existsUserQuery = r'''
+    query ExistsUser ($email: String!) {
+      ExistsUser (email: $email) {
+        exists
+        isRegWithGoogle
+      }
+    }''';
 }
