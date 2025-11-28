@@ -30,17 +30,20 @@ class StationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => StationDetailsBloc()
-            ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
+            ..add(
+              LoadStationDetailsEvent(stationID, stationType, stationDetails),
+            ),
         ),
         BlocProvider(
-          create: (context) => AssessmentBloc(
-            assessmentRepository: AssessmentRepository(),
-          )..add(GetStationAssessmentInfoEvent(stationId: stationID)),
+          create: (context) =>
+              AssessmentBloc(assessmentRepository: AssessmentRepository())
+                ..add(GetStationAssessmentInfoEvent(stationId: stationID))
+                ..add(CheckAssessedEvent(stationId: stationID)),
         ),
       ],
       child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
@@ -69,7 +72,10 @@ class StationDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsPage(BuildContext context, StationDetails stationDetails) {
+  Widget _buildDetailsPage(
+    BuildContext context,
+    StationDetails stationDetails,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final isBike = stationType == StationType.bicycle;
     final themeColor = isBike ? Colors.blue : Colors.green;
@@ -78,7 +84,7 @@ class StationDetailsPage extends StatelessWidget {
       backgroundColor: _backgroundColor,
       appBar: AppBar(
         title: Text(
-          l10n.information, 
+          l10n.information,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -100,7 +106,9 @@ class StationDetailsPage extends StatelessWidget {
               BlocBuilder<AssessmentBloc, AssessmentState>(
                 builder: (context, assessmentState) {
                   final displayStation = (assessmentState.totalAssessments > 0)
-                      ? stationDetails.copyWith(rating: assessmentState.averageScore)
+                      ? stationDetails.copyWith(
+                          rating: assessmentState.averageScore,
+                        )
                       : stationDetails;
 
                   return StationHeaderWidget(
@@ -109,29 +117,23 @@ class StationDetailsPage extends StatelessWidget {
                   );
                 },
               ),
-              
+
               const SizedBox(height: 20),
 
               // 2. Stats Grid
               SectionLabel(text: l10n.state),
-              StationStatsWidget(
-                station: stationDetails,
-                isBike: isBike,
-              ),
+              StationStatsWidget(station: stationDetails, isBike: isBike),
               const SizedBox(height: 24),
 
               // 3. Features List
               SectionLabel(text: l10n.accountDetails),
-              StationFeaturesWidget(
-                station: stationDetails,
-                isBike: isBike,
-              ),
+              StationFeaturesWidget(station: stationDetails, isBike: isBike),
               const SizedBox(height: 24),
 
               // 4. Connectors (Only EV)
               if (!isBike && stationDetails is EVStationDetails)
-                 StationConnectorsWidget(details: stationDetails),
-              
+                StationConnectorsWidget(details: stationDetails),
+
               const SizedBox(height: 40),
             ],
           ),

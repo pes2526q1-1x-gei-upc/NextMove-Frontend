@@ -267,7 +267,6 @@ class GraphQLQueries {
     }
   ''';
 
-
   static const String createTrackMutation = r'''
     mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
     createRecorrido(input: {
@@ -359,5 +358,11 @@ class GraphQLQueries {
     mutation EditAssessment($station_id: String!, $score: Int!, $comments: String) {
       editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
+  ''';
+
+  static const String checkAssessed = r'''
+    query checkAssessed($station_id: String!){
+      checkAssessed(station_id: $station_id)
+    } 
   ''';
 }
