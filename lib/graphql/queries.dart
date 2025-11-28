@@ -1,30 +1,18 @@
 class GraphQLQueries {
   static const String createUserMutation = r'''
-  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $photo: String, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
-    createUser(createInfo: {
-      email: $email,
-      name: $fullN,
-      nickname: $nickN,
-      photo: $photo,
-      phoneNumber: $phoneNum,
-      preferredMode: $mode,
-      preferredLanguage: $preferredLanguage,
-      birthDate: $birthDate,
-      bioDescription: $bioDescription    
-
-    }) {
-      email
-      name
-      nickname
-      photo
-      phoneNumber
-      preferredMode
-      createdAt
-      preferredLanguage
-      birthDate
-      bioDescription
-    }
-  }
+  mutation CreateUser($input: CreateUserInput!) {
+        createUser(createInfo: $input) {
+          email
+          name
+          photo
+          nickname
+          phoneNumber
+          preferredMode
+          preferredLanguage
+          birthDate
+          bioDescription
+        }
+      }
   ''';
 
   static const String getUserProfileQuery = r'''

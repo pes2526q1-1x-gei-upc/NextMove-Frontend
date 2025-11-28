@@ -228,22 +228,6 @@ class UserRemoteDataProvider {
   }
 
   Future<UserEntity> createUserProfile(UserEntity userEntity) async {
-    const String createUserMutation = r'''
-      mutation CreateUser($input: CreateUserInput!) {
-        createUser(createInfo: $input) {
-          email
-          name
-          photo
-          nickname
-          phoneNumber
-          preferredMode
-          preferredLanguage
-          birthDate
-          bioDescription
-        }
-      }
-    ''';
-
     final String birthDateFormatted = DateFormat(
       'yyyy-MM-dd',
     ).format(userEntity.fechaNacimiento);
@@ -272,7 +256,7 @@ class UserRemoteDataProvider {
     }
 
     final MutationOptions options = MutationOptions(
-      document: gql(createUserMutation),
+      document: gql(GraphQLQueries.createUserMutation),
       variables: {
         'input': {
           'email': userEntity.email,
