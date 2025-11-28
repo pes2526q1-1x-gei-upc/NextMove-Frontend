@@ -267,7 +267,7 @@ class GraphQLQueries {
     }
   ''';
 
-    static const String getBicingStationsBySearchQuery = r'''
+  static const String getBicingStationsBySearchQuery = r'''
       query SearchBicingStations($address: String!) {
         getEstacionesDeBicingPorDireccion(address: $address) {
           id
@@ -386,4 +386,12 @@ class GraphQLQueries {
       editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
+
+  static const String existsUserQuery = r'''
+    query ExistsUser ($email: String!) {
+      ExistsUser (email: $email) {
+        exists
+        isRegWithGoogle
+      }
+    }''';
 }

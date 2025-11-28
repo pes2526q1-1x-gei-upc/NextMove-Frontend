@@ -1,6 +1,4 @@
-name: Flutter CI Light
-# Descripción: CI ligera para análisis de código Flutter. Podria fallar en la detección de errores con firebase.
-# Prob de no detectar errores <= 10%. Mas adelante se hara más pesado, ahora buscamos compilación rápida.
+name: Flutter CI
 # Se ejecuta en push o PR a dev y main.
 on:
   push:

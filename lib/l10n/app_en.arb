@@ -235,5 +235,6 @@
     "sureActionConfirmation": "This action cannot be undone. Are you sure you want to proceed?",
     "deletedReview": "You have deleted your review.",
     "updateReview": "Update review",
-    "updatedReview": "Your review has been updated."
+    "updatedReview": "Your review has been updated.",
+    "needsToSignInWithGoogle": "This email is registered with Google. Please sign in with Google."
 }

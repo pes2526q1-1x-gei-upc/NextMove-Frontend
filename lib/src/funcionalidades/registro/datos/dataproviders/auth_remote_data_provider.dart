@@ -1,29 +1,39 @@
+import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
+import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:email_validator/email_validator.dart';
 
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
-  Future<bool> isEmailRegistered(String email) async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: "1111111");
-      await credential.user?.delete();
-      return false;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        return true;
-      } else if (e.code == 'invalid-email') {
-        throw AuthException(message: e.code);
-      } else {
-        throw ServerException(e.code);
-      }
+  Future<Tuple2<bool, bool?>> isEmailRegisteredAndWithGoogle(
+    String email,
+  ) async {
+    if (!EmailValidator.validate(email)) {
+      throw AuthException(message: 'invalid-email');
     }
+
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.existsUserQuery),
+      variables: {"email": email},
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final data = result.data?['ExistsUser'];
+    final exists = data['exists'] as bool;
+    final isRegWithGoogle = data['isRegWithGoogle'] == null ? null : data['isRegWithGoogle'] as bool;
+    return Tuple2(exists, isRegWithGoogle);
   }
 
   Future<Map<String, dynamic>> signInWithEmailAndPassword({

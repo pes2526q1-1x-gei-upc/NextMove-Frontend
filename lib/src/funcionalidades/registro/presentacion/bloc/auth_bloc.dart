@@ -23,9 +23,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     final prevState = state;
     emit(AuthLoadingState());
-    final result = await authRepository.isEmailRegistered(event.email);
+    final result = await authRepository.isEmailRegisteredAndWithGoogle(
+      event.email,
+    );
     result.fold(
       (failure) {
+        if (kDebugMode) {
+          print('Error en isEmailRegisteredAndWithGoogle: ${failure.message}');
+        }
         emit(
           AuthFailureState(
             errorCode: failure.message == 'invalid-email'
@@ -35,8 +40,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         emit(prevState);
       },
-      (isRegistered) =>
-          emit(isRegistered ? EmailExistsState() : EmailIsNewState()),
+      (data) {
+        bool isEmailRegistered = data.value1;
+        bool? isRegisteredWithGoogle = data.value2;
+        if (isEmailRegistered) {
+          if (isRegisteredWithGoogle == true) {
+            emit(EmailExistsWithGoogleState());
+          } else {
+            emit(EmailExistsWithoutGoogleState());
+          }
+        } else {
+          emit(EmailIsNewState());
+        }
+      },
     );
   }
 
