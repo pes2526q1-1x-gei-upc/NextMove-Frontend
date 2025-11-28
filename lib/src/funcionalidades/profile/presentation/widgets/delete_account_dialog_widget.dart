@@ -15,6 +15,7 @@ class DeleteAccountDialog extends StatefulWidget {
 class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isObscure = true;
+  String? _errorMessage; 
 
   @override
   void dispose() {
@@ -29,21 +30,13 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthFailureState) {
-          // Close dialog first
-          Navigator.pop(context);
+          setState(() {
+            _errorMessage = state.errorCode;
+          });
 
-          // Show error message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorCode),
-              backgroundColor: Colors.red,
-            ),
-          );
         } else if (state is AccountDeletedState) {
-          // Close dialog first
           Navigator.pop(context);
 
-          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.accountDeletedSuccessfully),
@@ -51,7 +44,6 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
             ),
           );
 
-          // Navigate to welcome page and clear navigation stack
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const WelcomePage()),
@@ -82,7 +74,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                 style: TextStyle(fontSize: 14, color: Colors.grey[800]),
               ),
               const SizedBox(height: 20),
-              // Check if user is Google user
+              
               Builder(
                 builder: (context) {
                   final user = FirebaseAuth.instance.currentUser;
@@ -93,20 +85,44 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                       false;
 
                   if (isGoogleUser) {
-                    // Google users don't need password field
-                    return Text(
-                      'You will be prompted to sign in with Google to confirm.',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'You will be prompted to sign in with Google to confirm.',
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        ),
+                        // Si ocurre un error con Google, lo mostramos aquí texto plano
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
+                      ],
                     );
                   } else {
-                    // Email/password users need to enter password
+                    // Usuarios con Email/Password
                     return TextField(
                       controller: _passwordController,
                       obscureText: _isObscure,
                       enabled: !isLoading,
+                      // Limpiamos el error en cuanto el usuario escribe algo nuevo
+                      onChanged: (value) {
+                        if (_errorMessage != null) {
+                          setState(() {
+                            _errorMessage = null;
+                          });
+                        }
+                      },
                       decoration: InputDecoration(
                         labelText: l10n.password,
                         isDense: true,
+                        // Aquí inyectamos el mensaje de error:
+                        errorText: _errorMessage,
+                        errorMaxLines: 2,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -153,18 +169,19 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                           false;
                       final password = _passwordController.text;
 
-                      // Google users don't need password, others do
                       if (!isGoogleUser && password.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.password),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
+                        // Validación local simple antes de enviar evento
+                        setState(() {
+                          _errorMessage = l10n.password; // "Contraseña requerida"
+                        });
                         return;
                       }
 
-                      // Dispatch delete event (password can be empty for Google users)
+                      // Limpiamos error previo antes de enviar
+                      setState(() {
+                         _errorMessage = null;
+                      });
+
                       context.read<AuthBloc>().add(
                         DeleteAccountEvent(password: password),
                       );
