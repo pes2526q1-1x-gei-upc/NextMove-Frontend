@@ -47,6 +47,7 @@ class AuthService {
     required String? email,
     required String? name,
     bool? needsToRegister,
+    bool regWithGoogle = false, // per defecte, false
   }) async {
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLQueries.updateUserMutation),
@@ -55,6 +56,7 @@ class AuthService {
         'email': email,
         'name': name,
         'needsToRegister': needsToRegister,
+        'regWithGoogle': regWithGoogle,
       },
       fetchPolicy: FetchPolicy.networkOnly,
     );

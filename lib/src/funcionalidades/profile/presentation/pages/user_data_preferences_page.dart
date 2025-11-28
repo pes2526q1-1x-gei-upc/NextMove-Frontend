@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -223,8 +224,13 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         idiomaPreferido: _selectedIdioma ?? 'Español',
         descripcion: _descripcionController.text.trim(),
         modoPreferido: _selectedModo ?? 'Coche',
-        photo: finalPhotoUrl ?? "", 
+        photo: finalPhotoUrl ?? "",
+        regWithGoogle: firebaseUser.providerData.any((info) => info.providerId == 'google.com'),
       );
+
+      if (kDebugMode) {
+        print("UserDataPreferencesPage: UserEntity creada: ${newUser.toMap()}");
+      }
 
       // Actualizar Provider
       if (FirebaseAuth.instance.currentUser != null) {
