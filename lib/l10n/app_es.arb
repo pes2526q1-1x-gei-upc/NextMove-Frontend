@@ -242,5 +242,6 @@
     "deleteAccount": "Eliminar cuenta",
     "deleteAccountConfirmation": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos.",
     "accountDeleted": "Tu cuenta ha sido eliminada correctamente.",
-    "errorDeletingAccount": "Error al eliminar la cuenta."
+    "errorDeletingAccount": "Error al eliminar la cuenta.",
+    "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente."
 }
