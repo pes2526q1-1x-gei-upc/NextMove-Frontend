@@ -18,6 +18,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:provider/provider.dart';
 
 class UserDataPreferencesPage extends StatefulWidget {
@@ -158,8 +159,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     try {
       User? firebaseUser = FirebaseAuth.instance.currentUser;
       UserEntity newUser;
-      
-      String? finalPhotoUrl; 
+
+      String? finalPhotoUrl;
 
       if (firebaseUser == null) {
         debugPrint("UserDataPreferencesPage: Creating new Firebase user...");
@@ -187,40 +188,56 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       }
 
       if (_selectedImageFile != null) {
-        debugPrint("UserDataPreferencesPage: Subiendo imagen seleccionada a S3...");
+        debugPrint(
+          "UserDataPreferencesPage: Subiendo imagen seleccionada a S3...",
+        );
         try {
           final repo = context.read<UserBloc>().userRepository;
-          
+
           final result = await repo.uploadProfilePhoto(_selectedImageFile!);
-          
+
           result.fold(
             (failure) {
-              debugPrint("UserDataPreferencesPage: ERROR subiendo foto: ${failure.message}");
+              debugPrint(
+                "UserDataPreferencesPage: ERROR subiendo foto: ${failure.message}",
+              );
             },
             (url) {
               debugPrint("UserDataPreferencesPage: FOTO SUBIDA OK: $url");
               finalPhotoUrl = url;
-            }
+            },
           );
         } catch (e) {
-          debugPrint("UserDataPreferencesPage: Excepción crítica subiendo imagen: $e");
+          debugPrint(
+            "UserDataPreferencesPage: Excepción crítica subiendo imagen: $e",
+          );
         }
-      } 
-
-      if (finalPhotoUrl == null && firebaseUser.photoURL != null && firebaseUser.photoURL!.isNotEmpty) {
-        finalPhotoUrl = firebaseUser.photoURL;
-        debugPrint("UserDataPreferencesPage: Usando foto de perfil de Google/Firebase: $finalPhotoUrl");
       }
 
-      debugPrint("UserDataPreferencesPage: Creando UserEntity. Foto final: '$finalPhotoUrl'");
+      if (finalPhotoUrl == null &&
+          firebaseUser.photoURL != null &&
+          firebaseUser.photoURL!.isNotEmpty) {
+        finalPhotoUrl = firebaseUser.photoURL;
+        debugPrint(
+          "UserDataPreferencesPage: Usando foto de perfil de Google/Firebase: $finalPhotoUrl",
+        );
+      }
 
-      var regWithGoogle = firebaseUser.providerData.any((info) => info.providerId == 'google.com');
+      debugPrint(
+        "UserDataPreferencesPage: Creando UserEntity. Foto final: '$finalPhotoUrl'",
+      );
+
+      var regWithGoogle = firebaseUser.providerData.any(
+        (info) => info.providerId == 'google.com',
+      );
 
       newUser = UserEntity(
         email: firebaseUser.email!,
         apodo: _apodoController.text.trim(),
         nombreCompleto: _nombreCompletoController.text.trim(),
-        fechaNacimiento: DateTime.tryParse(_fechaNacimientoController.text) ?? DateTime(1990),
+        fechaNacimiento:
+            DateTime.tryParse(_fechaNacimientoController.text) ??
+            DateTime(1990),
         fechaRegistro: DateTime.now(),
         numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
         idiomaPreferido: _selectedIdioma ?? 'Español',
@@ -245,16 +262,18 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       }
 
       if (mounted) {
-        debugPrint("UserDataPreferencesPage: Enviando evento CreateUserProfile...");
+        debugPrint(
+          "UserDataPreferencesPage: Enviando evento CreateUserProfile...",
+        );
         context.read<UserBloc>().add(CreateUserProfile(newUser));
       }
-
     } on FirebaseAuthException catch (e) {
       debugPrint("UserDataPreferencesPage: FirebaseAuthException: ${e.code}");
       setState(() => _isCreatingFirebaseUser = false);
       String errorMsg = 'Error de registro';
       if (e.code == 'weak-password') errorMsg = 'La contraseña es muy débil.';
-      if (e.code == 'email-already-in-use') errorMsg = 'El email ya está en uso.';
+      if (e.code == 'email-already-in-use')
+        errorMsg = 'El email ya está en uso.';
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -273,7 +292,11 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   }
 
   // Método auxiliar para estilo de inputs
-  InputDecoration _buildInputDecoration(String label, IconData icon, {bool showBorder = false}) {
+  InputDecoration _buildInputDecoration(
+    String label,
+    IconData icon, {
+    bool showBorder = false,
+  }) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon, color: Colors.grey),
@@ -282,7 +305,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           ? const OutlineInputBorder(borderSide: BorderSide(color: Colors.grey))
           : InputBorder.none,
       focusedBorder: showBorder
-          ? OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).primaryColor))
+          ? OutlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).primaryColor),
+            )
           : InputBorder.none,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
     );
@@ -296,15 +321,19 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     return WillPopScope(
       onWillPop: () async => !_isCreatingFirebaseUser,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F7), 
+        backgroundColor: const Color(0xFFF5F5F7),
         appBar: AppBar(
           backgroundColor: const Color(0xFFF5F5F7),
           elevation: 0,
           centerTitle: true,
-          automaticallyImplyLeading: false, 
+          automaticallyImplyLeading: false,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.black87,
+                    size: 20,
+                  ),
                   onPressed: () {
                     if (!_isCreatingFirebaseUser) Navigator.pop(context);
                   },
@@ -312,7 +341,11 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
               : null,
           title: Text(
             l10n.userDataPreferences,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A1A1A),
+            ),
           ),
         ),
         body: BlocConsumer<UserBloc, UserState>(
@@ -320,13 +353,22 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
             if (state is UserError) {
               setState(() => _isCreatingFirebaseUser = false);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
               );
             } else if (state is UserUpdated) {
-              final userProvider = Provider.of<UserProvider>(context, listen: false);
-              final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+              final userProvider = Provider.of<UserProvider>(
+                context,
+                listen: false,
+              );
+              final localeProvider = Provider.of<LocaleProvider>(
+                context,
+                listen: false,
+              );
               final firebaseUserNow = FirebaseAuth.instance.currentUser;
-              
+
               userProvider.setUser(
                 state.user.toMap(),
                 firebaseUserId: firebaseUserNow?.uid,
@@ -337,7 +379,12 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => AuthStateHandler(
+                      client: GraphQLConfig.client,
+                      isLoggedIn: true,
+                    ),
+                  ),
                   (route) => false,
                 );
               });
@@ -359,7 +406,10 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -378,15 +428,23 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                                   : _avatarImage,
                             ),
                             Positioned(
-                              bottom: 0, right: 0,
+                              bottom: 0,
+                              right: 0,
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
                                   color: primaryColor,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
                                 ),
-                                child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -402,22 +460,37 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                       children: [
                         TextFormField(
                           controller: _apodoController,
-                          decoration: _buildInputDecoration(l10n.nickname, Icons.alternate_email_rounded),
-                          validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryNickname : null,
+                          decoration: _buildInputDecoration(
+                            l10n.nickname,
+                            Icons.alternate_email_rounded,
+                          ),
+                          validator: (v) => v?.trim().isEmpty ?? true
+                              ? l10n.mandatoryNickname
+                              : null,
                         ),
                         const Divider(height: 1, indent: 40),
                         TextFormField(
                           controller: _nombreCompletoController,
-                          decoration: _buildInputDecoration(l10n.fullName, Icons.person_outline_rounded),
-                          validator: (v) => v?.trim().isEmpty ?? true ? l10n.mandatoryFullName : null,
+                          decoration: _buildInputDecoration(
+                            l10n.fullName,
+                            Icons.person_outline_rounded,
+                          ),
+                          validator: (v) => v?.trim().isEmpty ?? true
+                              ? l10n.mandatoryFullName
+                              : null,
                         ),
                         const Divider(height: 1, indent: 40),
                         TextFormField(
                           controller: _fechaNacimientoController,
-                          decoration: _buildInputDecoration(l10n.birthdate, Icons.cake_outlined),
+                          decoration: _buildInputDecoration(
+                            l10n.birthdate,
+                            Icons.cake_outlined,
+                          ),
                           readOnly: true,
                           onTap: () => _selectDate(context),
-                          validator: (v) => v?.isEmpty ?? true ? l10n.mandatoryBirthDate : null,
+                          validator: (v) => v?.isEmpty ?? true
+                              ? l10n.mandatoryBirthDate
+                              : null,
                         ),
                       ],
                     ),
@@ -425,22 +498,30 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     const SizedBox(height: 24),
 
                     // --- CONTACTO Y BIO ---
-                    ProfileSectionLabel(text: l10n.contactAndBioInfo), 
+                    ProfileSectionLabel(text: l10n.contactAndBioInfo),
                     ProfileStyledCard(
                       children: [
                         TextFormField(
                           controller: _telefonoController,
-                          decoration: _buildInputDecoration(l10n.telephoneNumber, Icons.phone_outlined),
+                          decoration: _buildInputDecoration(
+                            l10n.telephoneNumber,
+                            Icons.phone_outlined,
+                          ),
                           keyboardType: TextInputType.phone,
                           validator: (v) {
                             if (v == null || v.isEmpty) return null;
-                            return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v) ? null : l10n.invalidPhoneNumber;
+                            return RegExp(r'^\+?[0-9]{7,15}$').hasMatch(v)
+                                ? null
+                                : l10n.invalidPhoneNumber;
                           },
                         ),
                         const Divider(height: 1, indent: 40),
                         TextFormField(
                           controller: _descripcionController,
-                          decoration: _buildInputDecoration(l10n.userDescription, Icons.notes_rounded),
+                          decoration: _buildInputDecoration(
+                            l10n.userDescription,
+                            Icons.notes_rounded,
+                          ),
                           maxLines: 3,
                         ),
                       ],
@@ -460,29 +541,76 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                                 value: _selectedModo,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredMode,
-                                  prefixIcon: Icon(_selectedModo == 'Bici' ? Icons.directions_bike : Icons.electric_car, color: Colors.grey),
+                                  prefixIcon: Icon(
+                                    _selectedModo == 'Bici'
+                                        ? Icons.directions_bike
+                                        : Icons.electric_car,
+                                    color: Colors.grey,
+                                  ),
                                   border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
                                 ),
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                                validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                                items: _modos.map((m) => DropdownMenuItem(value: m, child: Text(m, style: const TextStyle(fontSize: 14)))).toList(),
-                                onChanged: (v) => setState(() => _selectedModo = v),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Colors.grey,
+                                ),
+                                validator: (v) => v == null
+                                    ? l10n.mandatoryPreferredMode
+                                    : null,
+                                items: _modos
+                                    .map(
+                                      (m) => DropdownMenuItem(
+                                        value: m,
+                                        child: Text(
+                                          m,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (v) =>
+                                    setState(() => _selectedModo = v),
                               ),
                             ),
-                            Container(width: 1, height: 40, color: Colors.grey[200], margin: const EdgeInsets.all(8)),
+                            Container(
+                              width: 1,
+                              height: 40,
+                              color: Colors.grey[200],
+                              margin: const EdgeInsets.all(8),
+                            ),
                             Expanded(
                               child: DropdownButtonFormField<String>(
                                 value: _selectedIdioma,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredLanguage,
-                                  prefixIcon: const Icon(Icons.language, color: Colors.grey),
+                                  prefixIcon: const Icon(
+                                    Icons.language,
+                                    color: Colors.grey,
+                                  ),
                                   border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
                                 ),
-                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                                items: _idiomas.map((i) => DropdownMenuItem(value: i, child: Text(i, style: const TextStyle(fontSize: 14)))).toList(),
-                                onChanged: (v) => setState(() => _selectedIdioma = v),
+                                icon: const Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: Colors.grey,
+                                ),
+                                items: _idiomas
+                                    .map(
+                                      (i) => DropdownMenuItem(
+                                        value: i,
+                                        child: Text(
+                                          i,
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (v) =>
+                                    setState(() => _selectedIdioma = v),
                               ),
                             ),
                           ],
@@ -501,10 +629,18 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           elevation: 2,
                         ),
-                        child: Text(l10n.finishRegistration, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          l10n.finishRegistration,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 40),
