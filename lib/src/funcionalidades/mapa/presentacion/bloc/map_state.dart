@@ -39,6 +39,8 @@ class MapLoadedState extends MapState {
   final Polyline routePolyline;
   final String? snackbarError;
   final Duration recordingElapsedTime;
+  final List<StationDetails> recentBikeSearches;
+  final List<StationDetails> recentEvSearches;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -57,6 +59,8 @@ class MapLoadedState extends MapState {
     required this.routePolyline,
     this.snackbarError,
     this.recordingElapsedTime = Duration.zero,
+    this.recentBikeSearches = const [],
+    this.recentEvSearches = const [],
   });
 
   @override
@@ -77,6 +81,8 @@ class MapLoadedState extends MapState {
         routePolyline,
         snackbarError,
         recordingElapsedTime,
+        recentBikeSearches,
+        recentEvSearches,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -90,13 +96,17 @@ class MapLoadedState extends MapState {
     Set<Marker>? carMarkers,
     LatLng? centerPosition,
     String? searchQuery,
+    bool clearSearchQuery = false,
     List<StationDetails>? searchResults,
     bool? isSearching,
     bool? isRecordingRoute,
     RecordedTrack? recordedTrack,
     Polyline? routePolyline,
     String? snackbarError,
+    bool clearSnackbarError = false,
     Duration? recordingElapsedTime,
+    List<StationDetails>? recentBikeSearches,
+    List<StationDetails>? recentEvSearches,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -107,7 +117,7 @@ class MapLoadedState extends MapState {
       bikeMarkers: bikeMarkers ?? this.bikeMarkers,
       carMarkers: carMarkers ?? this.carMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
-      searchQuery: searchQuery ?? this.searchQuery,
+      searchQuery: clearSearchQuery ? null : (searchQuery ?? this.searchQuery),
       searchResults: searchResults ?? this.searchResults,
       isSearching: isSearching ?? this.isSearching,
       isRecordingRoute: isRecordingRoute ?? this.isRecordingRoute,
@@ -115,9 +125,17 @@ class MapLoadedState extends MapState {
       routePolyline: routePolyline ?? this.routePolyline,
       snackbarError: snackbarError ?? this.snackbarError,
       recordingElapsedTime: recordingElapsedTime ?? this.recordingElapsedTime,
+      recentBikeSearches: recentBikeSearches ?? this.recentBikeSearches,
+      recentEvSearches: recentEvSearches ?? this.recentEvSearches,
     );
   }
 
+  /// Obtener búsquedas recientes según el modo actual
+  List<StationDetails> get currentModeRecentSearches {
+    return currentMode == StationType.bicycle 
+      ? recentBikeSearches 
+      : recentEvSearches;
+  }
 }
 
 /// Estado de error: cuando algo falla

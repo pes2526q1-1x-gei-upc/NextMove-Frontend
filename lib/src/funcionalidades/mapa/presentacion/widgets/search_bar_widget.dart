@@ -7,32 +7,47 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 class SearchBarWidget extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final String hintText;
+  final ValueChanged<bool>? onFocusChanged;
 
   const SearchBarWidget({
     super.key,
     this.onChanged,
     required this.hintText,
+    this.onFocusChanged,
   });
 
   @override
-  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+  State<SearchBarWidget> createState() => SearchBarWidgetState();
 }
 
-class _SearchBarWidgetState extends State<SearchBarWidget> {
+class SearchBarWidgetState extends State<SearchBarWidget> {
   late final TextEditingController _searchController;
+  late final FocusNode _focusNode;
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _focusNode = FocusNode();
+    
+    _focusNode.addListener(() {
+      print('🔍 Focus changed: ${_focusNode.hasFocus}');
+      widget.onFocusChanged?.call(_focusNode.hasFocus);
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _focusNode.dispose();
     _debounce?.cancel();
     super.dispose();
+  }
+
+  void clearSearch() {
+    _searchController.clear();
+    setState(() {});
   }
 
   @override
@@ -56,6 +71,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         ),
         child: TextField(
           controller: _searchController,
+          focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -65,6 +81,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 onPressed: () {
                   _searchController.clear();
                   context.read<MapBloc>().add(const ClearSearchEvent());
+                  setState(() {});
                 },
               ) 
               : null,
@@ -75,15 +92,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           ),
           onChanged: (value) {
-            //implementar barra de busqueda, he cambiado a on changed para que al usuario se le actualice en tiempo real lo que busca
               setState(() {});
               if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-              // Esperar 500ms después de que el usuario deje de escribir
               _debounce = Timer(const Duration(milliseconds: 500), () {
-                context.read<MapBloc>().add(SearchStationsEvent(value));
+                if (value.isNotEmpty) {
+                  context.read<MapBloc>().add(SearchStationsEvent(value));
+                } else {
+                  context.read<MapBloc>().add(const ClearSearchEvent());
+                }
               });
-
           },
         ),
       ),
