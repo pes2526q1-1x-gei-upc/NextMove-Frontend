@@ -67,31 +67,37 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
   ) async {
     if (state is StationListLoaded) {
       final currentState = state as StationListLoaded;
-      final updatedStations = await Future.wait(
-        currentState.stations.map((station) async {
-          if (station.id == event.stationId) {
-            final isFavorite = station.isFavorite ?? false;
-            final stationType = station is BicycleStationDetails
-                ? StationType.bicycle
-                : StationType.electricVehicle;
-            final result = await stationRepository.setStationFavoriteStatus(
-              station.id,
-              stationType,
-              !isFavorite,
-            );
-            await result.fold(
-              (failure) async {
-                emit(StationListToggleError(_mapFailureToMessage(failure), currentState.stations));
-              },
-              (success) async {
-                station.isFavorite = !isFavorite;
-              },
-            );
-          }
-          return station;
-        }).toList(),
+      final station = currentState.stations.firstWhere(
+        (s) => s.id == event.stationId,
       );
-      emit(StationListLoaded(updatedStations));
+      final oldIsFavorite = station.isFavorite ?? false;
+      final newIsFavorite = !oldIsFavorite;
+      final stationType = station is BicycleStationDetails
+          ? StationType.bicycle
+          : StationType.electricVehicle;
+
+      final result = await stationRepository.setStationFavoriteStatus(
+        station.id,
+        stationType,
+        newIsFavorite,
+      );
+      result.fold(
+        (failure) {
+          emit(
+            StationListToggleError(
+              _mapFailureToMessage(failure),
+              currentState.stations,
+            ),
+          );
+        },
+        (success) {
+          currentState.stations
+                  .firstWhere((s) => s.id == event.stationId)
+                  .isFavorite =
+              newIsFavorite;
+          emit(StationListLoaded(currentState.stations));
+        },
+      );
     }
   }
 }

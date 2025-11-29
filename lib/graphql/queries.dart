@@ -105,7 +105,8 @@ class GraphQLQueries {
         anclajesDisponibles,
         estado,
         bicisMecanicasDisponibles,
-        bicisElectricasDisponibles
+        bicisElectricasDisponibles,
+        isFavoriteStation
       }
     }''';
 
@@ -171,6 +172,7 @@ class GraphQLQueries {
           isSuperFast
           lastUpdated
           distance
+          isFavoriteStation
         }
       }
     }''';

@@ -248,6 +248,9 @@ class StationRemoteDataProvider {
       );
     }
     String? authHeader = await AuthRemoteDataProvider().authHeader;
+    if (kDebugMode) {
+      print('Auth Header: $authHeader');
+    }
     final MutationOptions options = MutationOptions(
       document: gql(
         isFavorite
