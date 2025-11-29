@@ -370,7 +370,7 @@ class GraphQLQueries {
 
   static const String deleteFavStation = r'''
     mutation deleteFavStation($stationId: String!, $stationType: String!) {
-      deleteFavStation(station_id: $stationId, type: $stationType)
+      deleteFavStation(stationId: $stationId, type: $stationType)
     }
   ''';
 }
