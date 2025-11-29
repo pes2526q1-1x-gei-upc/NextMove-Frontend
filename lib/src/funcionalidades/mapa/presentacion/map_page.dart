@@ -170,25 +170,16 @@ class _MapPageState extends State<MapPage> {
                       },
                     ),
 
-                    Positioned(
-                      top: 130,
-                      left: 16,
-                      right: 16,
-                      child: SearchResultsList(
-                        isSearchBarFocused: _isSearchBarFocused,
-                      ),
+                    // Botón de lista de estaciones
+                    StationListButtonWidget(
+                      currentMode: state.currentMode,
+                      userLocation: state.userLocation,
                     ),
 
                     // Avatar de perfil
                     //ProfileAvatarWidget(context: context),
                     // Route history button
                     RouteHistoryButtonWidget(),
-
-                    // Botón de lista de estaciones
-                    StationListButtonWidget(
-                      currentMode: state.currentMode,
-                      userLocation: state.userLocation,
-                    ),
 
                     // Columna de controles del mapa (botones combinados)
                     MapControlsColumnWidget(
@@ -199,6 +190,16 @@ class _MapPageState extends State<MapPage> {
 
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
+
+                    // ESTO LO HE MOVIDO AL FINAL DEL STACK PARA QUE APAREZCA POR ENCIMA DE TODO
+                    Positioned(
+                      top: 130,
+                      left: 16,
+                      right: 16,
+                      child: SearchResultsList(
+                        isSearchBarFocused: _isSearchBarFocused,
+                      ),
+                    ),
                   ],
                 );
               }
