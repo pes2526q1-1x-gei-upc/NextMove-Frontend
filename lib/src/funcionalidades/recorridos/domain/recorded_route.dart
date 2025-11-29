@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -35,6 +36,9 @@ class RecordedRoute {
   });
 
   factory RecordedRoute.fromJson(Map<String, dynamic> data) {
+    if (kDebugMode) {
+      print('RecordedRoute.fromJson data: $data');
+    }
     return RecordedRoute(
       id: data['id'] as String,
       userEmail: data['user_email'] as String,
@@ -66,14 +70,12 @@ class RecordedRoute {
             )
           : null,
       startTime: data['tiempo_inicio'] != null
-          ? DateTime.parse(data['tiempo_inicio'] as String)
+          ? DateFormat('dd/MM/yyyy HH:mm:ss').parse(data['tiempo_inicio'] as String)
           : null,
       endTime: data['tiempo_fin'] != null
-          ? DateTime.parse(data['tiempo_fin'] as String)
+          ? DateFormat('dd/MM/yyyy HH:mm:ss').parse(data['tiempo_fin'] as String)
           : null,
-      timestamp: DateFormat("dd/MM/yyyy HH:mm:ss").parse(
-        (data['fecha_recorrido'] as String).replaceAll(' (UTC)', '')
-      ),    
+      timestamp: DateFormat('dd/MM/yyyy HH:mm:ss').parse(data['fecha_recorrido'] as String),    
     );
   }
 }
