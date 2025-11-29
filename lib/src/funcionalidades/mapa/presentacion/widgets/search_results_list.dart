@@ -8,26 +8,55 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 
 
 class SearchResultsList extends StatelessWidget {
-  const SearchResultsList({super.key});
+  final bool isSearchBarFocused;
+  
+  const SearchResultsList({
+    super.key,
+    required this.isSearchBarFocused,
+  });
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    print('📋 SearchResultsList building with isSearchBarFocused: $isSearchBarFocused');
+    
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         if(state is! MapLoadedState){
-          return SizedBox.shrink();
+          print('📋 State is not MapLoadedState');
+          return const SizedBox.shrink();
+        }
+        
+        print('📋 searchQuery: ${state.searchQuery}, isSearching: ${state.isSearching}');
+        print('📋 recentBikeSearches: ${state.recentBikeSearches.length}');
+        print('📋 recentEvSearches: ${state.recentEvSearches.length}');
+        print('📋 currentMode: ${state.currentMode}');
+        
+        // CAMBIAR: Priorizar las búsquedas recientes cuando está enfocado y no hay búsqueda activa
+        final hasActiveSearch = state.searchQuery != null && state.searchQuery!.length >= 3;
+        
+        if (isSearchBarFocused && !hasActiveSearch) {
+          final recentSearches = state.currentModeRecentSearches;
+          print('📋 Checking recent searches: ${recentSearches.length}');
+          if (recentSearches.isNotEmpty) {
+            print('📋 Showing recent searches!');
+            return _buildRecentSearchesList(context, state, recentSearches);
+          } else {
+            print('📋 No recent searches to show');
+            return const SizedBox.shrink();
+          }
         }
         
         if(!state.isSearching) {
-          return SizedBox.shrink();
+          print('📋 Not searching, hiding');
+          return const SizedBox.shrink();
         }
 
         if(state.searchQuery != null && state.searchQuery!.length < 3) {
           return _messageCard(
             loc.minCharsSearchHint,
             Icons.search,
-            );
+          );
         }
 
         // Si la búsqueda no devolvió resultados
@@ -40,7 +69,6 @@ class SearchResultsList extends StatelessWidget {
         }
 
         return _buildResultsList(context, state);
-
       }
     );
   }
@@ -72,6 +100,78 @@ class SearchResultsList extends StatelessWidget {
           ),
         ),
       );
+  }
+
+  Widget _buildRecentSearchesList(
+    BuildContext context, 
+    MapLoadedState state, 
+    List<StationDetails> recentSearches,
+  ) {
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 350),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Text(
+                'Búsquedas recientes',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: recentSearches.length,
+                itemBuilder: (context, index) {
+                  final station = recentSearches[index];
+                  return ListTile(
+                    leading: Icon(
+                      state.currentMode == StationType.bicycle
+                          ? Icons.pedal_bike
+                          : Icons.ev_station,
+                      color: state.currentMode == StationType.bicycle
+                          ? Colors.blue
+                          : Colors.green,
+                    ),
+                    title: Text(
+                      station.name!,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(
+                      station.address!,
+                      style: const TextStyle(fontSize: 13, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: const Icon(Icons.history, color: Colors.grey, size: 20),
+                    onTap: () {
+                      debugPrint('✅ Búsqueda reciente: ${station.name}');
+                      FocusScope.of(context).unfocus(); // Cerrar teclado
+                      context.read<MapBloc>().add(SelectSearchResultEvent(station));
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildResultsList(BuildContext context, MapLoadedState state) {
@@ -112,9 +212,8 @@ class SearchResultsList extends StatelessWidget {
                     ),
                     onTap: () {
                       debugPrint('✅ Pulsado: ${station.name}');
-                      final currentState = state;
-                      context.read<MapBloc>().onMarkerTapped(station, currentState);
-                      context.read<MapBloc>().add(const ClearSearchEvent());
+                      FocusScope.of(context).unfocus(); // Cerrar teclado
+                      context.read<MapBloc>().add(SelectSearchResultEvent(station));
                     },
                   );
                 },

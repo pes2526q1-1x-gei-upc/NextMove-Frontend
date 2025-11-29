@@ -9,6 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/s
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -22,6 +23,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
   final RecordedRoutesRepository recordedRoutesRepository;
+  final SearchHistoryService searchHistoryService;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -37,6 +39,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.stationRepository,
     required this.trackRepository,
     required this.recordedRoutesRepository,
+    required this.searchHistoryService,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -46,6 +49,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<RequestLocationPermissionEvent>(_onRequestLocationPermission);
     on<UpdateUserLocationEvent>(_onUpdateUserLocation);
     on<SearchStationsEvent>(_onSearchStations);
+    on<SelectSearchResultEvent>(_onSelectSearchResult); 
     on<ClearSearchEvent>(_onClearSearch);
     on<StartRouteRecordingEvent>(_onStartRouteRecording);
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
@@ -93,6 +97,20 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       );
 
+      // Cargar búsquedas recientes guardadas
+      final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
+      final savedEvSearchIds = await searchHistoryService.getEvSearches();
+
+      // Recuperar objetos completos de estaciones desde los IDs guardados
+      final recentBikeSearches = _recoverStationsFromIds(
+        savedBikeSearchIds,
+        bikeStations,
+      );
+      final recentEvSearches = _recoverStationsFromIds(
+        savedEvSearchIds,
+        evStations,
+      );
+
       // Emitir estado cargado
       emit(
         MapLoadedState(
@@ -108,6 +126,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           searchResults: [],
           isSearching: false,
           routePolyline: defaultPolyline,
+          recentBikeSearches: recentBikeSearches,  // AÑADIR
+          recentEvSearches: recentEvSearches,      // AÑADIR
         ),
       );
 
@@ -117,12 +137,108 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(MapErrorState('Error cargando estaciones: $e'));
     }
   }
+  List<StationDetails> _recoverStationsFromIds(
+    List<String> stationIds,
+    List<StationDetails> allStations,
+  ) {
+
+    final Map<String, StationDetails> stationMap = {
+      for (var station in allStations) station.id: station
+    };
+
+    return stationIds
+        .where((id) => stationMap.containsKey(id))
+        .map((id) => stationMap[id]!)
+        .toList();
+  }
+
+  void _onSelectSearchResult(
+    SelectSearchResultEvent event,
+    Emitter<MapState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      final selectedStation = event.selectedStation;
+
+      List<StationDetails> updatedRecentSearches;
+      
+      if (currentState.currentMode == StationType.bicycle) {
+        updatedRecentSearches = _addToRecentSearches(
+          currentState.recentBikeSearches,
+          selectedStation,
+        );
+        
+        final stationIds = updatedRecentSearches.map((s) => s.id).toList();
+        await searchHistoryService.saveBikeSearches(stationIds);
+        
+        print('🔄 BEFORE EMIT - searchQuery: ${currentState.searchQuery}'); // AÑADIR
+        
+        emit(currentState.copyWith(
+          recentBikeSearches: updatedRecentSearches,
+          clearSearchQuery: true,
+          searchResults: [],
+          isSearching: false,
+        ));
+        
+        print('🔄 AFTER EMIT - searchQuery: ${(state as MapLoadedState).searchQuery}'); // AÑADIR
+      } else {
+        updatedRecentSearches = _addToRecentSearches(
+          currentState.recentEvSearches,
+          selectedStation,
+        );
+        
+        final stationIds = updatedRecentSearches.map((s) => s.id).toList();
+        await searchHistoryService.saveEvSearches(stationIds);
+        
+        print('🔄 BEFORE EMIT - searchQuery: ${currentState.searchQuery}'); // AÑADIR
+        
+        emit(currentState.copyWith(
+          recentEvSearches: updatedRecentSearches,
+          clearSearchQuery: true,
+          searchResults: [],
+          isSearching: false,
+        ));
+        
+        print('🔄 AFTER EMIT - searchQuery: ${(state as MapLoadedState).searchQuery}'); // AÑADIR
+      }
+
+      final updatedState = state as MapLoadedState;
+      onMarkerTapped(selectedStation, updatedState);
+
+      if (kDebugMode) {
+        print('Estación seleccionada: ${selectedStation.name} (${selectedStation.id})');
+        print('Búsquedas recientes guardadas: ${updatedRecentSearches.length}');
+      }
+    }
+  }
+
+  /// Añadir estación a búsquedas recientes (máximo 5, sin duplicados)
+  List<StationDetails> _addToRecentSearches(
+    List<StationDetails> currentSearches,
+    StationDetails newStation,
+  ) {
+    final List<StationDetails> filteredSearches = currentSearches
+        .where((station) => station.id != newStation.id)
+        .toList();
+
+    final List<StationDetails> updatedSearches = [
+      newStation,
+      ...filteredSearches,
+    ];
+
+    return updatedSearches.take(5).toList();
+  }
 
   /// Handler: Cambiar modo (bicicleta/coche)
   void _onChangeMode(ChangeModeEvent event, Emitter<MapState> emit) {
     final currentState = state;
     if (currentState is MapLoadedState) {
-      emit(currentState.copyWith(currentMode: event.newMode));
+      emit(currentState.copyWith(
+      currentMode: event.newMode,
+      clearSearchQuery: true,
+      searchResults: [],
+      isSearching: false,
+    ));
     }
   }
 
@@ -218,7 +334,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       if (query.isEmpty) {
         emit(
           currentState.copyWith(
-            searchQuery: null,
+            clearSearchQuery: true,
             searchResults: [],
             isSearching: false,
           ),

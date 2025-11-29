@@ -14,6 +14,8 @@ import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/re
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
@@ -43,7 +45,8 @@ class _MapPageState extends State<MapPage> {
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
-
+  final searchHistoryService = SearchHistoryService();
+  bool _isSearchBarFocused = false;
   StreamSubscription<Position>? _positionStream;
 
   @override
@@ -87,6 +90,7 @@ class _MapPageState extends State<MapPage> {
         stationRepository: stationRepository,
         trackRepository: trackRepository,
         recordedRoutesRepository: recordedRoutesRepository,
+        searchHistoryService: searchHistoryService,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
       child: _buildUI(context),
@@ -97,7 +101,12 @@ class _MapPageState extends State<MapPage> {
     var l10n = AppLocalizations.of(context)!;
     // Main UI
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () {   
+        FocusScope.of(context).unfocus(); // Esto debe quitar el teclado
+        setState(() {
+          _isSearchBarFocused = false; // Esto debe cerrar las búsquedas recientes
+        });
+      },
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
         body: BlocListener<MapBloc, MapState>(
@@ -149,15 +158,22 @@ class _MapPageState extends State<MapPage> {
                           print('Searching: $query');
                         }
                       },
+                      onFocusChanged: (isFocused) {
+                        print('📍 MapPage received focus change: $isFocused');
+                        setState(() {
+                          _isSearchBarFocused = isFocused;
+                        });
+                      },
                     ),
 
-                    if (state.isSearching)
-                      Positioned(
-                        top: 130,
-                        left: 16,
-                        right: 16,
-                        child: SearchResultsList(),
+                    Positioned(
+                      top: 130,
+                      left: 16,
+                      right: 16,
+                      child: SearchResultsList(
+                        isSearchBarFocused: _isSearchBarFocused,
                       ),
+                    ),
 
                     // Avatar de perfil
                     //ProfileAvatarWidget(context: context),
