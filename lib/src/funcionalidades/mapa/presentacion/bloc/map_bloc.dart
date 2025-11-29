@@ -126,8 +126,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           searchResults: [],
           isSearching: false,
           routePolyline: defaultPolyline,
-          recentBikeSearches: recentBikeSearches,  // AÑADIR
-          recentEvSearches: recentEvSearches,      // AÑADIR
+          recentBikeSearches: recentBikeSearches,  
+          recentEvSearches: recentEvSearches,      
         ),
       );
 
@@ -171,7 +171,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         final stationIds = updatedRecentSearches.map((s) => s.id).toList();
         await searchHistoryService.saveBikeSearches(stationIds);
         
-        print('🔄 BEFORE EMIT - searchQuery: ${currentState.searchQuery}'); // AÑADIR
         
         emit(currentState.copyWith(
           recentBikeSearches: updatedRecentSearches,
@@ -180,7 +179,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isSearching: false,
         ));
         
-        print('🔄 AFTER EMIT - searchQuery: ${(state as MapLoadedState).searchQuery}'); // AÑADIR
       } else {
         updatedRecentSearches = _addToRecentSearches(
           currentState.recentEvSearches,
@@ -190,7 +188,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         final stationIds = updatedRecentSearches.map((s) => s.id).toList();
         await searchHistoryService.saveEvSearches(stationIds);
         
-        print('🔄 BEFORE EMIT - searchQuery: ${currentState.searchQuery}'); // AÑADIR
         
         emit(currentState.copyWith(
           recentEvSearches: updatedRecentSearches,
@@ -199,7 +196,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isSearching: false,
         ));
         
-        print('🔄 AFTER EMIT - searchQuery: ${(state as MapLoadedState).searchQuery}'); // AÑADIR
       }
 
       final updatedState = state as MapLoadedState;

@@ -18,31 +18,22 @@ class SearchResultsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    print('📋 SearchResultsList building with isSearchBarFocused: $isSearchBarFocused');
-    
+
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         if(state is! MapLoadedState){
-          print('📋 State is not MapLoadedState');
+          print('State is not MapLoadedState');
           return const SizedBox.shrink();
         }
-        
-        print('📋 searchQuery: ${state.searchQuery}, isSearching: ${state.isSearching}');
-        print('📋 recentBikeSearches: ${state.recentBikeSearches.length}');
-        print('📋 recentEvSearches: ${state.recentEvSearches.length}');
-        print('📋 currentMode: ${state.currentMode}');
         
         // CAMBIAR: Priorizar las búsquedas recientes cuando está enfocado y no hay búsqueda activa
         final hasActiveSearch = state.searchQuery != null && state.searchQuery!.length >= 3;
         
         if (isSearchBarFocused && !hasActiveSearch) {
           final recentSearches = state.currentModeRecentSearches;
-          print('📋 Checking recent searches: ${recentSearches.length}');
           if (recentSearches.isNotEmpty) {
-            print('📋 Showing recent searches!');
             return _buildRecentSearchesList(context, state, recentSearches);
           } else {
-            print('📋 No recent searches to show');
             return const SizedBox.shrink();
           }
         }
@@ -121,7 +112,7 @@ class SearchResultsList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4), 
               child: Text(
                 'Búsquedas recientes',
                 style: const TextStyle(
@@ -132,12 +123,21 @@ class SearchResultsList extends StatelessWidget {
               ),
             ),
             Flexible(
-              child: ListView.builder(
+              child: ListView.separated( 
                 shrinkWrap: true,
+                padding: EdgeInsets.zero, 
                 itemCount: recentSearches.length,
+                separatorBuilder: (context, index) => const Divider( //  separador
+                  height: 1,
+                  thickness: 0.5,
+                  indent: 60, 
+                  endIndent: 16,
+                ),
                 itemBuilder: (context, index) {
                   final station = recentSearches[index];
                   return ListTile(
+                    dense: true, 
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     leading: Icon(
                       state.currentMode == StationType.bicycle
                           ? Icons.pedal_bike
@@ -145,23 +145,32 @@ class SearchResultsList extends StatelessWidget {
                       color: state.currentMode == StationType.bicycle
                           ? Colors.blue
                           : Colors.green,
+                      size: 24,
                     ),
                     title: Text(
                       station.name!,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 15, 
+                        fontWeight: FontWeight.w500, 
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    subtitle: Text(
-                      station.address!,
-                      style: const TextStyle(fontSize: 13, color: Colors.grey),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: const Icon(Icons.history, color: Colors.grey, size: 20),
+                    subtitle: station.address != null
+                      ? Text(
+                          station.address!,
+                          style: const TextStyle(
+                            fontSize: 12, 
+                            color: Colors.grey,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : null,
+                    trailing: const Icon(Icons.history, color: Colors.grey, size: 18),
                     onTap: () {
                       debugPrint('✅ Búsqueda reciente: ${station.name}');
-                      FocusScope.of(context).unfocus(); // Cerrar teclado
+                      FocusScope.of(context).unfocus();
                       context.read<MapBloc>().add(SelectSearchResultEvent(station));
                     },
                   );
@@ -176,49 +185,67 @@ class SearchResultsList extends StatelessWidget {
 
   Widget _buildResultsList(BuildContext context, MapLoadedState state) {
     return Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 350),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        constraints: const BoxConstraints(maxHeight: 350),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListView.separated( 
+          shrinkWrap: true,
+          padding: EdgeInsets.zero, 
+          itemCount: state.searchResults.length,
+          separatorBuilder: (context, index) => const Divider( // separador
+            height: 1,
+            thickness: 0.5,
+            indent: 60,
+            endIndent: 16,
+          ),
+          itemBuilder: (context, index) {
+            final station = state.searchResults[index];
+            return ListTile(
+              dense: true, 
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4), 
+              leading: Icon(
+                state.currentMode == StationType.bicycle
+                    ? Icons.pedal_bike
+                    : Icons.ev_station,
+                color: state.currentMode == StationType.bicycle
+                    ? Colors.blue
+                    : Colors.green,
+                size: 24, 
               ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: state.searchResults.length,
-                itemBuilder: (context, index) {
-                  final station = state.searchResults[index];
-                  return ListTile(
-                    leading: Icon(
-                      state.currentMode == StationType.bicycle
-                          ? Icons.pedal_bike
-                          : Icons.ev_station,
-                      color: state.currentMode == StationType.bicycle
-                          ? Colors.blue
-                          : Colors.green,
-                    ),
-                    title: Text(
-                      station.name!,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      station.address!,
-                      style: const TextStyle(fontSize: 13, color: Colors.grey),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: () {
-                      debugPrint('✅ Pulsado: ${station.name}');
-                      FocusScope.of(context).unfocus(); // Cerrar teclado
-                      context.read<MapBloc>().add(SelectSearchResultEvent(station));
-                    },
-                  );
-                },
+              title: Text(
+                station.name!,
+                style: const TextStyle(
+                  fontSize: 15, 
+                  fontWeight: FontWeight.w500, 
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          );
+              subtitle: station.address != null
+                ? Text(
+                    station.address!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : null,
+              onTap: () {
+                debugPrint('✅ Pulsado: ${station.name}');
+                FocusScope.of(context).unfocus();
+                context.read<MapBloc>().add(SelectSearchResultEvent(station));
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 }
