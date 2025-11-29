@@ -22,7 +22,9 @@ class RecordedRouteStatistics extends StatelessWidget {
         ? '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}'
         : '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
-    return SingleChildScrollView(
+    return Container(
+    color: Colors.white,
+    child: SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,6 +191,7 @@ class RecordedRouteStatistics extends StatelessWidget {
           ),
         ],
       ),
+    )
     );
   }
 

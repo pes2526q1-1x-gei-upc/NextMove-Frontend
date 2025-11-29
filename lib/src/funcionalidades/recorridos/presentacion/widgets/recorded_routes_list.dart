@@ -17,7 +17,6 @@ class RouteHistoryList extends StatelessWidget {
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final String userEmail = userProvider.email!;
-    
     return BlocProvider(
       create: (context) => RouteBloc()
         ..add(LoadRecordedRoutesEvent(userEmail)),
