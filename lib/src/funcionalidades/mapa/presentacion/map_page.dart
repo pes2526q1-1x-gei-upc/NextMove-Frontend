@@ -18,6 +18,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_histo
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
+
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 import 'widgets/google_map_widget.dart';
@@ -47,6 +48,9 @@ class _MapPageState extends State<MapPage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
+  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
+
+  
   StreamSubscription<Position>? _positionStream;
 
   @override
