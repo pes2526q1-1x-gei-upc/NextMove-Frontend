@@ -38,6 +38,7 @@ class MapLoadedState extends MapState {
   final RecordedTrack? recordedTrack;
   final Polyline routePolyline;
   final String? snackbarError;
+  final Duration recordingElapsedTime;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -55,6 +56,7 @@ class MapLoadedState extends MapState {
     this.recordedTrack,
     required this.routePolyline,
     this.snackbarError,
+    this.recordingElapsedTime = Duration.zero,
   });
 
   @override
@@ -74,6 +76,7 @@ class MapLoadedState extends MapState {
         recordedTrack,
         routePolyline,
         snackbarError,
+        recordingElapsedTime,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -93,6 +96,7 @@ class MapLoadedState extends MapState {
     RecordedTrack? recordedTrack,
     Polyline? routePolyline,
     String? snackbarError,
+    Duration? recordingElapsedTime,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -110,6 +114,7 @@ class MapLoadedState extends MapState {
       recordedTrack: recordedTrack ?? this.recordedTrack,
       routePolyline: routePolyline ?? this.routePolyline,
       snackbarError: snackbarError ?? this.snackbarError,
+      recordingElapsedTime: recordingElapsedTime ?? this.recordingElapsedTime,
     );
   }
 

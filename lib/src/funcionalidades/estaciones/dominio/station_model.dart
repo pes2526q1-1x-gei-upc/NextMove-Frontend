@@ -11,7 +11,7 @@ class StationDetails {
     final String? address;
     final int? totalSlots;
     final int? availableSlots;
-    final int? rating;
+    final double? rating;
     final double? distanceKm;
     final double? latitude;
     final double? longitude;
@@ -27,6 +27,20 @@ class StationDetails {
     this.longitude,
     this.distanceKm,
     });
+    
+    StationDetails copyWith({double? rating}) {
+      return StationDetails(
+        id: id,
+        name: name,
+        address: address,
+        totalSlots: totalSlots,
+        availableSlots: availableSlots,
+        rating: rating ?? this.rating,
+        latitude: latitude,
+        longitude: longitude,
+        distanceKm: distanceKm,
+      );
+    }
 }
 
 enum BicycleStationState {
@@ -62,6 +76,29 @@ class BicycleStationDetails extends StationDetails {
     this.availableElectricBikes,
   });
 
+  // --- IMPLEMENTACIÓN ESPECÍFICA DE COPYWITH ---
+  @override
+  BicycleStationDetails copyWith({double? rating}) {
+    return BicycleStationDetails(
+      id: id,
+      name: name,
+      address: address,
+      totalSlots: totalSlots,
+      availableSlots: availableSlots,
+      rating: rating ?? this.rating,
+      latitude: latitude,
+      longitude: longitude,
+      distanceKm: distanceKm,
+      availableBikes: availableBikes,
+      electricRechargeStation: electricRechargeStation,
+      canAnchorBikes: canAnchorBikes,
+      canRentBikes: canRentBikes,
+      state: state,
+      availableMechanicalBikes: availableMechanicalBikes,
+      availableElectricBikes: availableElectricBikes,
+    );
+  }
+
   factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
     // print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
     if (kDebugMode) {
@@ -86,7 +123,7 @@ class BicycleStationDetails extends StationDetails {
       longitude: (data['coordenadas']?['longitude'] as num?)?.toDouble(),
       totalSlots: data['plazasTotales'] as int?,
       availableSlots: data['anclajesDisponibles'] as int?,
-      rating: 5, // TODO: obtenir valoració de la BD
+      rating: data['rating'] != null ? (data['rating'] as num).toDouble() : null,
       distanceKm: data['distanciaKm'] != null ? (data['distanciaKm'] as num).toDouble() : null,
       availableBikes: data['bicisMecanicasDisponibles'] != null && data['bicisElectricasDisponibles'] != null ? (data['bicisMecanicasDisponibles'] as int) + (data['bicisElectricasDisponibles'] as int) : null,
       electricRechargeStation: data['estacionCargaElectrica'] as bool?,
@@ -137,6 +174,25 @@ class EVStationDetails extends StationDetails {
     this.accessType,
   });
 
+  // --- IMPLEMENTACIÓN ESPECÍFICA DE COPYWITH ---
+  @override
+  EVStationDetails copyWith({double? rating}) {
+    return EVStationDetails(
+      id: id,
+      name: name,
+      address: address,
+      availableSlots: availableSlots,
+      totalSlots: totalSlots,
+      rating: rating ?? this.rating, 
+      latitude: latitude,
+      longitude: longitude,
+      distanceKm: distanceKm,
+      isSuperFast: isSuperFast,
+      connectors: connectors,
+      accessType: accessType,
+    );
+  }
+
   factory EVStationDetails.fromJson(Map<String, dynamic> data) {
     List<Connector>? connectors;
     if (data['connectors'] != null) {
@@ -177,7 +233,7 @@ class EVStationDetails extends StationDetails {
       longitude: (data['coordinates']?['longitude'] as num?)?.toDouble(),
       availableSlots: connectors?.where((c) => c.status == ConnectorStatus.available).length ?? 0,
       totalSlots: connectors?.length,
-      rating: 5, //TODO: rating real des de la BD
+      rating: data['rating'] != null ? (data['rating'] as num).toDouble() : null, 
       distanceKm: data['distance'] != null ? (data['distance']).toDouble() : null,
       isSuperFast: data['isSuperFast'] as bool?,
       connectors: connectors,

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'map_events.dart';
 import 'map_state.dart';
@@ -20,10 +21,14 @@ var defaultPolyline = Polyline(
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
+  final RecordedRoutesRepository recordedRoutesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
+
+  // Timer para actualizar el tiempo transcurrido durante la grabación
+  Timer? _recordingTimer;
 
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
@@ -31,6 +36,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
+    required this.recordedRoutesRepository,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -44,6 +50,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<StartRouteRecordingEvent>(_onStartRouteRecording);
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
     on<AddRoutePointEvent>(_onAddRoutePoint);
+    on<UpdateRecordingElapsedTimeEvent>(_onUpdateRecordingElapsedTime);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -234,7 +241,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       try {
         final result = currentState.currentMode == StationType.electricVehicle
             ? await stationRepository.searchEvStations(query)
-            : await stationRepository.searchEvStations(query);
+            : await stationRepository.searchBicycleStations(query);
 
         result.fold(
           (failure) {
@@ -273,6 +280,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
     }
   }
+
+  
 
   /// Iniciar actualizaciones de ubicación
   void _startLocationUpdates() async {
@@ -378,8 +387,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           recordedTrack: RecordedTrack(),
           routePolyline: defaultPolyline,
           snackbarError: null,
+          recordingElapsedTime: Duration.zero,
         ),
       );
+
+      // Iniciar timer para actualizar el tiempo transcurrido
+      _recordingTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        add(const UpdateRecordingElapsedTimeEvent());
+      });
 
       if (kDebugMode) {
         print('Polyline reset for route recording start');
@@ -391,6 +406,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     StopRouteRecordingEvent event,
     Emitter<MapState> emit,
   ) async {
+    // Cancelar el timer de grabación
+    _recordingTimer?.cancel();
+    _recordingTimer = null;
+
     final currentState = state;
     if (currentState is MapLoadedState) {
       currentState.recordedTrack!.endTime = DateTime.now();
@@ -497,6 +516,22 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
 
       emit(currentState.copyWith(routePolyline: routePolyline));
+    }
+  }
+
+  void _onUpdateRecordingElapsedTime(
+    UpdateRecordingElapsedTimeEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState && currentState.isRecordingRoute) {
+      final newElapsedTime = currentState.recordingElapsedTime + const Duration(seconds: 1);
+      if (kDebugMode) {
+        print('Recording elapsed time: ${newElapsedTime.inSeconds} seconds');
+      }
+      emit(currentState.copyWith(
+        recordingElapsedTime: newElapsedTime,
+      ));
     }
   }
 

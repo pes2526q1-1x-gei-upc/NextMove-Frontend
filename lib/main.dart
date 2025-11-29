@@ -18,13 +18,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'config/graphql_config.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-// === IMPORTS DE PANTALLAS Y BLOCS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart'; 
-// ==============================
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -85,6 +83,7 @@ class NextMoveAppState extends State<NextMoveApp> {
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
           BlocProvider<UserBloc>(create: (_) => UserBloc()),
+          BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         ],
         child: MaterialApp(
           title: 'NextMove',
@@ -158,9 +157,9 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
       if (user != null) {
         await _loadUserData(user);
-        
+
         if (mounted) {
-           context.read<UserBloc>().add(LoadUserProfile(user.uid));
+          context.read<UserBloc>().add(LoadUserProfile(user.uid));
         }
 
         if (mounted) {
@@ -172,7 +171,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       } else {
         if (mounted) {
           userProvider.clearUser();
-          localeProvider.clearLocale(); 
+          localeProvider.clearLocale();
           setState(() {
             _isLoggedIn = false;
             _isLoadingUserData = false;
@@ -234,11 +233,11 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
     }
 
     return _isLoggedIn
-      ? const MainScreen()
-      : BlocProvider(
-          create: (context) => AuthBloc(),
-          child: const WelcomePage(),
-        );
+        ? const MainScreen()
+        : BlocProvider(
+            create: (context) => AuthBloc(),
+            child: const WelcomePage(),
+          );
   }
 }
 
@@ -255,7 +254,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  
+
   final Set<int> _visitedIndices = {0};
   int _socialReloadToken = 0;
 
@@ -276,19 +275,19 @@ class _MainScreenState extends State<MainScreen> {
         index: _selectedIndex,
         children: [
           const MapPage(),
-          
-          _visitedIndices.contains(1) 
-              ? const ChatsPlaceholder() 
+
+          _visitedIndices.contains(1)
+              ? const ChatsPlaceholder()
               : const SizedBox.shrink(),
-          
+
           _visitedIndices.contains(2)
               ? BlocProvider(
-                  key: ValueKey<int>(_socialReloadToken), 
+                  key: ValueKey<int>(_socialReloadToken),
                   create: (context) => SocialBloc(),
                   child: const SocialPage(),
                 )
               : const SizedBox.shrink(),
-          
+
           _visitedIndices.contains(3)
               ? const ProfilePage()
               : const SizedBox.shrink(),

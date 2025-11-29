@@ -208,7 +208,7 @@ class StationRemoteDataProvider {
     throw ServerException('Station not found');
   }
 
-  Future<List<StationDetails>> searchEvStations(String query) async {
+  Future<List<EVStationDetails>> searchEvStations(String query) async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getStationsBySearchQuery),
       variables: {'query': query},
@@ -229,7 +229,35 @@ class StationRemoteDataProvider {
     final data = result.data?['stationsByAddress'];
     if (data != null) {
       return (data as List)
-          .map((item) => EVStationDetails.fromJson(item) as StationDetails)
+          .map((item) => EVStationDetails.fromJson(item))
+          .toList();
+    }
+
+    return [];
+  }
+
+  Future<List<BicycleStationDetails>> searchBicycleStations(String query) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getBicingStationsBySearchQuery),
+      variables: {'address': query},
+    );
+
+    final QueryResult result = await getGraphQLQuery(
+      GraphQLQueries.getBicingStationsBySearchQuery,
+      options,
+    );
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    if (kDebugMode) {
+      print('searchBicycleStations result.data: ${result.data}');
+    }
+    final data = result.data?['getEstacionesDeBicingPorDireccion'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => BicycleStationDetails.fromJson(item))
           .toList();
     }
 

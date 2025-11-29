@@ -253,7 +253,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponible';
+  String get available => 'Disponibles';
 
   @override
   String get occupied => 'Ocupat';
@@ -389,12 +389,45 @@ class AppLocalizationsCa extends AppLocalizations {
   String get yourFriends => 'ELS TEUS AMICS';
 
   @override
-  String friendAdded(Object nickname) {
+  String friendAdded(String nickname) {
     return '$nickname s\'ha afegit als teus amics.';
   }
 
   @override
   String get friends => 'Amics';
+
+  @override
+  String get memberSince => 'Membre des de';
+
+  @override
+  String get deleteFriendship => 'Eliminar amistat';
+
+  @override
+  String deleteFriendConfirmation(String nickname) {
+    return 'Estàs segur que vols eliminar $nickname dels teus amics?';
+  }
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String deletedFriend(String nickname) {
+    return '$nickname ha estat eliminat dels teus amics.';
+  }
+
+  @override
+  String get deleteFriend => 'Eliminar amistat';
+
+  @override
+  String get blockUser => 'Bloquejar usuari';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return 'Estàs segur que vols bloquejar $nickname? Això eliminarà l\'amistat i no podreu veure els perfils mútuament.';
+  }
+
+  @override
+  String get block => 'Bloquejar';
 
   @override
   String get minCharsSearchHint =>
@@ -413,4 +446,170 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get howToGetThere => 'Indicacions';
+
+  @override
+  String get routeHistory => 'Historial de recorreguts enregistrats';
+
+  @override
+  String get noRoutesFound => 'No s\'han trobat recorreguts enregistrats.';
+
+  @override
+  String get distance => 'Distància';
+
+  @override
+  String get avgSpeed => 'Velocitat mitjana';
+
+  @override
+  String get routeStatistics => 'Estadístiques de la ruta';
+
+  @override
+  String get noRouteDataAvailable => 'No hi ha dades de ruta disponibles.';
+
+  @override
+  String get routeRecording => 'Gravació de ruta';
+
+  @override
+  String get duration => 'Durada';
+
+  @override
+  String get averageSpeed => 'Velocitat mitjana';
+
+  @override
+  String get maxSpeed => 'Velocitat màxima';
+
+  @override
+  String get elevation => 'Elevació';
+
+  @override
+  String get elevationGain => 'Guany d\'elevació';
+
+  @override
+  String get elevationLoss => 'Pèrdua d\'elevació';
+
+  @override
+  String get environmentalImpact => 'Impacte ambiental';
+
+  @override
+  String get co2Saved => 'CO₂ estalviat';
+
+  @override
+  String get caloriesBurned => 'Calories cremades';
+
+  @override
+  String get currentSpeed => 'Velocitat actual';
+
+  @override
+  String get stopRecording => 'Aturar la gravació';
+
+  @override
+  String get opinions => 'Valoracions';
+
+  @override
+  String get station => 'Estació';
+
+  @override
+  String get seeOpinions => 'Veure valoracions';
+
+  @override
+  String get withoutOpinions => 'Sense valoracions';
+
+  @override
+  String get rate => 'Valorar';
+
+  @override
+  String get yes => 'Sí';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mecànicas';
+
+  @override
+  String get electric => 'Elèctriques';
+
+  @override
+  String get free => 'Lliures';
+
+  @override
+  String get charge => 'Càrrega';
+
+  @override
+  String get reviewStation => 'Valorar Estació';
+
+  @override
+  String get writeYourOpinion => 'Escriu la teva opinió (opcional)';
+
+  @override
+  String get sendReview => 'Enviar valoració';
+
+  @override
+  String get excellent => 'Excel·lent';
+
+  @override
+  String get veryGood => 'Molt bé';
+
+  @override
+  String get good => 'Bé';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get bad => 'Malament';
+
+  @override
+  String get thankYouForYourReview => 'Gràcies per la teva valoració!';
+
+  @override
+  String get errorLoadingReviews => 'Error en carregar les valoracions';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get firstToReview => 'Sigues el primer a valorar aquesta estació!';
+
+  @override
+  String get editReview => 'Editar valoració';
+
+  @override
+  String get sureActionConfirmation =>
+      'Aquesta acció no es pot desfer. Estàs segur que vols continuar?';
+
+  @override
+  String get deletedReview => 'Has eliminat la teva valoració.';
+
+  @override
+  String get updateReview => 'Actualitzar valoració';
+
+  @override
+  String get updatedReview => 'La teva valoració ha estat actualitzada.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.';
+
+  @override
+  String get deleteAccount => 'Eliminar compte';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.';
+
+  @override
+  String get accountDeleted => 'El teu compte ha estat eliminat correctament.';
+
+  @override
+  String get errorDeletingAccount => 'Error en eliminar el compte.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'El compte s\'ha eliminat correctament.';
+
+  @override
+  String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
 }

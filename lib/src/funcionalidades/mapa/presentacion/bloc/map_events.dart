@@ -98,3 +98,8 @@ class AddRoutePointEvent extends MapEvent {
   @override
   List<Object?> get props => [point];
 }
+
+/// Evento: actualizar tiempo transcurrido de grabación
+class UpdateRecordingElapsedTimeEvent extends MapEvent {
+  const UpdateRecordingElapsedTimeEvent();
+}

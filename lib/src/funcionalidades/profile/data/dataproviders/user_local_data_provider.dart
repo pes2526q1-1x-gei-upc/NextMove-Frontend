@@ -1,7 +1,6 @@
 import '../../domain/entities/user_entity.dart';
 
 class UserLocalDataProvider {
-  // Fallback estático (como en tu código)
   UserEntity getFallbackUserProfile() {
     return UserEntity(
       email: "Correo",
@@ -13,8 +12,7 @@ class UserLocalDataProvider {
       idiomaPreferido: "Español",
       descripcion: "",
       modoPreferido: "Coche",
+      photo: "",
     );
   }
-
-  // Si necesitas update local, agrégalo (e.g., para cache), pero por ahora no aplica.
 }

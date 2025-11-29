@@ -11,7 +11,9 @@ final class AuthInitial extends AuthState {}
 
 final class EmailIsNewState extends AuthState {}
 
-final class EmailExistsState extends AuthState {}
+final class EmailExistsWithoutGoogleState extends AuthState {}
+
+final class EmailExistsWithGoogleState extends AuthState {}
 
 final class GoogleUserIsNewState extends AuthState {}
 
@@ -44,3 +46,5 @@ final class AuthFailureState extends AuthState {
   @override
   List<Object> get props => [errorCode];
 }
+
+final class AccountDeletedState extends AuthState {}

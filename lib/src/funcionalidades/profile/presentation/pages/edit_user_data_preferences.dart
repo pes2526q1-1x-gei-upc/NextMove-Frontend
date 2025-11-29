@@ -6,7 +6,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 
-// Widgets 
+// Widgets
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_avatar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/save_changes_button_widget.dart';
@@ -47,7 +47,7 @@ class _EditUserDataPreferencesPageState
 
   String? _selectedIdioma;
   String? _selectedModoUI;
-  String? _selectedModeAPI; 
+  String? _selectedModeAPI;
 
   @override
   void initState() {
@@ -85,15 +85,19 @@ class _EditUserDataPreferencesPageState
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
           onPressed: _goBack,
         ),
         title: Text(
           l10n.editProfile,
-          style: const TextStyle(
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
             color: Color(0xFF1A1A1A),
-            fontSize: 18, 
-            fontWeight: FontWeight.bold
           ),
         ),
       ),
@@ -101,18 +105,38 @@ class _EditUserDataPreferencesPageState
         listener: (context, state) {
           if (state is UserError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
             );
           } else if (state is UserUpdated) {
-            final userProvider = Provider.of<UserProvider>(context, listen: false);
-            final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+            final userProvider = Provider.of<UserProvider>(
+              context,
+              listen: false,
+            );
+
+            final localeProvider = Provider.of<LocaleProvider>(
+              context,
+              listen: false,
+            );
             final firebaseUser = FirebaseAuth.instance.currentUser;
-            
-            userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: null);
-            
+
+            userProvider.setUser(
+              state.user.toMap(),
+              firebaseUserId: firebaseUser?.uid,
+              firebaseToken: null,
+            );
+
             () async {
-              final token = firebaseUser == null ? null : await firebaseUser.getIdToken();
-              userProvider.setUser(state.user.toMap(), firebaseUserId: firebaseUser?.uid, firebaseToken: token);
+              final token = firebaseUser == null
+                  ? null
+                  : await firebaseUser.getIdToken();
+              userProvider.setUser(
+                state.user.toMap(),
+                firebaseUserId: firebaseUser?.uid,
+                firebaseToken: token,
+              );
             }();
 
             localeProvider.setLocaleFromLanguage(state.user.idiomaPreferido);
@@ -120,13 +144,19 @@ class _EditUserDataPreferencesPageState
             WidgetsBinding.instance.addPostFrameCallback((_) {
               final updatedL10n = AppLocalizations.of(context)!;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(updatedL10n.saveChangesFeedback), backgroundColor: Colors.green),
+                SnackBar(
+                  content: Text(updatedL10n.saveChangesFeedback),
+                  backgroundColor: Colors.green,
+                ),
               );
             });
           } else if (state is UserLoggedOut) {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (_) => BlocProvider(create: (context) => AuthBloc(), child: const WelcomePage()),
+                builder: (_) => BlocProvider(
+                  create: (context) => AuthBloc(),
+                  child: const WelcomePage(),
+                ),
               ),
               (route) => false,
             );
@@ -136,30 +166,43 @@ class _EditUserDataPreferencesPageState
           if (state is UserLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is UserLoaded || state is UserUpdated) {
-            final user = (state is UserLoaded ? state.user : (state as UserUpdated).user);
-            
+            final user = (state is UserLoaded
+                ? state.user
+                : (state as UserUpdated).user);
+
             if (_apodoController.text.isEmpty) {
               _apodoController.text = user.apodo;
               _nombreCompletoController.text = user.nombreCompleto;
-              _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(user.fechaNacimiento);
-              _telefonoController.text = user.numeroTelefono == 0 ? '' : user.numeroTelefono.toString();
+              _fechaNacimientoController.text = DateFormat(
+                'yyyy-MM-dd',
+              ).format(user.fechaNacimiento);
+              _telefonoController.text = user.numeroTelefono == 0
+                  ? ''
+                  : user.numeroTelefono.toString();
               _descripcionController.text = user.descripcion;
               _selectedIdioma = user.idiomaPreferido;
-              _selectedModeAPI = UserEntity.mapPreferredModeToAPI(user.modoPreferido);
+              _selectedModeAPI = UserEntity.mapPreferredModeToAPI(
+                user.modoPreferido,
+              );
             }
-            _selectedModoUI = _selectedModeAPI == "BIKE" ? l10n.bicycle : l10n.car;
+            _selectedModoUI = _selectedModeAPI == "BIKE"
+                ? l10n.bicycle
+                : l10n.car;
 
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     ProfileAvatarSelector(
                       selectedImageFile: _selectedImageFile,
+                      imageUrl: user.photo,
                       defaultImage: _avatarImage,
                       onImagePicked: (File newFile) {
                         setState(() {
@@ -167,7 +210,7 @@ class _EditUserDataPreferencesPageState
                         });
                       },
                     ),
-                    
+
                     const SizedBox(height: 30),
 
                     ProfileSectionLabel(text: l10n.personalInfo),
@@ -190,7 +233,7 @@ class _EditUserDataPreferencesPageState
                           showDivider: true,
                         ),
                         // Fecha de nacimiento
-                         ProfileStyledTextField(
+                        ProfileStyledTextField(
                           controller: _fechaNacimientoController,
                           label: l10n.birthdate,
                           icon: Icons.cake_outlined,
@@ -199,7 +242,7 @@ class _EditUserDataPreferencesPageState
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
 
                     ProfileSectionLabel(text: l10n.contactAndBioInfo),
@@ -215,7 +258,9 @@ class _EditUserDataPreferencesPageState
                           validator: (value) {
                             if (value == null || value.isEmpty) return null;
                             final phoneRegExp = RegExp(r'^\+?[0-9]{7,15}$');
-                            return phoneRegExp.hasMatch(value) ? null : l10n.invalidPhoneNumber;
+                            return phoneRegExp.hasMatch(value)
+                                ? null
+                                : l10n.invalidPhoneNumber;
                           },
                         ),
                         // Descripción
@@ -235,31 +280,44 @@ class _EditUserDataPreferencesPageState
                     ProfileSectionLabel(text: l10n.preferredMode),
                     ProfileStyledCard(
                       children: [
-                         DropdownButtonFormField<String>(
-                            initialValue: _selectedModoUI,
-                            decoration: cardInputDecoration(
-                                icon: _selectedModeAPI == "BIKE" 
-                                    ? Icons.directions_bike 
-                                    : Icons.electric_car,
-                                context: context
-                            ),
-                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
-                            dropdownColor: Colors.white,
-                            validator: (v) => v == null ? l10n.mandatoryPreferredMode : null,
-                            items: StationType.values.map((modo) {
-                              return DropdownMenuItem(
-                                value: modo == StationType.bicycle ? l10n.bicycle : l10n.car,
-                                child: Text(
-                                  modo == StationType.bicycle ? l10n.bicycle : l10n.car,
-                                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (v) => setState(() {
-                              _selectedModoUI = v;
-                              _selectedModeAPI = v == l10n.bicycle ? "BIKE" : "CAR";
-                            }),
+                        DropdownButtonFormField<String>(
+                          initialValue: _selectedModoUI,
+                          decoration: cardInputDecoration(
+                            icon: _selectedModeAPI == "BIKE"
+                                ? Icons.directions_bike
+                                : Icons.electric_car,
+                            context: context,
                           ),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Colors.grey,
+                          ),
+                          dropdownColor: Colors.white,
+                          validator: (v) =>
+                              v == null ? l10n.mandatoryPreferredMode : null,
+                          items: StationType.values.map((modo) {
+                            return DropdownMenuItem(
+                              value: modo == StationType.bicycle
+                                  ? l10n.bicycle
+                                  : l10n.car,
+                              child: Text(
+                                modo == StationType.bicycle
+                                    ? l10n.bicycle
+                                    : l10n.car,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (v) => setState(() {
+                            _selectedModoUI = v;
+                            _selectedModeAPI = v == l10n.bicycle
+                                ? "BIKE"
+                                : "CAR";
+                          }),
+                        ),
                       ],
                     ),
 
@@ -272,6 +330,7 @@ class _EditUserDataPreferencesPageState
                       descripcionController: _descripcionController,
                       selectedIdioma: _selectedIdioma,
                       selectedModeAPI: _selectedModeAPI,
+                      selectedImageFile: _selectedImageFile,
                     ),
 
                     const SizedBox(height: 30),

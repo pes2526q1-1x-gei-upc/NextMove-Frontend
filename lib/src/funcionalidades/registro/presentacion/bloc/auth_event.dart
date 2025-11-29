@@ -43,3 +43,12 @@ final class SignInWithGoogleEvent extends AuthEvent {
   @override
   List<Object> get props => [];
 }
+
+final class DeleteAccountEvent extends AuthEvent {
+  final String password;
+
+  const DeleteAccountEvent({required this.password});
+
+  @override
+  List<Object> get props => [password];
+}

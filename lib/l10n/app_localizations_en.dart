@@ -384,12 +384,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourFriends => 'YOUR FRIENDS';
 
   @override
-  String friendAdded(Object nickname) {
+  String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
 
   @override
   String get friends => 'Friends';
+
+  @override
+  String get memberSince => 'Member since';
+
+  @override
+  String get deleteFriendship => 'Delete friendship';
+
+  @override
+  String deleteFriendConfirmation(String nickname) {
+    return 'Are you sure you want to delete $nickname from your friends?';
+  }
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String deletedFriend(String nickname) {
+    return 'You have deleted $nickname from your friends.';
+  }
+
+  @override
+  String get deleteFriend => 'Delete friendship';
+
+  @override
+  String get blockUser => 'Block user';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return 'Are you sure you want to block $nickname? You won\'t be able to see their profile or interact with them.';
+  }
+
+  @override
+  String get block => 'Block';
 
   @override
   String get minCharsSearchHint =>
@@ -407,4 +440,170 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get howToGetThere => 'Directions';
+
+  @override
+  String get routeHistory => 'Recorded route history';
+
+  @override
+  String get noRoutesFound => 'No recorded routes were found.';
+
+  @override
+  String get distance => 'Distance';
+
+  @override
+  String get avgSpeed => 'Average speed';
+
+  @override
+  String get routeStatistics => 'Route statistics';
+
+  @override
+  String get noRouteDataAvailable => 'No route data available.';
+
+  @override
+  String get routeRecording => 'Route recording';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get averageSpeed => 'Average speed';
+
+  @override
+  String get maxSpeed => 'Max speed';
+
+  @override
+  String get elevation => 'Elevation';
+
+  @override
+  String get elevationGain => 'Elevation gain';
+
+  @override
+  String get elevationLoss => 'Elevation loss';
+
+  @override
+  String get environmentalImpact => 'Environmental impact';
+
+  @override
+  String get co2Saved => 'CO₂ saved';
+
+  @override
+  String get caloriesBurned => 'Calories burned';
+
+  @override
+  String get currentSpeed => 'Current speed';
+
+  @override
+  String get stopRecording => 'Stop recording';
+
+  @override
+  String get opinions => 'Reviews';
+
+  @override
+  String get station => 'Station';
+
+  @override
+  String get seeOpinions => 'See reviews';
+
+  @override
+  String get withoutOpinions => 'Without reviews';
+
+  @override
+  String get rate => 'Rate';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mechanical';
+
+  @override
+  String get electric => 'Electric';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get charge => 'Charge';
+
+  @override
+  String get reviewStation => 'Review Station';
+
+  @override
+  String get writeYourOpinion => 'Write your opinion (optional)';
+
+  @override
+  String get sendReview => 'Submit review';
+
+  @override
+  String get excellent => 'Excellent';
+
+  @override
+  String get veryGood => 'Very good';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get regular => 'Fair';
+
+  @override
+  String get bad => 'Poor';
+
+  @override
+  String get thankYouForYourReview => 'Thank you for your review!';
+
+  @override
+  String get errorLoadingReviews => 'Error loading reviews';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get firstToReview => 'Be the first to review this station!';
+
+  @override
+  String get editReview => 'Edit review';
+
+  @override
+  String get sureActionConfirmation =>
+      'This action cannot be undone. Are you sure you want to proceed?';
+
+  @override
+  String get deletedReview => 'You have deleted your review.';
+
+  @override
+  String get updateReview => 'Update review';
+
+  @override
+  String get updatedReview => 'Your review has been updated.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'This email is registered with Google. Please sign in with Google.';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.';
+
+  @override
+  String get accountDeleted => 'Your account has been successfully deleted.';
+
+  @override
+  String get errorDeletingAccount => 'Error deleting account.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'The account has been deleted successfully.';
+
+  @override
+  String get userMismatch => 'The user does not match the current user.';
 }

@@ -4,6 +4,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'dart:io';
 
 class ProfileSaveButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -12,6 +13,7 @@ class ProfileSaveButton extends StatelessWidget {
   final TextEditingController descripcionController;
   final String? selectedIdioma;
   final String? selectedModeAPI;
+  final File? selectedImageFile;
 
   const ProfileSaveButton({
     super.key,
@@ -21,33 +23,54 @@ class ProfileSaveButton extends StatelessWidget {
     required this.descripcionController,
     required this.selectedIdioma,
     required this.selectedModeAPI,
+    this.selectedImageFile,
   });
 
   // --- LÓGICA DE GUARDADO  ---
   void _saveChanges(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
+    debugPrint("ProfileSaveButton: _saveChanges called");
 
-    // 1. Validar el formulario usando la key que nos pasó el padre
-    if (!formKey.currentState!.validate()) {
+    try {
+      // 1. Validar el formulario usando la key que nos pasó el padre
+      if (!formKey.currentState!.validate()) {
+        debugPrint("ProfileSaveButton: Form validation failed");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.formError), backgroundColor: Colors.red),
+        );
+        return;
+      }
+      debugPrint(
+        "ProfileSaveButton: Form validation passed. Creating updated user...",
+      );
+
+      // 2. Crear una copia del usuario con los datos actualizados
+      final updatedUser = currentUser.copyWith(
+        numeroTelefono: int.tryParse(telefonoController.text) ?? 0,
+        descripcion: descripcionController.text.trim(),
+        idiomaPreferido: selectedIdioma ?? currentUser.idiomaPreferido,
+        modoPreferido: selectedModeAPI,
+      );
+      debugPrint(
+        "ProfileSaveButton: Updated user object created: $updatedUser",
+      );
+
+      // 3. Enviar el evento al BLoC
+      debugPrint("ProfileSaveButton: Dispatching UpdateUserProfile event...");
+      context.read<UserBloc>().add(
+        UpdateUserProfile(updatedUser, profilePhoto: selectedImageFile),
+      );
+      debugPrint("ProfileSaveButton: Event dispatched successfully");
+    } catch (e, stackTrace) {
+      debugPrint("ProfileSaveButton: Error in _saveChanges: $e");
+      debugPrint("ProfileSaveButton: Stack trace: $stackTrace");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.formError),
+          content: Text("Error interno al guardar: $e"),
           backgroundColor: Colors.red,
         ),
       );
-      return;
     }
-
-    // 2. Crear una copia del usuario con los datos actualizados
-    final updatedUser = currentUser.copyWith(
-      numeroTelefono: int.tryParse(telefonoController.text) ?? 0,
-      descripcion: descripcionController.text.trim(),
-      idiomaPreferido: selectedIdioma ?? currentUser.idiomaPreferido,
-      modoPreferido: selectedModeAPI,
-    );
-
-    // 3. Enviar el evento al BLoC 
-    context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
   }
 
   @override
@@ -57,7 +80,7 @@ class ProfileSaveButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => _saveChanges(context), 
+        onPressed: () => _saveChanges(context),
         style: ElevatedButton.styleFrom(
           elevation: 2,
           backgroundColor: Theme.of(context).primaryColor,

@@ -8,22 +8,22 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/s
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/station_bottom_sheet_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
 
-//imports widgets
 import 'widgets/google_map_widget.dart';
 import 'widgets/toggle_map_mode_widget.dart';
-import 'widgets/station_list_widget.dart';
-import 'widgets/center_user_widget.dart';
+
 import 'widgets/search_bar_widget.dart';
-import 'widgets/toggle_map_type_widget.dart';
-import 'widgets/record_track_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_list_widget.dart';
+import 'widgets/map_controls_column_widget.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -40,6 +40,7 @@ class _MapPageState extends State<MapPage> {
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
   TrackRepository trackRepository = TrackRepository();
+  RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
 
@@ -85,6 +86,7 @@ class _MapPageState extends State<MapPage> {
       create: (context) => MapBloc(
         stationRepository: stationRepository,
         trackRepository: trackRepository,
+        recordedRoutesRepository: recordedRoutesRepository,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
       child: _buildUI(context),
@@ -127,7 +129,7 @@ class _MapPageState extends State<MapPage> {
 
                 return Stack(
                   children: [
-                    // Widget del mapa (fondo)
+                    // Widget del mapa 
                     MapWidget(
                       initialCameraPosition: CameraPosition(
                         target: _bcnCenter,
@@ -159,6 +161,8 @@ class _MapPageState extends State<MapPage> {
 
                     // Avatar de perfil
                     //ProfileAvatarWidget(context: context),
+                    // Route history button
+                    RouteHistoryButtonWidget(),
 
                     // Botón de lista de estaciones
                     StationListButtonWidget(
@@ -166,21 +170,15 @@ class _MapPageState extends State<MapPage> {
                       userLocation: state.userLocation,
                     ),
 
-                    // Botón centrar en usuario
-                    CenterOnUserButtonWidget(
+                    // Columna de controles del mapa (botones combinados)
+                    MapControlsColumnWidget(
                       userLocation: state.userLocation,
                       mapController: _mapController,
+                      currentMapType: state.currentMapType,
                     ),
-
-                    // Botón cambiar tipo de mapa
-                    MapTypeToggleWidget(currentMapType: state.currentMapType),
 
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
-
-                    // Botón de grabación de ruta en bici
-                    if (state.currentMode == StationType.bicycle)
-                      const RecordTrackWidget(),
                   ],
                 );
               }

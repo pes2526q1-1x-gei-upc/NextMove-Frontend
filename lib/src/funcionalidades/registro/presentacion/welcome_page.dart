@@ -5,7 +5,6 @@ import 'package:flutter_signin_button/button_view.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_data_preferences_page.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/email_address_page.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -14,26 +13,26 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var signInButtonsWidth = MediaQuery.of(context).size.width * (2 / 3);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailureState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error: ${state.errorCode}")),
+              SnackBar(content: Text(switch (state.errorCode) {
+                'invalid-email' => l10n.invalidEmail,
+                'wrong-password' => l10n.wrongPassword,
+                '' => l10n.unknownError,
+                _ => l10n.errorOccurred(state.errorCode),
+              })),
             );
           } else if (state is UserNeedsProfileSetupState) {
-            // Aquí sí navegamos manualmente porque es una pantalla intermedia de registro
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => BlocProvider(
-                  create: (context) => UserBloc(),
-                  child: UserDataPreferencesPage(),
-                ),
+                builder: (context) => const UserDataPreferencesPage(),
               ),
             );
-          } 
-          // CORRECCIÓN: Eliminado el bloque AuthSuccessState que navegaba manualmente a MainScreen.
-          // Dejamos que main.dart escuche el cambio de usuario y monte la MainScreen con el Provider correcto.
+          }
         },
         child: Center(
           child: Padding(
@@ -44,7 +43,10 @@ class WelcomePage extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context)!.welcomeTo('NextMove'),
-                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
@@ -89,9 +91,9 @@ class EmailSignInButton extends StatelessWidget {
       width: signInButtonsWidth,
       text: AppLocalizations.of(context)!.useEmail,
       onPressed: () {
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (context) => const EmailAddressPage()));
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const EmailAddressPage()),
+        );
       },
     );
   }

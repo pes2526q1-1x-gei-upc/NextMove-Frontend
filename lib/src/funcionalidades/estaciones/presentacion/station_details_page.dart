@@ -3,236 +3,142 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_details_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
-
-
-extension ConnectionTypeLocalization on ConnectionType {
-  String localized(BuildContext context) {
-    switch (this) {
-      case ConnectionType.css2:
-        return AppLocalizations.of(context)!.css2;
-      case ConnectionType.chademo:
-        return AppLocalizations.of(context)!.chademo;
-      case ConnectionType.mennekes:
-        return AppLocalizations.of(context)!.mennekes;
-      case ConnectionType.shucko:
-        return AppLocalizations.of(context)!.shucko;
-    }
-  }
-}
-
-extension ConnectorStatusLocalization on ConnectorStatus {
-    String localized(BuildContext context) {
-        switch (this) {
-            case ConnectorStatus.available:
-                return AppLocalizations.of(context)!.available;
-            case ConnectorStatus.occupied:
-                return AppLocalizations.of(context)!.occupied;
-            case ConnectorStatus.unavailable:
-                return AppLocalizations.of(context)!.unavailable;
-        }
-    }
-}
-
-extension BicycleStationStateLocalization on BicycleStationState {
-    String localized(BuildContext context) {
-        switch (this) {
-            case BicycleStationState.operational:
-                return AppLocalizations.of(context)!.operational;
-            case BicycleStationState.closed:
-                return AppLocalizations.of(context)!.closed;
-        }
-    }
-}
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_connectors_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_features_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_header_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_shared_widgets.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_stats_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 
 class StationDetailsPage extends StatelessWidget {
-    final StationType stationType;
-    final String stationID;
-    final StationDetails? stationDetails;
+  final StationType stationType;
+  final String stationID;
+  final StationDetails? stationDetails;
 
-    const StationDetailsPage({
-        super.key,
-        required this.stationType,
-        required this.stationID,
-        this.stationDetails,
-    });
+  const StationDetailsPage({
+    super.key,
+    required this.stationType,
+    required this.stationID,
+    this.stationDetails,
+  });
 
-    @override
-    Widget build(BuildContext context) {
-        final l10n = AppLocalizations.of(context)!;
-        return BlocProvider(
-            create: (context) => StationDetailsBloc()
-                ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
-            child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
-                builder: (context, state) {
-                    if (state is StationDetailsLoading) {
-                        return const Scaffold(
-                            body: Center(child: CircularProgressIndicator()),
-                        );
-                    } else if (state is StationDetailsError) {
-                        return Scaffold(
-                            appBar: AppBar(title: Text(AppLocalizations.of(context)!.error)),
-                            body: Center(child: Text(state.message)),
-                        );
-                    } else if (state is StationDetailsLoaded) {
-                        final stationDetails = state.stationDetails;
-                        return _buildDetailsPage(context, stationDetails);
-                    } else {
-                        return Scaffold(
-                            body: Center(child: Text(l10n.unknownState)),
-                        );
-                    }
+  final Color _backgroundColor = const Color(0xFFF5F5F7);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => StationDetailsBloc()
+            ..add(
+              LoadStationDetailsEvent(stationID, stationType, stationDetails),
+            ),
+        ),
+        BlocProvider(
+          create: (context) =>
+              AssessmentBloc(assessmentRepository: AssessmentRepository())
+                ..add(GetStationAssessmentInfoEvent(stationId: stationID))
+                ..add(CheckAssessedEvent(stationId: stationID)),
+        ),
+      ],
+      child: BlocBuilder<StationDetailsBloc, StationDetailsState>(
+        builder: (context, state) {
+          if (state is StationDetailsLoading) {
+            return Scaffold(
+              backgroundColor: _backgroundColor,
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          } else if (state is StationDetailsError) {
+            return Scaffold(
+              backgroundColor: _backgroundColor,
+              appBar: AppBar(title: Text(l10n.error)),
+              body: Center(child: Text(state.message)),
+            );
+          } else if (state is StationDetailsLoaded) {
+            return _buildDetailsPage(context, state.stationDetails);
+          } else {
+            return Scaffold(
+              backgroundColor: _backgroundColor,
+              body: Center(child: Text(l10n.unknownState)),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildDetailsPage(
+    BuildContext context,
+    StationDetails stationDetails,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final isBike = stationType == StationType.bicycle;
+    final themeColor = isBike ? Colors.blue : Colors.green;
+
+    return Scaffold(
+      backgroundColor: _backgroundColor,
+      appBar: AppBar(
+        title: Text(
+          l10n.information,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1A1A1A),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: Colors.black,
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BlocBuilder<AssessmentBloc, AssessmentState>(
+                builder: (context, assessmentState) {
+                  final displayStation = (assessmentState.totalAssessments > 0)
+                      ? stationDetails.copyWith(
+                          rating: assessmentState.averageScore,
+                        )
+                      : stationDetails;
+
+                  return StationHeaderWidget(
+                    station: displayStation,
+                    themeColor: themeColor,
+                  );
                 },
-            ),
-        );
-    }
+              ),
 
-    Scaffold _buildDetailsPage(BuildContext context, StationDetails stationDetails) {
-        final String totalSlotsLabel = switch (stationType) {
-          StationType.bicycle => AppLocalizations.of(context)!.totalAnchors,
-          StationType.electricVehicle => AppLocalizations.of(context)!.totalChargers,
-        };
-        final String availableSlotsLabel = switch (stationType) {
-          StationType.bicycle => AppLocalizations.of(context)!.availableAnchors,
-          StationType.electricVehicle => AppLocalizations.of(context)!.availableChargers,
-        };
+              const SizedBox(height: 20),
 
-        final bikeDetails = stationType == StationType.bicycle ? stationDetails as BicycleStationDetails : null;
-        final evDetails = stationType == StationType.electricVehicle ? stationDetails as EVStationDetails : null;
+              // 2. Stats Grid
+              SectionLabel(text: l10n.state),
+              StationStatsWidget(station: stationDetails, isBike: isBike),
+              const SizedBox(height: 24),
 
-        return Scaffold(
-            appBar: AppBar(
-                title: Text(stationDetails.name ?? "N/A"),
-            ),
-            body: Center(
-                child: SingleChildScrollView(
-                    child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            createDetailRow(context, Icons.location_on_sharp, AppLocalizations.of(context)!.address, stationDetails.address ?? "N/A"),
-                            const SizedBox(height: 8),
-                            createDetailRow(context, Icons.event_seat, totalSlotsLabel, stationDetails.totalSlots?.toString() ?? "N/A"),
-                            const SizedBox(height: 8),
-                            createDetailRow(context, Icons.check_circle_outline, availableSlotsLabel, stationDetails.availableSlots?.toString() ?? "N/A"),
-                            const SizedBox(height: 8),
-                            Row( // rating
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                    Icon(Icons.star),
-                                    SizedBox(width: 4),
-                                    Text('${AppLocalizations.of(context)!.rating}: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                                    if (stationDetails.rating != null) ...[
-                                      createStarRatingRow(stationDetails.rating!),
-                                      Text(
-                                          '(${stationDetails.rating! % 2 == 0 ? (stationDetails.rating! ~/ 2) : (stationDetails.rating! / 2)}/5)',
-                                          style: Theme.of(context).textTheme.bodyLarge,
-                                      ),
-                                    ] else
-                                      Text("N/A", style: Theme.of(context).textTheme.bodyLarge),
-                                ],
-                            ),
-                            const SizedBox(height: 16),
-                            if (bikeDetails != null) ...[
-                                createDetailRow(context, Icons.pedal_bike, AppLocalizations.of(context)!.availableBikes, bikeDetails.availableBikes?.toString() ?? "N/A"),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.directions_bike, AppLocalizations.of(context)!.availableMechanicalBikes, bikeDetails.availableMechanicalBikes?.toString() ?? "N/A"),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.electric_bike, AppLocalizations.of(context)!.availableElectricBikes, bikeDetails.availableElectricBikes?.toString() ?? "N/A"),
-                                const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.electric_bike, AppLocalizations.of(context)!.electricRecharge, bikeDetails.electricRechargeStation),
-                                const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.anchor, AppLocalizations.of(context)!.canAnchorBikes, bikeDetails.canAnchorBikes),
-                                const SizedBox(height: 8),
-                                createDetailRowBool(context, Icons.directions_bike, AppLocalizations.of(context)!.canRentBikes, bikeDetails.canRentBikes),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.info_outline, AppLocalizations.of(context)!.state, bikeDetails.state?.localized(context) ?? "N/A"),
-                            ],
-                            if (evDetails != null) ...[
-                                createDetailRowBool(context, Icons.bolt, AppLocalizations.of(context)!.superFast, evDetails.isSuperFast),
-                                const SizedBox(height: 8),
-                                createDetailRow(context, Icons.lock_open, AppLocalizations.of(context)!.accessType, evDetails.accessType ?? "N/A"),
-                                const SizedBox(height: 16),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    AppLocalizations.of(context)!.connectors,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                if (evDetails.connectors != null)
-                                  ...(evDetails.connectors!.map((connector) => Card(
-                                    margin: const EdgeInsets.symmetric(vertical: 4),
-                                    child: ListTile(
-                                      leading: Icon(Icons.cable),
-                                      title: Text(connector.connectionType?.localized(context) ?? "N/A"),
-                                      subtitle: Text(connector.powerKw != null ? '${connector.powerKw} kW' : "N/A"),
-                                      trailing: Text(connector.status?.localized(context) ?? "N/A",
-                                        style: TextStyle(
-                                          color: switch (connector.status) {
-                                            ConnectorStatus.available => Colors.green,
-                                            ConnectorStatus.occupied => Colors.orange,
-                                            ConnectorStatus.unavailable => Colors.red,
-                                            null => Colors.grey,
-                                          },
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  )))
-                                else
-                                  Text("N/A"),
-                            ]
-                          ],
-                        ),
-                    ),
-                ),
-            ),
-        );
-    }
+              // 3. Features List
+              SectionLabel(text: l10n.accountDetails),
+              StationFeaturesWidget(station: stationDetails, isBike: isBike),
+              const SizedBox(height: 24),
 
-    Row createDetailRow(BuildContext context, IconData icon, String label, String value) {
-        return Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-                Icon(icon),
-                SizedBox(width: 4),
-                Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                Expanded(
-                  child: Text(
-                  (value == '' ? AppLocalizations.of(context)!.unknown : value),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  overflow: TextOverflow.visible,
-                  softWrap: true,
-                  ),
-                ),
+              // 4. Connectors (Only EV)
+              if (!isBike && stationDetails is EVStationDetails)
+                StationConnectorsWidget(details: stationDetails),
+
+              const SizedBox(height: 40),
             ],
-        );
-    }
-
-    Row createDetailRowBool(BuildContext context, IconData icon, String label, bool? value) {
-        return Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-                Icon(icon),
-                SizedBox(width: 4),
-                Text('$label: ', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                if (value == null)
-                  Text("N/A", style: Theme.of(context).textTheme.bodyLarge)
-                else
-                  Icon(
-                      value ? Icons.check : Icons.close,
-                      color: value ? Colors.green : Colors.red,
-                  ),
-            ],
-        );
-    }
-
-    
+          ),
+        ),
+      ),
+    );
+  }
 }
-
-
-
-
-

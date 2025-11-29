@@ -253,7 +253,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get closed => 'Cerrado';
 
   @override
-  String get available => 'Disponible';
+  String get available => 'Disponibles';
 
   @override
   String get occupied => 'Ocupado';
@@ -389,12 +389,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String get yourFriends => 'TUS AMIGOS';
 
   @override
-  String friendAdded(Object nickname) {
+  String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
 
   @override
   String get friends => 'Amigos';
+
+  @override
+  String get memberSince => 'Miembro desde';
+
+  @override
+  String get deleteFriendship => 'Eliminar amistad';
+
+  @override
+  String deleteFriendConfirmation(String nickname) {
+    return '¿Estás seguro de que quieres eliminar a $nickname de tus amigos?';
+  }
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String deletedFriend(String nickname) {
+    return 'Has eliminado a $nickname de tus amigos.';
+  }
+
+  @override
+  String get deleteFriend => 'Eliminar amistad';
+
+  @override
+  String get blockUser => 'Bloquear usuario';
+
+  @override
+  String blockUserConfirmation(String nickname) {
+    return '¿Estás seguro de que quieres bloquear a $nickname? No podrás ver su perfil ni interactuar con él.';
+  }
+
+  @override
+  String get block => 'Bloquear';
 
   @override
   String get minCharsSearchHint =>
@@ -413,4 +446,170 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get howToGetThere => 'Cómo llegar';
+
+  @override
+  String get routeHistory => 'Historial de recorridos grabados';
+
+  @override
+  String get noRoutesFound => 'No se han encontrado rutas grabadas.';
+
+  @override
+  String get distance => 'Distancia';
+
+  @override
+  String get avgSpeed => 'Velocidad media';
+
+  @override
+  String get routeStatistics => 'Estadísticas de la ruta';
+
+  @override
+  String get noRouteDataAvailable => 'No hay datos de la ruta disponibles.';
+
+  @override
+  String get routeRecording => 'Grabación de la ruta';
+
+  @override
+  String get duration => 'Duración';
+
+  @override
+  String get averageSpeed => 'Velocidad media';
+
+  @override
+  String get maxSpeed => 'Velocidad máxima';
+
+  @override
+  String get elevation => 'Elevación';
+
+  @override
+  String get elevationGain => 'Ganancia de elevación';
+
+  @override
+  String get elevationLoss => 'Pérdida de elevación';
+
+  @override
+  String get environmentalImpact => 'Impacto ambiental';
+
+  @override
+  String get co2Saved => 'CO₂ ahorrado';
+
+  @override
+  String get caloriesBurned => 'Calorías quemadas';
+
+  @override
+  String get currentSpeed => 'Velocidad actual';
+
+  @override
+  String get stopRecording => 'Detener grabación';
+
+  @override
+  String get opinions => 'Valoraciones';
+
+  @override
+  String get station => 'Estación';
+
+  @override
+  String get seeOpinions => 'Ver reviews';
+
+  @override
+  String get withoutOpinions => 'Sin reviews';
+
+  @override
+  String get rate => 'Valorar';
+
+  @override
+  String get yes => 'Sí';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get mechanical => 'Mecánicas';
+
+  @override
+  String get electric => 'Eléctricas';
+
+  @override
+  String get free => 'Libres';
+
+  @override
+  String get charge => 'Carga';
+
+  @override
+  String get reviewStation => 'Valorar estación';
+
+  @override
+  String get writeYourOpinion => 'Escribe tu opinión (opcional)';
+
+  @override
+  String get sendReview => 'Enviar valoración';
+
+  @override
+  String get excellent => 'Excelente';
+
+  @override
+  String get veryGood => 'Muy buena';
+
+  @override
+  String get good => 'Buena';
+
+  @override
+  String get regular => 'Regular';
+
+  @override
+  String get bad => 'Mala';
+
+  @override
+  String get thankYouForYourReview => '¡Gracias por tu valoración!';
+
+  @override
+  String get errorLoadingReviews => 'Error al cargar las valoraciones';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get firstToReview => '¡Sé el primero en valorar esta estación!';
+
+  @override
+  String get editReview => 'Editar valoración';
+
+  @override
+  String get sureActionConfirmation =>
+      'Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?';
+
+  @override
+  String get deletedReview => 'Has eliminado tu valoración.';
+
+  @override
+  String get updateReview => 'Actualizar valoración';
+
+  @override
+  String get updatedReview => 'Tu valoración ha sido actualizada.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'Este correo electrónico está registrado con Google. Por favor, inicia sesión con Google.';
+
+  @override
+  String get deleteAccount => 'Eliminar cuenta';
+
+  @override
+  String get deleteAccountConfirmation =>
+      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos.';
+
+  @override
+  String get accountDeleted => 'Tu cuenta ha sido eliminada correctamente.';
+
+  @override
+  String get errorDeletingAccount => 'Error al eliminar la cuenta.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'La cuenta se ha eliminado correctamente.';
+
+  @override
+  String get userMismatch => 'El usuario no coincide con el usuario actual.';
 }
