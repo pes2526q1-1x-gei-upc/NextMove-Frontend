@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/recorded_route_statistics.dart';
 import 'package:provider/provider.dart';
-import 'bloc/route_events.dart';
-import 'bloc/route_state.dart';
+import '../bloc/route_events.dart';
+import '../bloc/route_state.dart';
 
 class RouteHistoryList extends StatelessWidget {
   const RouteHistoryList({super.key});
@@ -16,9 +17,6 @@ class RouteHistoryList extends StatelessWidget {
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final String userEmail = userProvider.email!;
-    final String userToken = userProvider.firebaseToken!;
-    debugPrint('User token for route history: $userToken');
-
     return BlocProvider(
       create: (context) => RouteBloc()
         ..add(LoadRecordedRoutesEvent(userEmail)),
@@ -77,6 +75,11 @@ class RouteHistoryList extends StatelessWidget {
                     isThreeLine: true,
                     onTap: () {
                       // Implementar detalles del recorrido 
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => RecordedRouteStatistics(track: recorrido),
+                        ),
+                      );
                     },
                   );
 
