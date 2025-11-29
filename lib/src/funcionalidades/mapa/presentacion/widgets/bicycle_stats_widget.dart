@@ -17,33 +17,6 @@ class BicycleStatsWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        // --- Favorite toggle button ---
-        BlocBuilder<StationListBloc, StationListState>(
-          builder: (context, state) {
-            final currentStation = (state is StationListLoaded || state is StationListToggleError)
-                ? (state is StationListLoaded ? state.stations : (state as StationListToggleError).stations)
-                    .where((s) => s.id == station.id)
-                    .firstOrNull
-                : null;
-            final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
-            final starColor = switch (isFavorite) {
-              true => Colors.yellow[700],
-              false => null,
-              null => Colors.grey[300],
-            };
-            return IconButton(
-              icon: Icon(
-                (isFavorite ?? false) ? Icons.star : Icons.star_border,
-                color: starColor,
-              ),
-              onPressed: () {
-                context.read<StationListBloc>().add(
-                  ToggleFavoriteEvent(stationId: station.id),
-                );
-              },
-            );
-          },
-        ),
         const SizedBox(width: 8),
         // --- Card 1: Mecánicas ---
         Expanded(

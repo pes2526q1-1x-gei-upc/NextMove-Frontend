@@ -32,9 +32,9 @@ class StationBottomSheet extends StatelessWidget {
     final themeColor = isBicycle ? Colors.blue : Colors.green;
 
     return BlocProvider(
-      create: (context) => AssessmentBloc(
-        assessmentRepository: AssessmentRepository(),
-      )..add(GetStationAssessmentInfoEvent(stationId: station.id)),
+      create: (context) =>
+          AssessmentBloc(assessmentRepository: AssessmentRepository())
+            ..add(GetStationAssessmentInfoEvent(stationId: station.id)),
       child: Builder(
         builder: (context) {
           return Container(
@@ -93,31 +93,44 @@ class StationBottomSheet extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: themeColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.directions_walk_rounded,
-                                size: 16, color: themeColor),
-                            const SizedBox(width: 4),
-                            Text(
-                              station.distanceKm != null
-                                  ? '${station.distanceKm!.toStringAsFixed(1)} km'
-                                  : '- km',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: themeColor,
-                                fontSize: 12,
-                              ),
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
                             ),
-                          ],
-                        ),
-                      )
+                            decoration: BoxDecoration(
+                              color: themeColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.directions_walk_rounded,
+                                  size: 16,
+                                  color: themeColor,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  station.distanceKm != null
+                                      ? '${station.distanceKm!.toStringAsFixed(1)} km'
+                                      : '- km',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: themeColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.star, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
 
@@ -129,13 +142,16 @@ class StationBottomSheet extends StatelessWidget {
                       double? realRating;
                       if (assessmentState.totalAssessments > 0) {
                         realRating = assessmentState.averageScore;
-                      } else if (assessmentState.status == AssessmentStatus.success) {
-                        realRating = null; 
+                      } else if (assessmentState.status ==
+                          AssessmentStatus.success) {
+                        realRating = null;
                       } else {
                         realRating = station.rating;
                       }
 
-                      final displayStation = station.copyWith(rating: realRating);
+                      final displayStation = station.copyWith(
+                        rating: realRating,
+                      );
 
                       if (displayStation.rating != null) {
                         return Column(
@@ -150,11 +166,18 @@ class StationBottomSheet extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.star_outline_rounded, size: 18, color: Colors.grey[400]),
+                              Icon(
+                                Icons.star_outline_rounded,
+                                size: 18,
+                                color: Colors.grey[400],
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 l10n.withoutOpinions,
-                                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -174,10 +197,12 @@ class StationBottomSheet extends StatelessWidget {
                         ),
                       ),
                     child: station is BicycleStationDetails
-                        ? BicycleStatsWidget(station: station as BicycleStationDetails)
+                        ? BicycleStatsWidget(
+                            station: station as BicycleStationDetails,
+                          )
                         : station is EVStationDetails
-                            ? EVStatsWidget(station: station as EVStationDetails)
-                            : const SizedBox.shrink(),
+                        ? EVStatsWidget(station: station as EVStationDetails)
+                        : const SizedBox.shrink(),
                   ),
 
                   const SizedBox(height: 24),
@@ -205,17 +230,21 @@ class StationBottomSheet extends StatelessWidget {
                             ),
                           ),
                         );
-                        
+
                         if (context.mounted) {
                           context.read<AssessmentBloc>().add(
-                            GetStationAssessmentInfoEvent(stationId: station.id)
+                            GetStationAssessmentInfoEvent(
+                              stationId: station.id,
+                            ),
                           );
                         }
                       },
                       child: Text(
                         l10n.information,
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -223,7 +252,7 @@ class StationBottomSheet extends StatelessWidget {
               ),
             ),
           );
-        }
+        },
       ),
     );
   }
