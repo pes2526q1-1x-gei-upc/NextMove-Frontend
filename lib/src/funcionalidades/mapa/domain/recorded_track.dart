@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/src/shared/domain/track_statistics.dart';
 
 class TrackPoint {
   final LatLng location;
@@ -15,7 +16,7 @@ class TrackPoint {
   });
 }
 
-class RecordedTrack {
+class RecordedTrack implements TrackStatistics {
   final DateTime startTime = DateTime.now(); // set at the beginning
   late DateTime endTime = startTime;
 
