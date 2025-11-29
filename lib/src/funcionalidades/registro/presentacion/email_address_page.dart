@@ -30,16 +30,7 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(),
-      child: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthFailureState) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.errorCode)));
-          }
-        },
-        child: Builder(builder: (context) => _buildBody(context)),
-      ),
+      child: Builder(builder: (context) => _buildBody(context)),
     );
   }
 
@@ -68,7 +59,8 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                   const SizedBox(height: 32),
                   EmailAddressInputWidget(emailController: _emailController),
                   if (context.read<AuthBloc>().state is EmailIsNewState ||
-                      context.read<AuthBloc>().state is EmailExistsState) ...[
+                      context.read<AuthBloc>().state
+                          is EmailExistsWithoutGoogleState) ...[
                     const SizedBox(height: 16),
                     PasswordInputWidget(
                       passwordController: _passwordController,
@@ -99,7 +91,27 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
                             ),
                           );
                           setState(() {});
-                        case EmailExistsState(): // Usuario existe
+                        case EmailExistsWithGoogleState(): // Usuario con Google
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(l10n.signInWithGoogle),
+                              content: Text(l10n.needsToSignInWithGoogle),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (context.mounted) {
+                            Navigator.of(
+                              context,
+                            ).pop(); // Tornar a la pantalla d'inici (WelcomePage)
+                          }
+                          setState(() {});
+                        case EmailExistsWithoutGoogleState(): // Usuario existe
                           setState(() {});
                         case AuthFailureState(): // Error
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -216,7 +228,7 @@ class ContinueButton extends StatelessWidget {
       child: switch (context.read<AuthBloc>().state) {
         AuthInitial _ => Text(l10n.continue_),
         EmailIsNewState _ => Text(l10n.register),
-        EmailExistsState _ => Text(l10n.signIn),
+        EmailExistsWithoutGoogleState _ => Text(l10n.signIn),
         _ => const Text(''),
       },
     );

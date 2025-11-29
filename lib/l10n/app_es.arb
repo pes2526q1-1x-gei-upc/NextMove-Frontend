@@ -237,5 +237,12 @@
     "deletedReview": "Has eliminado tu valoración.",
     "updateReview": "Actualizar valoración",
     "updatedReview": "Tu valoración ha sido actualizada.",
-    "charge": "Carga"
+    "charge": "Carga",
+    "needsToSignInWithGoogle": "Este correo electrónico está registrado con Google. Por favor, inicia sesión con Google.",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteAccountConfirmation": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos.",
+    "accountDeleted": "Tu cuenta ha sido eliminada correctamente.",
+    "errorDeletingAccount": "Error al eliminar la cuenta.",
+    "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
+    "userMismatch": "El usuario no coincide con el usuario actual."
 }

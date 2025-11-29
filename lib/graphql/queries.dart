@@ -1,30 +1,25 @@
 class GraphQLQueries {
   static const String createUserMutation = r'''
-  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $photo: String, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
-    createUser(createInfo: {
-      email: $email,
-      name: $fullN,
-      nickname: $nickN,
-      photo: $photo,
-      phoneNumber: $phoneNum,
-      preferredMode: $mode,
-      preferredLanguage: $preferredLanguage,
-      birthDate: $birthDate,
-      bioDescription: $bioDescription    
+  mutation CreateUser($input: CreateUserInput!) {
+        createUser(createInfo: $input) {
+          email
+          name
+          photo
+          nickname
+          phoneNumber
+          preferredMode
+          preferredLanguage
+          birthDate
+          bioDescription
+          regWithGoogle
+        }
+      }
+  ''';
 
-    }) {
-      email
-      name
-      nickname
-      photo
-      phoneNumber
-      preferredMode
-      createdAt
-      preferredLanguage
-      birthDate
-      bioDescription
+  static const String deleteUserMutation = r'''
+    mutation deleteUser($email: String!) {
+      deleteUser(email: $email)
     }
-  }
   ''';
 
   static const String getUserProfileQuery = r'''
@@ -278,7 +273,7 @@ class GraphQLQueries {
     }
   ''';
 
-    static const String getBicingStationsBySearchQuery = r'''
+  static const String getBicingStationsBySearchQuery = r'''
       query SearchBicingStations($address: String!) {
         getEstacionesDeBicingPorDireccion(address: $address) {
           id
@@ -302,28 +297,30 @@ class GraphQLQueries {
     ''';
 
   static const String createTrackMutation = r'''
-    mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
+    mutation createTrackMutation($user_email: String!, $distancia: Float!, $velocidad_media: Float!, $velocidad_maxima: Float!, $co2: Float!, $kcal: Float!, $elevacion_positiva: Float!, $elevacion_negativa: Float!, $origen: CoordinatesInput!, $destino: CoordinatesInput!, $tiempo_inicio: String!, $tiempo_fin: String!, $fecha_recorrido: String!) {
     createRecorrido(input: {
-      user_email: $userEmail,
-      distancia: $distance
-      velocidad_media: $averageSpeed,
+      user_email: $user_email,
+      distancia: $distancia,
+      velocidad_media: $velocidad_media,
+      velocidad_maxima: $velocidad_maxima,
       co2: $co2,
       kcal: $kcal,
-      origen:  {
-         latitude: $originLat,
-         longitude: $originLon
-      },
-      destino:  {
-         latitude: $destinationLat,
-         longitude: $destinationLon
-      },
-      fecha_recorrido: $timestamp
+      elevacion_positiva: $elevacion_positiva,
+      elevacion_negativa: $elevacion_negativa,
+      origen: $origen,
+      destino: $destino,
+      tiempo_inicio: $tiempo_inicio,
+      tiempo_fin: $tiempo_fin,
+      fecha_recorrido: $fecha_recorrido
     }) {
       user_email
       distancia
       velocidad_media
+      velocidad_maxima
       co2
       kcal
+      elevacion_positiva
+      elevacion_negativa
       origen {
         latitude
         longitude
@@ -332,6 +329,8 @@ class GraphQLQueries {
         latitude
         longitude
       }
+      tiempo_inicio
+      tiempo_fin
       fecha_recorrido
     }
   }''';
@@ -398,4 +397,18 @@ class GraphQLQueries {
       editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
+
+  static const String checkAssessed = r'''
+    query checkAssessed($station_id: String!){
+      checkAssessed(station_id: $station_id)
+    } 
+  ''';
+
+  static const String existsUserQuery = r'''
+    query ExistsUser ($email: String!) {
+      ExistsUser (email: $email) {
+        exists
+        isRegWithGoogle
+      }
+    }''';
 }

@@ -58,11 +58,20 @@ class UserRepository {
       );
       return Right(createdUser);
     } on custom_exceptions.ServerException catch (e) {
+      if (kDebugMode) {
+        print('Error al crear perfil: ${e.toString()}');
+      }
       return Left(ServerFailure(message: e.toString()));
     } on custom_exceptions.AuthException catch (e) {
+      if (kDebugMode) {
+        print('Error al crear perfil: ${e.toString()}');
+      }
       return Left(AuthFailure(message: e.toString()));
     } catch (e) {
-      return Left(ServerFailure());
+      if (kDebugMode) {
+        print('Error al crear perfil: ${e.toString()}');
+      }
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 

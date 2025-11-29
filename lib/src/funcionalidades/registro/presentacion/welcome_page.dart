@@ -13,12 +13,18 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var signInButtonsWidth = MediaQuery.of(context).size.width * (2 / 3);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthFailureState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error: ${state.errorCode}")),
+              SnackBar(content: Text(switch (state.errorCode) {
+                'invalid-email' => l10n.invalidEmail,
+                'wrong-password' => l10n.wrongPassword,
+                '' => l10n.unknownError,
+                _ => l10n.errorOccurred(state.errorCode),
+              })),
             );
           } else if (state is UserNeedsProfileSetupState) {
             Navigator.of(context).pushReplacement(

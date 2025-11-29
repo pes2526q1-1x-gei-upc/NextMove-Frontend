@@ -119,8 +119,8 @@
     "waitAMoment": "Si us plau, espera un moment",
     "hi": "Hola, ",
     "ops": "Vaja!",
-    "account" : "Compte",
-    "accountDetails" : "Detalls del compte",
+    "account": "Compte",
+    "accountDetails": "Detalls del compte",
     "bloquedUsers": "Usuaris bloquejats",
     "noBloquedUsers": "No tens usuaris bloquejats.",
     "unblock": "Desbloquejar",
@@ -145,7 +145,7 @@
         "placeholders": {
             "nickname": {
                 "type": "String",
-                "example": "JohnDoe"   
+                "example": "JohnDoe"
             }
         }
     },
@@ -159,9 +159,9 @@
             }
         }
     },
-    "deleteFriend" : "Eliminar amistat",
-    "blockUser" : "Bloquejar usuari",
-    "blockUserConfirmation" : "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
+    "deleteFriend": "Eliminar amistat",
+    "blockUser": "Bloquejar usuari",
+    "blockUserConfirmation": "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
     "@blockUserConfirmation": {
         "placeholders": {
             "nickname": {
@@ -170,10 +170,9 @@
             }
         }
     },
-    "block" : "Bloquejar",
-
-    "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
-    "anyStationsFound" : "No s'han trobat resultats per a la teva cerca.",
+    "block": "Bloquejar",
+    "minCharsSearchHint": "Si us plau, introdueix almenys 3 caràcters per cercar.",
+    "anyStationsFound": "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",
     "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada.",
     "routeHistory": "Historial de recorreguts enregistrats",
@@ -227,6 +226,12 @@
     "sureActionConfirmation": "Aquesta acció no es pot desfer. Estàs segur que vols continuar?",
     "deletedReview": "Has eliminat la teva valoració.",
     "updateReview": "Actualitzar valoració",
-    "updatedReview": "La teva valoració ha estat actualitzada."
-    
+    "updatedReview": "La teva valoració ha estat actualitzada.",
+    "needsToSignInWithGoogle": "Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.",
+    "deleteAccount": "Eliminar compte",
+    "deleteAccountConfirmation": "Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.",
+    "accountDeleted": "El teu compte ha estat eliminat correctament.",
+    "errorDeletingAccount": "Error en eliminar el compte.",
+    "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
+    "userMismatch": "L'usuari no coincideix amb l'usuari actual."
 }

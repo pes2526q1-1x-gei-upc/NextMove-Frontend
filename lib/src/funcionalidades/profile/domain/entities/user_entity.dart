@@ -11,6 +11,7 @@ class UserEntity extends Equatable {
   final String idiomaPreferido;
   final String descripcion;
   final String modoPreferido;
+  final bool? regWithGoogle;
 
   const UserEntity({
     required this.email,
@@ -23,6 +24,7 @@ class UserEntity extends Equatable {
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
+    this.regWithGoogle,
   });
 
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
@@ -44,6 +46,7 @@ class UserEntity extends Equatable {
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
       photo: data['photo'] ?? '',
+      regWithGoogle: data['regWithGoogle'] ?? false,
     );
   }
 
@@ -59,6 +62,8 @@ class UserEntity extends Equatable {
       'preferredLanguage': mapLanguageToAPI(idiomaPreferido),
       'bioDescription': descripcion,
       'preferredMode': mapPreferredModeToAPI(modoPreferido),
+      'photo': photo,
+      'regWithGoogle': regWithGoogle,
     };
   }
 
@@ -142,6 +147,7 @@ class UserEntity extends Equatable {
       descripcion: descripcion ?? this.descripcion,
       modoPreferido: modoPreferido ?? this.modoPreferido,
       photo: photo ?? this.photo,
+      regWithGoogle: regWithGoogle,
     );
   }
 
@@ -157,5 +163,6 @@ class UserEntity extends Equatable {
     descripcion,
     modoPreferido,
     photo,
+    regWithGoogle,
   ];
 }
