@@ -169,43 +169,61 @@ class StationBottomSheet extends StatelessWidget {
                     EVStatsWidget(station: station as EVStationDetails),
 
                   const SizedBox(height: 24),
-
+                  Row(
                   // --- BOTÓN DE ACCIÓN ---
-                  SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: themeColor,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => StationDetailsPage(
-                              stationID: station.id,
-                              stationType: state.currentMode,
-                              stationDetails: station,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: themeColor,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                        );
-                        
-                        if (context.mounted) {
-                          context.read<AssessmentBloc>().add(
-                            GetStationAssessmentInfoEvent(stationId: station.id)
-                          );
-                        }
-                      },
-                      child: Text(
-                        l10n.information,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          onPressed: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => StationDetailsPage(
+                                  stationID: station.id,
+                                  stationType: state.currentMode,
+                                  stationDetails: station,
+                                ),
+                              ),
+                            );
+                            
+                            if (context.mounted) {
+                              context.read<AssessmentBloc>().add(
+                                GetStationAssessmentInfoEvent(stationId: station.id)
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.info_outline),
+                          label: Text(
+                            l10n.information,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          
+                        ),  
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            // TODO: Navegar a la pantalla de navegación
+                            // Navigator.of(context).push(...)
+                          },
+                          icon: const Icon(Icons.directions),
+                          label: Text(l10n.howToGetThere), 
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
