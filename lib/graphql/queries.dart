@@ -411,4 +411,72 @@ class GraphQLQueries {
         isRegWithGoogle
       }
     }''';
+
+    static const String getNavigationRouteQuery = r'''
+      query ComputeRoute(
+        $origin: CoordinatesInput!
+        $destination: CoordinatesInput!
+        $travelMode: TravelMode!
+        $routingPreference: RoutingPreference!
+      ) {
+          computeRoute(
+            input: {
+              origin: $origin
+              destination: $destination
+              travelMode: $travelMode
+              routingPreference: $routingPreference
+            }
+          ) {
+            recommendedRoute {
+              distance
+              distanceMeters
+              duration
+              durationSeconds
+              polyline
+              isEcoFriendly
+              routeLabels
+              startLocation {
+                latitude
+                longitude
+              }
+              endLocation {
+                latitude
+                longitude
+              }
+              viewport {
+                low {
+                  latitude
+                  longitude
+                }
+                high {
+                  latitude
+                  longitude
+                }
+              }
+              travelAdvisory {
+                hasTollRoads
+                estimatedTollPrice
+                fuelConsumption
+              }
+              steps {
+                instruction
+                distance
+                distanceMeters
+                duration
+                durationSeconds
+                startLocation {
+                  latitude
+                  longitude
+                }
+                endLocation {
+                  latitude
+                  longitude
+                }
+                polyline
+              }
+            }
+            alternativeRoutesCount
+            ecoFriendlyOptionsCount
+          }
+        }''';
 }
