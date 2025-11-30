@@ -7,6 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
@@ -44,6 +45,8 @@ class _MapPageState extends State<MapPage> {
   StationRepository stationRepository = StationRepository();
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
+  NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
@@ -94,6 +97,7 @@ class _MapPageState extends State<MapPage> {
         trackRepository: trackRepository,
         recordedRoutesRepository: recordedRoutesRepository,
         searchHistoryService: searchHistoryService,
+        navigationRouteRepository: navigationRouteRepository,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
       child: _buildUI(context),
@@ -151,7 +155,24 @@ class _MapPageState extends State<MapPage> {
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       onMapCreated: _onMapCreated,
+                      navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : Polyline(polylineId: PolylineId('No route')),
                     ),
+
+                    //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
+                    if (state.isNavigationMode)
+                      Positioned(
+                        top: 80,
+                        right: 16,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<MapBloc>().add(CancelNavigationEvent());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: Text("Cancelar Navegación"),
+                        ),
+                      ),
 
                     // Barra de búsqueda
                     SearchBarWidget(
@@ -223,7 +244,7 @@ class _MapPageState extends State<MapPage> {
         ),
       ),
     );
-
+    
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(

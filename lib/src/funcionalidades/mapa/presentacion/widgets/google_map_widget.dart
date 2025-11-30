@@ -5,6 +5,7 @@ class MapWidget extends StatefulWidget {
   final CameraPosition initialCameraPosition;
   final Set<Marker> markers;
   final Polyline polyline;
+  final Polyline navigationRoutePolyline;
   final MapType mapType;
   final void Function(GoogleMapController)? onMapCreated;
 
@@ -14,6 +15,7 @@ class MapWidget extends StatefulWidget {
     required this.initialCameraPosition,
     required this.markers,
     required this.polyline,
+    required this.navigationRoutePolyline,
     required this.mapType,
     this.onMapCreated,
   });
@@ -30,7 +32,7 @@ class _MapWidgetState extends State<MapWidget> {
       onMapCreated: widget.onMapCreated,
       initialCameraPosition: widget.initialCameraPosition,
       markers: widget.markers,
-      polylines: {widget.polyline},
+      polylines: {widget.polyline, widget.navigationRoutePolyline},
       mapType: widget.mapType,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
 /// Clase base abstracta para todos los estados del mapa
@@ -41,6 +42,10 @@ class MapLoadedState extends MapState {
   final Duration recordingElapsedTime;
   final List<StationDetails> recentBikeSearches;
   final List<StationDetails> recentEvSearches;
+  final bool isNavigationMode;
+  final StationDetails? selectedStation;
+  final NavigationRoute? navigationRoute;
+  final Polyline? decodedPolyline;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -61,6 +66,11 @@ class MapLoadedState extends MapState {
     this.recordingElapsedTime = Duration.zero,
     this.recentBikeSearches = const [],
     this.recentEvSearches = const [],
+    this.isNavigationMode = false,
+    this.selectedStation,
+    this.navigationRoute,
+    this.decodedPolyline,
+
   });
 
   @override
@@ -83,6 +93,10 @@ class MapLoadedState extends MapState {
         recordingElapsedTime,
         recentBikeSearches,
         recentEvSearches,
+        isNavigationMode,
+        selectedStation,
+        navigationRoute,
+        decodedPolyline,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -107,6 +121,10 @@ class MapLoadedState extends MapState {
     Duration? recordingElapsedTime,
     List<StationDetails>? recentBikeSearches,
     List<StationDetails>? recentEvSearches,
+    bool? isNavigationMode,
+    StationDetails? selectedStation,
+    NavigationRoute? navigationRoute,
+    Polyline? decodedPolyline,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -127,6 +145,10 @@ class MapLoadedState extends MapState {
       recordingElapsedTime: recordingElapsedTime ?? this.recordingElapsedTime,
       recentBikeSearches: recentBikeSearches ?? this.recentBikeSearches,
       recentEvSearches: recentEvSearches ?? this.recentEvSearches,
+      isNavigationMode: isNavigationMode ?? this.isNavigationMode,
+      selectedStation: selectedStation ?? this.selectedStation,
+      navigationRoute: navigationRoute ?? this.navigationRoute,
+      decodedPolyline: decodedPolyline ?? this.decodedPolyline,
     );
   }
 

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/EV_stats_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/bicycle_stats_widget.dart';
@@ -216,8 +218,10 @@ class StationBottomSheet extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {
-                            // TODO: Navegar a la pantalla de navegación
-                            // Navigator.of(context).push(...)
+                            context.read<MapBloc>().add(
+                              ShowRouteToStationEvent(station: station),
+                            );
+                            Navigator.of(context).pop();
                           },
                           icon: const Icon(Icons.directions),
                           label: Text(l10n.howToGetThere), 

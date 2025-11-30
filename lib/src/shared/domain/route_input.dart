@@ -4,8 +4,8 @@ import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
 class RouteInput {
   final LatLng origin;
   final LatLng destination;
-  final TravelMode mode;
-  final RoutingPreference routingPreference;
+  final TravelModeEnum mode;
+  final RoutingPreferenceEnum routingPreference;
 
   RouteInput({
     required this.origin,
