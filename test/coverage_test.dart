@@ -33,7 +33,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/recorded_routes_list.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/recorded_routes_list.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_events.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';

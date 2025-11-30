@@ -61,7 +61,7 @@ class ShowStationDetailsEvent extends MapEvent {
   List<Object?> get props => [station];
 }
 
-//Evento: Consulta de estaciones al backend según la barra de búsqueda
+/// Evento: Consulta de estaciones al backend según la barra de búsqueda
 class SearchStationsEvent extends MapEvent {
   final String query;
 
@@ -72,11 +72,20 @@ class SearchStationsEvent extends MapEvent {
 }
 
 class ClearSearchEvent extends MapEvent {
-  
   const ClearSearchEvent();
 
   @override
   List<Object?> get props => [];
+}
+
+/// Evento: usuario selecciona una estación de los resultados de búsqueda
+class SelectSearchResultEvent extends MapEvent {
+  final StationDetails selectedStation;
+
+  const SelectSearchResultEvent(this.selectedStation);
+
+  @override
+  List<Object?> get props => [selectedStation];
 }
 
 /// Evento: iniciar grabación de ruta
