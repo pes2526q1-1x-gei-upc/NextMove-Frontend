@@ -45,5 +45,34 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Esta app usa ubicación para mostrar estaciones de carga cercanas.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>NextMove necesita acceso a tu ubicación incluso en segundo plano para navegación y alertas.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Necesitamos acceso a tu galería para que puedas seleccionar una foto de perfil.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Necesitamos acceso a tu cámara para que puedas tomar una nueva foto de perfil.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>GIDClientID</key>
+    <string>518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk.apps.googleusercontent.com</string>
+
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

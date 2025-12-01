@@ -43,3 +43,43 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# env files
+*.env
+.env
+.env.local
+.env.production
+
+# Flutter/Dart build outputs
+**/generated_plugin_registrant.dart
+**/GeneratedPluginRegistrant.swift
+**/GeneratedPluginRegistrant.m
+**/generated_plugin_registrant.cc
+**/generated_plugin_registrant.h
+**/generated_plugins.cmake
+
+# Platform-specific generated files
+macos/Flutter/GeneratedPluginRegistrant.swift
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+# iOS/macOS
+ios/Flutter/Generated.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
+macos/Flutter/ephemeral/
+macos/Flutter/Flutter-Generated.xcconfig
+
+# Android
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+android/.gradle/
+android/local.properties
+lib/l10n/app_localizations_ca.dart
+lib/l10n/app_localizations_en.dart
+lib/l10n/app_localizations_es.dart
+lib/l10n/app_localizations.dart
+.vscode/settings.json
+untranslated_messages.txt

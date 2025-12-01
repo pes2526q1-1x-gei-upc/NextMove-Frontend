@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '518328761715',
     projectId: 'nextmove-69c37',
     storageBucket: 'nextmove-69c37.firebasestorage.app',
+    androidClientId: '518328761715-j04qmq3n45k6lurpjq91dt5ogc3thklq.apps.googleusercontent.com',
+    iosClientId: '518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk.apps.googleusercontent.com',
     iosBundleId: 'com.example.nextmoveApp',
   );
 
@@ -72,6 +74,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '518328761715',
     projectId: 'nextmove-69c37',
     storageBucket: 'nextmove-69c37.firebasestorage.app',
+    androidClientId: '518328761715-j04qmq3n45k6lurpjq91dt5ogc3thklq.apps.googleusercontent.com',
+    iosClientId: '518328761715-tovgf1bn8up8s7vuiu1pfrodj1i2h3sk.apps.googleusercontent.com',
     iosBundleId: 'com.example.nextmoveApp',
   );
 
@@ -83,4 +87,5 @@ class DefaultFirebaseOptions {
     authDomain: 'nextmove-69c37.firebaseapp.com',
     storageBucket: 'nextmove-69c37.firebasestorage.app',
   );
+
 }

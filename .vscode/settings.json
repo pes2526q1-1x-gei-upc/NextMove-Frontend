@@ -1,3 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "cmake.ignoreCMakeListsMissing": true,
+    "flutter-l10n-detector.localizations": {
+    "className": "AppLocalizations",
+    "localizationsPath":  "lib/l10n/gen",
+    "outputPath": "lib/l10n/gen"
+  }
 }
