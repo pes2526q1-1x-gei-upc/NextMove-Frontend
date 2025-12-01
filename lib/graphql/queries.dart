@@ -475,8 +475,6 @@ class GraphQLQueries {
                 polyline
               }
             }
-            alternativeRoutesCount
-            ecoFriendlyOptionsCount
           }
         }''';
 }

@@ -656,10 +656,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  void _onShowRouteToStation(
+  void _onShowRouteToStation (
     ShowRouteToStationEvent event,
     Emitter<MapState> emit,
-  ) {
+  ) async{
     final currentState = state;
     if (currentState is MapLoadedState) {
       
@@ -676,7 +676,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
 
       try{
-          navigationRouteRepository.fetchNavigationRoute(routeInput).then((result) {
+          final result = await navigationRouteRepository.fetchNavigationRoute(routeInput);
+
+          if(emit.isDone){
+            debugPrint('Bloc closed, aborting navigation route fetch.');
+            return;
+          }
           result.fold(
             (failure) {
               if (kDebugMode) {
@@ -709,12 +714,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               ));
             },
           );
-        });
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error fetching navigation route: $e');
-        }
-      }
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error fetching navigation route: $e');
+            }
+          }
 
     }
 

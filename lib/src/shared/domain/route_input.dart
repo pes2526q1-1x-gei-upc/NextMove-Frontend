@@ -24,7 +24,7 @@ class RouteInput {
         'latitude': destination.latitude,
         'longitude': destination.longitude,
       },
-      'mode': mode.name,
+      'travelMode': mode.name,
       'routingPreference': routingPreference.name,
     };
   }

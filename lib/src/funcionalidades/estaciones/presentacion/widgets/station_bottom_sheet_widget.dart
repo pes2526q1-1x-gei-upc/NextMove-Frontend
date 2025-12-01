@@ -17,12 +17,10 @@ import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/a
 class StationBottomSheet extends StatelessWidget {
   const StationBottomSheet({
     super.key,
-    required this.context,
     required this.station,
     required this.state,
   });
 
-  final BuildContext context;
   final StationDetails station;
   final MapLoadedState state;
 

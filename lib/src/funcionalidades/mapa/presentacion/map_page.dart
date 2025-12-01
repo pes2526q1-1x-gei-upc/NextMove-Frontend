@@ -40,6 +40,7 @@ class _MapPageState extends State<MapPage> {
   // Controllers & state
   // -----------------------------------------------------------------------
   GoogleMapController? _mapController;
+  BuildContext? _blocContext;
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
@@ -100,7 +101,12 @@ class _MapPageState extends State<MapPage> {
         navigationRouteRepository: navigationRouteRepository,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
-      child: _buildUI(context),
+      child: Builder(  // ← AÑADE ESTE Builder
+        builder: (blocContext) {
+          _blocContext = blocContext;  // ← GUARDA el context
+          return _buildUI(blocContext);
+        },
+      ),    
     );
   }
 
@@ -236,6 +242,8 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
+    final mapBloc = _blocContext!.read<MapBloc>();
+
     _mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
@@ -246,12 +254,17 @@ class _MapPageState extends State<MapPage> {
     );
     
     showModalBottomSheet(
-      context: context,
+      context: _blocContext!,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) =>
-          StationBottomSheet(context: context, station: station, state: state),
+      builder: (_) => BlocProvider<MapBloc>.value(
+      value: mapBloc,
+      child: StationBottomSheet(
+        station: station,
+        state: state,
+      ),
+    ),
     );
   }
 }
