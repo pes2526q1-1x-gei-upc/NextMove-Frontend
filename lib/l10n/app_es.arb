@@ -28,6 +28,7 @@
     "userDataPreferences": "Acaba de completar tu perfil",
     "nickname": "Apodo",
     "nicknameHint": "Introduce tu apodo",
+    "stationDetails": "Detalles de la estación",
     "birthdate": "Fecha de nacimiento",
     "bithdateHint": "Ej: 1990-01-01",
     "mandatoryBirthDate": "La fecha de nacimiento es obligatoria",
@@ -136,7 +137,7 @@
     "noFriendsAdded": "Aún no tienes amigos añadidos.",
     "results": "RESULTADOS",
     "yourFriends": "TUS AMIGOS",
-    "friendAdded": "{nickname} has been added to your friends.",
+    "friendAdded": "{nickname} ha sido añadido a tus amigos.",
     "@friendAdded": {
         "placeholders": {
             "nickname": {
@@ -167,7 +168,6 @@
             }
         }
     },
-
     "deleteFriend": "Eliminar amistad",
     "blockUser": "Bloquear usuario",
     "blockUserConfirmation": "¿Estás seguro de que quieres bloquear a {nickname}? No podrás ver su perfil ni interactuar con él.",
@@ -180,7 +180,6 @@
         }
     },
     "block": "Bloquear",
-    "friends": "Amigos",
     "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
     "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",
     "errorSavingRoute": "Error al guardar la ruta",
@@ -192,7 +191,6 @@
     "routeStatistics": "Estadísticas de la ruta",
     "noRouteDataAvailable": "No hay datos de la ruta disponibles.",
     "routeRecording": "Grabación de la ruta",
-    "distance": "Distancia",
     "duration": "Duración",
     "averageSpeed": "Velocidad media",
     "maxSpeed": "Velocidad máxima",
@@ -205,21 +203,17 @@
     "currentSpeed": "Velocidad actual",
     "stopRecording": "Detener grabación",
     "opinions": "Valoraciones",
-    "unknown": "Desconocido",
-    "unknownPower": "Potencia desconocida",
     "station": "Estación",
-    "seeOpinions": "Ver reviews",
-    "withoutOpinions": "Sin reviews",
+    "seeOpinions": "Ver opiniones",
+    "withoutOpinions": "Sin opiniones",
     "rate": "Valorar",
     "yes": "Sí",
     "no": "No",
-    "fast": "Rápido",
     "normal": "Normal",
     "mechanical": "Mecánicas",
     "electric": "Eléctricas",
     "free": "Libres",
-    "available": "Disponibles",
-    "carga": "Carga",
+    "charge": "Carga",
     "reviewStation": "Valorar estación",
     "writeYourOpinion": "Escribe tu opinión (opcional)",
     "sendReview": "Enviar valoración",
@@ -237,7 +231,6 @@
     "deletedReview": "Has eliminado tu valoración.",
     "updateReview": "Actualizar valoración",
     "updatedReview": "Tu valoración ha sido actualizada.",
-    "charge": "Carga",
     "needsToSignInWithGoogle": "Este correo electrónico está registrado con Google. Por favor, inicia sesión con Google.",
     "deleteAccount": "Eliminar cuenta",
     "deleteAccountConfirmation": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos.",

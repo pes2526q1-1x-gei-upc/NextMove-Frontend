@@ -1,47 +1,29 @@
 import 'package:flutter/material.dart';
 
-// === Header del Perfil (Avatar + Texto) ===
-// This widget displays the user's profile header with their photo and name
 class ProfileHeaderWidget extends StatelessWidget {
   final String title;
   final String subtitle;
-
-  // STEP 1: Add an optional parameter to receive the photo URL
-  // The '?' makes it nullable, meaning it can be null if no photo exists
-  // This is the same pattern used in ProfileAvatarSelector in edit_user_data_preferences
   final String? imageUrl;
 
   const ProfileHeaderWidget({
     super.key,
     required this.title,
     required this.subtitle,
-    this.imageUrl, // Optional parameter - can be null
+    this.imageUrl, 
   });
 
   @override
   Widget build(BuildContext context) {
-    // STEP 2: Determine which image to display
-    // This is the KEY LOGIC for loading user photos anywhere in your app
-    // We need to decide between three options:
-    // - NetworkImage: if user has uploaded a photo (imageUrl is not null/empty)
-    // - AssetImage: if no photo exists (imageUrl is null or empty)
-    // - Icon: as a fallback (we'll keep this as default)
 
     ImageProvider? backgroundImage;
     Widget? avatarChild;
 
-    // STEP 3: Check if imageUrl exists and is not empty
-    // This is CRITICAL - always check both null AND empty string
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      // USER HAS A PHOTO - use NetworkImage to load from URL
-      // NetworkImage automatically handles downloading and caching the image
       backgroundImage = NetworkImage(imageUrl!);
-      avatarChild = null; // Don't show icon when we have an image
+      avatarChild = null; 
 
       print('ProfileHeader: Loading user photo from URL: $imageUrl');
     } else {
-      // USER HAS NO PHOTO - use default icon
-      // We set backgroundImage to null and provide a child icon instead
       backgroundImage = null;
       avatarChild = const Icon(Icons.person, size: 40, color: Colors.grey);
 
@@ -62,15 +44,11 @@ class ProfileHeaderWidget extends StatelessWidget {
               ),
             ],
           ),
-          // STEP 4: Apply the image logic to CircleAvatar
-          // CircleAvatar has two main properties for displaying content:
-          // - backgroundImage: for actual images (NetworkImage, AssetImage, FileImage)
-          // - child: for widgets like icons or text when no image exists
           child: CircleAvatar(
             radius: 35,
             backgroundColor: Colors.grey[200],
-            backgroundImage: backgroundImage, // Will be NetworkImage or null
-            child: avatarChild, // Will be Icon or null
+            backgroundImage: backgroundImage, 
+            child: avatarChild, 
           ),
         ),
         const SizedBox(width: 20),

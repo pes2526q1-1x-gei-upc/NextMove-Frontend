@@ -115,6 +115,7 @@
     "confirmLogOut": "Estàs segur que vols tancar la sessió?",
     "contactAndBioInfo": "Informació de contacte i biografia",
     "personalInfo": "Informació personal",
+    "stationDetails": "Detalls de l'estació",
     "loading": "Carregant...",
     "waitAMoment": "Si us plau, espera un moment",
     "hi": "Hola, ",
@@ -137,6 +138,14 @@
     "results": "RESULTATS",
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
+    "@friendAdded": {
+        "placeholders": {
+            "nickname": {
+                "type": "String",
+                "example": "JohnDoe"
+            }
+        }
+    },
     "friends": "Amics",
     "memberSince": "Membre des de",
     "deleteFriendship": "Eliminar amistat",
@@ -182,7 +191,6 @@
     "routeStatistics": "Estadístiques de la ruta",
     "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
     "routeRecording": "Gravació de ruta",
-    "distance": "Distància",
     "duration": "Durada",
     "averageSpeed": "Velocitat mitjana",
     "maxSpeed": "Velocitat màxima",
@@ -195,20 +203,16 @@
     "currentSpeed": "Velocitat actual",
     "stopRecording": "Aturar la gravació",
     "opinions": "Valoracions",
-    "unknown": "Desconegut",
-    "unknownPower": "Potència desconeguda",
     "station": "Estació",
     "seeOpinions": "Veure valoracions",
     "withoutOpinions": "Sense valoracions",
     "rate": "Valorar",
     "yes": "Sí",
     "no": "No",
-    "fast": "Ràpid",
     "normal": "Normal",
     "mechanical": "Mecànicas",
     "electric": "Elèctriques",
     "free": "Lliures",
-    "available": "Disponibles",
     "charge": "Càrrega",
     "reviewStation": "Valorar Estació",
     "writeYourOpinion": "Escriu la teva opinió (opcional)",

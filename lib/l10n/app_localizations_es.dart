@@ -253,7 +253,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get closed => 'Cerrado';
 
   @override
-  String get available => 'Disponibles';
+  String get available => 'Disponible';
 
   @override
   String get occupied => 'Ocupado';
@@ -344,6 +344,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get accountDetails => 'Detalles de la cuenta';
 
   @override
+  String get stationDetails => 'Detalles de la estación';
+
+  @override
   String get bloquedUsers => 'Usuarios bloqueados';
 
   @override
@@ -390,7 +393,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String friendAdded(String nickname) {
-    return '$nickname has been added to your friends.';
+    return '$nickname ha sido añadido a tus amigos.';
   }
 
   @override
@@ -505,10 +508,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get station => 'Estación';
 
   @override
-  String get seeOpinions => 'Ver reviews';
+  String get seeOpinions => 'Ver opiniones';
 
   @override
-  String get withoutOpinions => 'Sin reviews';
+  String get withoutOpinions => 'Sin opiniones';
 
   @override
   String get rate => 'Valorar';

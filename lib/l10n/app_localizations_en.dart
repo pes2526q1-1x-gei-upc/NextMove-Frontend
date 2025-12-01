@@ -339,6 +339,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDetails => 'Account details';
 
   @override
+  String get stationDetails => 'Station details';
+
+  @override
   String get bloquedUsers => 'Blocked users';
 
   @override

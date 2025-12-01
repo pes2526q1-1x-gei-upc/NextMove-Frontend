@@ -126,7 +126,7 @@ class StationDetailsPage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // 3. Features List
-              SectionLabel(text: l10n.accountDetails),
+              SectionLabel(text: l10n.stationDetails),
               StationFeaturesWidget(station: stationDetails, isBike: isBike),
               const SizedBox(height: 24),
 

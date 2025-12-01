@@ -322,11 +322,7 @@ class UserRemoteDataProvider {
     if (endpoint == null) {
       throw custom_exceptions.ServerException('GRAPHQL_ENDPOINT no definido');
     }
-
-    // Asumimos que el endpoint es .../graphql y lo cambiamos a .../api/upload-profile-photo
-    // O si el endpoint es solo el host, construimos la url.
-    // Dado el código del backend, la ruta es /api/upload-profile-photo
-    // Si GRAPHQL_ENDPOINT es http://localhost:3000/graphql
+    
     final baseUrl = endpoint.replaceAll('/graphql', '');
     final uploadUrl = '$baseUrl/api/upload-profile-photo';
 

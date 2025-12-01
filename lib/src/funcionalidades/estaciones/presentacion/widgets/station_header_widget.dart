@@ -145,7 +145,6 @@ class StationHeaderWidget extends StatelessWidget {
                   "Current assessments count: ${assessmentState.assessments.length}",
                 );
 
-                // If user has assessed but we don't have the assessments loaded yet, fetch them first
                 if (userHasAssessed && assessmentState.assessments.isEmpty) {
                   debugPrint(
                     "Fetching assessments for station ${station.id}...",
@@ -156,11 +155,9 @@ class StationHeaderWidget extends StatelessWidget {
                     ),
                   );
 
-                  // Wait a bit for the assessments to load
                   await Future.delayed(const Duration(milliseconds: 800));
                 }
 
-                // Get the updated state after potential fetch
                 final currentState = assessmentBloc.state;
                 debugPrint(
                   "After fetch - assessments count: ${currentState.assessments.length}",
@@ -171,7 +168,6 @@ class StationHeaderWidget extends StatelessWidget {
                 if (userHasAssessed && currentState.assessments.isNotEmpty) {
                   final currentUser = FirebaseAuth.instance.currentUser;
                   if (currentUser != null) {
-                    // Try to get nickname from UserProvider first, fallback to Firebase displayName
                     final userProvider = context.read<UserProvider>();
                     final userNickname =
                         userProvider.user?['nickname'] as String? ??
@@ -215,7 +211,6 @@ class StationHeaderWidget extends StatelessWidget {
                       stationId: station.id.toString(),
                       stationName: station.name ?? l10n.station,
                       themeColor: themeColor,
-                      // Pass existing review to activate edit mode
                       existingAssessment: existingReview,
                     ),
                   ),

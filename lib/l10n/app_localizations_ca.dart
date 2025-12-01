@@ -253,7 +253,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponibles';
+  String get available => 'Disponible';
 
   @override
   String get occupied => 'Ocupat';
@@ -342,6 +342,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get accountDetails => 'Detalls del compte';
+
+  @override
+  String get stationDetails => 'Detalls de l\'estació';
 
   @override
   String get bloquedUsers => 'Usuaris bloquejats';

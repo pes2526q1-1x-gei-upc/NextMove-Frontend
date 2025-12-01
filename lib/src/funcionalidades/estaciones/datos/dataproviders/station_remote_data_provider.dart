@@ -6,7 +6,6 @@ import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
-  // OJO porque ahora coge el valor del notifier retornado, no el notifier!
   GraphQLClient client = GraphQLConfig.initializeClient().value;
   final QueryResult result = await client.query(options);
 

@@ -48,7 +48,7 @@ class _MapPageState extends State<MapPage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
-  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
+  //final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
 
   
   StreamSubscription<Position>? _positionStream;

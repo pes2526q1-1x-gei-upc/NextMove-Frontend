@@ -736,6 +736,12 @@ abstract class AppLocalizations {
   /// **'Account details'**
   String get accountDetails;
 
+  /// No description provided for @stationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Station details'**
+  String get stationDetails;
+
   /// No description provided for @bloquedUsers.
   ///
   /// In en, this message translates to:
