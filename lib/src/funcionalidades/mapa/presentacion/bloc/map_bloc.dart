@@ -22,8 +22,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   Set<Marker> carMarkers = {};
   Set<Marker> bikeMarkers = {};
-  Set<Marker> carMarkersToShow = {};
-  Set<Marker> bikeMarkersToShow = {};
 
   
   // Posición central por defecto (Barcelona)
@@ -95,13 +93,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         bikeClusterManagerId,
         bikeIcon,
       );
-      bikeMarkersToShow = bikeMarkers;
 
-      /*final carMarkers = _buildMarkersWithClusterForEv(
+      carMarkers = _buildMarkersWithClusterForEv(
         evStations,
         evClusterManagerId,
       );
-      debugPrint('CarsMarkers created: ${carMarkers.length}');*/
+      debugPrint('CarsMarkers created: ${carMarkers.length}');
 
       
 
@@ -112,8 +109,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         userLocation: null,
         currentMode: StationType.bicycle,
         currentMapType: MapType.normal,
-        bikeMarkers: bikeMarkersToShow,
-        carMarkers: carMarkersToShow,
+        bikeMarkers: bikeMarkers,
+        carMarkers: carMarkers,
         centerPosition: _bcnCenter,
         searchQuery: null,
         bikeClusterManager: bikeClusterManager,
@@ -241,7 +238,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       
 
     // ✅ Crear SOLO los marcadores del modo seleccionado
-    if (event.newMode == StationType.bicycle) {
+    /*if (event.newMode == StationType.bicycle) {
       bikeMarkersToShow = currentState.bikeMarkers;  // Usar los cacheados
       carMarkersToShow = const {};  // VACÍO
     } else {
@@ -253,13 +250,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         );
       }
       carMarkersToShow = carMarkers;  // Usar los cacheados
-    }
+    }*/
 
 
     emit(currentState.copyWith(
       currentMode: event.newMode,
-      bikeMarkers: bikeMarkersToShow,
-      carMarkers: carMarkersToShow,
+      bikeMarkers: event.newMode == StationType.bicycle ? bikeMarkers : {},
+      carMarkers: event.newMode == StationType.electricVehicle ? carMarkers : {},
     ));
     } 
   }
