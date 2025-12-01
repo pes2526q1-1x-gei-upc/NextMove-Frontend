@@ -46,6 +46,7 @@ class MapLoadedState extends MapState {
   final StationDetails? selectedStation;
   final NavigationRoute? navigationRoute;
   final Polyline? decodedPolyline;
+  final RouteViewport? routeViewport;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -70,6 +71,7 @@ class MapLoadedState extends MapState {
     this.selectedStation,
     this.navigationRoute,
     this.decodedPolyline,
+    this.routeViewport,
 
   });
 
@@ -97,6 +99,7 @@ class MapLoadedState extends MapState {
         selectedStation,
         navigationRoute,
         decodedPolyline,
+        routeViewport,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -125,6 +128,7 @@ class MapLoadedState extends MapState {
     StationDetails? selectedStation,
     NavigationRoute? navigationRoute,
     Polyline? decodedPolyline,
+    RouteViewport? routeViewport,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -149,6 +153,7 @@ class MapLoadedState extends MapState {
       selectedStation: selectedStation ?? this.selectedStation,
       navigationRoute: navigationRoute ?? this.navigationRoute,
       decodedPolyline: decodedPolyline ?? this.decodedPolyline,
+      routeViewport: routeViewport ?? this.routeViewport,
     );
   }
 

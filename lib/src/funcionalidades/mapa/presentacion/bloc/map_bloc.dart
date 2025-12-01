@@ -711,6 +711,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               emit(currentState.copyWith(
                 navigationRoute: navigationRoute,
                 decodedPolyline: navigationPolyline,
+                routeViewport: navigationRoute.viewport,
+                isNavigationMode: true,
               ));
             },
           );
@@ -735,7 +737,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         isNavigationMode: false,
         selectedStation: null,
         navigationRoute: null,
-        decodedPolyline: null,
+        decodedPolyline: Polyline(polylineId: PolylineId('no_route')),
+        routeViewport: null,
       ));
     }
   }

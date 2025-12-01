@@ -16,6 +16,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
@@ -134,6 +135,9 @@ class _MapPageState extends State<MapPage> {
                 ),
               );
             }
+            if(state is MapLoadedState && state.routeViewport != null){
+              _setZoomToViewport(state.routeViewport!); 
+            }
           },
           child: BlocBuilder<MapBloc, MapState>(
             builder: (context, state) {
@@ -167,7 +171,7 @@ class _MapPageState extends State<MapPage> {
                     //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
                     if (state.isNavigationMode)
                       Positioned(
-                        top: 80,
+                        top: 160,
                         right: 16,
                         child: ElevatedButton(
                           onPressed: () {
@@ -237,9 +241,22 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Markers
-  // -----------------------------------------------------------------------
+ void _setZoomToViewport(RouteViewport viewport) {
+    if (_mapController == null) return;
+  
+  final bounds = LatLngBounds(
+    southwest: viewport.low,
+    northeast: viewport.high,
+  );
+  
+  // Opción A: Con padding fijo
+  _mapController!.animateCamera(
+    CameraUpdate.newLatLngBounds(
+      bounds,
+      100,  // padding en píxeles alrededor de la ruta
+    ),
+  );
+  }
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
     final mapBloc = _blocContext!.read<MapBloc>();

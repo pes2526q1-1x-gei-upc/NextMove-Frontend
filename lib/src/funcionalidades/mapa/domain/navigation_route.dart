@@ -10,7 +10,7 @@ class NavigationRoute {
   final List<String> routeLabels;
   final LatLng? startLocation;
   final LatLng? endLocation;
-  final Viewport? viewport;
+  final RouteViewport? viewport;
   final TravelAdvisory? travelAdvisory;
   final List<RouteStep> steps;
 
@@ -51,7 +51,7 @@ class NavigationRoute {
             )
           : null,
       viewport: json['viewport'] != null
-          ? Viewport.fromJson(json['viewport'] as Map<String, dynamic>)
+          ? RouteViewport.fromJson(json['viewport'] as Map<String, dynamic>)
           : null,
       travelAdvisory: json['travelAdvisory'] != null
           ? TravelAdvisory.fromJson(json['travelAdvisory'] as Map<String, dynamic>)
@@ -64,17 +64,17 @@ class NavigationRoute {
   }
 }
 
-class Viewport {
+class RouteViewport {
   final LatLng low;
   final LatLng high;
 
-  Viewport({
+  RouteViewport({
     required this.low,
     required this.high,
   });
 
-  factory Viewport.fromJson(Map<String, dynamic> json) {
-    return Viewport(
+  factory RouteViewport.fromJson(Map<String, dynamic> json) {
+    return RouteViewport(
       low: LatLng(
         json['low']['latitude'] as double,
         json['low']['longitude'] as double,
