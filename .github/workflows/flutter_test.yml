@@ -58,6 +58,12 @@ jobs:
         with:
           name: coverage
           path: coverage/
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/lcov
+          key: lcov-${{ runner.os }}-v1
+          restore-keys: |
+            lcov-${{ runner.os }}-
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
       - name: Report code coverage
