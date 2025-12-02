@@ -4,7 +4,6 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_list.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
 class StationListButtonWidget extends StatelessWidget {
   final StationType currentMode;
   final LatLng? userLocation;
@@ -17,16 +16,18 @@ class StationListButtonWidget extends StatelessWidget {
 
   void _navigateToStationList(BuildContext context) async {
     LatLng location = userLocation ?? await _getCurrentPosition();
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => StationList(
-          stationType: currentMode,
-          latitude: location.latitude,
-          longitude: location.longitude,
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => StationList(
+            stationType: currentMode,
+            latitude: location.latitude,
+            longitude: location.longitude,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Future<LatLng> _getCurrentPosition() async {

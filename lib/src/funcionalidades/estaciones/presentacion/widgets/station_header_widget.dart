@@ -168,7 +168,7 @@ class StationHeaderWidget extends StatelessWidget {
 
                 AssessmentEntity? existingReview;
 
-                if (userHasAssessed && currentState.assessments.isNotEmpty) {
+                if (userHasAssessed && currentState.assessments.isNotEmpty && context.mounted) {
                   final currentUser = FirebaseAuth.instance.currentUser;
                   if (currentUser != null) {
                     // Try to get nickname from UserProvider first, fallback to Firebase displayName
