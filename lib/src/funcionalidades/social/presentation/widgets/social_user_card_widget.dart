@@ -49,13 +49,13 @@ class SocialUserCard extends StatelessWidget {
                   radius: 25,
                   backgroundColor: Colors.grey[200],
                   backgroundImage: hasPhoto ? NetworkImage(user.photo) : null,
-                  child: !hasPhoto
-                      ? const Icon(Icons.person, color: Colors.grey)
-                      : null,
                   onBackgroundImageError: hasPhoto 
                       ? (exception, stackTrace) {
                           debugPrint('Error cargando avatar en lista: $exception');
                         }
+                      : null,
+                  child: !hasPhoto
+                      ? const Icon(Icons.person, color: Colors.grey)
                       : null,
                 ),
                 
