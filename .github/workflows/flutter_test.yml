@@ -26,7 +26,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.4"
+          flutter-version-file: pubspec.yaml
           channel: "stable"
           cache: true
       - name: Generate test file with all imports to include untested files in coverage
