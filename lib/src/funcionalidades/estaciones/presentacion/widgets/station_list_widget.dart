@@ -32,10 +32,13 @@ class StationListButtonWidget extends StatelessWidget {
 
   Future<LatLng> _getCurrentPosition() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+      const LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
       );
-      return LatLng(position.latitude, position.longitude);
+      Position currentPosition = await Geolocator.getCurrentPosition(
+        locationSettings: locationSettings,
+      );
+      return LatLng(currentPosition.latitude, currentPosition.longitude);
     } catch (e) {
       return const LatLng(0.0, 0.0);
     }

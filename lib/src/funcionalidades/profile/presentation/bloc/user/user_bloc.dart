@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'user_event.dart';
