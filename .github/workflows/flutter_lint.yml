@@ -1,0 +1,39 @@
+name: Flutter lint
+on:
+  workflow_call
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.3"
+          channel: "stable"
+          cache: true
+
+      # Instala dependencias.
+      - run: flutter pub get
+
+      # Verifica el entorno Flutter (como flutter doctor local).
+      - run: flutter doctor -v
+
+      # Analiza el código y captura la salida.
+      - run: flutter analyze --write=flutter_analyze.log
+
+      - if: ${{ !cancelled() }}
+        uses: yorifuji/flutter-analyze-commenter@v1
+        with:
+          analyze-log: flutter_analyze.log
