@@ -321,8 +321,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     var l10n = AppLocalizations.of(context)!;
     final primaryColor = Theme.of(context).primaryColor;
 
-    return WillPopScope(
-      onWillPop: () async => !_isCreatingFirebaseUser,
+    return PopScope(
+      canPop: !_isCreatingFirebaseUser,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F7),
         appBar: AppBar(
