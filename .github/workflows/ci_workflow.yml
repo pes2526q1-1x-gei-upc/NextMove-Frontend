@@ -8,8 +8,14 @@ on:
 
 jobs:
   lint:
+    permissions:
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/flutter_lint.yml
   test:
+    permissions:
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/flutter_test.yml
     with:
       coverage: true
