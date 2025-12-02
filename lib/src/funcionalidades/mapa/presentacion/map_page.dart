@@ -149,7 +149,9 @@ class _MapPageState extends State<MapPage> {
                         }
                       },
                       onFocusChanged: (isFocused) {
-                        print('📍 MapPage received focus change: $isFocused');
+                        if (kDebugMode) {
+                          print('📍 MapPage received focus change: $isFocused');
+                        }
                         setState(() {
                           _isSearchBarFocused = isFocused;
                         });
@@ -177,7 +179,6 @@ class _MapPageState extends State<MapPage> {
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
-                    // ESTO LO HE MOVIDO AL FINAL DEL STACK PARA QUE APAREZCA POR ENCIMA DE TODO
                     Positioned(
                       top: 130,
                       left: 16,

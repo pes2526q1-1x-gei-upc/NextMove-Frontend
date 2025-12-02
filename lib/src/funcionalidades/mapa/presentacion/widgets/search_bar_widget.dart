@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -32,7 +33,9 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
     _focusNode = FocusNode();
     
     _focusNode.addListener(() {
-      print('🔍 Focus changed: ${_focusNode.hasFocus}');
+      if (kDebugMode) {
+        print('🔍 Focus changed: ${_focusNode.hasFocus}');
+      }
       widget.onFocusChanged?.call(_focusNode.hasFocus);
     });
   }

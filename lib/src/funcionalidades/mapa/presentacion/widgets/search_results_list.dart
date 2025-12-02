@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
@@ -22,7 +23,9 @@ class SearchResultsList extends StatelessWidget {
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         if(state is! MapLoadedState){
-          print('State is not MapLoadedState');
+          if (kDebugMode) {
+            print('State is not MapLoadedState');
+          }
           return const SizedBox.shrink();
         }
         
@@ -39,7 +42,9 @@ class SearchResultsList extends StatelessWidget {
         }
         
         if(!state.isSearching) {
-          print('📋 Not searching, hiding');
+          if (kDebugMode) {
+            print('📋 Not searching, hiding');
+          }
           return const SizedBox.shrink();
         }
 

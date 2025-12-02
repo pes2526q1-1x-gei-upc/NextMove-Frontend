@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -71,9 +72,13 @@ class FriendDetailsPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     try {
       final userBloc = context.read<UserBloc>();
-      print("FriendDetailsPage: Found UserBloc ${userBloc.hashCode}");
+      if (kDebugMode) {
+        print("FriendDetailsPage: Found UserBloc ${userBloc.hashCode}");
+      }
     } catch (e) {
-      print("FriendDetailsPage: Could not find UserBloc: $e");
+      if (kDebugMode) {
+        print("FriendDetailsPage: Could not find UserBloc: $e");
+      }
     }
 
     return Scaffold(
