@@ -48,7 +48,6 @@ class _MapPageState extends State<MapPage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
-  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
 
   
   StreamSubscription<Position>? _positionStream;
@@ -65,19 +64,6 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    _setMapStyle();
-  }
-
-  void _setMapStyle() async {
-    const style = '''
-    [
-      {
-        "featureType": "poi",
-        "stylers": [{"visibility": "off"}]
-      }
-    ]
-    ''';
-    _mapController?.setMapStyle(style);
   }
 
   // -----------------------------------------------------------------------
