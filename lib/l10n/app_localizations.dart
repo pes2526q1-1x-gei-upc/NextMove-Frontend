@@ -556,12 +556,6 @@ abstract class AppLocalizations {
   /// **'Closed'**
   String get closed;
 
-  /// No description provided for @available.
-  ///
-  /// In en, this message translates to:
-  /// **'Available'**
-  String get available;
-
   /// No description provided for @occupied.
   ///
   /// In en, this message translates to:
@@ -591,12 +585,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
-
-  /// No description provided for @unknownPower.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown power'**
-  String get unknownPower;
 
   /// No description provided for @unknown.
   ///
@@ -832,12 +820,6 @@ abstract class AppLocalizations {
   /// **'{nickname} has been added to your friends.'**
   String friendAdded(String nickname);
 
-  /// No description provided for @friends.
-  ///
-  /// In en, this message translates to:
-  /// **'Friends'**
-  String get friends;
-
   /// No description provided for @memberSince.
   ///
   /// In en, this message translates to:
@@ -891,6 +873,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
 
   /// No description provided for @minCharsSearchHint.
   ///
@@ -1030,6 +1018,12 @@ abstract class AppLocalizations {
   /// **'Reviews'**
   String get opinions;
 
+  /// No description provided for @unknownPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown power'**
+  String get unknownPower;
+
   /// No description provided for @station.
   ///
   /// In en, this message translates to:
@@ -1089,6 +1083,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free'**
   String get free;
+
+  /// No description provided for @available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
 
   /// No description provided for @charge.
   ///

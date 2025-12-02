@@ -93,10 +93,10 @@ class AssessmentRemoteDataProvider {
       return rawList.map((item) {
         return AssessmentEntity(
           nickname: item['nickname'] ?? 'Anónimo',
-          station_id: stationId,
+          stationId: stationId,
           score: (item['score'] as num).toInt(),
           description: item['comments'] ?? '',
-          created_at:
+          createdAt:
               DateTime.tryParse(item['created_at'].toString()) ??
               DateTime.now(),
         );

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
@@ -283,11 +282,11 @@ void main() {
     });
 
     test('many points performance', () {
-      int points_count = 10000;
+      int pointsCount = 10000;
       final track = RecordedTrack();
       final baseTime = DateTime.now();
       final random = Random(42); // Seed for reproducible randomness
-      for (int i = 0; i < points_count; i++) {
+      for (int i = 0; i < pointsCount; i++) {
       final lat = random.nextDouble() * 0.1 - 0.05; // Random lat between -0.05 and 0.05
       final lng = random.nextDouble() * 0.1 - 0.05; // Random lng between -0.05 and 0.05
       final alt = 90.0 + random.nextDouble() * 20.0; // Random altitude between 90.0 and 110.0
@@ -300,11 +299,11 @@ void main() {
       track.addPoint(point);
       }
 
-      expect(track.points.length, points_count);
+      expect(track.points.length, pointsCount);
       expect(track.totalDistanceMeters, greaterThan(0.0));
       expect(track.averageSpeedKmH, greaterThan(0.0));
       expect(track.maxSpeedKmH, greaterThan(0.0));
-      expect(track.totalTime, Duration(seconds: points_count - 1));
+      expect(track.totalTime, Duration(seconds: pointsCount - 1));
       expect(track.elevationGainMeters, greaterThan(0.0));
       expect(track.elevationLossMeters, greaterThan(0.0));
     });

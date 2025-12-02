@@ -213,7 +213,7 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
     return ReviewCard(
       userName: widget.review.nickname,
       date:
-          "${widget.review.created_at.day}/${widget.review.created_at.month}/${widget.review.created_at.year}",
+          "${widget.review.createdAt.day}/${widget.review.createdAt.month}/${widget.review.createdAt.year}",
       rating: widget.review.score.toDouble(),
       comment: widget.review.description,
       themeColor: widget.themeColor,
