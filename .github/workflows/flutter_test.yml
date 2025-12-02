@@ -10,6 +10,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
     defaults:
       run:
         working-directory: .
@@ -31,8 +33,8 @@ jobs:
           cache: true
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
-      - name: Create .env file to avoid asset missing error
-        run: touch .env
+      - name: Create .env file from ENV_FILE secret
+        run: echo "$ENV_FILE" > .env
       - name: Run tests with coverage information
         run: flutter test --coverage
       - name: Upload coverage reports for coverage job
