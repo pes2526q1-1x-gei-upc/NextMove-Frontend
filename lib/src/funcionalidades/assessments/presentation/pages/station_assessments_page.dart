@@ -174,10 +174,11 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
     if (currentUser == null || currentUser.email == null) {
     }
     if (currentUser != null && widget.review.nickname == currentUser.displayName) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isMine = true;
         });
+      }
     }
 
     try {

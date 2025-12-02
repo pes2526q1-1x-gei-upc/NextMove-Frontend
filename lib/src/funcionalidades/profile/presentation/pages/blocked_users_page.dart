@@ -108,7 +108,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
+                                color: Colors.black.withValues(alpha: 0.03),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -169,7 +169,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                   color: Colors.red,
                                   tooltip: "Desbloquear usuario",
                                   style: IconButton.styleFrom(
-                                    backgroundColor: Colors.red.withOpacity(0.1),
+                                    backgroundColor: Colors.red.withValues(alpha: 0.1),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   ),
                                 ),
