@@ -541,7 +541,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           children: [
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _selectedModo,
+                                initialValue: _selectedModo,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredMode,
                                   prefixIcon: Icon(
@@ -585,7 +585,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                             ),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _selectedIdioma,
+                                initialValue: _selectedIdioma,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredLanguage,
                                   prefixIcon: const Icon(
