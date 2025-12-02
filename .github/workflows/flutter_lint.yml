@@ -5,6 +5,9 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
 
@@ -17,7 +20,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.4"
+          flutter-version-file: pubspec.yaml
           channel: "stable"
           cache: true
 
@@ -27,5 +30,10 @@ jobs:
       # Verifica el entorno Flutter (como flutter doctor local).
       - run: flutter doctor -v
 
-      # Analiza el código (ignora warnings por ahora).
-      - run: flutter analyze || true
+      # Analiza el código y captura la salida.
+      - run: flutter analyze --write=flutter_analyze.log
+
+      - if: ${{ !cancelled() }}
+        uses: yorifuji/flutter-analyze-commenter@v1
+        with:
+          analyze-log: flutter_analyze.log
