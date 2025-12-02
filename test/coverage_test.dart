@@ -53,7 +53,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/star_
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/toggle_map_type_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/center_user_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/toggle_map_mode_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/EV_stats_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/ev_stats_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/google_map_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/info_card_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_bar_widget.dart';
