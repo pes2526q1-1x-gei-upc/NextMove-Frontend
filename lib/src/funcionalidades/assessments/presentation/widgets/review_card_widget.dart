@@ -34,7 +34,7 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           )
@@ -48,7 +48,7 @@ class ReviewCard extends StatelessWidget {
             children: [
               // --- AVATAR CON LOGICA DE FOTO ---
               CircleAvatar(
-                backgroundColor: themeColor.withOpacity(0.1),
+                backgroundColor: themeColor.withValues(alpha: 0.1),
                 radius: 18,
                 backgroundImage: hasPhoto ? NetworkImage(userPhotoUrl!) : null,
                 child: !hasPhoto

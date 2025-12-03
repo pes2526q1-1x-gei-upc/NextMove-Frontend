@@ -221,7 +221,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
+                disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
               ),
               onPressed: _selectedScore == 0
                   ? null

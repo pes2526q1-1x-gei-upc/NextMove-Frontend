@@ -97,7 +97,7 @@ class DetailFeatureRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: isActive! ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                color: isActive! ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -132,6 +132,6 @@ class SectionDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Divider(height: 1, color: Colors.grey.withOpacity(0.2));
+    return Divider(height: 1, color: Colors.grey.withValues(alpha: 0.2));
   }
 }

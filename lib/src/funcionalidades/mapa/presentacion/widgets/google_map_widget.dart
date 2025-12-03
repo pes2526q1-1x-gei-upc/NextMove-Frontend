@@ -26,6 +26,14 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    const style = '''
+    [
+      {
+        "featureType": "poi",
+        "stylers": [{"visibility": "off"}]
+      }
+    ]
+    ''';
     return GoogleMap(
       onMapCreated: widget.onMapCreated,
       initialCameraPosition: widget.initialCameraPosition,
@@ -36,6 +44,7 @@ class _MapWidgetState extends State<MapWidget> {
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       compassEnabled: true,
+      style: style,
     );
   }
 }

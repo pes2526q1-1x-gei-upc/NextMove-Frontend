@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -272,8 +274,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       setState(() => _isCreatingFirebaseUser = false);
       String errorMsg = 'Error de registro';
       if (e.code == 'weak-password') errorMsg = 'La contraseña es muy débil.';
-      if (e.code == 'email-already-in-use')
+      if (e.code == 'email-already-in-use') {
         errorMsg = 'El email ya está en uso.';
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -318,8 +321,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     var l10n = AppLocalizations.of(context)!;
     final primaryColor = Theme.of(context).primaryColor;
 
-    return WillPopScope(
-      onWillPop: () async => !_isCreatingFirebaseUser,
+    return PopScope(
+      canPop: !_isCreatingFirebaseUser,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F7),
         appBar: AppBar(
@@ -538,7 +541,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           children: [
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _selectedModo,
+                                initialValue: _selectedModo,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredMode,
                                   prefixIcon: Icon(
@@ -582,7 +585,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                             ),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _selectedIdioma,
+                                initialValue: _selectedIdioma,
                                 decoration: InputDecoration(
                                   labelText: l10n.preferredLanguage,
                                   prefixIcon: const Icon(

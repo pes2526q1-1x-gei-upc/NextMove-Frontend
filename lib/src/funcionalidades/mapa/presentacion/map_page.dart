@@ -48,7 +48,6 @@ class _MapPageState extends State<MapPage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
-  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
 
   
   StreamSubscription<Position>? _positionStream;
@@ -65,19 +64,6 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    _setMapStyle();
-  }
-
-  void _setMapStyle() async {
-    const style = '''
-    [
-      {
-        "featureType": "poi",
-        "stylers": [{"visibility": "off"}]
-      }
-    ]
-    ''';
-    _mapController?.setMapStyle(style);
   }
 
   // -----------------------------------------------------------------------
@@ -163,7 +149,9 @@ class _MapPageState extends State<MapPage> {
                         }
                       },
                       onFocusChanged: (isFocused) {
-                        print('📍 MapPage received focus change: $isFocused');
+                        if (kDebugMode) {
+                          print('📍 MapPage received focus change: $isFocused');
+                        }
                         setState(() {
                           _isSearchBarFocused = isFocused;
                         });
@@ -191,7 +179,6 @@ class _MapPageState extends State<MapPage> {
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
-                    // ESTO LO HE MOVIDO AL FINAL DEL STACK PARA QUE APAREZCA POR ENCIMA DE TODO
                     Positioned(
                       top: 130,
                       left: 16,

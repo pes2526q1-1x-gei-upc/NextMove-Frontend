@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // === Header del Perfil (Avatar + Texto) ===
@@ -38,14 +39,18 @@ class ProfileHeaderWidget extends StatelessWidget {
       backgroundImage = NetworkImage(imageUrl!);
       avatarChild = null; // Don't show icon when we have an image
 
-      print('ProfileHeader: Loading user photo from URL: $imageUrl');
+      if (kDebugMode) {
+        print('ProfileHeader: Loading user photo from URL: $imageUrl');
+      }
     } else {
       // USER HAS NO PHOTO - use default icon
       // We set backgroundImage to null and provide a child icon instead
       backgroundImage = null;
       avatarChild = const Icon(Icons.person, size: 40, color: Colors.grey);
 
-      print('ProfileHeader: No photo URL provided, showing default icon');
+      if (kDebugMode) {
+        print('ProfileHeader: No photo URL provided, showing default icon');
+      }
     }
 
     return Row(
@@ -56,7 +61,7 @@ class ProfileHeaderWidget extends StatelessWidget {
             border: Border.all(color: Colors.white, width: 3),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),

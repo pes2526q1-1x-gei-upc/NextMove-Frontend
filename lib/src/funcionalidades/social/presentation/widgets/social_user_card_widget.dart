@@ -29,7 +29,7 @@ class SocialUserCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -49,13 +49,13 @@ class SocialUserCard extends StatelessWidget {
                   radius: 25,
                   backgroundColor: Colors.grey[200],
                   backgroundImage: hasPhoto ? NetworkImage(user.photo) : null,
-                  child: !hasPhoto
-                      ? const Icon(Icons.person, color: Colors.grey)
-                      : null,
                   onBackgroundImageError: hasPhoto 
                       ? (exception, stackTrace) {
                           debugPrint('Error cargando avatar en lista: $exception');
                         }
+                      : null,
+                  child: !hasPhoto
+                      ? const Icon(Icons.person, color: Colors.grey)
                       : null,
                 ),
                 
@@ -91,7 +91,7 @@ class SocialUserCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -116,7 +116,7 @@ class SocialUserCard extends StatelessWidget {
                     color: Theme.of(context).primaryColor,
                     tooltip: "Añadir a amigos",
                     style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
