@@ -1,23 +1,23 @@
-# name: Flutter CI
+name: Flutter CI
 
-# # on:
-# #   push:
-# #     branches: [main, dev, 'release/**']
-# #   # pull_request:
-# #   #   branches: [main, dev, 'release/**']
+on:
+  push:
+    branches: [main, dev, 'release/**']
+  pull_request:
+    branches: [main, dev, 'release/**']
 
-# jobs:
-#   lint:
-#     permissions:
-#       contents: read
-#       pull-requests: write
-#     uses: ./.github/workflows/flutter_lint.yml
-#     secrets: inherit
-#   test:
-#     permissions:
-#       contents: read
-#       pull-requests: write
-#     uses: ./.github/workflows/flutter_test.yml
-#     secrets: inherit
-#     with:
-#       coverage: true
+jobs:
+  lint:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/flutter_lint.yml
+    secrets: inherit
+  test:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/flutter_test.yml
+    secrets: inherit
+    with:
+      coverage: true

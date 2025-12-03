@@ -1,7 +1,11 @@
 name: Firebase App Distribution
 
 on:
-  workflow_call
+  workflow_call:
+    inputs:
+      groups:
+        required: true
+        type: string
 
 jobs:
   firebase_distribution:
@@ -59,5 +63,5 @@ jobs:
         with:
           appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          groups: testers
+          groups: ${{ inputs.groups }}
           file: build/app/outputs/flutter-apk/app-release.apk
