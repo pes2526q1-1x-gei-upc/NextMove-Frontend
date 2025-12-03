@@ -23,7 +23,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.bemotion.nextmove"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
@@ -31,11 +30,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("beta") {
+            // This file is created by the CI workflow
+            storeFile = file("beta-keystore.jks")
+            // Read the secrets from the environment variables set in the workflow
+            storePassword = System.getenv("BETA_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("BETA_KEY_ALIAS")
+            keyPassword = System.getenv("BETA_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("beta")
         }
     }
 }
