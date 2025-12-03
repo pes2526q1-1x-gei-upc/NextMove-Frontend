@@ -79,26 +79,19 @@ class _EditUserDataPreferencesPageState
     var l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black87,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: _goBack,
         ),
         title: Text(
           l10n.editProfile,
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A1A),
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ),
       body: BlocConsumer<UserBloc, UserState>(

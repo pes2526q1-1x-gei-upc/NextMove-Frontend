@@ -8,6 +8,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/la
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/appearance_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
@@ -24,7 +25,6 @@ class ProfilePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
@@ -183,10 +183,7 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.dark_mode_outlined,
                           text: l10n.appearance,
-                          onTap: () => {
-                            // ignore: avoid_print
-                            if (kDebugMode) {print("Click en Modo Oscuro")},
-                          },
+                          onTap: () => AppearanceSelector.show(context),
                         ),
                       ],
                     ),

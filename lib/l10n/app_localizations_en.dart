@@ -360,6 +360,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark mode';
 
   @override
+  String get systemMode => 'Use system setting';
+
+  @override
   String get preliminarVersion => 'Preliminary version';
 
   @override

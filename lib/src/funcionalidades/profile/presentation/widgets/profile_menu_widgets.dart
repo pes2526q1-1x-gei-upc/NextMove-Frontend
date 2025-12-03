@@ -21,6 +21,7 @@ class ProfileHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // STEP 2: Determine which image to display
     // This is the KEY LOGIC for loading user photos anywhere in your app
     // We need to decide between three options:
@@ -58,14 +59,16 @@ class ProfileHeaderWidget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
+            border: Border.all(color: theme.cardColor, width: 3),
+            boxShadow: theme.brightness == Brightness.dark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
           ),
           // STEP 4: Apply the image logic to CircleAvatar
           // CircleAvatar has two main properties for displaying content:
@@ -85,16 +88,18 @@ class ProfileHeaderWidget extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      color: theme.colorScheme.outline,
+                    ),
               ),
             ],
           ),
@@ -131,23 +136,31 @@ class ProfileMenuOption extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(
+                        Theme.of(context).brightness == Brightness.dark ? 0.35 : 1,
+                      ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 20, color: Colors.black87),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   text,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+              ),
             ],
           ),
         ),
@@ -162,12 +175,13 @@ class ProfileMenuDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(
+    return Divider(
       height: 1,
       thickness: 1,
       indent: 60,
       endIndent: 0,
-      color: Color(0xFFF0F0F0),
+      color: Theme.of(context).dividerColor,
     );
   }
 }
+

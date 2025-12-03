@@ -31,6 +31,19 @@ class MapControlsColumnWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor = theme.cardColor;
+    final iconColor = theme.colorScheme.onSurface;
+    final List<BoxShadow> commonShadow = [
+      BoxShadow(
+        color: Colors.black.withOpacity(isDark ? 0.45 : 0.18),
+        spreadRadius: 1,
+        blurRadius: 12,
+        offset: const Offset(0, 6),
+      ),
+    ];
+
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         if (state is! MapLoadedState) {
@@ -53,21 +66,15 @@ class MapControlsColumnWidget extends StatelessWidget {
                   width: 50,
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.3),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                      ),
-                    ],
+                    boxShadow: commonShadow,
                   ),
                   child: Icon(
                     currentMapType == MapType.normal
                         ? Icons.satellite
                         : Icons.map,
-                    color: Colors.grey[700],
+                    color: iconColor,
                     size: 28,
                   ),
                 ),
@@ -81,17 +88,15 @@ class MapControlsColumnWidget extends StatelessWidget {
                   width: 50,
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.3),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                      ),
-                    ],
+                    boxShadow: commonShadow,
                   ),
-                  child: Icon(Icons.my_location, color: Colors.grey[700], size: 28),
+                  child: Icon(
+                    Icons.my_location,
+                    color: iconColor,
+                    size: 28,
+                  ),
                 ),
               ),
 
@@ -114,20 +119,13 @@ class MapControlsColumnWidget extends StatelessWidget {
                     width: 50,
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
+                    color: theme.colorScheme.secondaryContainer,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                    boxShadow: commonShadow,
                     ),
-                    child: const Icon(
+                  child: Icon(
                       Icons.bar_chart,
-                      color: Colors.white,
+                    color: theme.colorScheme.onSecondaryContainer,
                       size: 24,
                     ),
                   ),
@@ -148,20 +146,24 @@ class MapControlsColumnWidget extends StatelessWidget {
                   height: 60,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: isRecording ? Colors.red : Theme.of(context).colorScheme.primary,
+                    color: isRecording
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.primary,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withOpacity(isDark ? 0.55 : 0.25),
+                        spreadRadius: 1,
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: Icon(
                     isRecording ? Icons.stop : Icons.play_arrow,
-                    color: Colors.white,
+                    color: isRecording
+                        ? theme.colorScheme.onError
+                        : theme.colorScheme.onPrimary,
                     size: 32,
                   ),
                 ),

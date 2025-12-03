@@ -29,7 +29,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
     var l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -37,7 +37,10 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Colors.black87),
+              leading: Icon(
+                Icons.photo_library,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               title: Text(l10n.gallery),
               onTap: () {
                 _pickImage(ImageSource.gallery, context);
@@ -45,7 +48,10 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: Colors.black87),
+              leading: Icon(
+                Icons.camera_alt,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               title: Text(l10n.camera),
               onTap: () {
                 _pickImage(ImageSource.camera, context);

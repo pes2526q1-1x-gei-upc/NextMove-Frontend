@@ -24,24 +24,20 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new),
-          color: const Color(0xFF1A1A1A),
           iconSize: 22,
         ),
         title: Text(
           l10n.bloquedUsers,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ),
       body: SafeArea(
@@ -95,15 +91,20 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            boxShadow:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? null
+                                    : [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.03,
+                                          ),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(12),
@@ -113,7 +114,8 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                   width: 50,
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[200],
+                                    color:
+                                        Theme.of(context).colorScheme.surfaceVariant,
                                     shape: BoxShape.circle,
                                     image: user.photo.isNotEmpty
                                         ? DecorationImage(
@@ -123,7 +125,13 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                         : null,
                                   ),
                                   child: user.photo.isEmpty
-                                      ? const Icon(Icons.person, color: Colors.grey)
+                                      ? Icon(
+                                          Icons.person,
+                                          color: Theme.of(context)
+                                              .iconTheme
+                                              .color
+                                              ?.withOpacity(0.7),
+                                        )
                                       : null,
                                 ),
                                 const SizedBox(width: 16),
@@ -134,10 +142,12 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                     children: [
                                       Text(
                                         user.apodo,
-                                        style: const TextStyle(
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
-                                          color: Color(0xFF1A1A1A),
                                         ),
                                       ),
                                       Text(

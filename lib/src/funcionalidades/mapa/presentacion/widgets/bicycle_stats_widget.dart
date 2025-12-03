@@ -14,11 +14,10 @@ class BicycleStatsWidget extends StatelessWidget {
 
   final BicycleStationDetails station;
 
-  final Color _cardBackgroundColor = const Color(0xFFF5F5F7);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cardColor = Theme.of(context).cardColor;
     return Row(
       children: [
         // --- Card 1: Mecánicas ---
@@ -28,7 +27,7 @@ class BicycleStatsWidget extends StatelessWidget {
             label: l10n.mechanical,
             value: '${station.availableMechanicalBikes ?? "-"}',
             color: Colors.orange,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -40,7 +39,7 @@ class BicycleStatsWidget extends StatelessWidget {
             label: l10n.electric,
             value: '${station.availableElectricBikes ?? "-"}',
             color: Colors.blue,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -52,7 +51,7 @@ class BicycleStatsWidget extends StatelessWidget {
             label: l10n.free,
             value: '${station.availableSlots ?? "-"}',
             color: Colors.grey,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
       ],

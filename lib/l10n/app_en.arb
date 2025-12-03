@@ -128,6 +128,7 @@
     "appearance" : "Appearance",
     "lightMode" : "Light mode",
     "darkMode" : "Dark mode",
+    "systemMode": "Use system setting",
     "preliminarVersion": "Preliminary version",
     "searchByNickname": "Search by nickname",
     "noUsersFound": "No user found with that nickname.",

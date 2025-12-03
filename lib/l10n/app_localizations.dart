@@ -778,6 +778,12 @@ abstract class AppLocalizations {
   /// **'Dark mode'**
   String get darkMode;
 
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use system setting'**
+  String get systemMode;
+
   /// No description provided for @preliminarVersion.
   ///
   /// In en, this message translates to:

@@ -62,26 +62,22 @@ class _SocialPageState extends State<SocialPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new,
-            color: Colors.black87,
             size: 20,
           ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           l10n.social,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ),
       body: SafeArea(
@@ -92,15 +88,17 @@ class _SocialPageState extends State<SocialPage> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: Theme.of(context).brightness == Brightness.dark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: TextField(
                   controller: _searchController,

@@ -27,16 +27,19 @@ class ReviewCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final hasPhoto = userPhotoUrl != null && userPhotoUrl!.isNotEmpty;
 
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(
+              theme.brightness == Brightness.dark ? 0.35 : 0.08,
+            ),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           )
         ],
       ),
@@ -48,7 +51,7 @@ class ReviewCard extends StatelessWidget {
             children: [
               // --- AVATAR CON LOGICA DE FOTO ---
               CircleAvatar(
-                backgroundColor: themeColor.withValues(alpha: 0.1),
+                backgroundColor: themeColor.withOpacity(0.15),
                 radius: 18,
                 backgroundImage: hasPhoto ? NetworkImage(userPhotoUrl!) : null,
                 child: !hasPhoto
@@ -71,10 +74,10 @@ class ReviewCard extends StatelessWidget {
                   children: [
                     Text(
                       userName,
-                      style: const TextStyle(
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -82,8 +85,8 @@ class ReviewCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       date,
-                      style: TextStyle(
-                        color: Colors.grey[500],
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -109,7 +112,9 @@ class ReviewCard extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.only(left: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: theme.colorScheme.surfaceVariant.withOpacity(
+                      theme.brightness == Brightness.dark ? 0.4 : 0.9,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -129,8 +134,7 @@ class ReviewCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               comment,
-              style: TextStyle(
-                color: Colors.grey[800],
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
                 height: 1.4,
               ),

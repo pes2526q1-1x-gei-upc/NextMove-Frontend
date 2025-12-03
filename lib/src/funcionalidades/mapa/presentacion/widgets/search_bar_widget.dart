@@ -55,6 +55,12 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+    final iconColor = theme.colorScheme.onSurface.withOpacity(0.7);
+    final shadowColor = Colors.black.withOpacity(isDark ? 0.45 : 0.18);
+
     return Positioned(
       top: 70,
       left: 16,
@@ -62,13 +68,14 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: baseColor,
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.3),
-              spreadRadius: 2,
-              blurRadius: 5,
+              color: shadowColor,
+              spreadRadius: 1,
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -77,10 +84,10 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
           focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            prefixIcon: Icon(Icons.search, color: iconColor),
             suffixIcon: _searchController.text.isNotEmpty ? 
               IconButton(
-                icon: const Icon(Icons.clear, color: Colors.grey),
+                icon: Icon(Icons.clear, color: iconColor),
                 onPressed: () {
                   _searchController.clear();
                   context.read<MapBloc>().add(const ClearSearchEvent());

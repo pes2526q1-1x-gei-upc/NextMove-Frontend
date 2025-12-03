@@ -7,14 +7,15 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(
         text.toUpperCase(),
-        style: TextStyle(
+        style: theme.textTheme.labelSmall?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.grey[600],
+          color: theme.colorScheme.onSurfaceVariant,
           letterSpacing: 0.5,
         ),
       ),
@@ -36,6 +37,7 @@ class DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14),
       child: Row(
@@ -43,10 +45,12 @@ class DetailRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: theme.colorScheme.surfaceVariant.withOpacity(
+                theme.brightness == Brightness.dark ? 0.2 : 1,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: Colors.grey[700]),
+            child: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -54,7 +58,10 @@ class DetailRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+            style: TextStyle(
+              fontSize: 15,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -77,6 +84,7 @@ class DetailFeatureRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14),
       child: Row(
@@ -84,10 +92,12 @@ class DetailFeatureRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: theme.colorScheme.surfaceVariant.withOpacity(
+                theme.brightness == Brightness.dark ? 0.2 : 1,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: Colors.grey[700]),
+            child: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -97,7 +107,7 @@ class DetailFeatureRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: isActive! ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                color: (isActive! ? Colors.green : Colors.red).withOpacity(0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -132,6 +142,9 @@ class SectionDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Divider(height: 1, color: Colors.grey.withValues(alpha: 0.2));
+    return Divider(
+      height: 1,
+      color: Theme.of(context).dividerColor,
+    );
   }
 }

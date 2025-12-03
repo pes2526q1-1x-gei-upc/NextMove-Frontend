@@ -128,6 +128,7 @@
     "appearance": "Aparença",
     "lightMode": "Mode clar",
     "darkMode": "Mode fosc",
+    "systemMode": "Utilitza el mode del sistema",
     "preliminarVersion": "Versió preliminar",
     "searchByNickname": "Cerca per sobrenom",
     "noUsersFound": "No s'ha trobat cap usuari amb aquest sobrenom.",

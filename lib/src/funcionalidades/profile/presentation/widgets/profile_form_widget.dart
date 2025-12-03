@@ -7,6 +7,7 @@ class ProfileSectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.outline;
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
       child: Text(
@@ -14,7 +15,7 @@ class ProfileSectionLabel extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.grey[600],
+          color: color,
           letterSpacing: 0.8,
         ),
       ),
@@ -29,17 +30,21 @@ class ProfileStyledCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(children: children),
@@ -72,6 +77,9 @@ class ProfileStyledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.outline;
     return Column(
       children: [
         TextFormField(
@@ -80,15 +88,19 @@ class ProfileStyledTextField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: maxLines,
           style: TextStyle(
-            color: readOnly ? Colors.grey[600] : const Color(0xFF1A1A1A),
+            color: readOnly ? mutedColor : onSurface,
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+            labelStyle: TextStyle(color: mutedColor, fontSize: 14),
             border: InputBorder.none,
-            prefixIcon: Icon(icon, color: readOnly ? Colors.grey[400] : Colors.black87, size: 20),
+            prefixIcon: Icon(
+              icon,
+              color: readOnly ? mutedColor : onSurface,
+              size: 20,
+            ),
             prefixIconConstraints: const BoxConstraints(minWidth: 40),
             contentPadding: const EdgeInsets.symmetric(vertical: 14),
             isDense: true,
@@ -96,10 +108,10 @@ class ProfileStyledTextField extends StatelessWidget {
           validator: validator,
         ),
         if (showDivider)
-          const Divider(
+          Divider(
             height: 1,
             thickness: 1,
-            color: Color(0xFFF0F0F0),
+            color: theme.dividerColor,
             indent: 40, 
           ),
       ],
@@ -111,7 +123,7 @@ class ProfileStyledTextField extends StatelessWidget {
 InputDecoration cardInputDecoration({required IconData icon, required BuildContext context}) {
   return InputDecoration(
     border: InputBorder.none,
-    prefixIcon: Icon(icon, color: Colors.black87, size: 20),
+    prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
     contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
     isDense: true,
   );

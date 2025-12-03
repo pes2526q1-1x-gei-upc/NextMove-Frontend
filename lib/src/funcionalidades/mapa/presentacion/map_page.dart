@@ -137,6 +137,7 @@ class _MapPageState extends State<MapPage> {
                       markers: markersToShow,
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
+                      darkMode: Theme.of(context).brightness == Brightness.dark,
                       onMapCreated: _onMapCreated,
                     ),
 
@@ -214,11 +215,15 @@ class _MapPageState extends State<MapPage> {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) =>
-          StationBottomSheet(context: context, station: station, state: state),
+      builder: (_) => StationBottomSheet(
+        context: context,
+        station: station,
+        state: state,
+      ),
     );
   }
 }

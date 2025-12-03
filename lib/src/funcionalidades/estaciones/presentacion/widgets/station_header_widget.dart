@@ -25,6 +25,9 @@ class StationHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     final assessmentState = context.watch<AssessmentBloc>().state;
 
@@ -47,10 +50,10 @@ class StationHeaderWidget extends StatelessWidget {
         // --- NOMBRE DE LA ESTACIÓN ---
         Text(
           station.name ?? l10n.unknown,
-          style: const TextStyle(
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: textColor,
             height: 1.2,
           ),
         ),
@@ -59,14 +62,14 @@ class StationHeaderWidget extends StatelessWidget {
         // --- DIRECCIÓN ---
         Row(
           children: [
-            Icon(Icons.location_on_rounded, size: 18, color: Colors.grey[600]),
+            Icon(Icons.location_on_rounded, size: 18, color: mutedColor),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 station.address ?? l10n.unknown,
-                style: TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: mutedColor,
                   height: 1.3,
                 ),
               ),
@@ -87,14 +90,14 @@ class StationHeaderWidget extends StatelessWidget {
               createStarRatingRow((displayRating * 2).round()),
               Text(
                 '(${displayRating.toStringAsFixed(1)})',
-                style: const TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
               ),
 
               // Separador vertical
-              Container(width: 1, height: 16, color: Colors.grey[300]),
+              Container(width: 1, height: 16, color: theme.dividerColor),
 
               // Link "Ver opiniones"
               InkWell(
@@ -108,10 +111,11 @@ class StationHeaderWidget extends StatelessWidget {
                   child: Text(
                     "${l10n.seeOpinions} (${assessmentState.totalAssessments})",
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: themeColor,
                       fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.grey[400],
+                      decorationColor: themeColor,
                     ),
                   ),
                 ),
@@ -126,7 +130,7 @@ class StationHeaderWidget extends StatelessWidget {
                   child: Text(
                     l10n.withoutOpinions,
                     style: TextStyle(
-                      color: Colors.grey[500],
+                      color: mutedColor,
                       fontSize: 13,
                       decoration: TextDecoration.underline,
                     ),
@@ -228,9 +232,9 @@ class StationHeaderWidget extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: themeColor.withValues(alpha: 0.1),
+                  color: themeColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: themeColor.withValues(alpha: 0.2)),
+                  border: Border.all(color: themeColor.withOpacity(0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

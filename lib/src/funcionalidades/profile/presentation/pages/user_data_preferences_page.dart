@@ -324,19 +324,13 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     return PopScope(
       canPop: !_isCreatingFirebaseUser,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F7),
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF5F5F7),
           elevation: 0,
           centerTitle: true,
           automaticallyImplyLeading: false,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.black87,
-                    size: 20,
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios_new, size: 20),
                   onPressed: () {
                     if (!_isCreatingFirebaseUser) Navigator.pop(context);
                   },
@@ -347,7 +341,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
             ),
           ),
         ),

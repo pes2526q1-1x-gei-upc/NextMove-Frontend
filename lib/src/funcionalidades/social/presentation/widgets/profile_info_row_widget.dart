@@ -14,6 +14,8 @@ class ProfileInfoRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
@@ -21,10 +23,15 @@ class ProfileInfoRowWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: theme.colorScheme.surfaceVariant
+                  .withOpacity(isDark ? 0.35 : 1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 20, color: Colors.black87),
+            child: Icon(
+              icon,
+              size: 20,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -33,18 +40,16 @@ class ProfileInfoRowWidget extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 16,
-                    color: Color(0xFF1A1A1A),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
