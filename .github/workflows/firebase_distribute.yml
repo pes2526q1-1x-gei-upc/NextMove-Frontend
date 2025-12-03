@@ -80,8 +80,21 @@ jobs:
       #     channel: "stable"
       #     cache: true
 
-      # - name: Build APK (debug)
-      #   run: flutter build apk --debug
+      # 1. Decode the Keystore from Secrets
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.BETA_KEYSTORE_BASE64 }}" | base64 --decode > android/app/beta-keystore.jks
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      # 2. Build APK (Passing Secrets as Environment Variables)
+      - name: Build APK
+        run: flutter build apk --release
+        env:
+          BETA_KEYSTORE_PASSWORD: ${{ secrets.BETA_KEYSTORE_PASSWORD }}
+          BETA_KEY_ALIAS: ${{ secrets.BETA_KEY_ALIAS }}
+          BETA_KEY_PASSWORD: ${{ secrets.BETA_KEY_PASSWORD }}
 
       - name: Check if APK file is in expected location
         run: |
