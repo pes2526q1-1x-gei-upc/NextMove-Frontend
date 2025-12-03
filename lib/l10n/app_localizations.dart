@@ -880,6 +880,12 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get friends;
 
+  /// No description provided for @addFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get addFriend;
+
   /// No description provided for @minCharsSearchHint.
   ///
   /// In en, this message translates to:
@@ -1239,6 +1245,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The user does not match the current user.'**
   String get userMismatch;
+
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
 }
 
 class _AppLocalizationsDelegate

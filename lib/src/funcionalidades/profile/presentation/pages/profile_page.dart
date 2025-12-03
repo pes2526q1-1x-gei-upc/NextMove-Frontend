@@ -14,6 +14,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_en
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -103,6 +104,29 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                    // --- SECCIÓN 2: SOCIAL ---
+                    ProfileSectionLabel(text: l10n.social),
+                    ProfileStyledCard(
+                      children: [
+                        ProfileMenuOption(
+                          icon: Icons.person_outline_rounded,
+                          text: l10n.friends,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => SocialBloc(),
+                                  child: const SocialPage(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         const ProfileMenuDivider(),
                         ProfileMenuOption(
                           icon: Icons.block_rounded,
@@ -119,12 +143,11 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                        
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
-                    // --- SECCIÓN 2: PREFERENCIAS ---
+                    // --- SECCIÓN 3: PREFERENCIAS ---
                     ProfileSectionLabel(text: l10n.settings),
                     ProfileStyledCard(
                       children: [

@@ -253,9 +253,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponibles';
-
-  @override
   String get occupied => 'Ocupat';
 
   @override
@@ -269,9 +266,6 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Potència desconeguda';
 
   @override
   String get unknown => 'Desconegut';
@@ -394,9 +388,6 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
-  String get friends => 'Amics';
-
-  @override
   String get memberSince => 'Membre des de';
 
   @override
@@ -428,6 +419,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get block => 'Bloquejar';
+
+  @override
+  String get friends => 'Amics';
+
+  @override
+  String get addFriend => 'Afegeix amic';
 
   @override
   String get minCharsSearchHint =>
@@ -502,6 +499,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get opinions => 'Valoracions';
 
   @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
   String get station => 'Estació';
 
   @override
@@ -530,6 +530,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get free => 'Lliures';
+
+  @override
+  String get available => 'Disponible';
 
   @override
   String get charge => 'Càrrega';
@@ -609,4 +612,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
+
+  @override
+  String get social => 'Social';
 }

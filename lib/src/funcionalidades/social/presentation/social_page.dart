@@ -63,22 +63,33 @@ class _SocialPageState extends State<SocialPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF5F5F7),
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          l10n.social,
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Social",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-              const SizedBox(height: 20),
-
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,

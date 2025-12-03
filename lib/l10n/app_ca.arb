@@ -136,6 +136,7 @@
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
     "friends": "Amics",
+    "addFriend": "Afegeix amic",
     "memberSince": "Membre des de",
     "deleteFriendship": "Eliminar amistat",
     "deleteFriendConfirmation": "Estàs segur que vols eliminar {nickname} dels teus amics?",
@@ -228,5 +229,6 @@
     "accountDeleted": "El teu compte ha estat eliminat correctament.",
     "errorDeletingAccount": "Error en eliminar el compte.",
     "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
-    "userMismatch": "L'usuari no coincideix amb l'usuari actual."
+    "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
+    "social": "Social"
 }
