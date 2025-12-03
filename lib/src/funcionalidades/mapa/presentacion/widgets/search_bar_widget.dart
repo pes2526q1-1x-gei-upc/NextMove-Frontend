@@ -58,8 +58,8 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final baseColor = theme.cardColor;
-    final iconColor = theme.colorScheme.onSurface.withOpacity(0.7);
-    final shadowColor = Colors.black.withOpacity(isDark ? 0.45 : 0.18);
+    final iconColor = theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
 
     return Positioned(
       top: 70,

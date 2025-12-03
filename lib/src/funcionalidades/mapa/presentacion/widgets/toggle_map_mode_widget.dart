@@ -19,10 +19,10 @@ class ToggleMapModeWidget extends StatelessWidget {
     final baseColor = theme.cardColor;
     final bikeActiveColor = Colors.blue.shade600;
     final evActiveColor = Colors.green.shade600;
-    final inactiveIconColor = theme.colorScheme.onSurface.withOpacity(0.7);
+    final inactiveIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.7);
     final overlayShadow = [
       BoxShadow(
-        color: Colors.black.withOpacity(isDark ? 0.45 : 0.18),
+        color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
         spreadRadius: 1,
         blurRadius: 16,
         offset: const Offset(0, 8),

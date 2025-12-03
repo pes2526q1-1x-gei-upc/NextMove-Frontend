@@ -50,7 +50,7 @@ class FriendDetailsContent extends StatelessWidget {
                               offset: const Offset(0, 5),
                             ),
                           ],
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     image: hasPhoto 
                         ? DecorationImage(
                             image: NetworkImage(user.photo),
@@ -66,7 +66,7 @@ class FriendDetailsContent extends StatelessWidget {
                       ? Icon(
                           Icons.person,
                           size: 60,
-                          color: theme.iconTheme.color?.withOpacity(0.8),
+                          color: theme.iconTheme.color?.withValues(alpha: 0.8),
                         )
                       : null,
                 ),

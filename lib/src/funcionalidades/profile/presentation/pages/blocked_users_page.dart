@@ -115,7 +115,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                   height: 50,
                                   decoration: BoxDecoration(
                                     color:
-                                        Theme.of(context).colorScheme.surfaceVariant,
+                                        Theme.of(context).colorScheme.surfaceContainerHighest,
                                     shape: BoxShape.circle,
                                     image: user.photo.isNotEmpty
                                         ? DecorationImage(
@@ -130,7 +130,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                                           color: Theme.of(context)
                                               .iconTheme
                                               .color
-                                              ?.withOpacity(0.7),
+                                              ?.withValues(alpha: 0.7),
                                         )
                                       : null,
                                 ),

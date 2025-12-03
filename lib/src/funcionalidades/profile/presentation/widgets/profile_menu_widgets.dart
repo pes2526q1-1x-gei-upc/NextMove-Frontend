@@ -136,7 +136,7 @@ class ProfileMenuOption extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 
                         Theme.of(context).brightness == Brightness.dark ? 0.35 : 1,
                       ),
                   borderRadius: BorderRadius.circular(8),
@@ -159,7 +159,7 @@ class ProfileMenuOption extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
               ),
             ],
           ),

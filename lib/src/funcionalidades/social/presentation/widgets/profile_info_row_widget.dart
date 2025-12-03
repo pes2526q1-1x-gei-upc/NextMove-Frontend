@@ -23,8 +23,8 @@ class ProfileInfoRowWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant
-                  .withOpacity(isDark ? 0.35 : 1),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: isDark ? 0.35 : 1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(

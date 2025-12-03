@@ -66,7 +66,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
         ThemeData.estimateBrightnessForColor(widget.themeColor) ==
                 Brightness.dark
             ? Colors.white
-            : Colors.black.withOpacity(0.85);
+            : Colors.black.withValues(alpha: 0.85);
 
     return Container(
       decoration: BoxDecoration(
@@ -74,7 +74,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
+            color: Colors.black.withValues(alpha: 
               theme.brightness == Brightness.dark ? 0.5 : 0.15,
             ),
             blurRadius: 24,
@@ -188,7 +188,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         : Icons.star_outline_rounded,
                     color: starIndex <= _selectedScore
                         ? Colors.amber
-                        : theme.colorScheme.onSurface.withOpacity(0.25),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.25),
                     size: 40,
                   ),
                 ),
@@ -212,18 +212,18 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           // --- CAMPO DE COMENTARIOS ---
           Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
                 theme.brightness == Brightness.dark ? 0.35 : 1,
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: theme.dividerColor.withOpacity(
+                color: theme.dividerColor.withValues(alpha: 
                   theme.brightness == Brightness.dark ? 0.4 : 0.6,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(
+                  color: Colors.black.withValues(alpha: 
                     theme.brightness == Brightness.dark ? 0.45 : 0.08,
                   ),
                   blurRadius: 12,
@@ -260,10 +260,10 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                shadowColor: widget.themeColor.withOpacity(0.4),
-                overlayColor: buttonOnColor.withOpacity(0.08),
-                disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
-                disabledForegroundColor: buttonOnColor.withOpacity(0.6),
+                shadowColor: widget.themeColor.withValues(alpha: 0.4),
+                overlayColor: buttonOnColor.withValues(alpha: 0.08),
+                disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
+                disabledForegroundColor: buttonOnColor.withValues(alpha: 0.6),
               ),
               onPressed: _selectedScore == 0
                   ? null

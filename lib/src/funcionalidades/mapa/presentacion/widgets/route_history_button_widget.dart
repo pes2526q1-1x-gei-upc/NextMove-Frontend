@@ -19,7 +19,7 @@ class RouteHistoryButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final shadowColor = Colors.black.withOpacity(isDark ? 0.45 : 0.18);
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
 
     return Positioned(
       top: 130, // 70 + 50 (altura del botón anterior) + 10 (espacio)

@@ -45,7 +45,7 @@ class DetailRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
                 theme.brightness == Brightness.dark ? 0.2 : 1,
               ),
               borderRadius: BorderRadius.circular(8),
@@ -92,7 +92,7 @@ class DetailFeatureRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant.withOpacity(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
                 theme.brightness == Brightness.dark ? 0.2 : 1,
               ),
               borderRadius: BorderRadius.circular(8),
@@ -107,7 +107,7 @@ class DetailFeatureRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: (isActive! ? Colors.green : Colors.red).withOpacity(0.12),
+                color: (isActive! ? Colors.green : Colors.red).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(

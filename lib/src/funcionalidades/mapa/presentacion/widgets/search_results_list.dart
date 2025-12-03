@@ -74,7 +74,7 @@ class SearchResultsList extends StatelessWidget {
   Widget _messageCard(BuildContext context, String message, IconData icon) {
     final theme = Theme.of(context);
     final shadowColor =
-        Colors.black.withOpacity(theme.brightness == Brightness.dark ? 0.5 : 0.18);
+        Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.5 : 0.18);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -125,7 +125,7 @@ class SearchResultsList extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
+            color: Colors.black.withValues(alpha: 
               theme.brightness == Brightness.dark ? 0.5 : 0.18,
             ),
             spreadRadius: 1,
@@ -221,7 +221,7 @@ class SearchResultsList extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
+            color: Colors.black.withValues(alpha: 
               theme.brightness == Brightness.dark ? 0.5 : 0.18,
             ),
             spreadRadius: 1,

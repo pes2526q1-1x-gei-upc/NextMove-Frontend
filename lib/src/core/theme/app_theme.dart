@@ -64,7 +64,9 @@ class AppTheme {
       backgroundColor: Color(0xFF2C2F36),
       contentTextStyle: TextStyle(color: Colors.white),
     ),
-    dialogBackgroundColor: const Color(0xFF1C1F26),
+    dialogTheme: const DialogThemeData(
+      backgroundColor: Color(0xFF1C1F26),
+    ),
     useMaterial3: true,
   );
 }

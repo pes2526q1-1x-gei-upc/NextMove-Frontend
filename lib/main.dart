@@ -299,7 +299,7 @@ class _MainScreenState extends State<MainScreen> {
           selectedItemColor:
               bottomNavTheme.selectedItemColor ?? theme.colorScheme.primary,
           unselectedItemColor: bottomNavTheme.unselectedItemColor ??
-              theme.colorScheme.onSurface.withOpacity(0.6),
+              theme.colorScheme.onSurface.withValues(alpha: 0.6),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           currentIndex: _selectedIndex,

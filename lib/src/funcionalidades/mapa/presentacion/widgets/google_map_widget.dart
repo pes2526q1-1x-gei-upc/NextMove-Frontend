@@ -24,24 +24,11 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  GoogleMapController? _controller;
-
-  @override
-  void didUpdateWidget(covariant MapWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.darkMode != widget.darkMode && _controller != null) {
-      _controller!.setMapStyle(widget.darkMode ? _darkMapStyle : _lightMapStyle);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      onMapCreated: (controller) {
-        _controller = controller;
-        _controller!.setMapStyle(widget.darkMode ? _darkMapStyle : _lightMapStyle);
-        widget.onMapCreated?.call(controller);
-      },
+      style: widget.darkMode ? _darkMapStyle : _lightMapStyle,
+      onMapCreated: (controller) => widget.onMapCreated?.call(controller),
       initialCameraPosition: widget.initialCameraPosition,
       markers: widget.markers,
       polylines: {widget.polyline},

@@ -37,7 +37,7 @@ class MapControlsColumnWidget extends StatelessWidget {
     final iconColor = theme.colorScheme.onSurface;
     final List<BoxShadow> commonShadow = [
       BoxShadow(
-        color: Colors.black.withOpacity(isDark ? 0.45 : 0.18),
+        color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
         spreadRadius: 1,
         blurRadius: 12,
         offset: const Offset(0, 6),
@@ -152,7 +152,7 @@ class MapControlsColumnWidget extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.55 : 0.25),
+                        color: Colors.black.withValues(alpha: isDark ? 0.55 : 0.25),
                         spreadRadius: 1,
                         blurRadius: 14,
                         offset: const Offset(0, 6),

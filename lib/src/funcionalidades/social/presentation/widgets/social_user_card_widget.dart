@@ -53,7 +53,7 @@ class SocialUserCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 25,
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   backgroundImage: hasPhoto ? NetworkImage(user.photo) : null,
                   onBackgroundImageError: hasPhoto 
                       ? (exception, stackTrace) {
@@ -61,7 +61,7 @@ class SocialUserCard extends StatelessWidget {
                         }
                       : null,
                   child: !hasPhoto
-                      ? Icon(Icons.person, color: theme.iconTheme.color?.withOpacity(0.7))
+                      ? Icon(Icons.person, color: theme.iconTheme.color?.withValues(alpha: 0.7))
                       : null,
                 ),
                 
