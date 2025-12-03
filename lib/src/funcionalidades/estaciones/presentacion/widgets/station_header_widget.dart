@@ -168,7 +168,7 @@ class StationHeaderWidget extends StatelessWidget {
 
                 AssessmentEntity? existingReview;
 
-                if (userHasAssessed && currentState.assessments.isNotEmpty) {
+                if (userHasAssessed && currentState.assessments.isNotEmpty && context.mounted) {
                   final currentUser = FirebaseAuth.instance.currentUser;
                   if (currentUser != null) {
                     // Try to get nickname from UserProvider first, fallback to Firebase displayName
@@ -228,9 +228,9 @@ class StationHeaderWidget extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: themeColor.withOpacity(0.1),
+                  color: themeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: themeColor.withOpacity(0.2)),
+                  border: Border.all(color: themeColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Create empty .env file
+        run: touch .env
+
       - uses: actions/cache@v4
         with:
           path: ~/.pub-cache

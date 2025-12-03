@@ -426,8 +426,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     // Get the current position immediately
     try {
+      const LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+      );
       Position currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: locationSettings,
       );
       add(
         UpdateUserLocationEvent(
