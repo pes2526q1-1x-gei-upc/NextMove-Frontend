@@ -21,8 +21,6 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -256,13 +254,9 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final Set<int> _visitedIndices = {0};
-  int _socialReloadToken = 0;
 
   void _onItemTapped(int index) {
     setState(() {
-      if (index == 2) {
-        _socialReloadToken++;
-      }
       _selectedIndex = index;
       _visitedIndices.add(index);
     });
@@ -281,11 +275,7 @@ class _MainScreenState extends State<MainScreen> {
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(2)
-              ? BlocProvider(
-                  key: ValueKey<int>(_socialReloadToken),
-                  create: (context) => SocialBloc(),
-                  child: const SocialPage(),
-                )
+              ? const RankingPlaceholder()
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(3)
@@ -319,9 +309,9 @@ class _MainScreenState extends State<MainScreen> {
               label: 'Chats',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline),
-              activeIcon: Icon(Icons.people),
-              label: 'Social',
+              icon: Icon(Icons.emoji_events_outlined),
+              activeIcon: Icon(Icons.emoji_events),
+              label: 'Ranking',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
@@ -342,6 +332,17 @@ class ChatsPlaceholder extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Chats")),
       body: const Center(child: Text("Pantalla de Chats")),
+    );
+  }
+}
+
+class RankingPlaceholder extends StatelessWidget {
+  const RankingPlaceholder({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Ranking")),
+      body: const Center(child: Text("Pantalla de Ranking")),
     );
   }
 }

@@ -177,6 +177,7 @@
     },
     "block": "Block",
     "friends": "Friends",
+    "addFriend": "Add friend",
     "minCharsSearchHint" : "Please enter at least 3 characters to search.",
     "anyStationsFound" : "No results were found for your search.",
     "errorSavingRoute": "Error saving route",
@@ -236,5 +237,6 @@
     "accountDeleted": "Your account has been successfully deleted.",
     "errorDeletingAccount": "Error deleting account.",
     "accountDeletedSuccessfully": "The account has been deleted successfully.",
-    "userMismatch": "The user does not match the current user."
+    "userMismatch": "The user does not match the current user.",
+    "social": "Social"
 }

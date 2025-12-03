@@ -145,6 +145,7 @@
         }
     },
     "friends": "Amigos",
+    "addFriend": "Añadir amigo",
     "memberSince": "Miembro desde",
     "deleteFriendship": "Eliminar amistad",
     "deleteFriendConfirmation": "¿Estás seguro de que quieres eliminar a {nickname} de tus amigos?",
@@ -238,5 +239,6 @@
     "accountDeleted": "Tu cuenta ha sido eliminada correctamente.",
     "errorDeletingAccount": "Error al eliminar la cuenta.",
     "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
-    "userMismatch": "El usuario no coincide con el usuario actual."
+    "userMismatch": "El usuario no coincide con el usuario actual.",
+    "social": "Social"
 }
