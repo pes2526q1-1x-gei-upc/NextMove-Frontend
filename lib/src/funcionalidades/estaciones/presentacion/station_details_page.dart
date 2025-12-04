@@ -25,8 +25,6 @@ class StationDetailsPage extends StatelessWidget {
     this.stationDetails,
   });
 
-  final Color _backgroundColor = const Color(0xFFF5F5F7);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -50,12 +48,10 @@ class StationDetailsPage extends StatelessWidget {
         builder: (context, state) {
           if (state is StationDetailsLoading) {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (state is StationDetailsError) {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               appBar: AppBar(title: Text(l10n.error)),
               body: Center(child: Text(state.message)),
             );
@@ -63,7 +59,6 @@ class StationDetailsPage extends StatelessWidget {
             return _buildDetailsPage(context, state.stationDetails);
           } else {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               body: Center(child: Text(l10n.unknownState)),
             );
           }
@@ -78,23 +73,22 @@ class StationDetailsPage extends StatelessWidget {
   ) {
     final l10n = AppLocalizations.of(context)!;
     final isBike = stationType == StationType.bicycle;
-    final themeColor = isBike ? Colors.blue : Colors.green;
+    final theme = Theme.of(context);
+    final themeColor =
+        isBike ? theme.colorScheme.secondary : theme.colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           l10n.information,
-          style: const TextStyle(
+          style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A1A),
           ),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

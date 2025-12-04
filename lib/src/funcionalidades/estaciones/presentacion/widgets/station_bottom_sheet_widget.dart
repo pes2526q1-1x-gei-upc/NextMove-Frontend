@@ -28,7 +28,13 @@ class StationBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isBicycle = state.currentMode == StationType.bicycle;
-    final themeColor = isBicycle ? Colors.blue : Colors.green;
+    final theme = Theme.of(context);
+    final themeColor =
+        isBicycle ? theme.colorScheme.secondary : theme.colorScheme.primary;
+    final onThemeColor =
+        isBicycle ? theme.colorScheme.onSecondary : theme.colorScheme.onPrimary;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     return BlocProvider(
       create: (context) => AssessmentBloc(
@@ -37,9 +43,9 @@ class StationBottomSheet extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 30),
@@ -53,7 +59,7 @@ class StationBottomSheet extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: theme.dividerColor,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -71,10 +77,10 @@ class StationBottomSheet extends StatelessWidget {
                           children: [
                             Text(
                               station.name ?? l10n.unknown,
-                              style: const TextStyle(
+                              style: theme.textTheme.titleLarge?.copyWith(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: textColor,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -82,9 +88,9 @@ class StationBottomSheet extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               station.address ?? l10n.unknown,
-                              style: TextStyle(
+                              style: theme.textTheme.bodyMedium?.copyWith(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: mutedColor,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -96,7 +102,7 @@ class StationBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: themeColor.withValues(alpha: 0.1),
+                          color: themeColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -108,7 +114,7 @@ class StationBottomSheet extends StatelessWidget {
                               station.distanceKm != null
                                   ? '${station.distanceKm!.toStringAsFixed(1)} km'
                                   : '- km',
-                              style: TextStyle(
+                              style: theme.textTheme.labelMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: themeColor,
                                 fontSize: 12,
@@ -149,11 +155,15 @@ class StationBottomSheet extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.star_outline_rounded, size: 18, color: Colors.grey[400]),
+                              Icon(Icons.star_outline_rounded,
+                                  size: 18, color: mutedColor),
                               const SizedBox(width: 6),
                               Text(
                                 l10n.withoutOpinions,
-                                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: mutedColor,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -177,11 +187,13 @@ class StationBottomSheet extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: themeColor,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
+                foregroundColor: onThemeColor,
+                elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
+                shadowColor: themeColor.withValues(alpha: 0.4),
+                overlayColor: onThemeColor.withValues(alpha: 0.1),
                       ),
                       onPressed: () async {
                         await Navigator.of(context).push(
@@ -202,8 +214,12 @@ class StationBottomSheet extends StatelessWidget {
                       },
                       child: Text(
                         l10n.information,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: onThemeColor,
+                  letterSpacing: 0.2,
+                ),
                       ),
                     ),
                   ),

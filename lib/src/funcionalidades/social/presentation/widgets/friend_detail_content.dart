@@ -18,9 +18,11 @@ class FriendDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
     final l10n = AppLocalizations.of(context)!;
     final hasPhoto = user.photo.isNotEmpty;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final muted = theme.colorScheme.outline;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -38,15 +40,17 @@ class FriendDetailsContent extends StatelessWidget {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                    color: Colors.grey[200],
+                    border: Border.all(color: theme.cardColor, width: 4),
+                    boxShadow: isDark
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                    color: theme.colorScheme.surfaceContainerHighest,
                     image: hasPhoto 
                         ? DecorationImage(
                             image: NetworkImage(user.photo),
@@ -59,17 +63,20 @@ class FriendDetailsContent extends StatelessWidget {
                   ),
                   // Si no hay foto o falla, mostramos el icono
                   child: !hasPhoto 
-                      ? const Icon(Icons.person, size: 60, color: Colors.grey) 
+                      ? Icon(
+                          Icons.person,
+                          size: 60,
+                          color: theme.iconTheme.color?.withValues(alpha: 0.8),
+                        )
                       : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   user.nombreCompleto,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                   textAlign: TextAlign.center,
                 ),
                 if (user.apodo.isNotEmpty)
@@ -77,7 +84,7 @@ class FriendDetailsContent extends StatelessWidget {
                     "@${user.apodo}",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[600],
+                      color: muted,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -97,20 +104,24 @@ class FriendDetailsContent extends StatelessWidget {
                 value: user.email,
               ),
               if (user.descripcion.isNotEmpty) ...[
-                const Divider(height: 1, indent: 50, color: Color(0xFFF0F0F0)),
+                Divider(
+                  height: 1,
+                  indent: 50,
+                  color: theme.dividerColor,
+                ),
                 ProfileInfoRowWidget(
                   icon: Icons.description_outlined,
                   label: l10n.userDescription,
                   value: user.descripcion,
                 ),
               ],
-              const Divider(height: 1, indent: 50, color: Color(0xFFF0F0F0)),
+              Divider(height: 1, indent: 50, color: theme.dividerColor),
               ProfileInfoRowWidget(
                 icon: Icons.cake_outlined,
                 label: l10n.birthdate,
                 value: DateFormat('dd/MM/yyyy').format(user.fechaNacimiento),
               ),
-              const Divider(height: 1, indent: 50, color: Color(0xFFF0F0F0)),
+              Divider(height: 1, indent: 50, color: theme.dividerColor),
               ProfileInfoRowWidget(
                 icon: Icons.calendar_month_outlined,
                 label: l10n.memberSince,
@@ -132,7 +143,7 @@ class FriendDetailsContent extends StatelessWidget {
                 label: l10n.preferredMode,
                 value: _isBike(user.modoPreferido) ? l10n.bicycle : l10n.car,
               ),
-              const Divider(height: 1, indent: 50, color: Color(0xFFF0F0F0)),
+              Divider(height: 1, indent: 50, color: theme.dividerColor),
               ProfileInfoRowWidget(
                 icon: Icons.language,
                 label: l10n.preferredLanguage,

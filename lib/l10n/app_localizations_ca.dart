@@ -365,6 +365,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get darkMode => 'Mode fosc';
 
   @override
+  String get systemMode => 'Utilitza el mode del sistema';
+
+  @override
   String get preliminarVersion => 'Versió preliminar';
 
   @override

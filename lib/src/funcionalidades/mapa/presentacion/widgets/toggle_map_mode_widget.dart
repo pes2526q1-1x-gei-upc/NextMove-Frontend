@@ -14,6 +14,21 @@ class ToggleMapModeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+    final bikeActiveColor = Colors.blue.shade600;
+    final evActiveColor = Colors.green.shade600;
+    final inactiveIconColor = theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    final overlayShadow = [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
+        spreadRadius: 1,
+        blurRadius: 16,
+        offset: const Offset(0, 8),
+      ),
+    ];
+
     return Positioned(
       bottom: 30,
       left: 100,
@@ -21,16 +36,9 @@ class ToggleMapModeWidget extends StatelessWidget {
       child: Container(
         height: 56,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: baseColor,
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              spreadRadius: 2,
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: overlayShadow,
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30),
@@ -40,7 +48,7 @@ class ToggleMapModeWidget extends StatelessWidget {
               Expanded(
                 child: Material(
                   color: currentMode == StationType.bicycle
-                      ? Colors.blue.shade600
+                      ? bikeActiveColor
                       : Colors.transparent,
                   child: InkWell(
                     onTap: () => context.read<MapBloc>().add(ChangeModeEvent(StationType.bicycle)),
@@ -49,7 +57,7 @@ class ToggleMapModeWidget extends StatelessWidget {
                         Icons.directions_bike,
                         color: currentMode == StationType.bicycle
                             ? Colors.white
-                            : Colors.grey[700],
+                            : inactiveIconColor,
                         size: 28,
                       ),
                     ),
@@ -59,13 +67,13 @@ class ToggleMapModeWidget extends StatelessWidget {
               // Separator
               Container(
                 width: 1,
-                color: Colors.grey[300],
+                color: theme.dividerColor,
               ),
               // Car
               Expanded(
                 child: Material(
                   color: currentMode == StationType.electricVehicle
-                      ? Colors.green.shade600
+                      ? evActiveColor
                       : Colors.transparent,
                   child: InkWell(
                     onTap: () => context.read<MapBloc>().add(ChangeModeEvent(StationType.electricVehicle)),
@@ -74,7 +82,7 @@ class ToggleMapModeWidget extends StatelessWidget {
                         Icons.electric_car,
                         color: currentMode == StationType.electricVehicle
                             ? Colors.white
-                            : Colors.grey[700],
+                            : inactiveIconColor,
                         size: 28,
                       ),
                     ),

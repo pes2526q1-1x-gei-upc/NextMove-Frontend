@@ -24,6 +24,10 @@ class CenterOnUserButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
+
     return Positioned(
       bottom: 220,
       right: 16,
@@ -33,17 +37,22 @@ class CenterOnUserButtonWidget extends StatelessWidget {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
+                color: shadowColor,
+                spreadRadius: 1,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: Icon(Icons.my_location, color: Colors.grey[700], size: 28),
+          child: Icon(
+            Icons.my_location,
+            color: theme.colorScheme.onSurface,
+            size: 28,
+          ),
         ),
       ),
     );

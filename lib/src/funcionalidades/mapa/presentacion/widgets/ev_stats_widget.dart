@@ -12,12 +12,11 @@ class EVStatsWidget extends StatelessWidget {
 
   final EVStationDetails station;
 
-  final Color _cardBackgroundColor = const Color(0xFFF5F5F7);
-
   @override
   Widget build(BuildContext context) {
     final bool isFast = station.isSuperFast ?? false;
     final l10n = AppLocalizations.of(context)!;
+    final cardColor = Theme.of(context).cardColor;
     return Row(
       children: [
         // --- Card 1: Disponibilidad ---
@@ -28,7 +27,7 @@ class EVStatsWidget extends StatelessWidget {
             value:
                 '${station.availableSlots ?? "-"} / ${station.totalSlots ?? "-"}',
             color: Colors.green,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -40,7 +39,7 @@ class EVStatsWidget extends StatelessWidget {
             label: l10n.charge,
             value: isFast ? l10n.fast : l10n.normal,
             color: isFast ? Colors.amber[700]! : Colors.blue,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
       ],

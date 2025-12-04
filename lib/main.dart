@@ -12,6 +12,7 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/src/core/theme/app_theme.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,10 +22,12 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
 final LocaleProvider localeProvider = LocaleProvider();
+final ThemeProvider themeProvider = ThemeProvider();
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -80,42 +83,41 @@ class NextMoveAppState extends State<NextMoveApp> {
         providers: [
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
+          ChangeNotifierProvider.value(value: themeProvider),
           BlocProvider<UserBloc>(create: (_) => UserBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         ],
-        child: MaterialApp(
-          title: 'NextMove',
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          // Usamos el localeProvider para gestionar el idioma dinámico
-          locale: localeProvider.locale,
-          localeResolutionCallback: (locale, supportedLocales) {
-            for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale?.languageCode) {
-                return supportedLocale;
-              }
-            }
-            return const Locale('en');
+        child: Consumer<ThemeProvider>(
+          builder: (context, theme, _) {
+            return MaterialApp(
+              title: 'NextMove',
+              debugShowCheckedModeBanner: false,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: localeProvider.locale,
+              localeResolutionCallback: (locale, supportedLocales) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale?.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+                return const Locale('en');
+              },
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: theme.themeMode,
+              routes: {
+                '/login': (context) => BlocProvider(
+                      create: (context) => AuthBloc(),
+                      child: const WelcomePage(),
+                    ),
+              },
+              home: AuthStateHandler(
+                client: GraphQLConfig.client,
+                isLoggedIn: isLoggedIn,
+              ),
+            );
           },
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-            useMaterial3: true,
-          ),
-
-          // ruta de Login para el Logout
-          routes: {
-            '/login': (context) => BlocProvider(
-              create: (context) => AuthBloc(),
-              child: const WelcomePage(),
-            ),
-          },
-
-          // Widget que maneja la autenticación y decide qué pantalla mostrar
-          home: AuthStateHandler(
-            client: GraphQLConfig.client,
-            isLoggedIn: isLoggedIn,
-          ),
         ),
       ),
     );
@@ -264,6 +266,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bottomNavTheme = theme.bottomNavigationBarTheme;
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -290,9 +294,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Colors.grey,
+          backgroundColor:
+              bottomNavTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
+          selectedItemColor:
+              bottomNavTheme.selectedItemColor ?? theme.colorScheme.primary,
+          unselectedItemColor: bottomNavTheme.unselectedItemColor ??
+              theme.colorScheme.onSurface.withValues(alpha: 0.6),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           currentIndex: _selectedIndex,
