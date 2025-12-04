@@ -40,3 +40,4 @@ jobs:
         uses: yorifuji/flutter-analyze-commenter@v1
         with:
           analyze-log: flutter_analyze.log
+          max-issues: 1000
