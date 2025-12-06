@@ -376,7 +376,7 @@ class EmailAddressInputWidget extends StatelessWidget {
         ),
         prefixIcon: const Icon(Icons.email_outlined),
         filled: true,
-        fillColor: isReadOnly ? Theme.of(context).disabledColor.withOpacity(0.1) : Theme.of(context).cardColor,
+        fillColor: isReadOnly ? Theme.of(context).disabledColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
         contentPadding: const EdgeInsets.all(20),
       ),
       keyboardType: TextInputType.emailAddress,

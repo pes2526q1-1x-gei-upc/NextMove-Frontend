@@ -110,7 +110,7 @@ class _EditUserDataPreferencesPageState
                     modo['icon'] as IconData,
                     color: isSelected 
                         ? activeColor 
-                        : Theme.of(context).iconTheme.color?.withOpacity(0.7),
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
                   ),
                   title: Text(
                     modo['label'] as String,

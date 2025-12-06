@@ -148,6 +148,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         setState(() => _selectedImageFile = File(pickedFile.path));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
       );
@@ -185,7 +186,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     modo == 'Bici' ? Icons.directions_bike : Icons.electric_car,
                     color: isSelected 
                         ? activeColor 
-                        : Theme.of(context).iconTheme.color?.withOpacity(0.7),
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
                   ),
                   title: Text(
                     modo,
@@ -239,7 +240,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     Icons.language, 
                     color: isSelected 
                         ? activeColor 
-                        : Theme.of(context).iconTheme.color?.withOpacity(0.7)
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7)
                   ),
                   title: Text(
                     idioma,
@@ -304,6 +305,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           throw Exception("Error creando usuario en Firebase");
         }
       }
+
+      if (!mounted) return;
 
       if (_selectedImageFile != null) {
         debugPrint(
@@ -371,6 +374,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
       // Actualizar Provider
       if (FirebaseAuth.instance.currentUser != null) {
+        if (!mounted) return;
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(
           newUser.toMap(),

@@ -74,15 +74,15 @@ class WelcomePage extends StatelessWidget {
                       style: theme.textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
-                        color: theme.colorScheme.onBackground,
+                        color: theme.colorScheme.onSurface,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       l10n.welcomeTo('NextMove'), 
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.center,
@@ -99,13 +99,13 @@ class WelcomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
                         ],
                         border: Border.all(
-                          color: theme.dividerColor.withOpacity(0.1),
+                          color: theme.dividerColor.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Column(
