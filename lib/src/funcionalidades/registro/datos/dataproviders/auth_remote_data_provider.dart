@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
@@ -62,7 +63,7 @@ class AuthRemoteDataProvider {
 
     // Step 2: Delete from GraphQL backend FIRST
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.deleteUserMutation),
+      document: gql(GraphQLMutations.deleteUserMutation),
       variables: {'email': userEmail},
       fetchPolicy: FetchPolicy.networkOnly,
     );

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart'
     as custom_exceptions;
@@ -162,7 +163,7 @@ class UserRemoteDataProvider {
       );
     }
 
-    const String updateUserMutation = GraphQLQueries.updateUserMutation;
+    const String updateUserMutation = GraphQLMutations.updateUserMutation;
 
     String? formatBirthDate(DateTime? date) {
       if (date == null) return null;
@@ -272,7 +273,7 @@ class UserRemoteDataProvider {
     }
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.createUserMutation),
+      document: gql(GraphQLMutations.createUserMutation),
       variables: {
         'input': {
           'email': userEntity.email,
