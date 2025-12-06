@@ -30,9 +30,6 @@ jobs:
       # Instala dependencias.
       - run: flutter pub get
 
-      # Verifica el entorno Flutter (como flutter doctor local).
-      - run: flutter doctor -v
-
       # Analiza el código y captura la salida.
       - run: flutter analyze --write=flutter_analyze.log
 
