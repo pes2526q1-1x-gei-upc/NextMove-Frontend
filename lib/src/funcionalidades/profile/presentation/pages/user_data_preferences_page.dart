@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-
-// === IMPORTS DE WIDGETS DE ESTILO ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
-
-// === OTROS IMPORTS ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -33,8 +28,6 @@ class UserDataPreferencesPage extends StatefulWidget {
 
 class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
-
-  // Variable local para controlar la carga de Firebase antes de llamar al Bloc
   bool _isCreatingFirebaseUser = false;
 
   late final TextEditingController _apodoController;
@@ -85,10 +78,21 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        const calendarColor = Colors.green;
+
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Theme.of(context).primaryColor,
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: calendarColor, 
+              onPrimary: Colors.white,
+              onSurface: isDark ? Colors.white : theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: calendarColor, 
+              ),
             ),
           ),
           child: child!,
@@ -105,6 +109,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) => SafeArea(
         child: Wrap(
           children: [
@@ -141,10 +148,120 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         setState(() => _selectedImageFile = File(pickedFile.path));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
       );
     }
+  }
+
+  // === Selectores de Preferencias (Bottom Sheets) ===
+  void _showModoSelector() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  l10n.preferredMode,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ..._modos.map((modo) {
+                final isSelected = _selectedModo == modo;
+                final primaryColor = Theme.of(context).primaryColor;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final activeColor = isDark ? Colors.white : primaryColor;
+                
+                return ListTile(
+                  leading: Icon(
+                    modo == 'Bici' ? Icons.directions_bike : Icons.electric_car,
+                    color: isSelected 
+                        ? activeColor 
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                  ),
+                  title: Text(
+                    modo,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? activeColor : null,
+                    ),
+                  ),
+                  trailing: isSelected ? Icon(Icons.check, color: activeColor) : null,
+                  onTap: () {
+                    setState(() => _selectedModo = modo);
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showIdiomaSelector() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  l10n.preferredLanguage,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ..._idiomas.map((idioma) {
+                final isSelected = _selectedIdioma == idioma;
+                final primaryColor = Theme.of(context).primaryColor;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final activeColor = isDark ? Colors.white : primaryColor;
+
+                return ListTile(
+                  leading: Icon(
+                    Icons.language, 
+                    color: isSelected 
+                        ? activeColor 
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7)
+                  ),
+                  title: Text(
+                    idioma,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? activeColor : null,
+                    ),
+                  ),
+                  trailing: isSelected ? Icon(Icons.check, color: activeColor) : null,
+                  onTap: () {
+                    setState(() => _selectedIdioma = idioma);
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // === Finalizar Registro  ===
@@ -188,6 +305,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           throw Exception("Error creando usuario en Firebase");
         }
       }
+
+      if (!mounted) return;
 
       if (_selectedImageFile != null) {
         debugPrint(
@@ -255,6 +374,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
       // Actualizar Provider
       if (FirebaseAuth.instance.currentUser != null) {
+        if (!mounted) return;
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         userProvider.setUser(
           newUser.toMap(),
@@ -319,7 +439,8 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    final primaryColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return PopScope(
       canPop: !_isCreatingFirebaseUser,
@@ -330,7 +451,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           automaticallyImplyLeading: false,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                  icon: Icon(Icons.arrow_back_ios_new, size: 20, color: theme.iconTheme.color),
                   onPressed: () {
                     if (!_isCreatingFirebaseUser) Navigator.pop(context);
                   },
@@ -343,6 +464,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          backgroundColor: Colors.transparent,
         ),
         body: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
@@ -484,9 +606,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           ),
                           readOnly: true,
                           onTap: () => _selectDate(context),
-                          validator: (v) => v?.isEmpty ?? true
-                              ? l10n.mandatoryBirthDate
-                              : null,
+                          // Validator eliminado: fecha de nacimiento ahora es opcional
                         ),
                       ],
                     ),
@@ -529,87 +649,18 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     ProfileSectionLabel(text: "Preferencias"),
                     ProfileStyledCard(
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                initialValue: _selectedModo,
-                                decoration: InputDecoration(
-                                  labelText: l10n.preferredMode,
-                                  prefixIcon: Icon(
-                                    _selectedModo == 'Bici'
-                                        ? Icons.directions_bike
-                                        : Icons.electric_car,
-                                    color: Colors.grey,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.grey,
-                                ),
-                                validator: (v) => v == null
-                                    ? l10n.mandatoryPreferredMode
-                                    : null,
-                                items: _modos
-                                    .map(
-                                      (m) => DropdownMenuItem(
-                                        value: m,
-                                        child: Text(
-                                          m,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (v) =>
-                                    setState(() => _selectedModo = v),
-                              ),
-                            ),
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.grey[200],
-                              margin: const EdgeInsets.all(8),
-                            ),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                initialValue: _selectedIdioma,
-                                decoration: InputDecoration(
-                                  labelText: l10n.preferredLanguage,
-                                  prefixIcon: const Icon(
-                                    Icons.language,
-                                    color: Colors.grey,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.grey,
-                                ),
-                                items: _idiomas
-                                    .map(
-                                      (i) => DropdownMenuItem(
-                                        value: i,
-                                        child: Text(
-                                          i,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (v) =>
-                                    setState(() => _selectedIdioma = v),
-                              ),
-                            ),
-                          ],
+                        ProfileMenuOption(
+                          icon: _selectedModo == 'Bici' ? Icons.directions_bike : Icons.electric_car,
+                          text: _selectedModo ?? l10n.preferredMode,
+                          onTap: _showModoSelector,
+                          trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+                        ),
+                        const Divider(height: 1, indent: 40),
+                        ProfileMenuOption(
+                          icon: Icons.language,
+                          text: _selectedIdioma ?? l10n.preferredLanguage,
+                          onTap: _showIdiomaSelector,
+                          trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -619,21 +670,22 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     // --- BOTÓN FINALIZAR ---
                     SizedBox(
                       width: double.infinity,
+                      height: 56, // Altura consistente
                       child: ElevatedButton(
                         onPressed: _finalizarOnboarding,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: theme.colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16), // Radio consistente
                           ),
-                          elevation: 2,
+                          elevation: 0, // Sin elevación para ser más "minimalista" flat, o 2 si se prefiere
                         ),
                         child: Text(
                           l10n.finishRegistration,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

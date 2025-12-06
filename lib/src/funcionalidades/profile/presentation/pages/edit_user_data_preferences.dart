@@ -10,11 +10,11 @@ import 'dart:io';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_avatar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/save_changes_button_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
 
 // Otros Imports
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/presentacion/welcome_page.dart';
@@ -73,6 +73,69 @@ class _EditUserDataPreferencesPageState
   }
 
   void _goBack() => Navigator.pop(context);
+
+  // === Selector de Modo (Bottom Sheet) ===
+  void _showModoSelector() {
+    final l10n = AppLocalizations.of(context)!;
+    final modos = [
+      {'label': l10n.bicycle, 'apiValue': 'BIKE', 'icon': Icons.directions_bike},
+      {'label': l10n.car, 'apiValue': 'CAR', 'icon': Icons.electric_car},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  l10n.preferredMode,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ...modos.map((modo) {
+                final isSelected = _selectedModeAPI == modo['apiValue'];
+                final primaryColor = Theme.of(context).primaryColor;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final activeColor = isDark ? Colors.white : primaryColor;
+                
+                return ListTile(
+                  leading: Icon(
+                    modo['icon'] as IconData,
+                    color: isSelected 
+                        ? activeColor 
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                  ),
+                  title: Text(
+                    modo['label'] as String,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? activeColor : null,
+                    ),
+                  ),
+                  trailing: isSelected ? Icon(Icons.check, color: activeColor) : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedModeAPI = modo['apiValue'] as String;
+                      _selectedModoUI = modo['label'] as String;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,43 +336,13 @@ class _EditUserDataPreferencesPageState
                     ProfileSectionLabel(text: l10n.preferredMode),
                     ProfileStyledCard(
                       children: [
-                        DropdownButtonFormField<String>(
-                          initialValue: _selectedModoUI,
-                          decoration: cardInputDecoration(
-                            icon: _selectedModeAPI == "BIKE"
-                                ? Icons.directions_bike
-                                : Icons.electric_car,
-                            context: context,
-                          ),
-                          icon: const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Colors.grey,
-                          ),
-                          dropdownColor: Colors.white,
-                          validator: (v) =>
-                              v == null ? l10n.mandatoryPreferredMode : null,
-                          items: StationType.values.map((modo) {
-                            return DropdownMenuItem(
-                              value: modo == StationType.bicycle
-                                  ? l10n.bicycle
-                                  : l10n.car,
-                              child: Text(
-                                modo == StationType.bicycle
-                                    ? l10n.bicycle
-                                    : l10n.car,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (v) => setState(() {
-                            _selectedModoUI = v;
-                            _selectedModeAPI = v == l10n.bicycle
-                                ? "BIKE"
-                                : "CAR";
-                          }),
+                        ProfileMenuOption(
+                          icon: _selectedModeAPI == "BIKE" 
+                              ? Icons.directions_bike 
+                              : Icons.electric_car,
+                          text: _selectedModoUI ?? l10n.preferredMode,
+                          onTap: _showModoSelector,
+                          trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
                         ),
                       ],
                     ),

@@ -10,7 +10,7 @@ class ProfileHeaderWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    this.imageUrl, // Optional parameter - can be null
+    this.imageUrl,
   });
 
   @override
@@ -51,15 +51,11 @@ class ProfileHeaderWidget extends StatelessWidget {
                     ),
                   ],
           ),
-          // STEP 4: Apply the image logic to CircleAvatar
-          // CircleAvatar has two main properties for displaying content:
-          // - backgroundImage: for actual images (NetworkImage, AssetImage, FileImage)
-          // - child: for widgets like icons or text when no image exists
           child: CircleAvatar(
             radius: 35,
             backgroundColor: Colors.grey[200],
-            backgroundImage: backgroundImage, // Will be NetworkImage or null
-            child: avatarChild, // Will be Icon or null
+            backgroundImage: backgroundImage, 
+            child: avatarChild,
           ),
         ),
         const SizedBox(width: 20),
@@ -95,12 +91,14 @@ class ProfileMenuOption extends StatelessWidget {
   final IconData icon;
   final String text;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   const ProfileMenuOption({
     super.key,
     required this.icon,
     required this.text,
     required this.onTap,
+    this.trailing,
   });
 
   @override
@@ -138,10 +136,13 @@ class ProfileMenuOption extends StatelessWidget {
                       ),
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
-              ),
+              if (trailing != null)
+                trailing!
+              else
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
+                ),
             ],
           ),
         ),
@@ -165,4 +166,3 @@ class ProfileMenuDivider extends StatelessWidget {
     );
   }
 }
-
