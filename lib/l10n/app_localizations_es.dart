@@ -75,7 +75,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.';
 
   @override
-  String get userDataPreferences => 'Acaba de completar tu perfil';
+  String get userDataPreferences => 'Completa tu perfil';
 
   @override
   String get nickname => 'Apodo';

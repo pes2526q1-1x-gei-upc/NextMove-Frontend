@@ -25,7 +25,7 @@
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
     "wrongPassword": "La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.",
-    "userDataPreferences": "Acaba de completar el teu perfil",
+    "userDataPreferences": "Completa el teu perfil",
     "nickname": "Sobrenom",
     "nicknameHint": "Introdueix el teu sobrenom",
     "birthdate": "Data de naixement",
