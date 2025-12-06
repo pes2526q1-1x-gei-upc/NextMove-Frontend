@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
@@ -28,7 +29,7 @@ class AssessmentRemoteDataProvider {
       final authHeader = await _authHeader;
 
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.createAssessmentQuery),
+        document: gql(GraphQLMutations.createAssessmentQuery),
         variables: {
           'station_id': stationId,
           'score': score,
@@ -162,7 +163,7 @@ class AssessmentRemoteDataProvider {
       final authHeader = await _authHeader;
 
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.editAssessmentQuery),
+        document: gql(GraphQLMutations.editAssessmentQuery),
         variables: {
           'station_id': stationId,
           'score': score,
@@ -200,7 +201,7 @@ class AssessmentRemoteDataProvider {
       final authHeader = await _authHeader;
 
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.deleteAssessmentQuery),
+        document: gql(GraphQLMutations.deleteAssessmentQuery),
         variables: {'station_id': stationId},
         context: Context().withEntry(
           HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),

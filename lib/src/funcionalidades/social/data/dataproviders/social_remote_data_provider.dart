@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import '../../../../../../graphql/queries.dart';
@@ -100,7 +101,7 @@ class SocialRemoteDataProvider {
   Future<void> addFriend(String friendNickname) async {
     String? authHeader = await _authHeader;
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.newFriendship),
+      document: gql(GraphQLMutations.newFriendship),
       variables: {
         'nickname': friendNickname,
       },
@@ -120,7 +121,7 @@ class SocialRemoteDataProvider {
   Future<void> removeFriend(String friendNickname) async {
     String? authHeader = await _authHeader;
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.deleteFriendship),
+      document: gql(GraphQLMutations.deleteFriendship),
       variables: {
         'nickname': friendNickname,
       },
@@ -150,7 +151,7 @@ class SocialRemoteDataProvider {
     debugPrint("header en blockUser: $authHeader");
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.blockUser),
+      document: gql(GraphQLMutations.blockUser),
       variables: {
         'nickname': userToBlockNickname,
       },
@@ -214,7 +215,7 @@ class SocialRemoteDataProvider {
     debugPrint("Solicitando desbloqueo de: $userToUnblockNickname");
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.unBlockUser),
+      document: gql(GraphQLMutations.unBlockUser),
       variables: {
         'nickname': userToUnblockNickname,
       },
