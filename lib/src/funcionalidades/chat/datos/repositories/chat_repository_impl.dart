@@ -7,8 +7,8 @@ import '../datasources/socket_datasource.dart';
 /// Utiliza SocketDataSource para comunicación en tiempo real
 class ChatRepositoryImpl implements ChatRepository {
   final SocketDataSource _socketDataSource;
-
   ChatRepositoryImpl(this._socketDataSource);
+  SocketDataSource get socketDataSource => _socketDataSource;
 
   @override
   Stream<Message> get messageStream =>

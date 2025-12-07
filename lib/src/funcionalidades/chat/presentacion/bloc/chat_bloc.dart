@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import '../../dominio/repositories/chat_repository.dart';
 import '../../dominio/entities/message.dart';
+import '../../datos/repositories/chat_repository_impl.dart';
 import '../../../../../config/socket_config.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -42,35 +43,34 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   /// Inicializar conexión de chat
-  Future<void> _onInitializeChat(
-    InitializeChat event,
-    Emitter<ChatState> emit,
-  ) async {
-    try {
-      emit(const ChatConnecting());
-      debugPrint('[ChatBloc] Inicializando chat...');
+Future<void> _onInitializeChat(
+  InitializeChat event,
+  Emitter<ChatState> emit,
+) async {
+  try {
+    emit(const ChatConnecting());
+    debugPrint('[ChatBloc] Inicializando chat...');
 
-      // Conectar Socket.IO
-      await SocketConfig.connect(event.firebaseToken, event.userId);
+    // Conectar Socket.IO
+    await SocketConfig.connect(event.firebaseToken, event.userId);
+    await Future.delayed(const Duration(seconds: 1));
 
-      // Esperar un momento para asegurar la conexión
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      if (!SocketConfig.isConnected) {
-        emit(const ChatConnectionError('No se pudo establecer conexión'));
-        return;
-      }
-
-      // Configurar listeners de streams
-      _setupStreamListeners();
-
-      emit(ChatConnected(event.userId));
-      debugPrint('[ChatBloc] ✅ Chat inicializado correctamente');
-    } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error inicializando chat: $e');
-      emit(ChatConnectionError(e.toString()));
+    if (!SocketConfig.isConnected) {
+      emit(const ChatConnectionError('No se pudo establecer conexión'));
+      return;
     }
+
+    // Configurar listeners de streams
+    (_chatRepository as ChatRepositoryImpl).socketDataSource.setupSocketListeners();
+    _setupStreamListeners();
+
+    emit(ChatConnected(event.userId));
+    debugPrint('[ChatBloc] ✅ Chat inicializado correctamente');
+  } catch (e) {
+    debugPrint('[ChatBloc] ❌ Error inicializando chat: $e');
+    emit(ChatConnectionError(e.toString()));
   }
+}
 
   /// Configurar listeners de los streams del repositorio
   void _setupStreamListeners() {

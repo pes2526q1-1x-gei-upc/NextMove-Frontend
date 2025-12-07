@@ -16,9 +16,8 @@ class SocketDataSource {
   final StreamController<Map<String, dynamic>> _roomJoinedController =
       StreamController<Map<String, dynamic>>.broadcast();
 
-  SocketDataSource() {
-    _setupSocketListeners();
-  }
+  bool _listenersConfigured = false;
+  SocketDataSource();
 
   /// Streams públicos para escuchar eventos
   Stream<MessageModel> get messageStream => _messageController.stream;
@@ -31,7 +30,13 @@ class SocketDataSource {
       _roomJoinedController.stream;
 
   /// Configurar listeners de Socket.IO
-  void _setupSocketListeners() {
+  void setupSocketListeners() {
+
+    if (_listenersConfigured) {
+      debugPrint('[SocketDataSource] Listeners ya configurados');
+      return;
+    }
+
     final socket = SocketConfig.socket;
     if (socket == null) {
       debugPrint('[SocketDataSource] Socket no inicializado');
@@ -39,13 +44,16 @@ class SocketDataSource {
     }
 
     // Escuchar nuevos mensajes
+    debugPrint('[SocketDataSource] 🔧 Configurando listeners...');
+
     socket.on('message:new', (data) {
+      debugPrint('[SocketDataSource] 💬 RAW DATA: $data');
       try {
-        debugPrint('[SocketDataSource] 💬 Mensaje nuevo recibido: $data');
         final message = MessageModel.fromJson(data as Map<String, dynamic>);
         _messageController.add(message);
+        debugPrint('[SocketDataSource] ✅ Mensaje procesado');
       } catch (e) {
-        debugPrint('[SocketDataSource] Error procesando mensaje: $e');
+        debugPrint('[SocketDataSource] ❌ Error procesando mensaje: $e');
       }
     });
 
@@ -93,7 +101,7 @@ class SocketDataSource {
     socket.on('message:read:confirmed', (data) {
       debugPrint('[SocketDataSource] ✓ Mensaje leído: $data');
     });
-
+    _listenersConfigured = true;
     debugPrint('[SocketDataSource] Listeners configurados');
   }
 

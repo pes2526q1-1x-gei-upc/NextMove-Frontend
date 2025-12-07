@@ -36,6 +36,8 @@ class _ChatListPageState extends State<ChatListPage> {
         firebaseToken: firebaseToken,
         userId: userId,
       ));
+
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 
