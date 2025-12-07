@@ -24,6 +24,11 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
 
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/datasources/socket_datasource.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository_impl.dart';
+
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
 final LocaleProvider localeProvider = LocaleProvider();
@@ -332,13 +337,35 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class ChatsPlaceholder extends StatelessWidget {
+class ChatsPlaceholder extends StatefulWidget {
   const ChatsPlaceholder({super.key});
+  
+  @override
+  State<ChatsPlaceholder> createState() => _ChatsPlaceholderState();
+}
+
+class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
+  late final ChatBloc _chatBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = ChatBloc(
+      ChatRepositoryImpl(SocketDataSource()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Chats")),
-      body: const Center(child: Text("Pantalla de Chats")),
+    return BlocProvider.value(
+      value: _chatBloc,
+      child: const ChatListPage(),
     );
   }
 }
