@@ -1,11 +1,44 @@
+// lib/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import '../bloc/chat_bloc.dart';
 import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import 'chat_room_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+
+// Query para listar amigos (del módulo de friendship existente)
+const String listFriendsQuery = r'''
+  query ListFriends {
+    ListFriends {
+      name
+      photo
+      email
+    }
+  }
+''';
+
+// Query para obtener email de un usuario por nickname
+const String getUserEmailQuery = r'''
+  query GetUserEmail($nickname: String!) {
+    getUserByNickname(nickname: $nickname) {
+      email
+    }
+  }
+''';
+
+// Mutation para abrir chat directo
+const String getOrCreateDirectChatMutation = r'''
+  query GetOrCreateDirectChat($userEmail: String!) {
+    getOrCreateDirectChat(userEmail: $userEmail) {
+      id
+      type
+      name
+    }
+  }
+''';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -15,15 +48,10 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
-  bool _initialized = false;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      _initializeChat();
-      _initialized = true;
-    }
+  void initState() {
+    super.initState();
+    _initializeChat();
   }
 
   Future<void> _initializeChat() async {
@@ -32,12 +60,46 @@ class _ChatListPageState extends State<ChatListPage> {
     final userId = userProvider.firebaseUserId;
 
     if (firebaseToken != null && userId != null) {
-      context.read<ChatBloc>().add(InitializeChat(
-        firebaseToken: firebaseToken,
-        userId: userId,
-      ));
+      context.read<ChatBloc>().add(
+        InitializeChat(firebaseToken: firebaseToken, userId: userId),
+      );
+    }
+  }
 
-      await Future.delayed(const Duration(seconds: 1));
+  Future<void> _openChatWithFriend(
+    BuildContext context,
+    String friendNickname,
+    String friendEmail, // Pasar email directamente
+  ) async {
+    final client = GraphQLProvider.of(context).value;
+
+    try {
+      // Ya no necesitas query de email, lo tienes directamente
+      final chatResult = await client.query(
+        QueryOptions(
+          document: gql(getOrCreateDirectChatMutation),
+          variables: {'userEmail': friendEmail},
+          fetchPolicy: FetchPolicy.networkOnly,
+        ),
+      );
+
+      if (chatResult.hasException) {
+        throw Exception(chatResult.exception.toString());
+      }
+
+      final chat = chatResult.data!['getOrCreateDirectChat'];
+      final chatId = chat['id'] as String;
+
+      _navigateToRoom(chatId, friendNickname);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
   }
 
@@ -46,12 +108,9 @@ class _ChatListPageState extends State<ChatListPage> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
+        builder: (_) => BlocProvider.value(
           value: chatBloc,
-          child: ChatRoomPage(
-            roomId: roomId,
-            roomName: roomName,
-          ),
+          child: ChatRoomPage(roomId: roomId, roomName: roomName),
         ),
       ),
     );
@@ -74,8 +133,8 @@ class _ChatListPageState extends State<ChatListPage> {
         ],
       ),
       body: BlocBuilder<ChatBloc, ChatState>(
-        builder: (context, state) {
-          if (state is ChatConnecting) {
+        builder: (context, chatState) {
+          if (chatState is ChatConnecting) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -88,7 +147,7 @@ class _ChatListPageState extends State<ChatListPage> {
             );
           }
 
-          if (state is ChatConnectionError) {
+          if (chatState is ChatConnectionError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -99,15 +158,9 @@ class _ChatListPageState extends State<ChatListPage> {
                     color: theme.colorScheme.error,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Error de conexión',
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text('Error de conexión', style: theme.textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  Text(
-                    state.message,
-                    textAlign: TextAlign.center,
-                  ),
+                  Text(chatState.message, textAlign: TextAlign.center),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: _initializeChat,
@@ -119,116 +172,115 @@ class _ChatListPageState extends State<ChatListPage> {
             );
           }
 
-          // TODO: Cuando tengas el endpoint GraphQL, cargar las salas reales
-          // Por ahora, mostrar salas de prueba
-          return _buildTestRoomsList(theme);
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Implementar crear nuevo chat
-          _showCreateChatDialog(context);
-        },
-        child: const Icon(Icons.add_comment),
-      ),
-    );
-  }
-
-  Widget _buildTestRoomsList(ThemeData theme) {
-    // Salas de prueba para desarrollo
-    final testRooms = [
-      {'id': 'test-room-1', 'name': 'Sala de Prueba 1', 'lastMessage': 'Hola!'},
-      {'id': 'test-room-2', 'name': 'Sala de Prueba 2', 'lastMessage': null},
-      {'id': 'test-room-3', 'name': 'Equipo NextMove', 'lastMessage': '¿Cómo va el proyecto?'},
-    ];
-
-    return ListView.separated(
-      itemCount: testRooms.length,
-      separatorBuilder: (context, index) => Divider(
-        height: 1,
-        color: theme.colorScheme.outlineVariant,
-      ),
-      itemBuilder: (context, index) {
-        final room = testRooms[index];
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: theme.colorScheme.primaryContainer,
-            child: Text(
-              room['name']![0],
-              style: TextStyle(
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
+          // Cargar lista de amigos
+          return Query(
+            options: QueryOptions(
+              document: gql(listFriendsQuery),
+              fetchPolicy: FetchPolicy.networkOnly,
             ),
-          ),
-          title: Text(
-            room['name']!,
-            style: theme.textTheme.titleMedium,
-          ),
-          subtitle: room['lastMessage'] != null
-              ? Text(
-                  room['lastMessage']!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall,
-                )
-              : null,
-          trailing: Icon(
-            Icons.chevron_right,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-          ),
-          onTap: () => _navigateToRoom(room['id']!, room['name']!),
-        );
-      },
-    );
-  }
-
-  void _showCreateChatDialog(BuildContext context) {
-    final theme = Theme.of(context);
-    final roomIdController = TextEditingController();
-    final roomNameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Crear nueva sala'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: roomIdController,
-              decoration: const InputDecoration(
-                labelText: 'ID de la sala',
-                hintText: 'ej: my-room-123',
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: roomNameController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre de la sala',
-                hintText: 'ej: Mi Sala de Chat',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final roomId = roomIdController.text.trim();
-              final roomName = roomNameController.text.trim();
-              
-              if (roomId.isNotEmpty && roomName.isNotEmpty) {
-                Navigator.of(dialogContext).pop();
-                _navigateToRoom(roomId, roomName);
+            builder: (result, {fetchMore, refetch}) {
+              if (result.isLoading) {
+                return const Center(child: CircularProgressIndicator());
               }
+
+              if (result.hasException) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Error cargando amigos'),
+                      const SizedBox(height: 8),
+                      Text(result.exception.toString()),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => refetch!(),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final friends =
+                  result.data?['ListFriends'] as List<dynamic>? ?? [];
+
+              if (friends.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.people_outline,
+                        size: 64,
+                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No tienes amigos aún',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text('Agrega amigos para empezar a chatear'),
+                    ],
+                  ),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async => refetch!(),
+                child: ListView.separated(
+                  itemCount: friends.length,
+                  separatorBuilder: (context, index) => Divider(
+                    height: 1,
+                    color: theme.colorScheme.outlineVariant,
+                  ),
+                  itemBuilder: (context, index) {
+                    final friend = friends[index];
+                    final nickname = friend['name'] as String;
+                    final photo = friend['photo'] as String?;
+                    final email = friend['email'] as String;
+
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: photo != null
+                            ? NetworkImage(photo)
+                            : null,
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        child: photo == null
+                            ? Text(
+                                nickname[0].toUpperCase(),
+                                style: TextStyle(
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                ),
+                              )
+                            : null,
+                      ),
+                      title: Text(nickname, style: theme.textTheme.titleMedium),
+                      subtitle: Text(
+                        'Toca para chatear',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chat_bubble_outline,
+                        color: theme.colorScheme.primary,
+                      ),
+                      onTap: () => _openChatWithFriend(context, nickname, email),
+                    );
+                  },
+                ),
+              );
             },
-            child: const Text('Crear'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
