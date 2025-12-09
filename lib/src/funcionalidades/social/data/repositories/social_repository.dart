@@ -1,13 +1,15 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
+import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/social/data/dataproviders/social_remote_data_provider.dart';
 
 class SocialRepository {
   final SocialRemoteDataProvider remoteDataProvider;
 
-  SocialRepository() : remoteDataProvider = SocialRemoteDataProvider();
+  SocialRepository({SocialRemoteDataProvider? remoteDataProvider})
+      : remoteDataProvider = remoteDataProvider ?? SocialRemoteDataProvider();
 
   Future<Either<Failure, List<UserEntity>>> getFriends() async {
     try {

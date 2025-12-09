@@ -4,11 +4,13 @@ import 'social_event.dart';
 import 'social_state.dart';
 
 class SocialBloc extends Bloc<SocialEvent, SocialState> {
-  final SocialRepository socialRepository = SocialRepository();
+  final SocialRepository socialRepository;
 
   String? _currentNickname;
 
-  SocialBloc() : super(const SocialState()) {
+  SocialBloc({SocialRepository? socialRepository})
+      : socialRepository = socialRepository ?? SocialRepository(),
+        super(const SocialState()) {
     on<LoadFriendsEvent>(_onLoadFriends);
     on<SearchUsersEvent>(_onSearchUsers);
     on<ClearSearchEvent>(_onClearSearch);
