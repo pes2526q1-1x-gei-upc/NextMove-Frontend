@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/shared/domain/track_statistics.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/auth_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
@@ -14,9 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/data/dataProviders/recorded_route_data_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_track.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
@@ -38,9 +35,9 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/bicyc
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/data/dataproviders/track_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recording_track.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/dataProviders/track_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/friend_detail_content.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';

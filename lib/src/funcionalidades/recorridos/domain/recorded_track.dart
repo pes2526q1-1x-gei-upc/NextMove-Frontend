@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recording_track.dart';
 
 class RecordedTrack extends RecordingTrack {
   final String id;

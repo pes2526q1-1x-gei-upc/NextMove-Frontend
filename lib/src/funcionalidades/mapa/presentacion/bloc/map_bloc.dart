@@ -6,9 +6,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recording_track.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
 import 'map_events.dart';
 import 'map_state.dart';
@@ -22,7 +21,6 @@ var defaultPolyline = Polyline(
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
-  final RecordedTracksRepository recordedTracksRepository;
   final SearchHistoryService searchHistoryService;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
@@ -38,7 +36,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
-    required this.recordedTracksRepository,
     required this.searchHistoryService,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {

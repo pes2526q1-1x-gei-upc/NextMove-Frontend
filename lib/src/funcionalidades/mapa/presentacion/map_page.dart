@@ -7,8 +7,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/track_repository.dart';
 
 // Imports del BLoC
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
@@ -43,7 +42,6 @@ class _MapPageState extends State<MapPage> {
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
   TrackRepository trackRepository = TrackRepository();
-  RecordedTracksRepository recordedTracksRepository = RecordedTracksRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
@@ -79,7 +77,6 @@ class _MapPageState extends State<MapPage> {
       create: (context) => MapBloc(
         stationRepository: stationRepository,
         trackRepository: trackRepository,
-        recordedTracksRepository: recordedTracksRepository,
         searchHistoryService: searchHistoryService,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),

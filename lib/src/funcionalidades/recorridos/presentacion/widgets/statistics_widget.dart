@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recording_track.dart';
 
 class StatisticsWidget extends StatelessWidget {
   const StatisticsWidget({
@@ -10,6 +10,7 @@ class StatisticsWidget extends StatelessWidget {
     required this.l10n,
   });
 
+  // Com que RecordedTrack hereta de RecordingTrack, el widget accepta qualsevol dels dos tipus de track
   final RecordingTrack track;
   final Duration elapsedTime;
   final AppLocalizations l10n;

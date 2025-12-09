@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_track.dart';
 
 abstract class TrackState extends Equatable {
   const TrackState();

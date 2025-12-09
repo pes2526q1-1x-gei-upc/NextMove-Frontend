@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
-import 'route_events.dart';
-import 'route_state.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/track_repository.dart';
+import 'track_events.dart';
+import 'track_state.dart';
 
 class TrackBloc extends Bloc<TrackEvent, TrackState> {
-  final RecordedTracksRepository recordedTracksRepository;
+  final TrackRepository trackRepository;
 
-  TrackBloc() : recordedTracksRepository = RecordedTracksRepository(),
+  TrackBloc() : trackRepository = TrackRepository(),
       super(const TrackInitialState()) {
     on<LoadRecordedTracksEvent>(_onLoadRecordedTracks);
   }
@@ -18,7 +18,7 @@ class TrackBloc extends Bloc<TrackEvent, TrackState> {
     ) async {
         emit(const TrackLoadingState());
         final result =
-            await recordedTracksRepository.getRecordedTracksByUser(event.userEmail);
+            await trackRepository.getRecordedTracksByUser(event.userEmail);
 
         result.fold(
           (failure) {

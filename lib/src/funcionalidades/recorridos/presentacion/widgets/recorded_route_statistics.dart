@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_track.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/statistics_widget.dart';
 

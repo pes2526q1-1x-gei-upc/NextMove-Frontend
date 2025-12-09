@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/track_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/recorded_route_statistics.dart';
 import 'package:provider/provider.dart';
-import '../bloc/route_events.dart';
-import '../bloc/route_state.dart';
+import '../bloc/track_events.dart';
+import '../bloc/track_state.dart';
 
 class RouteHistoryList extends StatelessWidget {
   const RouteHistoryList({super.key});
