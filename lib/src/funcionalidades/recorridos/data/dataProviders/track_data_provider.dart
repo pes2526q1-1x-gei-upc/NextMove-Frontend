@@ -60,6 +60,7 @@ class TrackDataProvider {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getRecorridosByUserQuery),
       variables: {'userEmail': userEmail},
+      fetchPolicy: FetchPolicy.networkOnly
     );
 
     final QueryResult result = await client.query(options);
