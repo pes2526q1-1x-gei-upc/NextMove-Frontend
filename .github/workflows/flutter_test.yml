@@ -44,13 +44,13 @@ jobs:
           path: coverage/
 
   coverage:
-      runs-on: ubuntu-latest
-      needs: test
-      if: ${{ inputs.coverage }}
-      permissions:
-        contents: read
-        pull-requests: write
-      steps:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ inputs.coverage }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
       - name: Check out the repository to the runner
         uses: actions/checkout@v6
       - name: Download coverage reports from test job
@@ -58,12 +58,22 @@ jobs:
         with:
           name: coverage
           path: coverage/
-      - uses: actions/cache@v4
+      - name: Cache apt packages
+        uses: actions/cache@v4
         with:
-          path: /usr/local/bin/lcov
-          key: lcov-${{ runner.os }}-v1
+          path: |
+            /var/lib/apt/lists/*
+            /var/cache/apt/archives/*.deb
+          key: apt-${{ runner.os }}-v1
           restore-keys: |
-            lcov-${{ runner.os }}-
+            apt-${{ runner.os }}-
+      - name: Cache LCOV binary
+        uses: actions/cache@v4
+        with:
+          path: /usr/bin/lcov
+          key: lcov-${{ runner.os }}-v1-${{ hashFiles('**/setup-lcov.sh') }}
+          restore-keys: |
+            lcov-${{ runner.os }}-v1-
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
       - name: Apply coverage exclusions
@@ -76,6 +86,3 @@ jobs:
           artifact-name: "" # We skip the artifact upload
           github-token: ${{ secrets.GITHUB_TOKEN }}
           update-comment: true
-  # Builds:
-  # Para Android: flutter build apk --debug
-  # Para iOS: flutter build ios --debug --no-codesign (requiere macos-latest)
