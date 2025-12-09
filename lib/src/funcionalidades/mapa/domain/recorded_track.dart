@@ -15,8 +15,8 @@ class TrackPoint {
   });
 }
 
-class RecordedTrack {
-  final DateTime startTime = DateTime.now(); // set at the beginning
+class RecordingTrack {
+  DateTime startTime = DateTime.now(); // set at the beginning
   late DateTime endTime = startTime;
 
   // points are being added as the route is recorded; same for the calculation of statistics
@@ -33,10 +33,14 @@ class RecordedTrack {
   double co2SavedKG = 0.0;
   double kcalBurned = 0.0;
 
-  TrackPoint get startPoint => points.first;
-  TrackPoint get endPoint => points.last;
+  LatLng? origin;
+  LatLng? destination;
 
   void addPoint(TrackPoint newPoint) {
+    if (points.isEmpty) {
+      origin = newPoint.location;
+    }
+    destination = newPoint.location;
     double speedKmH = 0.0;
     if (points.isNotEmpty) {
       final lastPoint = points.last;

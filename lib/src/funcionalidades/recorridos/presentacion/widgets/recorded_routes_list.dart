@@ -18,26 +18,26 @@ class RouteHistoryList extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final String userEmail = userProvider.email!;
     return BlocProvider(
-      create: (context) => RouteBloc()
-        ..add(LoadRecordedRoutesEvent(userEmail)),
-      child: BlocBuilder<RouteBloc, RouteState>(
+      create: (context) => TrackBloc()
+        ..add(LoadRecordedTracksEvent(userEmail)),
+      child: BlocBuilder<TrackBloc, TrackState>(
         builder: (context, state) {
-          if (state is RouteLoadingState) {
+          if (state is TrackLoadingState) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(l10n.routeHistory), 
               ),
               body: Center(child: CircularProgressIndicator()),
             );
-          } else if (state is RouteErrorState) {
+          } else if (state is TrackErrorState) {
             return Scaffold(
               appBar: AppBar(
                 title: Text(l10n.routeHistory),
               ),
               body: Center(child: Text('${l10n.error}: ${state.message}')), //ojo aqui con el state message, me puede dar problemas con los idiomas
             );
-          } else if (state is RouteLoadedState) {
-            final recorridos = state.recordedRoutes;
+          } else if (state is TrackLoadedState) {
+            final recorridos = state.recordedTracks;
 
             if (recorridos.isEmpty) {
               return Scaffold(
@@ -69,15 +69,15 @@ class RouteHistoryList extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     subtitle: Text(
-                      '${l10n.distance}: ${((recorrido.distance)/1000).toStringAsFixed(2)} km\n'
-                      '${l10n.averageSpeed}: ${recorrido.averageSpeed!.toStringAsFixed(1)} km/h\n',
+                      '${l10n.distance}: ${((recorrido.totalDistanceMeters)/1000).toStringAsFixed(2)} km\n'
+                      '${l10n.averageSpeed}: ${recorrido.averageSpeedKmH.toStringAsFixed(1)} km/h\n',
                     ),
                     isThreeLine: true,
                     onTap: () {
                       // Implementar detalles del recorrido 
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => RecordedRouteStatistics(track: recorrido),
+                          builder: (context) => RecordedTrackStatistics(track: recorrido),
                         ),
                       );
                     },

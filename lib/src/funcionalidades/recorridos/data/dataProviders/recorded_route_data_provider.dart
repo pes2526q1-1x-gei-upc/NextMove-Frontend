@@ -6,10 +6,10 @@ import 'package:nextmove_app/src/core/errors/exceptions.dart'
 import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 
-class RecordedRouteDataProvider {
+class RecordedTrackDataProvider {
   //i want to get the info of pasts routes of the back
   GraphQLClient get client => GraphQLConfig.client.value;
-  Future<List<RecordedRoute>> getRecordedRoutes(String userEmail) async {
+  Future<List<RecordedTrack>> getRecordedTracks(String userEmail) async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getRecorridosByUserQuery),
       variables: {
@@ -36,9 +36,9 @@ class RecordedRouteDataProvider {
       );
     }
 
-    final List<dynamic> recordedRoutes = result.data?['recorridosByUser'] ?? [];
-    return recordedRoutes
-        .map((routeJson) => RecordedRoute.fromJson(routeJson))
+    final List<dynamic> recordedTracks = result.data?['recorridosByUser'] ?? [];
+    return recordedTracks
+        .map((trackJson) => RecordedTrack.fromJson(trackJson))
         .toList();
   }
 }

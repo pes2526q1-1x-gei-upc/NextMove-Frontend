@@ -22,7 +22,7 @@ var defaultPolyline = Polyline(
 class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
-  final RecordedRoutesRepository recordedRoutesRepository;
+  final RecordedTracksRepository recordedTracksRepository;
   final SearchHistoryService searchHistoryService;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
@@ -38,7 +38,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
-    required this.recordedRoutesRepository,
+    required this.recordedTracksRepository,
     required this.searchHistoryService,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
@@ -499,7 +499,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(
         currentState.copyWith(
           isRecordingRoute: true,
-          recordedTrack: RecordedTrack(),
+          recordingTrack: RecordingTrack(),
           routePolyline: defaultPolyline,
           snackbarError: null,
           recordingElapsedTime: Duration.zero,
@@ -527,15 +527,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     final currentState = state;
     if (currentState is MapLoadedState) {
-      currentState.recordedTrack!.endTime = DateTime.now();
+      currentState.recordingTrack!.endTime = DateTime.now();
       if (kDebugMode) {
         print(
-          'Stopped route recording. Total points recorded: ${currentState.recordedTrack?.points.length ?? 0}',
+          'Stopped route recording. Total points recorded: ${currentState.recordingTrack?.points.length ?? 0}',
         );
-        print("Route information: ${currentState.recordedTrack.toString()}");
+        print("Route information: ${currentState.recordingTrack.toString()}");
       }
 
-      if (currentState.recordedTrack!.points.length < 2) {
+      if (currentState.recordingTrack!.points.length < 2) {
         if (kDebugMode) {
           print('Not enough points recorded to save the track.');
         }
@@ -556,8 +556,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
-      final saveResult = await trackRepository.saveRecordedTrack(
-        currentState.recordedTrack!,
+      final saveResult = await trackRepository.saveRecordingTrack(
+        currentState.recordingTrack!,
       );
       saveResult.fold(
         (failure) {
@@ -603,12 +603,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           'Adding route point: ${event.point.location.latitude}, ${event.point.location.longitude} at ${event.point.timestamp}',
         );
         print(
-          'Total points in track: ${(currentState.recordedTrack?.points.length ?? 0) + 1}',
+          'Total points in track: ${(currentState.recordingTrack?.points.length ?? 0) + 1}',
         );
       }
 
       // add the new point to the recorded track
-      currentState.recordedTrack!.addPoint(
+      currentState.recordingTrack!.addPoint(
         TrackPoint(
           location: event.point.location,
           altitude: event.point.altitude,

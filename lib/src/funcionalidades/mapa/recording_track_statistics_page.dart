@@ -25,8 +25,8 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final recordedTrack = state.recordedTrack;
-          if (recordedTrack == null || recordedTrack.points.isEmpty) {
+          final recordingTrack = state.recordingTrack;
+          if (recordingTrack == null || recordingTrack.points.isEmpty) {
             return Center(
               child: Text(
                 l10n.noRouteDataAvailable,
@@ -39,7 +39,7 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
             print('Statistics page - Elapsed time: ${state.recordingElapsedTime.inSeconds} seconds');
           }
 
-          return _buildStatisticsView(context, recordedTrack, l10n, state.recordingElapsedTime);
+          return _buildStatisticsView(context, recordingTrack, l10n, state.recordingElapsedTime);
         },
       ),
     );
@@ -47,7 +47,7 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
 
   Widget _buildStatisticsView(
     BuildContext context,
-    RecordedTrack track,
+    RecordingTrack track,
     AppLocalizations l10n,
     Duration elapsedTime,
   ) {

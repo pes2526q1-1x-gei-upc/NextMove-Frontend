@@ -43,7 +43,7 @@ class _MapPageState extends State<MapPage> {
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
   TrackRepository trackRepository = TrackRepository();
-  RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
+  RecordedTracksRepository recordedTracksRepository = RecordedTracksRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
@@ -79,7 +79,7 @@ class _MapPageState extends State<MapPage> {
       create: (context) => MapBloc(
         stationRepository: stationRepository,
         trackRepository: trackRepository,
-        recordedRoutesRepository: recordedRoutesRepository,
+        recordedTracksRepository: recordedTracksRepository,
         searchHistoryService: searchHistoryService,
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),

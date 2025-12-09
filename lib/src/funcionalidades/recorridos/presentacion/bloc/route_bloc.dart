@@ -4,28 +4,28 @@ import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/re
 import 'route_events.dart';
 import 'route_state.dart';
 
-class RouteBloc extends Bloc<RouteEvent, RouteState> {
-  final RecordedRoutesRepository recordedRoutesRepository;
+class TrackBloc extends Bloc<TrackEvent, TrackState> {
+  final RecordedTracksRepository recordedTracksRepository;
 
-  RouteBloc() : recordedRoutesRepository = RecordedRoutesRepository(),
-      super(const RouteInitialState()) {
-    on<LoadRecordedRoutesEvent>(_onLoadRecordedRoutes);
+  TrackBloc() : recordedTracksRepository = RecordedTracksRepository(),
+      super(const TrackInitialState()) {
+    on<LoadRecordedTracksEvent>(_onLoadRecordedTracks);
   }
 
-  Future<void> _onLoadRecordedRoutes(
-      LoadRecordedRoutesEvent event, 
-      Emitter<RouteState> emit
+  Future<void> _onLoadRecordedTracks(
+      LoadRecordedTracksEvent event, 
+      Emitter<TrackState> emit
     ) async {
-        emit(const RouteLoadingState());
+        emit(const TrackLoadingState());
         final result =
-            await recordedRoutesRepository.getRecordedRoutesByUser(event.userEmail);
+            await recordedTracksRepository.getRecordedTracksByUser(event.userEmail);
 
         result.fold(
           (failure) {
-            emit(RouteErrorState(failure.message));
+            emit(TrackErrorState(failure.message));
           },
-          (recordedRoutes) {
-            emit(RouteLoadedState(recordedRoutes: recordedRoutes));
+          (recordedTracks) {
+            emit(TrackLoadedState(recordedTracks: recordedTracks));
           },
         );
     }

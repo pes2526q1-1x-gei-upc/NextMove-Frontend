@@ -9,7 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart
 
 class TrackDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
-  Future<void> saveRecordedTrack(RecordedTrack track) async {
+  Future<void> saveRecordingTrack(RecordingTrack track) async {
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLMutations.createTrackMutation),
       variables: {
@@ -22,12 +22,12 @@ class TrackDataProvider {
         'elevacion_positiva': track.elevationGainMeters,
         'elevacion_negativa': track.elevationLossMeters,
         'origen': {
-          'latitude': track.startPoint.location.latitude,
-          'longitude': track.startPoint.location.longitude,
+          'latitude': track.origin?.latitude,
+          'longitude': track.origin?.longitude,
         },
         'destino': {
-          'latitude': track.endPoint.location.latitude,
-          'longitude': track.endPoint.location.longitude,
+          'latitude': track.destination?.latitude,
+          'longitude': track.destination?.longitude,
         },
         'tiempo_inicio': track.startTime.toIso8601String(),
         'tiempo_fin': track.endTime.toIso8601String(),

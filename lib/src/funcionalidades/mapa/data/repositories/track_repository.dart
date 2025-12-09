@@ -9,9 +9,9 @@ class TrackRepository {
   final TrackDataProvider trackDataProvider;
   TrackRepository() : trackDataProvider = TrackDataProvider();
   
-  Future<Either<Failure, void>> saveRecordedTrack(RecordedTrack track) async {
+  Future<Either<Failure, void>> saveRecordingTrack(RecordingTrack track) async {
     try {
-      await trackDataProvider.saveRecordedTrack(track);
+      await trackDataProvider.saveRecordingTrack(track);
       return Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -19,7 +19,7 @@ class TrackRepository {
       return Left(ConnectionFailure());
     } catch (e) {
       if (kDebugMode) {
-        print('UnknownFailure in saveRecordedTrack: $e');
+        print('UnknownFailure in saveRecordingTrack: $e');
       }
       return Left(UnknownFailure());
     }

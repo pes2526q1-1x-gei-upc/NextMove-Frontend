@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 
-abstract class RouteEvent extends Equatable {
-  const RouteEvent();
+abstract class TrackEvent extends Equatable {
+  const TrackEvent();
 
   @override
   List<Object?> get props => [];
 
 }
 
-class LoadRecordedRoutesEvent extends RouteEvent {
+class LoadRecordedTracksEvent extends TrackEvent {
   final String userEmail;
-  const LoadRecordedRoutesEvent(this.userEmail);
+  const LoadRecordedTracksEvent(this.userEmail);
 
   @override
   List<Object?> get props => [userEmail];

@@ -35,7 +35,7 @@ class MapLoadedState extends MapState {
   final List<StationDetails> searchResults;
   final bool isSearching;
   final bool isRecordingRoute;
-  final RecordedTrack? recordedTrack;
+  final RecordingTrack? recordingTrack;
   final Polyline routePolyline;
   final String? snackbarError;
   final Duration recordingElapsedTime;
@@ -55,7 +55,7 @@ class MapLoadedState extends MapState {
     this.searchResults = const [],
     required this.isSearching,
     this.isRecordingRoute = false,
-    this.recordedTrack,
+    this.recordingTrack,
     required this.routePolyline,
     this.snackbarError,
     this.recordingElapsedTime = Duration.zero,
@@ -77,7 +77,7 @@ class MapLoadedState extends MapState {
         searchResults,
         isSearching,
         isRecordingRoute,
-        recordedTrack,
+        recordingTrack,
         routePolyline,
         snackbarError,
         recordingElapsedTime,
@@ -100,7 +100,7 @@ class MapLoadedState extends MapState {
     List<StationDetails>? searchResults,
     bool? isSearching,
     bool? isRecordingRoute,
-    RecordedTrack? recordedTrack,
+    RecordingTrack? recordingTrack,
     Polyline? routePolyline,
     String? snackbarError,
     bool clearSnackbarError = false,
@@ -121,7 +121,7 @@ class MapLoadedState extends MapState {
       searchResults: searchResults ?? this.searchResults,
       isSearching: isSearching ?? this.isSearching,
       isRecordingRoute: isRecordingRoute ?? this.isRecordingRoute,
-      recordedTrack: recordedTrack ?? this.recordedTrack,
+      recordingTrack: recordingTrack ?? this.recordingTrack,
       routePolyline: routePolyline ?? this.routePolyline,
       snackbarError: snackbarError ?? this.snackbarError,
       recordingElapsedTime: recordingElapsedTime ?? this.recordingElapsedTime,

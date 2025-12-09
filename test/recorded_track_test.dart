@@ -5,9 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 
 void main() {
-  group('RecordedTrack', () {
+  group('RecordingTrack', () {
     test('initialization', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       expect(track.points, isEmpty);
       expect(track.totalDistanceMeters, 0.0);
       expect(track.averageSpeedKmH, 0.0);
@@ -21,7 +21,7 @@ void main() {
     });
 
     test('add first point', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final point = TrackPoint(
         location: LatLng(0.0, 0.0),
         altitude: 100.0,
@@ -29,8 +29,8 @@ void main() {
       );
       track.addPoint(point);
       expect(track.points.length, 1);
-      expect(track.startPoint, point);
-      expect(track.endPoint, point);
+      expect(track.origin, point);
+      expect(track.destination, point);
       expect(point.speed, 0.0);
       expect(track.totalDistanceMeters, 0.0);
       expect(track.averageSpeedKmH, 0.0);
@@ -43,7 +43,7 @@ void main() {
     });
 
     test('add second point with distance and time', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time1 = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
@@ -61,7 +61,7 @@ void main() {
       track.addPoint(point2);
 
       expect(track.points.length, 2);
-      expect(track.endPoint, point2);
+      expect(track.destination, point2);
       expect(point2.speed, greaterThan(0.0));
       expect(track.totalDistanceMeters, greaterThan(0.0));
       expect(track.averageSpeedKmH, greaterThan(0.0));
@@ -74,7 +74,7 @@ void main() {
     });
 
     test('add point with elevation loss', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
         altitude: 100.0,
@@ -94,7 +94,7 @@ void main() {
     });
 
     test('max speed update', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
         altitude: 100.0,
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('toString output', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final output = track.toString();
       expect(output, contains('startTime'));
       expect(output, contains('endTime'));
@@ -137,7 +137,7 @@ void main() {
     });
 
     test('add point with zero time difference', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
@@ -162,7 +162,7 @@ void main() {
     });
 
     test('add point with same location', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time1 = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
@@ -190,7 +190,7 @@ void main() {
     });
 
     test('add point with negative time difference', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time1 = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
@@ -216,7 +216,7 @@ void main() {
     });
 
     test('extreme large distance', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time1 = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0), // equator
@@ -241,7 +241,7 @@ void main() {
     });
 
     test('negative altitudes', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final time1 = DateTime.now();
       final point1 = TrackPoint(
         location: LatLng(0.0, 0.0),
@@ -263,7 +263,7 @@ void main() {
     });
 
     test('multiple elevation changes', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final baseTime = DateTime.now();
       final points = [
         TrackPoint(location: LatLng(0.0, 0.0), altitude: 100.0, timestamp: baseTime),
@@ -283,7 +283,7 @@ void main() {
 
     test('many points performance', () {
       int pointsCount = 10000;
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final baseTime = DateTime.now();
       final random = Random(42); // Seed for reproducible randomness
       for (int i = 0; i < pointsCount; i++) {
@@ -309,7 +309,7 @@ void main() {
     });
 
     test('varying speeds for max speed', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final baseTime = DateTime.now();
       // Add points with increasing speed
       final points = [
@@ -327,7 +327,7 @@ void main() {
     });
 
     test('co2 and kcal calculations', () {
-      final track = RecordedTrack();
+      final track = RecordingTrack();
       final baseTime = DateTime.now();
       // Add points to cover 1 km
       final point1 = TrackPoint(location: LatLng(0.0, 0.0), altitude: 100.0, timestamp: baseTime);

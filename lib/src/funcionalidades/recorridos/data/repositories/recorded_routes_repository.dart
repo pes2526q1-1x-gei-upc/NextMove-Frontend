@@ -6,14 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
 
 
-class RecordedRoutesRepository {
-  final RecordedRouteDataProvider recordedRouteDataProvider;
-  RecordedRoutesRepository() : recordedRouteDataProvider = RecordedRouteDataProvider();
+class RecordedTracksRepository {
+  final RecordedTrackDataProvider recordedTrackDataProvider;
+  RecordedTracksRepository() : recordedTrackDataProvider = RecordedTrackDataProvider();
 
-  Future<Either<Failure, List<RecordedRoute>>> getRecordedRoutesByUser(String userEmail) async {
+  Future<Either<Failure, List<RecordedTrack>>> getRecordedTracksByUser(String userEmail) async {
     try {
       final routes =
-          await recordedRouteDataProvider.getRecordedRoutes(userEmail);
+          await recordedTrackDataProvider.getRecordedTracks(userEmail);
       return Right(routes);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -21,7 +21,7 @@ class RecordedRoutesRepository {
       return Left(ConnectionFailure());
     } catch (e) {
       if (kDebugMode) {
-        print('UnknownFailure in getRecordedRoutes: $e');
+        print('UnknownFailure in getRecordedTracks: $e');
       }
       throw UnknownFailure();
     }
