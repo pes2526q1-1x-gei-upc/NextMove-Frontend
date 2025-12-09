@@ -29,8 +29,8 @@ void main() {
       );
       track.addPoint(point);
       expect(track.points.length, 1);
-      expect(track.origin, point);
-      expect(track.destination, point);
+      expect(track.origin, LatLng(point.location.latitude, point.location.longitude));
+      expect(track.destination, LatLng(point.location.latitude, point.location.longitude));
       expect(point.speed, 0.0);
       expect(track.totalDistanceMeters, 0.0);
       expect(track.averageSpeedKmH, 0.0);
@@ -61,7 +61,7 @@ void main() {
       track.addPoint(point2);
 
       expect(track.points.length, 2);
-      expect(track.destination, point2);
+      expect(track.destination, LatLng(point2.location.latitude, point2.location.longitude));
       expect(point2.speed, greaterThan(0.0));
       expect(track.totalDistanceMeters, greaterThan(0.0));
       expect(track.averageSpeedKmH, greaterThan(0.0));
