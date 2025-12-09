@@ -86,9 +86,10 @@ jobs:
         run: |
           echo "$HOME/.local/lcov/bin" >> $GITHUB_PATH
           echo "PERL5LIB=$HOME/.local/lcov/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
+          echo "ignore_errors = deprecated" > ~/.lcovrc
 
       - name: Apply coverage exclusions
-        run: lcov --ignore-errors unused,unused --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentacion/*' -o coverage/lcov.info
+        run: lcov --ignore-errors unused,deprecated --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentacion/*' -o coverage/lcov.info
 
       - name: Report code coverage
         uses: zgosalvez/github-actions-report-lcov@v4
