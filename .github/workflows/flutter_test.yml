@@ -69,15 +69,18 @@ jobs:
         with:
           path: ~/.local/lcov
           key: ${{ runner.os }}-lcov-${{ env.LATEST_TAG }}
-      - name: Install LCOV
+      - name: Install LCOV and Dependencies
         if: steps.cache-lcov.outputs.cache-hit != 'true'
         run: |
           mkdir -p ~/.local/lcov
+          cpanm --notest --local-lib=$HOME/.local/lcov Capture::Tiny DateTime
           git clone --depth 1 --branch ${{ env.LATEST_TAG }} https://github.com/linux-test-project/lcov.git lcov-source
           cd lcov-source
           make install PREFIX=$HOME/.local/lcov
-      - name: Add LCOV to PATH
-        run: echo "$HOME/.local/lcov/bin" >> $GITHUB_PATH
+      - name: Setup LCOV Environment
+        run: |
+          echo "$HOME/.local/lcov/bin" >> $GITHUB_PATH
+          echo "PERL5LIB=$HOME/.local/lcov/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
       - name: Apply coverage exclusions
         run: lcov --ignore-errors unused,unused --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentacion/*' -o coverage/lcov.info
       - name: Report code coverage
