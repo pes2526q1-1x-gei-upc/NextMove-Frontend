@@ -1,20 +1,17 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-
-// Imports de Blocs y Eventos
+import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_state.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
-
-// Imports de Widgets y Páginas
+import 'package:nextmove_app/src/funcionalidades/social/presentation/pages/friend_detail_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_user_card_widget.dart';
-import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_search_bar.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_empty_state.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class SocialPage extends StatefulWidget {
@@ -26,35 +23,27 @@ class SocialPage extends StatefulWidget {
 
 class _SocialPageState extends State<SocialPage> {
   final TextEditingController _searchController = TextEditingController();
-  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     final userState = context.read<UserBloc>().state;
-    debugPrint("Iniciamos pantalla de social");
+    
+    // Carga inicial de amigos si el usuario ya está disponible
     if (userState is UserLoaded || userState is UserUpdated) {
       final nickname = (userState as dynamic).user.apodo;
       context.read<SocialBloc>().add(LoadFriendsEvent(nickname));
-    } else {
-      debugPrint(
-        "[SocialPage] El usuario aún no está listo. Esperando BlocListener...",
-      );
     }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      context.read<SocialBloc>().add(SearchUsersEvent(query));
-    });
+    context.read<SocialBloc>().add(SearchUsersEvent(query));
   }
 
   @override
@@ -86,51 +75,11 @@ class _SocialPageState extends State<SocialPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: Theme.of(context).brightness == Brightness.dark
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: l10n.searchByNickname,
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _searchController.clear();
-                              _debounce?.cancel();
-                              context.read<SocialBloc>().add(
-                                ClearSearchEvent(),
-                              );
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                  ),
-                ),
+              SocialSearchBar(
+                controller: _searchController,
+                onSearchChanged: _onSearchChanged,
               ),
-
               const SizedBox(height: 24),
-
               Expanded(
                 child: BlocConsumer<SocialBloc, SocialState>(
                   listener: (context, state) {
@@ -148,36 +97,16 @@ class _SocialPageState extends State<SocialPage> {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    final usersToShow = state.isSearching
-                        ? state.searchResults
-                        : state.friends;
+                    final usersToShow =
+                        state.isSearching ? state.searchResults : state.friends;
                     final String emptyMessage = state.isSearching
                         ? l10n.noUsersFound
                         : l10n.noFriendsAdded;
 
                     if (usersToShow.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              state.isSearching
-                                  ? Icons.person_off_outlined
-                                  : Icons.people_outline,
-                              size: 60,
-                              color: Colors.grey[300],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              emptyMessage,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
+                      return SocialEmptyState(
+                        isSearching: state.isSearching,
+                        message: emptyMessage,
                       );
                     }
 
@@ -212,11 +141,7 @@ class _SocialPageState extends State<SocialPage> {
                               return SocialUserCard(
                                 user: user,
                                 isFriend: !showAddButton,
-
                                 onTap: () {
-                                  debugPrint(
-                                    "SocialPage: Tapped on user: ${user.apodo}",
-                                  );
                                   final socialBloc = context.read<SocialBloc>();
 
                                   Navigator.push(
@@ -244,22 +169,21 @@ class _SocialPageState extends State<SocialPage> {
                                     ),
                                   );
                                 },
-
                                 onAddPressed: showAddButton
                                     ? () {
                                         final userProvider =
                                             Provider.of<UserProvider>(
-                                              context,
-                                              listen: false,
-                                            ).user;
+                                          context,
+                                          listen: false,
+                                        ).user;
                                         final currentNickname =
                                             userProvider?['nickname'];
                                         context.read<SocialBloc>().add(
-                                          AddFriendEvent(
-                                            currentNickname,
-                                            user.apodo,
-                                          ),
-                                        );
+                                              AddFriendEvent(
+                                                currentNickname,
+                                                user.apodo,
+                                              ),
+                                            );
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(

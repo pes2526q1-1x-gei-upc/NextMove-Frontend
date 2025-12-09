@@ -57,7 +57,7 @@ class SocialUserCard extends StatelessWidget {
                   backgroundImage: hasPhoto ? NetworkImage(user.photo) : null,
                   onBackgroundImageError: hasPhoto 
                       ? (exception, stackTrace) {
-                          debugPrint('Error cargando avatar en lista: $exception');
+                          debugPrint('Error cargando avatar: $exception');
                         }
                       : null,
                   child: !hasPhoto
@@ -67,7 +67,7 @@ class SocialUserCard extends StatelessWidget {
                 
                 const SizedBox(width: 16),
                 
-                // Info del Usuario
+                // Datos del usuario
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +91,7 @@ class SocialUserCard extends StatelessWidget {
                   ),
                 ),
 
-                // Botón de estado (Amigo o Añadir)
+                // Indicador de amistad o botón de solicitud
                 if (isFriend)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -117,7 +117,7 @@ class SocialUserCard extends StatelessWidget {
                 else
                   IconButton(
                     onPressed: onAddPressed,
-                    tooltip: "Añadir a amigos",
+                    tooltip: "Enviar solicitud",
                     icon: Icon(
                       Icons.person_add_alt_1_rounded,
                       color: colorScheme.onPrimaryContainer,

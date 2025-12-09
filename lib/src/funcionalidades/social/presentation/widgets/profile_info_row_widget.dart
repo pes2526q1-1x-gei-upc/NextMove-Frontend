@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Fila reutilizable para mostrar un par icono-etiqueta-valor en el perfil
 class ProfileInfoRowWidget extends StatelessWidget {
   final IconData icon;
   final String label;

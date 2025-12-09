@@ -15,7 +15,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_en
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/pages/social_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

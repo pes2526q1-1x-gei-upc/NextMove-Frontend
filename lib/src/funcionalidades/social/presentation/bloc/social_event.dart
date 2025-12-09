@@ -7,22 +7,21 @@ abstract class SocialEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Carga inicial de la lista de amigos
+// Inicializa la carga de amigos del usuario actual
 class LoadFriendsEvent extends SocialEvent {
   final String currentUserId;
   const LoadFriendsEvent(this.currentUserId);
 }
 
-// Evento que se dispara al escribir en la barra de búsqueda
+// Ejecuta la búsqueda de usuarios por apodo
 class SearchUsersEvent extends SocialEvent {
   final String query;
   const SearchUsersEvent(this.query);
 }
 
-// Limpiar búsqueda y volver a ver la lista de amigos
+// Limpia los resultados y el estado de búsqueda
 class ClearSearchEvent extends SocialEvent {}
 
-// Acción de añadir amigo
 class AddFriendEvent extends SocialEvent {
   final String currentUserId;
   final String friendId;

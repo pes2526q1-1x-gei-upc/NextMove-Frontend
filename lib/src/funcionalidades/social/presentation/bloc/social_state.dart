@@ -5,10 +5,10 @@ enum SocialStatus { initial, loading, success, failure }
 
 class SocialState extends Equatable {
   final SocialStatus status;
-  final List<UserEntity> friends;       // Lista de amigos actuales
-  final List<UserEntity> searchResults; // Resultados de la búsqueda
-  final List<UserEntity> blockedUsers;  // Lista de usuarios bloqueados
-  final bool isSearching;               // ¿Está el usuario buscando activamente?
+  final List<UserEntity> friends;       // Lista de amigos confirmados
+  final List<UserEntity> searchResults; // Resultados de la búsqueda activa
+  final List<UserEntity> blockedUsers;  
+  final bool isSearching;               // Determina si se muestra la interfaz de búsqueda
   final String? errorMessage;
 
   const SocialState({

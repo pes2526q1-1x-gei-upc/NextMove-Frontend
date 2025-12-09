@@ -10,7 +10,7 @@ class FriendDetailsContent extends StatelessWidget {
 
   const FriendDetailsContent({super.key, required this.user});
 
-  // Helper para normalizar el modo de transporte
+  // Normaliza variantes del modo de transporte recibidas del backend
   bool _isBike(String mode) {
     final m = mode.toUpperCase();
     return m == 'BIKE' || m == 'BICICLETA' || m == 'BICI';
@@ -28,10 +28,10 @@ class FriendDetailsContent extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           
-          // --- AVATAR Y NOMBRE ---
+          // Encabezado del perfil
           Center(
             child: Column(
               children: [
@@ -56,12 +56,11 @@ class FriendDetailsContent extends StatelessWidget {
                             image: NetworkImage(user.photo),
                             fit: BoxFit.cover,
                             onError: (exception, stackTrace) {
-                               debugPrint("Error cargando foto detalle: $exception");
+                               debugPrint("Error foto detalle: $exception");
                             },
                           )
                         : null,
                   ),
-                  // Si no hay foto o falla, mostramos el icono
                   child: !hasPhoto 
                       ? Icon(
                           Icons.person,
@@ -94,7 +93,7 @@ class FriendDetailsContent extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // --- SECCIÓN: INFORMACIÓN ---
+          // Información general
           ProfileSectionLabel(text: l10n.information),
           ProfileStyledCard(
             children: [
@@ -132,7 +131,7 @@ class FriendDetailsContent extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // --- SECCIÓN: PREFERENCIAS ---
+          // Preferencias
           ProfileSectionLabel(text: l10n.preferredMode),
           ProfileStyledCard(
             children: [
