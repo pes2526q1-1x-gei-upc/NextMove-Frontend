@@ -58,24 +58,26 @@ jobs:
         with:
           name: coverage
           path: coverage/
-      - name: Cache apt packages
+      - name: Get latest LCOV version
+        run: |
+          LATEST_TAG=$(curl -s https://api.github.com/repos/linux-test-project/lcov/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "Latest LCOV version: $LATEST_TAG"
+      - name: Cache LCOV
+        id: cache-lcov
         uses: actions/cache@v4
         with:
-          path: |
-            /var/lib/apt/lists/*
-            /var/cache/apt/archives/*.deb
-          key: apt-${{ runner.os }}-v1
-          restore-keys: |
-            apt-${{ runner.os }}-
-      - name: Cache LCOV binary
-        uses: actions/cache@v4
-        with:
-          path: /usr/bin/lcov
-          key: lcov-${{ runner.os }}-v1-${{ hashFiles('**/setup-lcov.sh') }}
-          restore-keys: |
-            lcov-${{ runner.os }}-v1-
-      - name: Setup LCOV
-        uses: hrishikesh-kadam/setup-lcov@v1
+          path: ~/.local/lcov
+          key: ${{ runner.os }}-lcov-${{ env.LATEST_TAG }}
+      - name: Install LCOV
+        if: steps.cache-lcov.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/lcov
+          git clone --depth 1 --branch ${{ env.LATEST_TAG }} https://github.com/linux-test-project/lcov.git lcov-source
+          cd lcov-source
+          make install PREFIX=$HOME/.local/lcov
+      - name: Add LCOV to PATH
+        run: echo "$HOME/.local/lcov/bin" >> $GITHUB_PATH
       - name: Apply coverage exclusions
         run: lcov --ignore-errors unused,unused --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentacion/*' -o coverage/lcov.info
       - name: Report code coverage
