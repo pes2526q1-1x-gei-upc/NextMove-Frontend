@@ -111,9 +111,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
-    /*if (kDebugMode) {
+    if (kDebugMode) {
       print('getAllBicycleStationDetails result.data: ${result.data}');
-    }*/
+    }
     final data = result.data?['getEstacionesDeBicing'];
 
     if (data != null) {
@@ -139,9 +139,9 @@ class StationRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
-    /*if (kDebugMode) {
+    if (kDebugMode) {
       print('getAllEVStationDetails result.data: ${result.data}');
-    }*/
+    }
     final data = result.data?['stations']['stations'];
     if (data != null) {
       return (data as List).map((item) {
