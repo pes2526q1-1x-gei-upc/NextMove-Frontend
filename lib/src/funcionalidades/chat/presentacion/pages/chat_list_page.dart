@@ -15,7 +15,6 @@ const String listFriendsQuery = r'''
     ListFriends {
       name
       photo
-      email
     }
   }
 ''';
@@ -23,7 +22,8 @@ const String listFriendsQuery = r'''
 // Query para obtener email de un usuario por nickname
 const String getUserEmailQuery = r'''
   query GetUserEmail($nickname: String!) {
-    getUserByNickname(nickname: $nickname) {
+    UsersByNickname(nickname: $nickname) {
+      nickname
       email
     }
   }
@@ -69,16 +69,44 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _openChatWithFriend(
     BuildContext context,
     String friendNickname,
-    String friendEmail, // Pasar email directamente
+    String? friendEmail, // Pasar email directamente
   ) async {
     final client = GraphQLProvider.of(context).value;
 
     try {
-      // Ya no necesitas query de email, lo tienes directamente
+      String email = friendEmail ?? '';
+
+      // Si no tenemos el email, lo buscamos
+      if (email.isEmpty) {
+        final emailResult = await client.query(
+          QueryOptions(
+            document: gql(getUserEmailQuery),
+            variables: {'nickname': friendNickname},
+            fetchPolicy: FetchPolicy.networkOnly,
+          ),
+        );
+
+        if (emailResult.hasException) {
+          throw Exception(emailResult.exception.toString());
+        }
+
+        final users = emailResult.data?['UsersByNickname'] as List<dynamic>?;
+        if (users != null && users.isNotEmpty) {
+          // Buscar coincidencia exacta de nickname
+          final user = users.firstWhere(
+            (u) => u['nickname'] == friendNickname,
+            orElse: () => users.first,
+          );
+          email = user['email'] as String;
+        } else {
+          throw Exception('No se pudo encontrar el email del usuario');
+        }
+      }
+
       final chatResult = await client.query(
         QueryOptions(
           document: gql(getOrCreateDirectChatMutation),
-          variables: {'userEmail': friendEmail},
+          variables: {'userEmail': email},
           fetchPolicy: FetchPolicy.networkOnly,
         ),
       );
@@ -244,7 +272,8 @@ class _ChatListPageState extends State<ChatListPage> {
                     final friend = friends[index];
                     final nickname = friend['name'] as String;
                     final photo = friend['photo'] as String?;
-                    final email = friend['email'] as String;
+                    // El email ya no viene en ListFriends por problemas de schema backend
+                    final String? email = null;
 
                     return ListTile(
                       leading: CircleAvatar(
