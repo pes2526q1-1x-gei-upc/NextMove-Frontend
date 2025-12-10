@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -169,7 +170,7 @@ class _MapPageState extends State<MapPage> {
                     ),
 
                     //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
-                    if (state.isNavigationMode)
+                    if (state.isNavigationMode)...[
                       Positioned(
                         top: 160,
                         right: 16,
@@ -183,8 +184,20 @@ class _MapPageState extends State<MapPage> {
                           child: Text("Cancelar Navegación"),
                         ),
                       ),
+                      Positioned(
+                        top:60,
+                        left:0,
+                        right:0,
+                        child: RouteInfoWidget(
+                          origin: state.userLocation!,
+                          destination: state.selectedStation!,
+                        )
+                      )
+                    ],
+                    
 
                     // Barra de búsqueda
+                    if(!state.isNavigationMode)...[
                     SearchBarWidget(
                       hintText: AppLocalizations.of(context)!.searchStation,
                       onChanged: (query) {
@@ -209,7 +222,7 @@ class _MapPageState extends State<MapPage> {
                     // Avatar de perfil
                     //ProfileAvatarWidget(context: context),
                     // Route history button
-                    RouteHistoryButtonWidget(),
+                    RouteHistoryButtonWidget()],
 
                     // Columna de controles del mapa (botones combinados)
                     MapControlsColumnWidget(

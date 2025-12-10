@@ -666,6 +666,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(currentState.copyWith(
         isNavigationMode: true,
         selectedStation: event.station,
+        searchQuery: null,
+        searchResults: [],
       ));
 
       final routeInput = RouteInput(
@@ -713,6 +715,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                 decodedPolyline: navigationPolyline,
                 routeViewport: navigationRoute.viewport,
                 isNavigationMode: true,
+                selectedStation: event.station,
+                searchQuery: null,
+                searchResults: [],
               ));
             },
           );
