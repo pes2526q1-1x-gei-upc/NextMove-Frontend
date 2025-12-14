@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -23,7 +24,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart'; 
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart'; 
 
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
@@ -84,6 +85,7 @@ class NextMoveAppState extends State<NextMoveApp> {
         providers: [
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
+          ChangeNotifierProvider(create: (_) => StationsCache()),
           BlocProvider<UserBloc>(create: (_) => UserBloc()),
         ],
         child: MaterialApp(

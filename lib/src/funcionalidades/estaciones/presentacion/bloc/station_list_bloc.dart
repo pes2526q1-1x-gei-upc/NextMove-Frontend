@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 part 'station_list_event.dart';
@@ -11,7 +12,9 @@ part 'station_list_state.dart';
 
 class StationListBloc extends Bloc<StationListEvent, StationListState> {
   final StationRepository stationRepository;
-  StationListBloc()
+  final StationsCache stationsCache;
+
+  StationListBloc(this.stationsCache)
     : stationRepository = StationRepository(),
       super(StationListInitial()) {
     on<LoadStationListEvent>(_onLoadStationListEvent);
@@ -37,7 +40,11 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
     result.fold((failure) {
       emit(StationListError(_mapFailureToMessage(failure)));
       emit(prevState);
-    }, (stations) => emit(StationListLoaded(stations ?? [])));
+    }, (stations) {
+      final loadedStations = stations ?? [];
+      stationsCache.updateStations(loadedStations);
+      emit(StationListLoaded(loadedStations));
+    });
   }
 
   Future<void> _onSearchStationListEvent(
@@ -91,10 +98,10 @@ class StationListBloc extends Bloc<StationListEvent, StationListState> {
           );
         },
         (success) {
-          currentState.stations
-                  .firstWhere((s) => s.id == event.stationId)
-                  .isFavorite =
-              newIsFavorite;
+          final updatedStation = currentState.stations
+              .firstWhere((s) => s.id == event.stationId);
+          updatedStation.isFavorite = newIsFavorite;
+          stationsCache.updateStation(updatedStation);
           emit(StationListLoaded(currentState.stations));
         },
       );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
 
@@ -20,7 +22,7 @@ class StationList extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
-      create: (context) => StationListBloc()
+      create: (context) => StationListBloc(context.read<StationsCache>())
         ..add(
           LoadStationListEvent(
             stationType: stationType,
@@ -67,22 +69,29 @@ class StationList extends StatelessWidget {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: Icon(
-                              (stationDetails.isFavorite ?? false)
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: switch (stationDetails.isFavorite) {
+                          Consumer<StationsCache>(
+                            builder: (context, cache, child) {
+                              final cachedStation = cache.getStation(stationDetails.id);
+                              final isFavorite = cachedStation?.isFavorite ?? stationDetails.isFavorite;
+                              final starColor = switch (isFavorite) {
                                 true => Colors.yellow[700],
                                 false => null,
-                                null => Colors.grey[300]
-                              },
-                            ),
-                            onPressed: () {
-                              context.read<StationListBloc>().add(
-                                ToggleFavoriteEvent(
-                                  stationId: stationDetails.id,
+                                null => Colors.grey[300],
+                              };
+                              return IconButton(
+                                icon: Icon(
+                                  (isFavorite ?? false)
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: starColor,
                                 ),
+                                onPressed: () {
+                                  context.read<StationListBloc>().add(
+                                    ToggleFavoriteEvent(
+                                      stationId: stationDetails.id,
+                                    ),
+                                  );
+                                },
                               );
                             },
                           ),

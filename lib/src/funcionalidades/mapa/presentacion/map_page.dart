@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -87,6 +88,7 @@ class _MapPageState extends State<MapPage> {
         stationRepository: stationRepository,
         trackRepository: trackRepository,
         recordedRoutesRepository: recordedRoutesRepository,
+        stationsCache: context.read<StationsCache>(),
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
       child: _buildUI(context),
@@ -210,7 +212,7 @@ class _MapPageState extends State<MapPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) =>
-          StationBottomSheet(context: context, station: station, state: state),
+          StationBottomSheet(context: context, stationId: station.id, state: state),
     );
   }
 }

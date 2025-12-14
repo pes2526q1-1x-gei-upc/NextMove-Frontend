@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
   final Color themeColor;
+  final VoidCallback? onToggleFavorite;
 
   const StationHeaderWidget({
     super.key,
     required this.station,
     required this.themeColor,
+    this.onToggleFavorite,
   });
 
   @override
@@ -28,6 +31,8 @@ class StationHeaderWidget extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     final assessmentState = context.watch<AssessmentBloc>().state;
+
+    final onPressed = onToggleFavorite;
 
     double? displayRating;
     
@@ -69,13 +74,9 @@ class StationHeaderWidget extends StatelessWidget {
                 ),
               ),
             ),
-            BlocBuilder<StationListBloc, StationListState>(
-              builder: (context, state) {
-                final currentStation = (state is StationListLoaded || state is StationListToggleError)
-                    ? (state is StationListLoaded ? state.stations : (state as StationListToggleError).stations)
-                        .where((s) => s.id == station.id)
-                        .firstOrNull
-                    : null;
+            Consumer<StationsCache>(
+              builder: (context, cache, child) {
+                final currentStation = cache.getStation(station.id);
                 final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
                 final starColor = switch (isFavorite) {
                   true => Colors.yellow[700],
@@ -87,11 +88,7 @@ class StationHeaderWidget extends StatelessWidget {
                     (isFavorite ?? false) ? Icons.star : Icons.star_border,
                     color: starColor,
                   ),
-                  onPressed: () {
-                    context.read<StationListBloc>().add(
-                      ToggleFavoriteEvent(stationId: station.id),
-                    );
-                  },
+                  onPressed: onPressed,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 );

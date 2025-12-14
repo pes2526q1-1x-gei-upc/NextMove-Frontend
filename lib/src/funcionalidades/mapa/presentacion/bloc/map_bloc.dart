@@ -9,6 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/s
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -22,6 +23,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final StationRepository stationRepository;
   final TrackRepository trackRepository;
   final RecordedRoutesRepository recordedRoutesRepository;
+  final StationsCache stationsCache;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -37,6 +39,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.stationRepository,
     required this.trackRepository,
     required this.recordedRoutesRepository,
+    required this.stationsCache,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -110,6 +113,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           routePolyline: defaultPolyline,
         ),
       );
+
+      // Update cache
+      stationsCache.updateStations([...bikeStations, ...evStations]);
 
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
