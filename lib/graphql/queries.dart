@@ -1,29 +1,5 @@
 class GraphQLQueries {
-  static const String createUserMutation = r'''
-  mutation CreateUser($email: String!, $fullN: String!, $nickN: String!, $phoneNum: String, $mode: Mode!, $preferredLanguage: Language, $birthDate: String, $bioDescription: String) {
-    createUser(createInfo: {
-      email: $email,
-      name: $fullN,
-      nickname: $nickN,
-      phoneNumber: $phoneNum,
-      preferredMode: $mode,
-      preferredLanguage: $preferredLanguage,
-      birthDate: $birthDate,
-      bioDescription: $bioDescription    
-    }) {
-      email
-      name
-      nickname
-      phoneNumber
-      preferredMode
-      createdAt
-      preferredLanguage
-      birthDate
-      bioDescription
-    }
-  }
-  ''';
-
+  // === Perfil ===
   static const String getUserProfileQuery = r'''
   query Me {
     me {
@@ -41,34 +17,15 @@ class GraphQLQueries {
   }
   ''';
 
-  static const String updateUserMutation = r'''
-  mutation UpdateMe($fullName: String, $nickname: String, $preferredMode: Mode, $phoneNumber: String, $bioDescription: String, $preferredLanguage: Language, $birthDate: String) {
-    updateMe(
-      nickname: $nickname,
-      name: $fullName,
-      preferredMode: $preferredMode,
-      phoneNumber: $phoneNumber,
-      bioDescription: $bioDescription,
-      birthDate: $birthDate,
-      preferredLanguage: $preferredLanguage
-    ) {
-      email
-      name
-      phoneNumber
-      birthDate
-      
-      nickname
-      photo
-      bioDescription
-      
-      preferredMode
-      preferredLanguage
-    
-      createdAt
-    }
-  }
-  ''';
+  static const String existsUserQuery = r'''
+    query ExistsUser ($email: String!) {
+      ExistsUser (email: $email) {
+        exists
+        isRegWithGoogle
+      }
+    }''';
 
+  // === Estaciones Bicing ===
   static const String getBicycleStationDetailsQuery = r'''
     query getBicingStationDetails($stationID: ID!) {
       getEstacionDeBicing(id: $stationID) {
@@ -134,6 +91,30 @@ class GraphQLQueries {
     }
   }''';
 
+  static const String getBicingStationsBySearchQuery = r'''
+      query SearchBicingStations($address: String!) {
+        getEstacionesDeBicingPorDireccion(address: $address) {
+          id
+          nombre
+          direccion
+          coordenadas {
+            latitude
+            longitude
+          }
+          plazasTotales
+          estacionCargaElectrica
+          sePuedenAlquilarBicis
+          sePuedeAnclarBicis
+          plazasOcupadas
+          anclajesDisponibles
+          estado
+          bicisMecanicasDisponibles
+          bicisElectricasDisponibles
+        }
+      }
+    ''';
+
+  // === Estaciones EV ===
   static const String getEVStationDetailsQuery = r'''
     query getEVStationDetails($stationID: ID!) {
       station(id: $stationID) {
@@ -199,23 +180,35 @@ class GraphQLQueries {
     }
   }''';
 
+  static const String getStationsBySearchQuery = r'''
+    query getStationsBySearchQuery($query: String!) {
+      stationsByAddress(address: $query) {
+        id
+        name
+        address
+        city
+        coordinates {
+          latitude
+          longitude
+        }
+        distance
+      connectors {
+        type
+        powerKw
+        status
+      }
+      isSuperFast
+      }
+    }
+  ''';
+
+  // === Social ===
   static const String getFriends = r'''
   query getFriends () {
     ListFriends(){
       name
+      photo
     }
-  }''';
-
-  static const String newFriendship = r'''
-  mutation newFriendship ($nickname: String!) {
-    AddFriendship(nickname: $nickname){
-      
-    }
-  }''';
-
-  static const String deleteFriendship = r'''
-  mutation deleteFriendship ($nickname: String!) {
-    RemoveFriendship(nickname: $nickname)
   }''';
 
   static const String getUsersByNickname = r'''
@@ -234,12 +227,6 @@ class GraphQLQueries {
     } 
   }''';
 
-  static const String blockUser = r'''
-  mutation blockUser($nickname: String!) {
-    BlockUser(nickname: $nickname)
-  }
-  ''';
-
   static const String getBlockList = r'''
   query getBlockList {
     BlockList {
@@ -249,50 +236,19 @@ class GraphQLQueries {
   }
   ''';
 
-  static const String unBlockUser = r'''
-  mutation unBlockUser($nickname: String!) {
-    UnBlockUser(nickname: $nickname)
-  }
-  ''';
-
-  static const String getStationsBySearchQuery = r'''
-    query getStationsBySearchQuery($query: String!) {
-      stationsByAddress(address: $query) {
-        id
-        name
-        address
-        city
-        coordinates {
-          latitude
-          longitude
-        }
-      }
-    }
-  ''';
-
-  static const String createTrackMutation = r'''
-    mutation createTrackMutation($userEmail: String!, $distance: Float!, $averageSpeed: Float!, $co2: Float!, $kcal: Float!, $originLat: Float!, $originLon: Float!, $destinationLat: Float!, $destinationLon: Float!, $timestamp: String!) {
-    createRecorrido(input: {
-      user_email: $userEmail,
-      distancia: $distance
-      velocidad_media: $averageSpeed,
-      co2: $co2,
-      kcal: $kcal,
-      origen:  {
-         latitude: $originLat,
-         longitude: $originLon
-      },
-      destino:  {
-         latitude: $destinationLat,
-         longitude: $destinationLon
-      },
-      fecha_recorrido: $timestamp
-    }) {
+  // === Recorridos ===
+  static const String getRecorridosByUserQuery = r'''
+  query GetRecorridosByUser($userEmail: String!) {
+    recorridosByUser(user_email: $userEmail) {
+      id
       user_email
       distancia
       velocidad_media
+      velocidad_maxima
       co2
       kcal
+      elevacion_positiva
+      elevacion_negativa
       origen {
         latitude
         longitude
@@ -301,32 +257,14 @@ class GraphQLQueries {
         latitude
         longitude
       }
+      tiempo_inicio
+      tiempo_fin
       fecha_recorrido
     }
-  }''';
+  }
+''';
 
-  static const String getRecorridosByUserQuery = r'''
-    query GetRecorridosByUser($userEmail: String!) {
-      recorridosByUser(user_email: $userEmail) {
-        id
-        user_email
-        distancia
-        velocidad_media
-        co2
-        kcal
-        origen {
-          latitude
-          longitude
-        }
-        destino {
-          latitude
-          longitude
-        }
-        fecha_recorrido
-      }
-    }
-  ''';
-
+  // === Valoraciones ===
   static const String getAssessmentsByStationIdQuery = r'''
     query getAssessmentsByStationIdQuery ($id: String!){
       getAssessmentsByStationId(id: $id){
@@ -345,22 +283,10 @@ class GraphQLQueries {
       }
     }''';
 
-  static const String createAssessmentQuery = r'''
-    mutation CreateAssessment($station_id: String!, $score: Int!, $comments: String) {
-      createAssessment(station_id: $station_id, score: $score, comments: $comments)
-    }
-  ''';
-
-  static const String deleteAssessmentQuery = r'''
-    mutation DeleteAssessment($station_id: String!) {
-      deleteAssessment(station_id: $station_id)
-    }
-  ''';
-
-  static const String editAssessmentQuery = r'''
-    mutation EditAssessment($station_id: String!, $score: Int!, $comments: String) {
-      editAssessment(station_id: $station_id, score: $score, comments: $comments)
-    }
+  static const String checkAssessed = r'''
+    query checkAssessed($station_id: String!){
+      checkAssessed(station_id: $station_id)
+    } 
   ''';
 
   static const String addFavStation = r'''

@@ -125,7 +125,7 @@ class StationRepository {
     }
   }
 
-  Future<Either<Failure, List<StationDetails>>> searchEvStations(String query) async{
+  Future<Either<Failure, List<EVStationDetails>>> searchEvStations(String query) async{
     try {
       return Right(
         await stationRemoteDataProvider.searchEvStations(query),
@@ -137,6 +137,23 @@ class StationRepository {
     } catch (e) {
       if (kDebugMode) {
         print('UnknownFailure in searchEvStations: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
+
+  Future<Either<Failure, List<BicycleStationDetails>>> searchBicycleStations(String query) async{
+    try {
+      return Right(
+        await stationRemoteDataProvider.searchBicycleStations(query),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in searchBicycleStations: $e');
       }
       throw UnknownFailure();
     }

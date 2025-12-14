@@ -2,21 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/delete_account_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/footer_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/language_selector_widget.dart';
-
-// === IMPORTS DE WIDGETS PERSONALIZADOS ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
-
-// === OTROS IMPORTS ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/appearance_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -26,14 +25,13 @@ class ProfilePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
             String displayName = l10n.loading;
             String subText = l10n.waitAMoment;
             UserEntity? currentUser;
-            
+
             if (state is UserLoaded) {
               currentUser = state.user;
               displayName =
@@ -49,6 +47,23 @@ class ProfilePage extends StatelessWidget {
               subText = l10n.errorLoadingProfile;
             }
 
+
+            String? userPhotoUrl;
+            if (currentUser != null) {
+
+              userPhotoUrl = currentUser.photo;
+
+
+              if (userPhotoUrl.isNotEmpty) {
+                debugPrint('ProfilePage: User has photo URL: $userPhotoUrl');
+              } else {
+                debugPrint('ProfilePage: User has no photo (URL is null or empty)');
+              }
+            } else {
+              userPhotoUrl = null;
+              debugPrint('ProfilePage: Current user is null, cannot load photo');
+            }
+
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Padding(
@@ -60,9 +75,12 @@ class ProfilePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-
-                    // --- HEADER ---
-                    ProfileHeaderWidget(title: displayName, subtitle: subText),
+                    ProfileHeaderWidget(
+                      title: displayName,
+                      subtitle: subText,
+                      imageUrl:
+                          userPhotoUrl,
+                    ),
 
                     const SizedBox(height: 30),
 
@@ -86,6 +104,29 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                    // --- SECCIÓN 2: SOCIAL ---
+                    ProfileSectionLabel(text: l10n.social),
+                    ProfileStyledCard(
+                      children: [
+                        ProfileMenuOption(
+                          icon: Icons.person_outline_rounded,
+                          text: l10n.friends,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => SocialBloc(),
+                                  child: const SocialPage(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         const ProfileMenuDivider(),
                         ProfileMenuOption(
                           icon: Icons.block_rounded,
@@ -102,12 +143,11 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                        
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
-                    // --- SECCIÓN 2: PREFERENCIAS ---
+                    // --- SECCIÓN 3: PREFERENCIAS ---
                     ProfileSectionLabel(text: l10n.settings),
                     ProfileStyledCard(
                       children: [
@@ -143,10 +183,7 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.dark_mode_outlined,
                           text: l10n.appearance,
-                          onTap: () => {
-                            // ignore: avoid_print
-                            if (kDebugMode) {print("Click en Modo Oscuro")},
-                          },
+                          onTap: () => AppearanceSelector.show(context),
                         ),
                       ],
                     ),
@@ -155,12 +192,16 @@ class ProfilePage extends StatelessWidget {
 
                     // --- BOTÓN LOGOUT ---
                     const ProfileLogoutButton(),
+
+                    const SizedBox(height: 15),
+                    // --- BOTÓN ELIMINAR CUENTA ---
+
+                    const DeleteAccountButton(),
                     
                     const SizedBox(height: 30),
-
                     // --- FOOTER ---
                     const AppFooter(),
-                    
+
                     const SizedBox(height: 20),
                   ],
                 ),

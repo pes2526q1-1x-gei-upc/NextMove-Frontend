@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import '../../../../graphql/queries.dart';
 
 class AuthService {
@@ -47,14 +48,16 @@ class AuthService {
     required String? email,
     required String? name,
     bool? needsToRegister,
+    bool regWithGoogle = false, // per defecte, false
   }) async {
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.updateUserMutation),
+      document: gql(GraphQLMutations.updateUserMutation),
       variables: {
         'id': firebaseUid,
         'email': email,
         'name': name,
         'needsToRegister': needsToRegister,
+        'regWithGoogle': regWithGoogle,
       },
       fetchPolicy: FetchPolicy.networkOnly,
     );

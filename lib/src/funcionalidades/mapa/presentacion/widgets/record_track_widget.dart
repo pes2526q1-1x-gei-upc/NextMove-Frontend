@@ -10,6 +10,8 @@ class RecordTrackWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) {
         if (state is! MapLoadedState) {
@@ -44,20 +46,20 @@ class RecordTrackWidget extends StatelessWidget {
                     width: 50,
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
+                    color: theme.colorScheme.secondaryContainer,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           spreadRadius: 2,
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.bar_chart,
-                      color: Colors.white,
+                      color: theme.colorScheme.onSecondaryContainer,
                       size: 24,
                     ),
                   ),
@@ -72,20 +74,20 @@ class RecordTrackWidget extends StatelessWidget {
                     height: 60,
                     width: 60,
                     decoration: BoxDecoration(
-                      color: Colors.red,
+                      color: theme.colorScheme.error,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           spreadRadius: 2,
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.stop,
-                      color: Colors.white,
+                      color: theme.colorScheme.onError,
                       size: 32,
                     ),
                   ),
@@ -107,20 +109,20 @@ class RecordTrackWidget extends StatelessWidget {
                 height: 60,
                 width: 60,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       spreadRadius: 2,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.play_arrow,
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                   size: 32,
                 ),
               ),

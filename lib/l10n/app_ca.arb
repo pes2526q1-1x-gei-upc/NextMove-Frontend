@@ -25,7 +25,7 @@
     "passwordNeedsNumber": "La contrasenya ha de tenir almenys 1 número.",
     "passwordNeedsSpecialCharacter": "La contrasenya ha de tenir almenys 1 caràcter especial.",
     "wrongPassword": "La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.",
-    "userDataPreferences": "Acaba de completar el teu perfil",
+    "userDataPreferences": "Completa el teu perfil",
     "nickname": "Sobrenom",
     "nicknameHint": "Introdueix el teu sobrenom",
     "birthdate": "Data de naixement",
@@ -74,7 +74,6 @@
     "dc": "CC",
     "speedType": "Tipus de velocitat",
     "superFast": "Superràpid",
-    "fast": "Ràpid",
     "semiFast": "Semi-ràpid",
     "connectionType": "Tipus de connexió",
     "chargerType": "Tipus de carregador",
@@ -98,7 +97,6 @@
     "accessType": "Tipus d'accés",
     "error": "Error",
     "unknownPower": "Potència desconeguda",
-    "unknown": "Desconegut",
     "stations": "Estacions",
     "saveChangesError": "Error al desar els canvis.",
     "bicycle": "Bicicleta",
@@ -119,8 +117,8 @@
     "waitAMoment": "Si us plau, espera un moment",
     "hi": "Hola, ",
     "ops": "Vaja!",
-    "account" : "Compte",
-    "accountDetails" : "Detalls del compte",
+    "account": "Compte",
+    "accountDetails": "Detalls del compte",
     "bloquedUsers": "Usuaris bloquejats",
     "noBloquedUsers": "No tens usuaris bloquejats.",
     "unblock": "Desbloquejar",
@@ -130,6 +128,7 @@
     "appearance": "Aparença",
     "lightMode": "Mode clar",
     "darkMode": "Mode fosc",
+    "systemMode": "Utilitza el mode del sistema",
     "preliminarVersion": "Versió preliminar",
     "searchByNickname": "Cerca per sobrenom",
     "noUsersFound": "No s'ha trobat cap usuari amb aquest sobrenom.",
@@ -138,6 +137,7 @@
     "yourFriends": "ELS TEUS AMICS",
     "friendAdded": "{nickname} s'ha afegit als teus amics.",
     "friends": "Amics",
+    "addFriend": "Afegeix amic",
     "memberSince": "Membre des de",
     "deleteFriendship": "Eliminar amistat",
     "deleteFriendConfirmation": "Estàs segur que vols eliminar {nickname} dels teus amics?",
@@ -145,7 +145,7 @@
         "placeholders": {
             "nickname": {
                 "type": "String",
-                "example": "JohnDoe"   
+                "example": "JohnDoe"
             }
         }
     },
@@ -159,9 +159,9 @@
             }
         }
     },
-    "deleteFriend" : "Eliminar amistat",
-    "blockUser" : "Bloquejar usuari",
-    "blockUserConfirmation" : "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
+    "deleteFriend": "Eliminar amistat",
+    "blockUser": "Bloquejar usuari",
+    "blockUserConfirmation": "Estàs segur que vols bloquejar {nickname}? Això eliminarà l'amistat i no podreu veure els perfils mútuament.",
     "@blockUserConfirmation": {
         "placeholders": {
             "nickname": {
@@ -170,15 +170,13 @@
             }
         }
     },
-    "block" : "Bloquejar",
-
-    "minCharsSearchHint" : "Si us plau, introdueix almenys 3 caràcters per cercar.",
-    "anyStationsFound" : "No s'han trobat resultats per a la teva cerca.",
+    "block": "Bloquejar",
+    "minCharsSearchHint": "Si us plau, introdueix almenys 3 caràcters per cercar.",
+    "anyStationsFound": "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",
     "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada.",
     "routeHistory": "Historial de recorreguts enregistrats",
     "noRoutesFound": "No s'han trobat recorreguts enregistrats.",
-    "distance": "Distància",
     "avgSpeed": "Velocitat mitjana",
     "routeStatistics": "Estadístiques de la ruta",
     "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
@@ -197,7 +195,6 @@
     "stopRecording": "Aturar la gravació",
     "opinions": "Valoracions",
     "unknown": "Desconegut",
-    "unknownPower": "Potència desconeguda",
     "station": "Estació",
     "seeOpinions": "Veure valoracions",
     "withoutOpinions": "Sense valoracions",
@@ -209,7 +206,6 @@
     "mechanical": "Mecànicas",
     "electric": "Elèctriques",
     "free": "Lliures",
-    "available": "Disponibles",
     "charge": "Càrrega",
     "reviewStation": "Valorar Estació",
     "writeYourOpinion": "Escriu la teva opinió (opcional)",
@@ -227,6 +223,13 @@
     "sureActionConfirmation": "Aquesta acció no es pot desfer. Estàs segur que vols continuar?",
     "deletedReview": "Has eliminat la teva valoració.",
     "updateReview": "Actualitzar valoració",
-    "updatedReview": "La teva valoració ha estat actualitzada."
-    
+    "updatedReview": "La teva valoració ha estat actualitzada.",
+    "needsToSignInWithGoogle": "Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.",
+    "deleteAccount": "Eliminar compte",
+    "deleteAccountConfirmation": "Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.",
+    "accountDeleted": "El teu compte ha estat eliminat correctament.",
+    "errorDeletingAccount": "Error en eliminar el compte.",
+    "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
+    "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
+    "social": "Social"
 }

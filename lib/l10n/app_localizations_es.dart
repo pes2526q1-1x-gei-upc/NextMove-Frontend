@@ -75,7 +75,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'La contraseña es incorrecta. Si usaste esta dirección de correo electrónico para registrarte con Google, inicia sesión con Google.';
 
   @override
-  String get userDataPreferences => 'Acaba de completar tu perfil';
+  String get userDataPreferences => 'Completa tu perfil';
 
   @override
   String get nickname => 'Apodo';
@@ -253,9 +253,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get closed => 'Cerrado';
 
   @override
-  String get available => 'Disponibles';
-
-  @override
   String get occupied => 'Ocupado';
 
   @override
@@ -269,9 +266,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Potencia desconocida';
 
   @override
   String get unknown => 'Desconocido';
@@ -371,6 +365,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get darkMode => 'Modo oscuro';
 
   @override
+  String get systemMode => 'Usar configuración del sistema';
+
+  @override
   String get preliminarVersion => 'Versión preliminar';
 
   @override
@@ -392,9 +389,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
-
-  @override
-  String get friends => 'Amigos';
 
   @override
   String get memberSince => 'Miembro desde';
@@ -428,6 +422,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get block => 'Bloquear';
+
+  @override
+  String get friends => 'Amigos';
+
+  @override
+  String get addFriend => 'Añadir amigo';
 
   @override
   String get minCharsSearchHint =>
@@ -502,6 +502,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get opinions => 'Valoraciones';
 
   @override
+  String get unknownPower => 'Potencia desconocida';
+
+  @override
   String get station => 'Estación';
 
   @override
@@ -530,6 +533,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get free => 'Libres';
+
+  @override
+  String get available => 'Disponible';
 
   @override
   String get charge => 'Carga';
@@ -585,4 +591,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get updatedReview => 'Tu valoración ha sido actualizada.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'Este correo electrónico está registrado con Google. Por favor, inicia sesión con Google.';
+
+  @override
+  String get deleteAccount => 'Eliminar cuenta';
+
+  @override
+  String get deleteAccountConfirmation =>
+      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y se perderán todos tus datos.';
+
+  @override
+  String get accountDeleted => 'Tu cuenta ha sido eliminada correctamente.';
+
+  @override
+  String get errorDeletingAccount => 'Error al eliminar la cuenta.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'La cuenta se ha eliminado correctamente.';
+
+  @override
+  String get userMismatch => 'El usuario no coincide con el usuario actual.';
+
+  @override
+  String get social => 'Social';
 }

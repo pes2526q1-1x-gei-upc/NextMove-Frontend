@@ -9,9 +9,10 @@ if [ "$packageName" = "" ]; then
 fi
 
 echo "// ignore_for_file: unused_import" > "$outputFile"
-find lib -name '*.dart' | grep -v '.g.dart' | grep -v 'generated_plugin_registrant' | grep -v '_state\.dart$' | grep -v '_event\.dart$' | awk -v package=$packageName '{gsub("^lib", "", $1); printf("import '\''package:%s%s'\'';\n", package, $1);}' >> "$outputFile"
+find lib -name '*.dart' | grep -v '.g.dart' | grep -v 'generated_plugin_registrant' | grep -v '_state\.dart$' | grep -v '_event\.dart$' | grep -v 'main\.dart$' | grep -v 'firebase_options\.dart$' | grep -v 'app_localizations.*\.dart$' | grep -v '_widget\.dart$' | grep -v '_page\.dart$' | grep -v 'queries\.dart$' | grep -v '/presentacion/' | awk -v package=$packageName '{gsub("^lib", "", $1); printf("import '\''package:%s%s'\'';\n", package, $1);}' >> "$outputFile"
 echo "" >> "$outputFile"
 echo "void main() {}" >> "$outputFile"
 
 flutter test --coverage
+lcov --ignore-errors unused,unused --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentacion/*' -o coverage/lcov.info
 genhtml coverage/lcov.info -o coverage/html | grep "lines.......:"

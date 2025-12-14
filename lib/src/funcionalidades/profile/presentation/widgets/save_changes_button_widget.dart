@@ -4,6 +4,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'dart:io';
 
 class ProfileSaveButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -12,6 +13,7 @@ class ProfileSaveButton extends StatelessWidget {
   final TextEditingController descripcionController;
   final String? selectedIdioma;
   final String? selectedModeAPI;
+  final File? selectedImageFile;
 
   const ProfileSaveButton({
     super.key,
@@ -21,6 +23,7 @@ class ProfileSaveButton extends StatelessWidget {
     required this.descripcionController,
     required this.selectedIdioma,
     required this.selectedModeAPI,
+    this.selectedImageFile,
   });
 
   // --- LÓGICA DE GUARDADO  ---
@@ -54,7 +57,9 @@ class ProfileSaveButton extends StatelessWidget {
 
       // 3. Enviar el evento al BLoC
       debugPrint("ProfileSaveButton: Dispatching UpdateUserProfile event...");
-      context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
+      context.read<UserBloc>().add(
+        UpdateUserProfile(updatedUser, profilePhoto: selectedImageFile),
+      );
       debugPrint("ProfileSaveButton: Event dispatched successfully");
     } catch (e, stackTrace) {
       debugPrint("ProfileSaveButton: Error in _saveChanges: $e");
@@ -71,25 +76,28 @@ class ProfileSaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return SizedBox(
       width: double.infinity,
+      height: 56, 
       child: ElevatedButton(
         onPressed: () => _saveChanges(context),
         style: ElevatedButton.styleFrom(
-          elevation: 2,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: primaryColor,
+          foregroundColor: theme.colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16), 
           ),
+          elevation: 0, 
         ),
         child: Text(
           l10n.saveChanges,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
       ),

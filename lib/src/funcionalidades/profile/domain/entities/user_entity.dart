@@ -11,6 +11,7 @@ class UserEntity extends Equatable {
   final String idiomaPreferido;
   final String descripcion;
   final String modoPreferido;
+  final bool? regWithGoogle;
 
   const UserEntity({
     required this.email,
@@ -23,6 +24,7 @@ class UserEntity extends Equatable {
     required this.idiomaPreferido,
     required this.descripcion,
     required this.modoPreferido,
+    this.regWithGoogle,
   });
 
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
@@ -44,13 +46,14 @@ class UserEntity extends Equatable {
       descripcion: data['bioDescription'] ?? '',
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
       photo: data['photo'] ?? '',
+      regWithGoogle: data['regWithGoogle'] ?? false,
     );
   }
 
   // Método para convertir a mapa (útil para enviar a API)
   Map<String, dynamic> toMap() {
     return {
-      'email':email,
+      'email': email,
       'nickname': apodo,
       'name': nombreCompleto,
       'birthDate': fechaNacimiento.toIso8601String().split('T').first,
@@ -59,6 +62,8 @@ class UserEntity extends Equatable {
       'preferredLanguage': mapLanguageToAPI(idiomaPreferido),
       'bioDescription': descripcion,
       'preferredMode': mapPreferredModeToAPI(modoPreferido),
+      'photo': photo,
+      'regWithGoogle': regWithGoogle,
     };
   }
 
@@ -129,6 +134,7 @@ class UserEntity extends Equatable {
     String? idiomaPreferido,
     String? descripcion,
     String? modoPreferido,
+    String? photo,
   }) {
     return UserEntity(
       email: email ?? this.email,
@@ -136,25 +142,27 @@ class UserEntity extends Equatable {
       nombreCompleto: nombreCompleto ?? this.nombreCompleto,
       fechaNacimiento: fechaNacimiento ?? this.fechaNacimiento,
       fechaRegistro: fechaRegistro ?? this.fechaRegistro,
-      numeroTelefono: numeroTelefono ?? this.numeroTelefono,    
+      numeroTelefono: numeroTelefono ?? this.numeroTelefono,
       idiomaPreferido: idiomaPreferido ?? this.idiomaPreferido,
       descripcion: descripcion ?? this.descripcion,
       modoPreferido: modoPreferido ?? this.modoPreferido,
-      photo: photo
+      photo: photo ?? this.photo,
+      regWithGoogle: regWithGoogle,
     );
   }
 
   @override
   List<Object?> get props => [
-        email,
-        apodo,
-        nombreCompleto,
-        fechaNacimiento,
-        fechaRegistro,
-        numeroTelefono,
-        idiomaPreferido,
-        descripcion,
-        modoPreferido,
-        photo
-      ];
+    email,
+    apodo,
+    nombreCompleto,
+    fechaNacimiento,
+    fechaRegistro,
+    numeroTelefono,
+    idiomaPreferido,
+    descripcion,
+    modoPreferido,
+    photo,
+    regWithGoogle,
+  ];
 }

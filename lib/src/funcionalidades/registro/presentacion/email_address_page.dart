@@ -30,137 +30,202 @@ class _EmailAddressPageState extends State<EmailAddressPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(),
-      child: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthFailureState) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.errorCode)));
-          }
-        },
-        child: Builder(builder: (context) => _buildBody(context)),
-      ),
+      child: Builder(builder: (context) => _buildBody(context)),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.whatIsYourEmailAddress,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  EmailAddressInputWidget(emailController: _emailController),
-                  if (context.read<AuthBloc>().state is EmailIsNewState ||
-                      context.read<AuthBloc>().state is EmailExistsState) ...[
-                    const SizedBox(height: 16),
-                    PasswordInputWidget(
-                      passwordController: _passwordController,
-                    ),
-                    if (context.read<AuthBloc>().state is EmailIsNewState) ...[
-                      Text(
-                        l10n.passwordRequirements,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ],
-                  const SizedBox(height: 24),
-                  BlocListener<AuthBloc, AuthState>(
-                    listener: (context, state) async {
-                      switch (state) {
-                        case EmailIsNewState(): // Usuario nuevo
-                          await showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(l10n.register),
-                              content: Text(l10n.needsToRegister),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            ),
-                          );
-                          setState(() {});
-                        case EmailExistsState(): // Usuario existe
-                          setState(() {});
-                        case AuthFailureState(): // Error
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(switch (state.errorCode) {
-                                'invalid-email' => l10n.invalidEmail,
-                                'wrong-password' => l10n.wrongPassword,
-                                '' => l10n.unknownError,
-                                _ => l10n.errorOccurred(state.errorCode),
-                              }),
-                            ),
-                          );
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.iconTheme.color),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        // Título grande y minimalista
+                        Text(
+                          l10n.whatIsYourEmailAddress,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
 
-                        case AuthSuccessState(): // Ya iniciado sesion
-                          {
-                            if (state.meData != null) {
-                              Provider.of<UserProvider>(
-                                context,
-                                listen: false,
-                              ).setUser(
-                                state.meData!,
-                                firebaseUserId: state.firebaseUserId,
-                                firebaseToken: state.firebaseToken,
-                              );
+                        // Campo de Email
+                        EmailAddressInputWidget(emailController: _emailController),
+                        
+                        // Lógica condicional para mostrar password
+                        BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, state) {
+                            if (state is EmailIsNewState || state is EmailExistsWithoutGoogleState) {
+                               return Column(
+                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                 children: [
+                                   const SizedBox(height: 20),
+                                   PasswordInputWidget(
+                                     passwordController: _passwordController,
+                                   ),
+                                   if (state is EmailIsNewState) ...[
+                                     const SizedBox(height: 8),
+                                     Padding(
+                                       padding: const EdgeInsets.only(left: 4),
+                                       child: Text(
+                                         l10n.passwordRequirements,
+                                         style: theme.textTheme.bodySmall?.copyWith(
+                                           color: theme.disabledColor,
+                                         ),
+                                       ),
+                                     ),
+                                   ],
+                                 ],
+                               );
                             }
-                            appKey.currentState?.setLoggedIn(true);
+                            return const SizedBox.shrink();
+                          },
+                        ),
 
-                            Navigator.of(
-                              context,
-                            ).popUntil((route) => route.isFirst);
-                          }
+                        const SizedBox(height: 20),
 
-                        case UserNeedsProfileSetupState(): // Onboarding
-                          appKey.currentState?.setLoggedIn(true);
-                          Provider.of<UserProvider>(
-                            context,
-                            listen: false,
-                          ).setEmailPwd(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (pageContext) =>
-                                  const UserDataPreferencesPage(),
-                            ),
-                          );
-                        default:
-                          break;
-                      }
-                    },
-                    child: const SizedBox.shrink(),
+                        // Listener de eventos
+                        BlocListener<AuthBloc, AuthState>(
+                          listener: (context, state) async {
+                            switch (state) {
+                              case EmailIsNewState(): // Usuario nuevo
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    title: Text(l10n.register),
+                                    content: Text(l10n.needsToRegister),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                setState(() {}); 
+                              case EmailExistsWithGoogleState(): // Usuario con Google
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    title: Text(l10n.signInWithGoogle),
+                                    content: Text(l10n.needsToSignInWithGoogle),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(); 
+                                }
+                                setState(() {});
+                              case EmailExistsWithoutGoogleState(): // Usuario existe
+                                setState(() {}); 
+                              case AuthFailureState(): // Error
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: theme.colorScheme.error,
+                                    content: Text(switch (state.errorCode) {
+                                      'invalid-email' => l10n.invalidEmail,
+                                      'wrong-password' => l10n.wrongPassword,
+                                      '' => l10n.unknownError,
+                                      _ => l10n.errorOccurred(state.errorCode),
+                                    }, style: const TextStyle(color: Colors.white)),
+                                  ),
+                                );
+
+                              case AuthSuccessState(): // Ya iniciado sesion
+                                {
+                                  if (state.meData != null) {
+                                    Provider.of<UserProvider>(
+                                      context,
+                                      listen: false,
+                                    ).setUser(
+                                      state.meData!,
+                                      firebaseUserId: state.firebaseUserId,
+                                      firebaseToken: state.firebaseToken,
+                                    );
+                                  }
+                                  appKey.currentState?.setLoggedIn(true);
+
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                }
+
+                              case UserNeedsProfileSetupState(): // Onboarding
+                                appKey.currentState?.setLoggedIn(true);
+                                Provider.of<UserProvider>(
+                                  context,
+                                  listen: false,
+                                ).setEmailPwd(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (pageContext) =>
+                                        const UserDataPreferencesPage(),
+                                  ),
+                                );
+                              default:
+                                break;
+                            }
+                          },
+                          child: const SizedBox.shrink(),
+                        ),
+                        
+                        const Spacer(),
+                        
+                        const SizedBox(height: 20),
+                        
+                        // Botón Continuar
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ContinueButton(
+                            emailController: _emailController,
+                            passwordController: _passwordController,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
-                  ContinueButton(
-                    emailController: _emailController,
-                    passwordController: _passwordController,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          }
         ),
       ),
     );
@@ -181,7 +246,17 @@ class ContinueButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 0,
+      ),
       onPressed: () async {
         final emailAddress = _emailController.text.trim();
         if (context.read<AuthBloc>().state is AuthInitial) {
@@ -213,12 +288,22 @@ class ContinueButton extends StatelessWidget {
           }
         }
       },
-      child: switch (context.read<AuthBloc>().state) {
-        AuthInitial _ => Text(l10n.continue_),
-        EmailIsNewState _ => Text(l10n.register),
-        EmailExistsState _ => Text(l10n.signIn),
-        _ => const Text(''),
-      },
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+           Widget textWidget;
+           if (state is AuthInitial) {
+             textWidget = Text(l10n.continue_, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold));
+           } else if (state is EmailIsNewState) {
+             textWidget = Text(l10n.register, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold));
+           } else if (state is EmailExistsWithoutGoogleState) {
+             textWidget = Text(l10n.signIn, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold));
+           } else {
+             textWidget = Text(l10n.continue_, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold));
+           }
+           
+           return textWidget;
+        }
+      ),
     );
   }
 }
@@ -238,9 +323,24 @@ class PasswordInputWidget extends StatelessWidget {
       controller: _passwordController,
       decoration: InputDecoration(
         labelText: l10n.password,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        ),
+        prefixIcon: const Icon(Icons.lock_outline_rounded),
+        filled: true,
+        fillColor: Theme.of(context).cardColor,
+        contentPadding: const EdgeInsets.all(20),
       ),
       obscureText: true,
+      style: const TextStyle(fontSize: 16),
     );
   }
 }
@@ -256,17 +356,34 @@ class EmailAddressInputWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isReadOnly = context.watch<AuthBloc>().state is! AuthInitial;
+    
     return TextField(
       controller: _emailController,
       decoration: InputDecoration(
         labelText: l10n.emailAddress,
-        border: const OutlineInputBorder(),
+        hintText: 'name@example.com',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+        ),
+        prefixIcon: const Icon(Icons.email_outlined),
+        filled: true,
+        fillColor: isReadOnly ? Theme.of(context).disabledColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+        contentPadding: const EdgeInsets.all(20),
       ),
       keyboardType: TextInputType.emailAddress,
-      readOnly: context.read<AuthBloc>().state is! AuthInitial,
-      style: context.read<AuthBloc>().state is! AuthInitial
+      readOnly: isReadOnly,
+      style: isReadOnly
           ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+          : const TextStyle(fontSize: 16),
     );
   }
 }

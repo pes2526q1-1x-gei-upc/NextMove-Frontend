@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
+import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'user_event.dart';
 import 'user_state.dart';
 
@@ -18,18 +19,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     LoadUserProfile event,
     Emitter<UserState> emit,
   ) async {
-    print("UserBloc: Loading profile for ${event.userId}");
+    if (kDebugMode) {
+      print("UserBloc: Loading profile for ${event.userId}");
+    }
     emit(UserLoading());
     final result = await userRepository.getUserProfile(event.userId);
     result.fold(
       (failure) {
-        print("UserBloc: Failed to load profile: ${failure.message}");
+        if (kDebugMode) {
+          print("UserBloc: Failed to load profile: ${failure.message}");
+        }
         emit(UserNeedsToSignUp());
       },
       (user) {
-        print(
+        if (kDebugMode) {
+          print(
           "UserBloc: Loaded profile for ${user.apodo} (Email: ${user.email})",
         );
+        }
         emit(UserLoaded(user));
       },
     );
@@ -43,7 +50,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       "UserBloc: Received UpdateUserProfile event for ${event.updatedUser.apodo}",
     );
     emit(UserLoading());
-    debugPrint("UserBloc: Emitted UserLoading state");
+
+    // 1. Upload photo if present
+    if (event.profilePhoto != null) {
+      debugPrint("UserBloc: Uploading profile photo...");
+      final uploadResult = await userRepository.uploadProfilePhoto(
+        event.profilePhoto!,
+      );
+
+      final failureOrUrl = uploadResult.fold((l) => l, (r) => r);
+      if (failureOrUrl is Failure) {
+        // Check if it's a failure
+        debugPrint("UserBloc: Photo upload failed: ${failureOrUrl.message}");
+        emit(UserError(failureOrUrl.message ?? 'Error al subir foto'));
+        return;
+      }
+      debugPrint("UserBloc: Photo uploaded successfully. URL: $failureOrUrl");
+      // We don't need to update event.updatedUser.photo because the backend handles it,
+      // and the subsequent updateProfile call will return the fresh user object.
+    }
+
     debugPrint("UserBloc: Calling userRepository.updateUserProfile...");
     final result = await userRepository.updateUserProfile(event.updatedUser);
     result.fold(

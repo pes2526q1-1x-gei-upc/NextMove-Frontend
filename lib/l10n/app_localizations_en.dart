@@ -249,9 +249,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closed => 'Closed';
 
   @override
-  String get available => 'Available';
-
-  @override
   String get occupied => 'Occupied';
 
   @override
@@ -265,9 +262,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Unknown power';
 
   @override
   String get unknown => 'Unknown';
@@ -366,6 +360,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark mode';
 
   @override
+  String get systemMode => 'Use system setting';
+
+  @override
   String get preliminarVersion => 'Preliminary version';
 
   @override
@@ -387,9 +384,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
-
-  @override
-  String get friends => 'Friends';
 
   @override
   String get memberSince => 'Member since';
@@ -423,6 +417,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get block => 'Block';
+
+  @override
+  String get friends => 'Friends';
+
+  @override
+  String get addFriend => 'Add friend';
 
   @override
   String get minCharsSearchHint =>
@@ -496,6 +496,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get opinions => 'Reviews';
 
   @override
+  String get unknownPower => 'Unknown power';
+
+  @override
   String get station => 'Station';
 
   @override
@@ -524,6 +527,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get free => 'Free';
+
+  @override
+  String get available => 'Available';
 
   @override
   String get charge => 'Charge';
@@ -579,4 +585,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatedReview => 'Your review has been updated.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'This email is registered with Google. Please sign in with Google.';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.';
+
+  @override
+  String get accountDeleted => 'Your account has been successfully deleted.';
+
+  @override
+  String get errorDeletingAccount => 'Error deleting account.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'The account has been deleted successfully.';
+
+  @override
+  String get userMismatch => 'The user does not match the current user.';
+
+  @override
+  String get social => 'Social';
 }

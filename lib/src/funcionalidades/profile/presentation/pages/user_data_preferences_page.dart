@@ -1,15 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-
-// === IMPORTS DE WIDGETS DE ESTILO ===
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
-
-// === OTROS IMPORTS ===
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -17,6 +15,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:provider/provider.dart';
 
 class UserDataPreferencesPage extends StatefulWidget {
@@ -29,8 +28,6 @@ class UserDataPreferencesPage extends StatefulWidget {
 
 class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   final _formKey = GlobalKey<FormState>();
-
-  // Variable local para controlar la carga de Firebase antes de llamar al Bloc
   bool _isCreatingFirebaseUser = false;
 
   late final TextEditingController _apodoController;
@@ -81,10 +78,21 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
+        final theme = Theme.of(context);
+        final isDark = theme.brightness == Brightness.dark;
+        const calendarColor = Colors.green;
+
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Theme.of(context).primaryColor,
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: calendarColor, 
+              onPrimary: Colors.white,
+              onSurface: isDark ? Colors.white : theme.colorScheme.onSurface,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: calendarColor, 
+              ),
             ),
           ),
           child: child!,
@@ -101,6 +109,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) => SafeArea(
         child: Wrap(
           children: [
@@ -137,71 +148,146 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         setState(() => _selectedImageFile = File(pickedFile.path));
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
       );
     }
   }
 
-  // === Finalizar Registro ===
+  // === Selectores de Preferencias (Bottom Sheets) ===
+  void _showModoSelector() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  l10n.preferredMode,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ..._modos.map((modo) {
+                final isSelected = _selectedModo == modo;
+                final primaryColor = Theme.of(context).primaryColor;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final activeColor = isDark ? Colors.white : primaryColor;
+                
+                return ListTile(
+                  leading: Icon(
+                    modo == 'Bici' ? Icons.directions_bike : Icons.electric_car,
+                    color: isSelected 
+                        ? activeColor 
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7),
+                  ),
+                  title: Text(
+                    modo,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? activeColor : null,
+                    ),
+                  ),
+                  trailing: isSelected ? Icon(Icons.check, color: activeColor) : null,
+                  onTap: () {
+                    setState(() => _selectedModo = modo);
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showIdiomaSelector() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+               Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  l10n.preferredLanguage,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ..._idiomas.map((idioma) {
+                final isSelected = _selectedIdioma == idioma;
+                final primaryColor = Theme.of(context).primaryColor;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
+                final activeColor = isDark ? Colors.white : primaryColor;
+
+                return ListTile(
+                  leading: Icon(
+                    Icons.language, 
+                    color: isSelected 
+                        ? activeColor 
+                        : Theme.of(context).iconTheme.color?.withValues(alpha: 0.7)
+                  ),
+                  title: Text(
+                    idioma,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? activeColor : null,
+                    ),
+                  ),
+                  trailing: isSelected ? Icon(Icons.check, color: activeColor) : null,
+                  onTap: () {
+                    setState(() => _selectedIdioma = idioma);
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // === Finalizar Registro  ===
   Future<void> _finalizarOnboarding() async {
     var l10n = AppLocalizations.of(context)!;
     debugPrint("UserDataPreferencesPage: _finalizarOnboarding called");
 
     if (!_formKey.currentState!.validate()) {
-      debugPrint("UserDataPreferencesPage: Form validation failed");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.formError)));
       return;
     }
-    debugPrint("UserDataPreferencesPage: Form validation passed");
 
     setState(() => _isCreatingFirebaseUser = true);
 
     try {
-      final firebaseUser = FirebaseAuth.instance.currentUser;
+      User? firebaseUser = FirebaseAuth.instance.currentUser;
       UserEntity newUser;
 
-      if (firebaseUser != null) {
-        debugPrint(
-          "UserDataPreferencesPage: Firebase user exists: ${firebaseUser.email}",
-        );
-        newUser = UserEntity(
-          email: firebaseUser.email!,
-          apodo: _apodoController.text.trim(),
-          nombreCompleto: _nombreCompletoController.text.trim(),
-          fechaNacimiento:
-              DateTime.tryParse(_fechaNacimientoController.text) ??
-              DateTime(1990),
-          fechaRegistro: DateTime.now(),
-          numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-          idiomaPreferido: _selectedIdioma ?? 'Español',
-          descripcion: _descripcionController.text.trim(),
-          modoPreferido: _selectedModo ?? 'Coche',
-          photo: firebaseUser.photoURL ?? '',
-        );
+      String? finalPhotoUrl;
 
-        // Update UserProvider explicitly for Google Sign-In flow
-        debugPrint(
-          "UserDataPreferencesPage: Updating UserProvider for Google user...",
-        );
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.setUser(
-          newUser.toMap(),
-          firebaseUserId: firebaseUser.uid,
-          firebaseToken: null,
-        );
-      } else {
+      if (firebaseUser == null) {
         debugPrint("UserDataPreferencesPage: Creating new Firebase user...");
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         final String? emailProvider = userProvider.email;
         final String? pwdProvider = userProvider.pwd;
 
         if (emailProvider == null || pwdProvider == null) {
-          debugPrint(
-            "UserDataPreferencesPage: Missing credentials in provider",
-          );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.errorOccurred("No hay credenciales."))),
           );
@@ -214,32 +300,92 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
               password: pwdProvider,
             );
 
-        final createdFirebaseUser = userCredential.user;
-        if (createdFirebaseUser == null)
+        firebaseUser = userCredential.user;
+        if (firebaseUser == null) {
           throw Exception("Error creando usuario en Firebase");
-        debugPrint(
-          "UserDataPreferencesPage: Firebase user created: ${createdFirebaseUser.email}",
-        );
+        }
+      }
 
-        newUser = UserEntity(
-          email: createdFirebaseUser.email!,
-          apodo: _apodoController.text.trim(),
-          nombreCompleto: _nombreCompletoController.text.trim(),
-          fechaNacimiento:
-              DateTime.tryParse(_fechaNacimientoController.text) ??
-              DateTime(1990),
-          fechaRegistro: DateTime.now(),
-          numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
-          idiomaPreferido: _selectedIdioma ?? 'Español',
-          descripcion: _descripcionController.text.trim(),
-          modoPreferido: _selectedModo ?? 'Coche',
-          photo: '',
+      if (!mounted) return;
+
+      if (_selectedImageFile != null) {
+        debugPrint(
+          "UserDataPreferencesPage: Subiendo imagen seleccionada a S3...",
+        );
+        try {
+          final repo = context.read<UserBloc>().userRepository;
+
+          final result = await repo.uploadProfilePhoto(_selectedImageFile!);
+
+          result.fold(
+            (failure) {
+              debugPrint(
+                "UserDataPreferencesPage: ERROR subiendo foto: ${failure.message}",
+              );
+            },
+            (url) {
+              debugPrint("UserDataPreferencesPage: FOTO SUBIDA OK: $url");
+              finalPhotoUrl = url;
+            },
+          );
+        } catch (e) {
+          debugPrint(
+            "UserDataPreferencesPage: Excepción crítica subiendo imagen: $e",
+          );
+        }
+      }
+
+      if (finalPhotoUrl == null &&
+          firebaseUser.photoURL != null &&
+          firebaseUser.photoURL!.isNotEmpty) {
+        finalPhotoUrl = firebaseUser.photoURL;
+        debugPrint(
+          "UserDataPreferencesPage: Usando foto de perfil de Google/Firebase: $finalPhotoUrl",
+        );
+      }
+
+      debugPrint(
+        "UserDataPreferencesPage: Creando UserEntity. Foto final: '$finalPhotoUrl'",
+      );
+
+      var regWithGoogle = firebaseUser.providerData.any(
+        (info) => info.providerId == 'google.com',
+      );
+
+      newUser = UserEntity(
+        email: firebaseUser.email!,
+        apodo: _apodoController.text.trim(),
+        nombreCompleto: _nombreCompletoController.text.trim(),
+        fechaNacimiento:
+            DateTime.tryParse(_fechaNacimientoController.text) ??
+            DateTime(1990),
+        fechaRegistro: DateTime.now(),
+        numeroTelefono: int.tryParse(_telefonoController.text) ?? 0,
+        idiomaPreferido: _selectedIdioma ?? 'Español',
+        descripcion: _descripcionController.text.trim(),
+        modoPreferido: _selectedModo ?? 'Coche',
+        photo: finalPhotoUrl ?? "",
+        regWithGoogle: regWithGoogle,
+      );
+
+      if (kDebugMode) {
+        print("UserDataPreferencesPage: UserEntity creada: ${newUser.toMap()}");
+      }
+
+      // Actualizar Provider
+      if (FirebaseAuth.instance.currentUser != null) {
+        if (!mounted) return;
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(
+          newUser.toMap(),
+          firebaseUserId: firebaseUser.uid,
+          firebaseToken: null,
         );
       }
 
       if (mounted) {
         debugPrint(
-          "UserDataPreferencesPage: Dispatching CreateUserProfile event...",
+          "UserDataPreferencesPage: Enviando evento CreateUserProfile...",
         );
         context.read<UserBloc>().add(CreateUserProfile(newUser));
       }
@@ -248,8 +394,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
       setState(() => _isCreatingFirebaseUser = false);
       String errorMsg = 'Error de registro';
       if (e.code == 'weak-password') errorMsg = 'La contraseña es muy débil.';
-      if (e.code == 'email-already-in-use')
+      if (e.code == 'email-already-in-use') {
         errorMsg = 'El email ya está en uso.';
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -257,7 +404,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
         );
       }
     } catch (e) {
-      debugPrint("UserDataPreferencesPage: Error: $e");
+      debugPrint("UserDataPreferencesPage: Error General: $e");
       setState(() => _isCreatingFirebaseUser = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -267,7 +414,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
     }
   }
 
-  // Método auxiliar para el estilo de input limpio dentro de Cards
+  // Método auxiliar para estilo de inputs
   InputDecoration _buildInputDecoration(
     String label,
     IconData icon, {
@@ -292,24 +439,19 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    final primaryColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
-    return WillPopScope(
-      onWillPop: () async => !_isCreatingFirebaseUser,
+    return PopScope(
+      canPop: !_isCreatingFirebaseUser,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F7), 
         appBar: AppBar(
-          backgroundColor: const Color(0xFFF5F5F7),
           elevation: 0,
           centerTitle: true,
-          automaticallyImplyLeading: false, 
+          automaticallyImplyLeading: false,
           leading: Navigator.canPop(context)
               ? IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.black87,
-                    size: 20,
-                  ),
+                  icon: Icon(Icons.arrow_back_ios_new, size: 20, color: theme.iconTheme.color),
                   onPressed: () {
                     if (!_isCreatingFirebaseUser) Navigator.pop(context);
                   },
@@ -318,11 +460,11 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
           title: Text(
             l10n.userDataPreferences,
             style: const TextStyle(
-              fontSize: 24, 
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
             ),
           ),
+          backgroundColor: Colors.transparent,
         ),
         body: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
@@ -344,7 +486,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                 listen: false,
               );
               final firebaseUserNow = FirebaseAuth.instance.currentUser;
-              debugPrint("EMAIL :$firebaseUserNow?.email");
+
               userProvider.setUser(
                 state.user.toMap(),
                 firebaseUserId: firebaseUserNow?.uid,
@@ -355,7 +497,12 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
 
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => AuthStateHandler(
+                      client: GraphQLConfig.client,
+                      isLoggedIn: true,
+                    ),
+                  ),
                   (route) => false,
                 );
               });
@@ -429,7 +576,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     ProfileSectionLabel(text: l10n.personalInfo),
                     ProfileStyledCard(
                       children: [
-                        // Apodo
                         TextFormField(
                           controller: _apodoController,
                           decoration: _buildInputDecoration(
@@ -440,8 +586,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                               ? l10n.mandatoryNickname
                               : null,
                         ),
-                        const Divider(height: 1, indent: 40), // Divisor interno
-                        // Nombre Completo
+                        const Divider(height: 1, indent: 40),
                         TextFormField(
                           controller: _nombreCompletoController,
                           decoration: _buildInputDecoration(
@@ -453,8 +598,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                               : null,
                         ),
                         const Divider(height: 1, indent: 40),
-
-                        // Fecha Nacimiento
                         TextFormField(
                           controller: _fechaNacimientoController,
                           decoration: _buildInputDecoration(
@@ -463,9 +606,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           ),
                           readOnly: true,
                           onTap: () => _selectDate(context),
-                          validator: (v) => v?.isEmpty ?? true
-                              ? l10n.mandatoryBirthDate
-                              : null,
+                          // Validator eliminado: fecha de nacimiento ahora es opcional
                         ),
                       ],
                     ),
@@ -473,12 +614,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     const SizedBox(height: 24),
 
                     // --- CONTACTO Y BIO ---
-                    ProfileSectionLabel(
-                      text: l10n.contactAndBioInfo,
-                    ), // Usamos una key parecida o genérica
+                    ProfileSectionLabel(text: l10n.contactAndBioInfo),
                     ProfileStyledCard(
                       children: [
-                        // Teléfono
                         TextFormField(
                           controller: _telefonoController,
                           decoration: _buildInputDecoration(
@@ -494,8 +632,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           },
                         ),
                         const Divider(height: 1, indent: 40),
-
-                        // Descripción
                         TextFormField(
                           controller: _descripcionController,
                           decoration: _buildInputDecoration(
@@ -513,93 +649,18 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     ProfileSectionLabel(text: "Preferencias"),
                     ProfileStyledCard(
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: _selectedModo,
-                                decoration: InputDecoration(
-                                  labelText: l10n.preferredMode,
-                                  prefixIcon: Icon(
-                                    _selectedModo == 'Bici'
-                                        ? Icons.directions_bike
-                                        : Icons.electric_car,
-                                    color: Colors.grey,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                    vertical: 10,
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.grey,
-                                ),
-                                validator: (v) => v == null
-                                    ? l10n.mandatoryPreferredMode
-                                    : null,
-                                items: _modos.map((m) {
-                                  return DropdownMenuItem(
-                                    value: m,
-                                    child: Text(
-                                      m,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (v) =>
-                                    setState(() => _selectedModo = v),
-                              ),
-                            ),
-
-                            // Divisor vertical sutil
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: Colors.grey[200],
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 8,
-                              ),
-                            ),
-
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: _selectedIdioma,
-                                decoration: InputDecoration(
-                                  labelText: l10n.preferredLanguage,
-                                  prefixIcon: const Icon(
-                                    Icons.language,
-                                    color: Colors.grey,
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                    vertical: 10,
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.grey,
-                                ),
-                                items: _idiomas
-                                    .map(
-                                      (i) => DropdownMenuItem(
-                                        value: i,
-                                        child: Text(
-                                          i,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                                onChanged: (v) =>
-                                    setState(() => _selectedIdioma = v),
-                              ),
-                            ),
-                          ],
+                        ProfileMenuOption(
+                          icon: _selectedModo == 'Bici' ? Icons.directions_bike : Icons.electric_car,
+                          text: _selectedModo ?? l10n.preferredMode,
+                          onTap: _showModoSelector,
+                          trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
+                        ),
+                        const Divider(height: 1, indent: 40),
+                        ProfileMenuOption(
+                          icon: Icons.language,
+                          text: _selectedIdioma ?? l10n.preferredLanguage,
+                          onTap: _showIdiomaSelector,
+                          trailing: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -609,27 +670,27 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     // --- BOTÓN FINALIZAR ---
                     SizedBox(
                       width: double.infinity,
+                      height: 56, // Altura consistente
                       child: ElevatedButton(
                         onPressed: _finalizarOnboarding,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: theme.colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16), // Radio consistente
                           ),
-                          elevation: 2,
+                          elevation: 0, // Sin elevación para ser más "minimalista" flat, o 2 si se prefiere
                         ),
                         child: Text(
                           l10n.finishRegistration,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 40),
                   ],
                 ),

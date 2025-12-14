@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInWithEmailEvent>(_onSignInWithEmail);
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
     on<SignInWithGoogleEvent>(_onSignInWithGoogle);
+    on<DeleteAccountEvent>(_onDeleteAccount);
   }
 
   Future<void> _onCheckEmailExistence(
@@ -23,9 +24,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     final prevState = state;
     emit(AuthLoadingState());
-    final result = await authRepository.isEmailRegistered(event.email);
+    final result = await authRepository.isEmailRegisteredAndWithGoogle(
+      event.email,
+    );
     result.fold(
       (failure) {
+        if (kDebugMode) {
+          print('Error en isEmailRegisteredAndWithGoogle: ${failure.message}');
+        }
         emit(
           AuthFailureState(
             errorCode: failure.message == 'invalid-email'
@@ -35,8 +41,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         emit(prevState);
       },
-      (isRegistered) =>
-          emit(isRegistered ? EmailExistsState() : EmailIsNewState()),
+      (data) {
+        bool isEmailRegistered = data.value1;
+        bool? isRegisteredWithGoogle = data.value2;
+        if (isEmailRegistered) {
+          if (isRegisteredWithGoogle == true) {
+            emit(EmailExistsWithGoogleState());
+          } else {
+            emit(EmailExistsWithoutGoogleState());
+          }
+        } else {
+          emit(EmailIsNewState());
+        }
+      },
     );
   }
 
@@ -116,6 +133,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ),
           );
         }
+      },
+    );
+  }
+
+  Future<void> _onDeleteAccount(
+    DeleteAccountEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    final prevState = state;
+    emit(AuthLoadingState());
+    final result = await authRepository.deleteAccount(event.password);
+    result.fold(
+      (failure) {
+        emit(AuthFailureState(errorCode: _mapFailureToMessage(failure)));
+        emit(prevState);
+      },
+      (_) {
+        emit(AccountDeletedState());
       },
     );
   }

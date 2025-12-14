@@ -12,6 +12,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
@@ -28,14 +29,16 @@ class StationHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     final assessmentState = context.watch<AssessmentBloc>().state;
 
     final onPressed = onToggleFavorite;
 
     double? displayRating;
-    
+
     if (assessmentState.totalAssessments > 0) {
       displayRating = assessmentState.averageScore;
     } else if (assessmentState.status == AssessmentStatus.success) {
@@ -43,19 +46,9 @@ class StationHeaderWidget extends StatelessWidget {
     } else {
       displayRating = station.rating;
     }
-    AssessmentEntity? myExistingReview;
-    
-    if (assessmentState.status == AssessmentStatus.success && 
-        currentUser != null && 
-        assessmentState.assessments.isNotEmpty) {
-      try {
-        myExistingReview = assessmentState.assessments.firstWhere(
-          (review) => review.nickname == currentUser.displayName,
-        );
-      } catch (_) {
-        myExistingReview = null;
-      }
-    }
+
+    // Use the userHasAssessed field from state
+    final bool userHasAssessed = assessmentState.userHasAssessed;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,10 +59,10 @@ class StationHeaderWidget extends StatelessWidget {
             Expanded(
               child: Text(
                 station.name ?? l10n.unknown,
-                style: const TextStyle(
+                style: theme.textTheme.headlineSmall?.copyWith(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: textColor,
                   height: 1.2,
                 ),
               ),
@@ -97,31 +90,31 @@ class StationHeaderWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
         // --- DIRECCIÓN ---
         Row(
           children: [
-            Icon(Icons.location_on_rounded, size: 18, color: Colors.grey[600]),
+            Icon(Icons.location_on_rounded, size: 18, color: mutedColor),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 station.address ?? l10n.unknown,
-                style: TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: mutedColor,
                   height: 1.3,
                 ),
               ),
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // --- BARRA DE ACCIONES (Estrellas | Link | Botón) ---
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 8, 
+          spacing: 8,
           runSpacing: 8,
           children: [
             // ESTRELLAS (Si existen)
@@ -129,52 +122,125 @@ class StationHeaderWidget extends StatelessWidget {
               createStarRatingRow((displayRating * 2).round()),
               Text(
                 '(${displayRating.toStringAsFixed(1)})',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
-              
+
               // Separador vertical
-              Container(width: 1, height: 16, color: Colors.grey[300]),
+              Container(width: 1, height: 16, color: theme.dividerColor),
 
               // Link "Ver opiniones"
               InkWell(
                 onTap: () => _navigateToReviews(context, l10n),
                 borderRadius: BorderRadius.circular(4),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 4,
+                  ),
                   child: Text(
-                    "${l10n.seeOpinions} (${assessmentState.totalAssessments})", 
+                    "${l10n.seeOpinions} (${assessmentState.totalAssessments})",
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: themeColor,
                       fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.grey[400],
+                      decorationColor: themeColor,
                     ),
                   ),
                 ),
               ),
-            ] else 
-               // TEXTO "SIN OPINIONES" (Si no hay estrellas)
-               InkWell(
+            ] else
+              // TEXTO "SIN OPINIONES" (Si no hay estrellas)
+              InkWell(
                 onTap: () => _navigateToReviews(context, l10n),
                 borderRadius: BorderRadius.circular(4),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
-                    l10n.withoutOpinions, 
+                    l10n.withoutOpinions,
                     style: TextStyle(
-                      color: Colors.grey[500],
+                      color: mutedColor,
                       fontSize: 13,
                       decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
               ),
-            
+
             // BOTÓN DE ACCIÓN (VALORAR O EDITAR)
             InkWell(
-              onTap: () {
+              onTap: () async {
                 final assessmentBloc = context.read<AssessmentBloc>();
-                
+
+                debugPrint("=== EDIT BUTTON CLICKED ===");
+                debugPrint("userHasAssessed: $userHasAssessed");
+                debugPrint(
+                  "Current assessments count: ${assessmentState.assessments.length}",
+                );
+
+                // If user has assessed but we don't have the assessments loaded yet, fetch them first
+                if (userHasAssessed && assessmentState.assessments.isEmpty) {
+                  debugPrint(
+                    "Fetching assessments for station ${station.id}...",
+                  );
+                  assessmentBloc.add(
+                    GetAssessmentsByStationEvent(
+                      stationId: station.id.toString(),
+                    ),
+                  );
+
+                  // Wait a bit for the assessments to load
+                  await Future.delayed(const Duration(milliseconds: 800));
+                }
+
+                // Get the updated state after potential fetch
+                final currentState = assessmentBloc.state;
+                debugPrint(
+                  "After fetch - assessments count: ${currentState.assessments.length}",
+                );
+
+                AssessmentEntity? existingReview;
+
+                if (userHasAssessed && currentState.assessments.isNotEmpty && context.mounted) {
+                  final currentUser = FirebaseAuth.instance.currentUser;
+                  if (currentUser != null) {
+                    // Try to get nickname from UserProvider first, fallback to Firebase displayName
+                    final userProvider = context.read<UserProvider>();
+                    final userNickname =
+                        userProvider.user?['nickname'] as String? ??
+                        currentUser.displayName;
+
+                    debugPrint("Looking for assessment by user: $userNickname");
+                    debugPrint(
+                      "Available assessments: ${currentState.assessments.map((a) => a.nickname).toList()}",
+                    );
+
+                    try {
+                      existingReview = currentState.assessments.firstWhere(
+                        (review) => review.nickname == userNickname,
+                      );
+                      debugPrint(
+                        "Found existing review with score: ${existingReview.score}",
+                      );
+                    } catch (e) {
+                      debugPrint(
+                        "No matching review found for user: $userNickname",
+                      );
+                      existingReview = null;
+                    }
+                  }
+                }
+
+                debugPrint(
+                  "existingReview is ${existingReview != null ? 'NOT NULL' : 'NULL'}",
+                );
+                debugPrint("=========================");
+
+                if (!context.mounted) return;
+
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -185,33 +251,38 @@ class StationHeaderWidget extends StatelessWidget {
                       stationId: station.id.toString(),
                       stationName: station.name ?? l10n.station,
                       themeColor: themeColor,
-                      // Si encontramos mi reseña, la pasamos para activar modo edición
-                      existingAssessment: myExistingReview, 
+                      // Pass existing review to activate edit mode
+                      existingAssessment: existingReview,
                     ),
                   ),
                 );
               },
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: themeColor.withOpacity(0.1),
+                  color: themeColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: themeColor.withOpacity(0.2)),
+                  border: Border.all(color: themeColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Icono cambia según estado
+                    // Icon changes based on whether user has assessed
                     Icon(
-                      myExistingReview != null ? Icons.edit_rounded : Icons.star_rate_rounded, 
-                      size: 14, 
-                      color: themeColor
+                      userHasAssessed
+                          ? Icons.edit_rounded
+                          : Icons.star_rate_rounded,
+                      size: 14,
+                      color: themeColor,
                     ),
                     const SizedBox(width: 4),
-                    // Texto cambia según estado
+                    // Text changes based on whether user has assessed
                     Text(
-                      myExistingReview != null ? l10n.editReview : l10n.rate,
+                      userHasAssessed ? l10n.editReview : l10n.rate,
                       style: TextStyle(
                         color: themeColor,
                         fontWeight: FontWeight.bold,
@@ -230,7 +301,9 @@ class StationHeaderWidget extends StatelessWidget {
 
   void _navigateToReviews(BuildContext context, AppLocalizations l10n) {
     final assessmentBloc = context.read<AssessmentBloc>();
-    assessmentBloc.add(GetAssessmentsByStationEvent(stationId: station.id.toString()));
+    assessmentBloc.add(
+      GetAssessmentsByStationEvent(stationId: station.id.toString()),
+    );
 
     Navigator.push(
       context,

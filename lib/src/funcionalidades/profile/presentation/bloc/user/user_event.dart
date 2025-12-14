@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/user_entity.dart';
 
+import 'dart:io';
+
 abstract class UserEvent extends Equatable {
   const UserEvent();
 
@@ -9,7 +11,7 @@ abstract class UserEvent extends Equatable {
 }
 
 class LoadUserProfile extends UserEvent {
-  final String userId;  
+  final String userId;
   const LoadUserProfile(this.userId);
 
   @override
@@ -18,10 +20,12 @@ class LoadUserProfile extends UserEvent {
 
 class UpdateUserProfile extends UserEvent {
   final UserEntity updatedUser;
-  const UpdateUserProfile(this.updatedUser);
+  final File? profilePhoto;
+
+  const UpdateUserProfile(this.updatedUser, {this.profilePhoto});
 
   @override
-  List<Object?> get props => [updatedUser];
+  List<Object?> get props => [updatedUser, profilePhoto];
 }
 
 class CreateUserProfile extends UserEvent {

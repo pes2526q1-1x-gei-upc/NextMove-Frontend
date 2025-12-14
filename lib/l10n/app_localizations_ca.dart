@@ -75,7 +75,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.';
 
   @override
-  String get userDataPreferences => 'Acaba de completar el teu perfil';
+  String get userDataPreferences => 'Completa el teu perfil';
 
   @override
   String get nickname => 'Sobrenom';
@@ -253,9 +253,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponibles';
-
-  @override
   String get occupied => 'Ocupat';
 
   @override
@@ -269,9 +266,6 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Potència desconeguda';
 
   @override
   String get unknown => 'Desconegut';
@@ -371,6 +365,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get darkMode => 'Mode fosc';
 
   @override
+  String get systemMode => 'Utilitza el mode del sistema';
+
+  @override
   String get preliminarVersion => 'Versió preliminar';
 
   @override
@@ -392,9 +389,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String friendAdded(String nickname) {
     return '$nickname s\'ha afegit als teus amics.';
   }
-
-  @override
-  String get friends => 'Amics';
 
   @override
   String get memberSince => 'Membre des de';
@@ -428,6 +422,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get block => 'Bloquejar';
+
+  @override
+  String get friends => 'Amics';
+
+  @override
+  String get addFriend => 'Afegeix amic';
 
   @override
   String get minCharsSearchHint =>
@@ -502,6 +502,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get opinions => 'Valoracions';
 
   @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
   String get station => 'Estació';
 
   @override
@@ -530,6 +533,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get free => 'Lliures';
+
+  @override
+  String get available => 'Disponible';
 
   @override
   String get charge => 'Càrrega';
@@ -585,4 +591,31 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get updatedReview => 'La teva valoració ha estat actualitzada.';
+
+  @override
+  String get needsToSignInWithGoogle =>
+      'Aquest correu electrònic està registrat amb Google. Si us plau, inicia sessió amb Google.';
+
+  @override
+  String get deleteAccount => 'Eliminar compte';
+
+  @override
+  String get deleteAccountConfirmation =>
+      'Estàs segur que vols eliminar el teu compte? Aquesta acció no es pot desfer i es perdran totes les teves dades.';
+
+  @override
+  String get accountDeleted => 'El teu compte ha estat eliminat correctament.';
+
+  @override
+  String get errorDeletingAccount => 'Error en eliminar el compte.';
+
+  @override
+  String get accountDeletedSuccessfully =>
+      'El compte s\'ha eliminat correctament.';
+
+  @override
+  String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
+
+  @override
+  String get social => 'Social';
 }

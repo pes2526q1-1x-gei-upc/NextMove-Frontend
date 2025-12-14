@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/src/shared/domain/track_statistics.dart';
 
 class TrackPoint {
   final LatLng location;
@@ -15,22 +16,29 @@ class TrackPoint {
   });
 }
 
-class RecordedTrack {
+class RecordedTrack implements TrackStatistics {
   final DateTime startTime = DateTime.now(); // set at the beginning
   late DateTime endTime = startTime;
 
   // points are being added as the route is recorded; same for the calculation of statistics
   List<TrackPoint> points = [];
+  @override
   double totalDistanceMeters = 0.0;
+  @override
   double averageSpeedKmH = 0.0;
+  @override
   double maxSpeedKmH = 0.0;
   Duration totalTime = Duration.zero;
+  @override
   double elevationGainMeters = 0.0;
+  @override
   double elevationLossMeters = 0.0;
 
   bool suspectedFraud = false;
   
+  @override
   double co2SavedKG = 0.0;
+  @override
   double kcalBurned = 0.0;
 
   TrackPoint get startPoint => points.first;

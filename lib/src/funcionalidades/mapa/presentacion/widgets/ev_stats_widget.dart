@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/info_card_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 
 
 class EVStatsWidget extends StatelessWidget {
@@ -14,12 +12,11 @@ class EVStatsWidget extends StatelessWidget {
 
   final EVStationDetails station;
 
-  final Color _cardBackgroundColor = const Color(0xFFF5F5F7);
-
   @override
   Widget build(BuildContext context) {
     final bool isFast = station.isSuperFast ?? false;
     final l10n = AppLocalizations.of(context)!;
+    final cardColor = Theme.of(context).cardColor;
     return Row(
       children: [
         const SizedBox(width: 8),
@@ -31,7 +28,7 @@ class EVStatsWidget extends StatelessWidget {
             value:
                 '${station.availableSlots ?? "-"} / ${station.totalSlots ?? "-"}',
             color: Colors.green,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -43,7 +40,7 @@ class EVStatsWidget extends StatelessWidget {
             label: l10n.charge,
             value: isFast ? l10n.fast : l10n.normal,
             color: isFast ? Colors.amber[700]! : Colors.blue,
-            backgroundColor: _cardBackgroundColor,
+            backgroundColor: cardColor,
           ),
         ),
       ],

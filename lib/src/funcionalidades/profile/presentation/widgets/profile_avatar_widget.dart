@@ -5,12 +5,14 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class ProfileAvatarSelector extends StatefulWidget {
   final File? selectedImageFile;
+  final String? imageUrl;
   final AssetImage defaultImage;
   final Function(File) onImagePicked;
 
   const ProfileAvatarSelector({
     super.key,
     required this.selectedImageFile,
+    this.imageUrl,
     required this.defaultImage,
     required this.onImagePicked,
   });
@@ -27,7 +29,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
     var l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -35,7 +37,10 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
         child: Wrap(
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Colors.black87),
+              leading: Icon(
+                Icons.photo_library,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               title: Text(l10n.gallery),
               onTap: () {
                 _pickImage(ImageSource.gallery, context);
@@ -43,7 +48,10 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: Colors.black87),
+              leading: Icon(
+                Icons.camera_alt,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               title: Text(l10n.camera),
               onTap: () {
                 _pickImage(ImageSource.camera, context);
@@ -70,7 +78,9 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.imagePickerError)),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.imagePickerError),
+          ),
         );
       }
     }
@@ -78,6 +88,15 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
 
   @override
   Widget build(BuildContext context) {
+    ImageProvider? imageProvider;
+    if (widget.selectedImageFile != null) {
+      imageProvider = FileImage(widget.selectedImageFile!);
+    } else if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
+      imageProvider = NetworkImage(widget.imageUrl!);
+    } else {
+      imageProvider = widget.defaultImage;
+    }
+
     return Center(
       child: GestureDetector(
         onTap: () => _showImageSourceActionSheet(context),
@@ -87,7 +106,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
             border: Border.all(color: Colors.white, width: 4),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -98,9 +117,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
               CircleAvatar(
                 radius: 55,
                 backgroundColor: Colors.grey[200],
-                backgroundImage: widget.selectedImageFile != null
-                    ? FileImage(widget.selectedImageFile!)
-                    : widget.defaultImage,
+                backgroundImage: imageProvider,
               ),
               Positioned(
                 bottom: 0,
@@ -112,11 +129,7 @@ class _ProfileAvatarSelectorState extends State<ProfileAvatarSelector> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
-                  child: const Icon(
-                    Icons.edit,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
                 ),
               ),
             ],

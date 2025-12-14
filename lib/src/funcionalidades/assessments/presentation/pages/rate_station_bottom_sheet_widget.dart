@@ -61,11 +61,26 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isEditing = widget.existingAssessment != null;
+    final theme = Theme.of(context);
+    final buttonOnColor =
+        ThemeData.estimateBrightnessForColor(widget.themeColor) ==
+                Brightness.dark
+            ? Colors.white
+            : Colors.black.withValues(alpha: 0.85);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 
+              theme.brightness == Brightness.dark ? 0.5 : 0.15,
+            ),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomInset),
       child: Column(
@@ -77,7 +92,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: theme.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -92,8 +107,8 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               if (isEditing) const SizedBox(width: 48), 
               
               Text(
-                isEditing ? l10n.editReview : l10n.reviewStation, 
-                style: const TextStyle(
+                isEditing ? l10n.editReview : l10n.reviewStation,
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -143,11 +158,14 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           ),
 
           const SizedBox(height: 8),
-          Text(
-            widget.stationName,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
+              Text(
+                widget.stationName,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
 
           const SizedBox(height: 30),
 
@@ -170,7 +188,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         : Icons.star_outline_rounded,
                     color: starIndex <= _selectedScore
                         ? Colors.amber
-                        : Colors.grey[300],
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.25),
                     size: 40,
                   ),
                 ),
@@ -180,8 +198,10 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           const SizedBox(height: 10),
           Text(
             _getRatingLabel(_selectedScore, l10n),
-            style: TextStyle(
-              color: _selectedScore > 0 ? Colors.amber[800] : Colors.transparent,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: _selectedScore > 0
+                  ? Colors.amber[700]
+                  : Colors.transparent,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -192,17 +212,35 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           // --- CAMPO DE COMENTARIOS ---
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F7), 
-              borderRadius: BorderRadius.circular(16),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
+                theme.brightness == Brightness.dark ? 0.35 : 1,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: theme.dividerColor.withValues(alpha: 
+                  theme.brightness == Brightness.dark ? 0.4 : 0.6,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 
+                    theme.brightness == Brightness.dark ? 0.45 : 0.08,
+                  ),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: TextField(
               controller: _commentController,
               maxLines: 3,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: l10n.writeYourOpinion, 
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),
@@ -214,14 +252,18 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
+              // Calculamos el color de texto según el contraste del fondo
               style: ElevatedButton.styleFrom(
                 backgroundColor: widget.themeColor,
-                foregroundColor: Colors.white,
-                elevation: 0,
+                foregroundColor: buttonOnColor,
+                elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
+                shadowColor: widget.themeColor.withValues(alpha: 0.4),
+                overlayColor: buttonOnColor.withValues(alpha: 0.08),
+                disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
+                disabledForegroundColor: buttonOnColor.withValues(alpha: 0.6),
               ),
               onPressed: _selectedScore == 0
                   ? null
@@ -257,8 +299,13 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                       );
                     },
               child: Text(
-                isEditing ? l10n.updateReview: l10n.sendReview, 
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                isEditing ? l10n.updateReview : l10n.sendReview,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: buttonOnColor,
+                  letterSpacing: 0.2,
+                ),
               ),
             ),
           ),

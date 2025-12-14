@@ -556,12 +556,6 @@ abstract class AppLocalizations {
   /// **'Closed'**
   String get closed;
 
-  /// No description provided for @available.
-  ///
-  /// In en, this message translates to:
-  /// **'Available'**
-  String get available;
-
   /// No description provided for @occupied.
   ///
   /// In en, this message translates to:
@@ -591,12 +585,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
-
-  /// No description provided for @unknownPower.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown power'**
-  String get unknownPower;
 
   /// No description provided for @unknown.
   ///
@@ -790,6 +778,12 @@ abstract class AppLocalizations {
   /// **'Dark mode'**
   String get darkMode;
 
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use system setting'**
+  String get systemMode;
+
   /// No description provided for @preliminarVersion.
   ///
   /// In en, this message translates to:
@@ -831,12 +825,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{nickname} has been added to your friends.'**
   String friendAdded(String nickname);
-
-  /// No description provided for @friends.
-  ///
-  /// In en, this message translates to:
-  /// **'Friends'**
-  String get friends;
 
   /// No description provided for @memberSince.
   ///
@@ -891,6 +879,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// No description provided for @addFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get addFriend;
 
   /// No description provided for @minCharsSearchHint.
   ///
@@ -1030,6 +1030,12 @@ abstract class AppLocalizations {
   /// **'Reviews'**
   String get opinions;
 
+  /// No description provided for @unknownPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown power'**
+  String get unknownPower;
+
   /// No description provided for @station.
   ///
   /// In en, this message translates to:
@@ -1089,6 +1095,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free'**
   String get free;
+
+  /// No description provided for @available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
 
   /// No description provided for @charge.
   ///
@@ -1197,6 +1209,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your review has been updated.'**
   String get updatedReview;
+
+  /// No description provided for @needsToSignInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is registered with Google. Please sign in with Google.'**
+  String get needsToSignInWithGoogle;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account? This action cannot be undone and all your data will be lost.'**
+  String get deleteAccountConfirmation;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been successfully deleted.'**
+  String get accountDeleted;
+
+  /// No description provided for @errorDeletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting account.'**
+  String get errorDeletingAccount;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'The account has been deleted successfully.'**
+  String get accountDeletedSuccessfully;
+
+  /// No description provided for @userMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The user does not match the current user.'**
+  String get userMismatch;
+
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
 }
 
 class _AppLocalizationsDelegate

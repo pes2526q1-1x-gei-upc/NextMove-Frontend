@@ -3,10 +3,17 @@ import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart'
     as custom_exceptions;
 import '../../../../../graphql/queries.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class UserRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
@@ -14,20 +21,26 @@ class UserRemoteDataProvider {
 
   Future<UserEntity> getUserProfile(String identifier) async {
     final currentUser = firebaseAuth.currentUser;
-    print(
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: getUserProfile for $identifier. CurrentUser UID: ${currentUser?.uid}",
     );
+    }
 
     // Cargar el perfil del usuario logeado
     if (currentUser != null && identifier == currentUser.uid) {
-      print("UserRemoteDataProvider: Fetching MY profile");
+      if (kDebugMode) {
+        print("UserRemoteDataProvider: Fetching MY profile");
+      }
       return _fetchMyProfile(currentUser.email!);
     }
     // Cargar el perfil de otro usuario por su nickname
     else {
-      print(
+      if (kDebugMode) {
+        print(
         "UserRemoteDataProvider: Fetching profile by nickname: $identifier",
       );
+      }
       return _fetchUserProfileByNickname(identifier);
     }
   }
@@ -39,6 +52,7 @@ class UserRemoteDataProvider {
           email
           name
           nickname
+          photo
           phoneNumber
           bioDescription
           preferredMode
@@ -97,14 +111,20 @@ class UserRemoteDataProvider {
     final List<dynamic> data = result.data?['UsersByNickname'] ?? [];
 
     if (data.isEmpty) {
-      print("UserRemoteDataProvider: No users found for nickname $nickname");
+      if (kDebugMode) {
+        print("UserRemoteDataProvider: No users found for nickname $nickname");
+      }
       throw custom_exceptions.ServerException('Perfil de amigo no encontrado');
     }
     final currentUser = firebaseAuth.currentUser;
-    print("El usuario actual es: ${currentUser?.email}");
-    print(
+    if (kDebugMode) {
+      print("El usuario actual es: ${currentUser?.email}");
+    }
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
     );
+    }
 
     // Buscar coincidencia exacta
     final exactMatch = data.firstWhere(
@@ -112,9 +132,11 @@ class UserRemoteDataProvider {
           (userJson['nickname'] as String).toLowerCase() ==
           nickname.toLowerCase(),
       orElse: () {
-        print(
+        if (kDebugMode) {
+          print(
           "UserRemoteDataProvider: Exact match for '$nickname' not found in results.",
         );
+        }
         return null;
       },
     );
@@ -123,9 +145,11 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('Usuario no encontrado');
     }
 
-    print(
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: Found user: ${exactMatch['nickname']} (Email: ${exactMatch['email']})",
     );
+    }
 
     return UserEntity.fromRawData(exactMatch);
   }
@@ -139,7 +163,7 @@ class UserRemoteDataProvider {
       );
     }
 
-    const String updateUserMutation = GraphQLQueries.updateUserMutation;
+    const String updateUserMutation = GraphQLMutations.updateUserMutation;
 
     String? formatBirthDate(DateTime? date) {
       if (date == null) return null;
@@ -221,21 +245,6 @@ class UserRemoteDataProvider {
   }
 
   Future<UserEntity> createUserProfile(UserEntity userEntity) async {
-    const String createUserMutation = r'''
-      mutation CreateUser($input: CreateUserInput!) {
-        createUser(createInfo: $input) {
-          email
-          name
-          nickname
-          phoneNumber
-          preferredMode
-          preferredLanguage
-          birthDate
-          bioDescription
-        }
-      }
-    ''';
-
     final String birthDateFormatted = DateFormat(
       'yyyy-MM-dd',
     ).format(userEntity.fechaNacimiento);
@@ -264,17 +273,19 @@ class UserRemoteDataProvider {
     }
 
     final MutationOptions options = MutationOptions(
-      document: gql(createUserMutation),
+      document: gql(GraphQLMutations.createUserMutation),
       variables: {
         'input': {
           'email': userEntity.email,
           'name': userEntity.nombreCompleto,
           'nickname': userEntity.apodo,
+          'photo': userEntity.photo,
           'phoneNumber': phoneNumberToSend, // Envía null si es 0
           'preferredMode': modeEnum,
           'preferredLanguage': langEnum,
           'birthDate': birthDateFormatted,
           'bioDescription': userEntity.descripcion,
+          'regWithGoogle': userEntity.regWithGoogle ?? false,
         },
       },
     );
@@ -314,5 +325,75 @@ class UserRemoteDataProvider {
 
   Future<void> logout() async {
     await firebaseAuth.signOut();
+  }
+
+  Future<String> uploadProfilePhoto(File file) async {
+    final user = firebaseAuth.currentUser;
+    if (user == null) {
+      throw custom_exceptions.AuthException(message: 'Usuario no autenticado');
+    }
+
+    final token = await user.getIdToken();
+    final endpoint = dotenv.env['GRAPHQL_ENDPOINT'];
+
+    if (endpoint == null) {
+      throw custom_exceptions.ServerException('GRAPHQL_ENDPOINT no definido');
+    }
+
+    // Asumimos que el endpoint es .../graphql y lo cambiamos a .../api/upload-profile-photo
+    // O si el endpoint es solo el host, construimos la url.
+    // Dado el código del backend, la ruta es /api/upload-profile-photo
+    // Si GRAPHQL_ENDPOINT es http://localhost:3000/graphql
+    final baseUrl = endpoint.replaceAll('/graphql', '');
+    final uploadUrl = '$baseUrl/api/upload-profile-photo';
+
+    if (kDebugMode) {
+      print('Uploading photo to: $uploadUrl');
+    }
+
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Determine mime type
+      final mimeType = lookupMimeType(file.path);
+      MediaType? mediaType;
+      if (mimeType != null) {
+        final split = mimeType.split('/');
+        if (split.length == 2) {
+          mediaType = MediaType(split[0], split[1]);
+        }
+      }
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          file.path,
+          contentType: mediaType,
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['imageUrl'];
+      } else {
+        if (kDebugMode) {
+          print('Upload failed: ${response.statusCode} - ${response.body}');
+        }
+        throw custom_exceptions.ServerException(
+          'Error al subir foto: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Exception uploading photo: $e');
+      }
+      throw custom_exceptions.ServerException(
+        'Error de conexión al subir foto',
+      );
+    }
   }
 }

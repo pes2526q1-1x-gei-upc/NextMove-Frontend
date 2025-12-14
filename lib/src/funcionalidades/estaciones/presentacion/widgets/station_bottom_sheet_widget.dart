@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
@@ -14,6 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
+import 'package:provider/provider.dart';
 
 class StationBottomSheet extends StatelessWidget {
   const StationBottomSheet({
@@ -31,7 +31,15 @@ class StationBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isBicycle = state.currentMode == StationType.bicycle;
-    final themeColor = isBicycle ? Colors.blue : Colors.green;
+    final theme = Theme.of(context);
+    final themeColor = isBicycle
+        ? theme.colorScheme.secondary
+        : theme.colorScheme.primary;
+    final onThemeColor = isBicycle
+        ? theme.colorScheme.onSecondary
+        : theme.colorScheme.onPrimary;
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     return Consumer<StationsCache>(
       builder: (context, cache, child) {
@@ -43,20 +51,22 @@ class StationBottomSheet extends StatelessWidget {
               AssessmentBloc(assessmentRepository: AssessmentRepository())
                 ..add(GetStationAssessmentInfoEvent(stationId: station.id)),
           child: BlocProvider<StationListBloc>(
-            create: (context) => StationListBloc(context.read<StationsCache>())
-              ..add(
-                LoadStationListEvent(
-                  stationType: state.currentMode,
-                  latitude: state.userLocation?.latitude ?? 41.3851,
-                  longitude: state.userLocation?.longitude ?? 2.1734,
+            create: (context) =>
+                StationListBloc(context.read<StationsCache>())..add(
+                  LoadStationListEvent(
+                    stationType: state.currentMode,
+                    latitude: state.userLocation?.latitude ?? 41.3851,
+                    longitude: state.userLocation?.longitude ?? 2.1734,
+                  ),
                 ),
-              ),
             child: Builder(
               builder: (context) {
                 return Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 30),
@@ -70,7 +80,7 @@ class StationBottomSheet extends StatelessWidget {
                             width: 40,
                             height: 4,
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: theme.dividerColor,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -88,10 +98,10 @@ class StationBottomSheet extends StatelessWidget {
                                 children: [
                                   Text(
                                     station.name ?? l10n.unknown,
-                                    style: const TextStyle(
+                                    style: theme.textTheme.titleLarge?.copyWith(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                      color: textColor,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -99,9 +109,9 @@ class StationBottomSheet extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     station.address ?? l10n.unknown,
-                                    style: TextStyle(
+                                    style: theme.textTheme.bodyMedium?.copyWith(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: mutedColor,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -117,7 +127,7 @@ class StationBottomSheet extends StatelessWidget {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: themeColor.withOpacity(0.1),
+                                    color: themeColor.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Row(
@@ -132,11 +142,12 @@ class StationBottomSheet extends StatelessWidget {
                                         station.distanceKm != null
                                             ? '${station.distanceKm!.toStringAsFixed(1)} km'
                                             : '- km',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: themeColor,
-                                          fontSize: 12,
-                                        ),
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: themeColor,
+                                              fontSize: 12,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -148,11 +159,11 @@ class StationBottomSheet extends StatelessWidget {
                                         (state is StationListLoaded ||
                                             state is StationListToggleError)
                                         ? (state is StationListLoaded
-                                                ? state.stations
-                                                : (state as StationListToggleError)
+                                                  ? state.stations
+                                                  : (state as StationListToggleError)
                                                         .stations)
-                                            .where((s) => s.id == station.id)
-                                            .firstOrNull
+                                              .where((s) => s.id == station.id)
+                                              .firstOrNull
                                         : null;
                                     final isFavorite =
                                         currentStation?.isFavorite ??
@@ -206,7 +217,9 @@ class StationBottomSheet extends StatelessWidget {
                             if (displayStation.rating != null) {
                               return Column(
                                 children: [
-                                  StarRatingRowBottomSheet(station: displayStation),
+                                  StarRatingRowBottomSheet(
+                                    station: displayStation,
+                                  ),
                                   const SizedBox(height: 20),
                                 ],
                               );
@@ -219,15 +232,16 @@ class StationBottomSheet extends StatelessWidget {
                                     Icon(
                                       Icons.star_outline_rounded,
                                       size: 18,
-                                      color: Colors.grey[400],
+                                      color: mutedColor,
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
                                       l10n.withoutOpinions,
-                                      style: TextStyle(
-                                        color: Colors.grey[500],
-                                        fontSize: 13,
-                                      ),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: mutedColor,
+                                            fontSize: 13,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -238,23 +252,25 @@ class StationBottomSheet extends StatelessWidget {
 
                         // --- STATS ---
                         station is BicycleStationDetails
-                            ? BicycleStatsWidget(
-                            station: station,
-                          )
-                        : station is EVStationDetails
-                        ? EVStatsWidget(station: station)
-                        : const SizedBox.shrink(),
+                            ? BicycleStatsWidget(station: station)
+                            : station is EVStationDetails
+                            ? EVStatsWidget(station: station)
+                            : const SizedBox.shrink(),
+
+                        // --- BOTÓN DE ACCIÓN ---
                         SizedBox(
                           width: double.infinity,
                           height: 54,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: themeColor,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
+                              foregroundColor: onThemeColor,
+                              elevation: 2,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
+                              shadowColor: themeColor.withValues(alpha: 0.4),
+                              overlayColor: onThemeColor.withValues(alpha: 0.1),
                             ),
                             onPressed: () async {
                               await Navigator.of(context).push(
@@ -277,9 +293,11 @@ class StationBottomSheet extends StatelessWidget {
                             },
                             child: Text(
                               l10n.information,
-                              style: const TextStyle(
+                              style: theme.textTheme.titleMedium?.copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: onThemeColor,
+                                letterSpacing: 0.2,
                               ),
                             ),
                           ),

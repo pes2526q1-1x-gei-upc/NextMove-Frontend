@@ -26,21 +26,19 @@ class StationReviewsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          l10n.opinions, 
-          style: const TextStyle(
-            color: Colors.black, 
-            fontWeight: FontWeight.bold, 
-            fontSize: 20
-          ),
+          l10n.opinions,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -50,26 +48,40 @@ class StationReviewsPage extends StatelessWidget {
           if (state.status == AssessmentStatus.loading) {
             return Center(child: CircularProgressIndicator(color: themeColor));
           }
-          
+
           // --- FAILURE ---
           if (state.status == AssessmentStatus.failure) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline_rounded, size: 48, color: Colors.red[300]),
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
-                  Text(state.errorMessage ?? l10n.error),
+                  Text(
+                    state.errorMessage ?? l10n.error,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: themeColor),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: () {
                       context.read<AssessmentBloc>().add(
-                        GetAssessmentsByStationEvent(stationId: stationId),
-                      );
+                            GetAssessmentsByStationEvent(stationId: stationId),
+                          );
                     },
                     child: Text(l10n.retry),
-                  )
+                  ),
                 ],
               ),
             );
@@ -84,20 +96,25 @@ class StationReviewsPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey[300]),
+                    Icon(
+                      Icons.rate_review_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       l10n.withoutOpinions,
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       l10n.firstToReview,
-                      style: TextStyle(color: Colors.grey[400]),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
                   ],
                 ),
@@ -151,6 +168,7 @@ class _AsyncReviewItem extends StatefulWidget {
 class _AsyncReviewItemState extends State<_AsyncReviewItem> {
   bool _isMine = false;
   bool _isLoadingOwnership = true;
+  String? _userPhotoUrl; // <--- NUEVA VARIABLE DE ESTADO
 
   @override
   void initState() {
@@ -161,21 +179,32 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
   Future<void> _checkOwnership() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null || currentUser.email == null) {
-      if (mounted) setState(() => _isLoadingOwnership = false);
-      return;
     }
-
-    if (widget.review.nickname == currentUser.displayName) {
-       if (mounted) setState(() { _isMine = true; });
+    if (currentUser != null && widget.review.nickname == currentUser.displayName) {
+      if (mounted) {
+        setState(() {
+          _isMine = true;
+        });
+      }
     }
 
     try {
       final repo = context.read<AssessmentBloc>().assessmentRepository;
-      final emailFromBackend = await repo.getUserEmailByNickname(widget.review.nickname);
+      final userReview = await repo.getUserEmailByNickname(
+        widget.review.nickname,
+      );
+      final emailFromBackend = userReview?.email;
+      final photoUser = userReview?.photo; 
 
       if (mounted) {
         setState(() {
-          _isMine = (emailFromBackend != null && emailFromBackend == currentUser.email);
+          _userPhotoUrl = photoUser; 
+
+          // Verificamos propiedad real
+          if (currentUser != null && emailFromBackend != null) {
+            _isMine = (emailFromBackend == currentUser.email);
+          }
+          
           _isLoadingOwnership = false;
         });
       }
@@ -191,30 +220,34 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
 
     return ReviewCard(
       userName: widget.review.nickname,
-      date: "${widget.review.created_at.day}/${widget.review.created_at.month}/${widget.review.created_at.year}",
+      date:
+          "${widget.review.createdAt.day}/${widget.review.createdAt.month}/${widget.review.createdAt.year}",
       rating: widget.review.score.toDouble(),
       comment: widget.review.description,
       themeColor: widget.themeColor,
-      
+      userPhotoUrl: _userPhotoUrl,
+
       // Si canEdit es true, pasamos la función para abrir el modal
-      onEditPressed: canEdit ? () {
-          final assessmentBloc = context.read<AssessmentBloc>();
-          
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => BlocProvider.value(
-              value: assessmentBloc,
-              child: RateStationBottomSheet(
-                stationId: widget.stationId,
-                stationName: widget.stationName,
-                themeColor: widget.themeColor,
-                existingAssessment: widget.review,
-              ),
-            ),
-          );
-      } : null,
+      onEditPressed: canEdit
+          ? () {
+              final assessmentBloc = context.read<AssessmentBloc>();
+
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => BlocProvider.value(
+                  value: assessmentBloc,
+                  child: RateStationBottomSheet(
+                    stationId: widget.stationId,
+                    stationName: widget.stationName,
+                    themeColor: widget.themeColor,
+                    existingAssessment: widget.review,
+                  ),
+                ),
+              );
+            }
+          : null,
     );
   }
 }

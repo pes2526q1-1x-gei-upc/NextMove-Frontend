@@ -15,8 +15,11 @@ import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/re
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
+
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
 
 import 'widgets/google_map_widget.dart';
@@ -44,7 +47,10 @@ class _MapPageState extends State<MapPage> {
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
+  final searchHistoryService = SearchHistoryService();
+  bool _isSearchBarFocused = false;
 
+  
   StreamSubscription<Position>? _positionStream;
 
   @override
@@ -59,19 +65,6 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    _setMapStyle();
-  }
-
-  void _setMapStyle() async {
-    const style = '''
-    [
-      {
-        "featureType": "poi",
-        "stylers": [{"visibility": "off"}]
-      }
-    ]
-    ''';
-    _mapController?.setMapStyle(style);
   }
 
   // -----------------------------------------------------------------------
@@ -88,6 +81,7 @@ class _MapPageState extends State<MapPage> {
         stationRepository: stationRepository,
         trackRepository: trackRepository,
         recordedRoutesRepository: recordedRoutesRepository,
+        searchHistoryService: searchHistoryService,
         stationsCache: context.read<StationsCache>(),
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
@@ -99,7 +93,12 @@ class _MapPageState extends State<MapPage> {
     var l10n = AppLocalizations.of(context)!;
     // Main UI
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () {   
+        FocusScope.of(context).unfocus(); // Esto debe quitar el teclado
+        setState(() {
+          _isSearchBarFocused = false; // Esto debe cerrar las búsquedas recientes
+        });
+      },
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
         body: BlocListener<MapBloc, MapState>(
@@ -140,6 +139,7 @@ class _MapPageState extends State<MapPage> {
                       markers: markersToShow,
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
+                      darkMode: Theme.of(context).brightness == Brightness.dark,
                       onMapCreated: _onMapCreated,
                     ),
 
@@ -151,26 +151,26 @@ class _MapPageState extends State<MapPage> {
                           print('Searching: $query');
                         }
                       },
+                      onFocusChanged: (isFocused) {
+                        if (kDebugMode) {
+                          print('📍 MapPage received focus change: $isFocused');
+                        }
+                        setState(() {
+                          _isSearchBarFocused = isFocused;
+                        });
+                      },
                     ),
-
-                    if (state.isSearching)
-                      Positioned(
-                        top: 130,
-                        left: 16,
-                        right: 16,
-                        child: SearchResultsList(),
-                      ),
-
-                    // Avatar de perfil
-                    //ProfileAvatarWidget(context: context),
-                    // Route history button
-                    RouteHistoryButtonWidget(),
 
                     // Botón de lista de estaciones
                     StationListButtonWidget(
                       currentMode: state.currentMode,
                       userLocation: state.userLocation,
                     ),
+
+                    // Avatar de perfil
+                    //ProfileAvatarWidget(context: context),
+                    // Route history button
+                    RouteHistoryButtonWidget(),
 
                     // Columna de controles del mapa (botones combinados)
                     MapControlsColumnWidget(
@@ -181,6 +181,15 @@ class _MapPageState extends State<MapPage> {
 
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
+
+                    Positioned(
+                      top: 130,
+                      left: 16,
+                      right: 16,
+                      child: SearchResultsList(
+                        isSearchBarFocused: _isSearchBarFocused,
+                      ),
+                    ),
                   ],
                 );
               }
@@ -208,6 +217,7 @@ class _MapPageState extends State<MapPage> {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

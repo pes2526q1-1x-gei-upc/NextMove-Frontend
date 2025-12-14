@@ -1,28 +1,39 @@
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart'
     as custom_exceptions;
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
-import 'package:nextmove_app/graphql/queries.dart';
 
 class TrackDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
   Future<void> saveRecordedTrack(RecordedTrack track) async {
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.createTrackMutation),
+      document: gql(GraphQLMutations.createTrackMutation),
       variables: {
-        'userEmail': userProvider.email,
-        'distance': track.totalDistanceMeters,
-        'averageSpeed': track.averageSpeedKmH,
+        'user_email': userProvider.email,
+        'distancia': track.totalDistanceMeters,
+        'velocidad_media': track.averageSpeedKmH,
+        'velocidad_maxima': track.maxSpeedKmH,
         'co2': track.co2SavedKG,
         'kcal': track.kcalBurned,
-        'originLat': track.startPoint.location.latitude,
-        'originLon': track.startPoint.location.longitude,
-        'destinationLat': track.endPoint.location.latitude,
-        'destinationLon': track.endPoint.location.longitude,
-        'timestamp': track.startTime.toIso8601String(),
+        'elevacion_positiva': track.elevationGainMeters,
+        'elevacion_negativa': track.elevationLossMeters,
+        'origen': {
+          'latitude': track.startPoint.location.latitude,
+          'longitude': track.startPoint.location.longitude,
+        },
+        'destino': {
+          'latitude': track.endPoint.location.latitude,
+          'longitude': track.endPoint.location.longitude,
+        },
+        'tiempo_inicio': track.startTime.toIso8601String(),
+        'tiempo_fin': track.endTime.toIso8601String(),
+        'fecha_recorrido': track.startTime
+            .toLocal()
+            .toIso8601String()
       },
     );
     final QueryResult result = await client.mutate(options);
