@@ -129,7 +129,7 @@ class GraphQLQueries {
         latitude
         longitude
       }
-      
+      isFavoriteStation
       distanciaKm
     }
   }''';
@@ -195,6 +195,7 @@ class GraphQLQueries {
         status
       }
       isSuperFast
+      isFavoriteStation
     }
   }''';
 

@@ -33,6 +33,7 @@ class StationRemoteDataProvider {
           "coordinates": {"latitude": latitude, "longitude": longitude},
         },
       },
+      fetchPolicy: FetchPolicy.networkOnly,
     );
 
     final QueryResult result = await getGraphQLQuery(
