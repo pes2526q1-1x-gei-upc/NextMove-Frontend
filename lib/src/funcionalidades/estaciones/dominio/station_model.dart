@@ -245,6 +245,7 @@ class EVStationDetails extends StationDetails {
       isSuperFast: data['isSuperFast'] as bool?,
       connectors: connectors,
       accessType: data['accessType'] as String?,
+      isFavorite: data['isFavoriteStation'] as bool?,
     );
   }
 }
