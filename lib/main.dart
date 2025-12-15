@@ -23,6 +23,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart'; 
+
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -84,6 +86,7 @@ class NextMoveAppState extends State<NextMoveApp> {
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
           ChangeNotifierProvider.value(value: themeProvider),
+          ChangeNotifierProvider(create: (_) => StationsCache()),
           BlocProvider<UserBloc>(create: (_) => UserBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         ],

@@ -1,16 +1,10 @@
-
-
-
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/info_card_widget.dart';
 
 class BicycleStatsWidget extends StatelessWidget {
-  const BicycleStatsWidget({
-    super.key,
-    required this.station,
-  });
+  const BicycleStatsWidget({super.key, required this.station});
 
   final BicycleStationDetails station;
 
@@ -20,6 +14,7 @@ class BicycleStatsWidget extends StatelessWidget {
     final cardColor = Theme.of(context).cardColor;
     return Row(
       children: [
+        const SizedBox(width: 8),
         // --- Card 1: Mecánicas ---
         Expanded(
           child: InfoCard(

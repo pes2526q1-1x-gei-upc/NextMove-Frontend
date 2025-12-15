@@ -62,7 +62,8 @@ class GraphQLQueries {
         anclajesDisponibles,
         estado,
         bicisMecanicasDisponibles,
-        bicisElectricasDisponibles
+        bicisElectricasDisponibles,
+        isFavoriteStation
       }
     }''';
 
@@ -85,7 +86,7 @@ class GraphQLQueries {
         latitude
         longitude
       }
-      
+      isFavoriteStation
       distanciaKm
     }
   }''';
@@ -152,6 +153,7 @@ class GraphQLQueries {
           isSuperFast
           lastUpdated
           distance
+          isFavoriteStation
         }
       }
     }''';
@@ -174,6 +176,7 @@ class GraphQLQueries {
         status
       }
       isSuperFast
+      isFavoriteStation
     }
   }''';
 
@@ -284,5 +287,17 @@ class GraphQLQueries {
     query checkAssessed($station_id: String!){
       checkAssessed(station_id: $station_id)
     } 
+  ''';
+
+  static const String addFavStation = r'''
+    mutation addFavStation($stationId: String!, $stationType: String!) {
+      addFavStation(station_id: $stationId, type: $stationType)
+    }
+  ''';
+
+  static const String deleteFavStation = r'''
+    mutation deleteFavStation($stationId: String!, $stationType: String!) {
+      deleteFavStation(stationId: $stationId, type: $stationType)
+    }
   ''';
 }

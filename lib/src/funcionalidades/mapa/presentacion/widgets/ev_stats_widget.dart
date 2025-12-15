@@ -19,6 +19,7 @@ class EVStatsWidget extends StatelessWidget {
     final cardColor = Theme.of(context).cardColor;
     return Row(
       children: [
+        const SizedBox(width: 8),
         // --- Card 1: Disponibilidad ---
         Expanded(
           child: InfoCard(

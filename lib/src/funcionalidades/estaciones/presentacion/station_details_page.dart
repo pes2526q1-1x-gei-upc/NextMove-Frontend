@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_details_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_connectors_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_features_widget.dart';
@@ -9,9 +13,6 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_shared_widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_stats_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 
 class StationDetailsPage extends StatelessWidget {
   final StationType stationType;
@@ -32,10 +33,8 @@ class StationDetailsPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => StationDetailsBloc()
-            ..add(
-              LoadStationDetailsEvent(stationID, stationType, stationDetails),
-            ),
+          create: (context) => StationDetailsBloc(context.read<StationsCache>())
+            ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
         ),
         BlocProvider(
           create: (context) =>
@@ -108,6 +107,9 @@ class StationDetailsPage extends StatelessWidget {
                   return StationHeaderWidget(
                     station: displayStation,
                     themeColor: themeColor,
+                    onToggleFavorite: () => context.read<StationDetailsBloc>().add(
+                      ToggleFavoriteEvent(displayStation.id),
+                    ),
                   );
                 },
               ),

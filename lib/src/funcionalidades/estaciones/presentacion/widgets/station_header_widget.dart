@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
   final Color themeColor;
+  final VoidCallback? onToggleFavorite;
 
   const StationHeaderWidget({
     super.key,
     required this.station,
     required this.themeColor,
+    this.onToggleFavorite,
   });
 
   @override
@@ -30,6 +34,8 @@ class StationHeaderWidget extends StatelessWidget {
     final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     final assessmentState = context.watch<AssessmentBloc>().state;
+
+    final onPressed = onToggleFavorite;
 
     double? displayRating;
 
@@ -48,14 +54,40 @@ class StationHeaderWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- NOMBRE DE LA ESTACIÓN ---
-        Text(
-          station.name ?? l10n.unknown,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-            height: 1.2,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                station.name ?? l10n.unknown,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            Consumer<StationsCache>(
+              builder: (context, cache, child) {
+                final currentStation = cache.getStation(station.id);
+                final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
+                final starColor = switch (isFavorite) {
+                  true => Colors.yellow[700],
+                  false => null,
+                  null => Colors.grey[300],
+                };
+                return IconButton(
+                  icon: Icon(
+                    (isFavorite ?? false) ? Icons.star : Icons.star_border,
+                    color: starColor,
+                  ),
+                  onPressed: onPressed,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                );
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 8),
 

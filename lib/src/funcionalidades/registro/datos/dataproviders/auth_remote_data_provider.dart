@@ -14,6 +14,16 @@ import 'package:email_validator/email_validator.dart';
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
+  Future<String?> get authHeader async {
+    final fireBaseUser = FirebaseAuth.instance.currentUser;
+    String? authHeader = '';
+    if (fireBaseUser != null) {
+      final token = await fireBaseUser.getIdToken();
+      authHeader = 'Bearer $token';
+    }
+    return authHeader;
+  }
+
   Future<void> deleteAccount(String password) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {

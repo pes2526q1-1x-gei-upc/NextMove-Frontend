@@ -15,6 +15,7 @@ class StationDetails {
     final double? distanceKm;
     final double? latitude;
     final double? longitude;
+    bool? isFavorite;
 
     StationDetails({
     required this.id,
@@ -26,6 +27,7 @@ class StationDetails {
     this.latitude,
     this.longitude,
     this.distanceKm,
+    this.isFavorite,
     });
     
     StationDetails copyWith({double? rating}) {
@@ -67,6 +69,7 @@ class BicycleStationDetails extends StationDetails {
     super.latitude,
     super.longitude,
     super.distanceKm,
+    super.isFavorite,
     this.availableBikes,
     this.electricRechargeStation,
     this.canAnchorBikes,
@@ -114,6 +117,7 @@ class BicycleStationDetails extends StationDetails {
       if (data['sePuedeAnclarBicis'] == null) print('sePuedeAnclarBicis is null for bicycle station id: ${data['id']}');
       if (data['sePuedenAlquilarBicis'] == null) print('sePuedenAlquilarBicis is null for bicycle station id: ${data['id']}');
       if (data['estado'] == null) print('estado is null for bicycle station id: ${data['id']}');
+      if (data['isFavoriteStation'] == null) print('isFavoriteStation is null for bicycle station id: ${data['id']}');
     }
     return BicycleStationDetails(
       id: data['id'],
@@ -132,6 +136,7 @@ class BicycleStationDetails extends StationDetails {
       state: data['estado'] == "OPERATIVA" ? BicycleStationState.operational : data['estado'] == "CERRADA" ? BicycleStationState.closed : null,
       availableMechanicalBikes: data['bicisMecanicasDisponibles'] as int?,
       availableElectricBikes: data['bicisElectricasDisponibles'] as int?,
+      isFavorite: data['isFavoriteStation'] as bool?,
     );
   }
 }
@@ -169,6 +174,7 @@ class EVStationDetails extends StationDetails {
     super.latitude,
     super.longitude,
     super.distanceKm,
+    super.isFavorite,
     this.isSuperFast,
     this.connectors,
     this.accessType,
@@ -190,6 +196,7 @@ class EVStationDetails extends StationDetails {
       isSuperFast: isSuperFast,
       connectors: connectors,
       accessType: accessType,
+      isFavorite: isFavorite,
     );
   }
 
@@ -238,6 +245,7 @@ class EVStationDetails extends StationDetails {
       isSuperFast: data['isSuperFast'] as bool?,
       connectors: connectors,
       accessType: data['accessType'] as String?,
+      isFavorite: data['isFavoriteStation'] as bool?,
     );
   }
 }
