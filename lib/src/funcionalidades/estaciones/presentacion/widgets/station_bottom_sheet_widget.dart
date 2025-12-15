@@ -89,8 +89,8 @@ class StationBottomSheet extends StatelessWidget {
 
                         // --- CABECERA ---
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
                               child: Column(
@@ -119,79 +119,38 @@ class StationBottomSheet extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: themeColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.directions_walk_rounded,
+                                    size: 16,
+                                    color: themeColor,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: themeColor.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(12),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    station.distanceKm != null
+                                        ? '${station.distanceKm!.toStringAsFixed(1)} km'
+                                        : '- km',
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: themeColor,
+                                          fontSize: 12,
+                                        ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.directions_walk_rounded,
-                                        size: 16,
-                                        color: themeColor,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        station.distanceKm != null
-                                            ? '${station.distanceKm!.toStringAsFixed(1)} km'
-                                            : '- km',
-                                        style: theme.textTheme.labelMedium
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: themeColor,
-                                              fontSize: 12,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // --- Favorite toggle button ---
-                                BlocBuilder<StationListBloc, StationListState>(
-                                  builder: (context, state) {
-                                    final currentStation =
-                                        (state is StationListLoaded ||
-                                            state is StationListToggleError)
-                                        ? (state is StationListLoaded
-                                                  ? state.stations
-                                                  : (state as StationListToggleError)
-                                                        .stations)
-                                              .where((s) => s.id == station.id)
-                                              .firstOrNull
-                                        : null;
-                                    final isFavorite =
-                                        currentStation?.isFavorite ??
-                                        station.isFavorite;
-                                    final starColor = switch (isFavorite) {
-                                      true => Colors.yellow[700],
-                                      false => null,
-                                      null => Colors.grey[300],
-                                    };
-                                    return IconButton(
-                                      icon: Icon(
-                                        (isFavorite ?? false)
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        color: starColor,
-                                      ),
-                                      onPressed: () {
-                                        context.read<StationListBloc>().add(
-                                          ToggleFavoriteEvent(
-                                            stationId: station.id,
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            FavoriteToggleButton(station: station),
                           ],
                         ),
 
@@ -257,6 +216,8 @@ class StationBottomSheet extends StatelessWidget {
                             ? EVStatsWidget(station: station)
                             : const SizedBox.shrink(),
 
+                        const SizedBox(height: 20),
+
                         // --- BOTÓN DE ACCIÓN ---
                         SizedBox(
                           width: double.infinity,
@@ -309,6 +270,45 @@ class StationBottomSheet extends StatelessWidget {
               },
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class FavoriteToggleButton extends StatelessWidget {
+  const FavoriteToggleButton({super.key, required this.station});
+
+  final StationDetails station;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<StationListBloc, StationListState>(
+      builder: (context, state) {
+        final currentStation =
+            (state is StationListLoaded || state is StationListToggleError)
+            ? (state is StationListLoaded
+                      ? state.stations
+                      : (state as StationListToggleError).stations)
+                  .where((s) => s.id == station.id)
+                  .firstOrNull
+            : null;
+        final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
+        final starColor = switch (isFavorite) {
+          true => Colors.yellow[700],
+          false => null,
+          null => Colors.grey[300],
+        };
+        return IconButton(
+          icon: Icon(
+            (isFavorite ?? false) ? Icons.star : Icons.star_border,
+            color: starColor,
+          ),
+          onPressed: () {
+            context.read<StationListBloc>().add(
+              ToggleFavoriteEvent(stationId: station.id),
+            );
+          },
         );
       },
     );
