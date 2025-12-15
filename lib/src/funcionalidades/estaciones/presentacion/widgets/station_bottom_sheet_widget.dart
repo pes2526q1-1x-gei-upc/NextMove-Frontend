@@ -216,6 +216,8 @@ class StationBottomSheet extends StatelessWidget {
                             ? EVStatsWidget(station: station)
                             : const SizedBox.shrink(),
 
+                        const SizedBox(height: 20),
+
                         // --- BOTÓN DE ACCIÓN ---
                         SizedBox(
                           width: double.infinity,
