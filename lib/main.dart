@@ -22,6 +22,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_user_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart'; 
 
@@ -114,6 +115,7 @@ class NextMoveAppState extends State<NextMoveApp> {
                       create: (context) => AuthBloc(),
                       child: const WelcomePage(),
                     ),
+                '/blocked-user': (context) => const BlockedUserPage(),
               },
               home: AuthStateHandler(
                 client: GraphQLConfig.client,

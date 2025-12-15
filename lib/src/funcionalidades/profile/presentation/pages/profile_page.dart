@@ -199,6 +199,31 @@ class ProfilePage extends StatelessWidget {
                     const DeleteAccountButton(),
                     
                     const SizedBox(height: 30),
+
+                    // --- BOTÓN TEMPORAL PARA PRUEBA ---
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/blocked-user');
+                        },
+                        icon: const Icon(Icons.block_rounded, color: Colors.red),
+                        label: const Text(
+                          'Probar pantalla bloqueado (temporal)',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.withValues(alpha: 0.1),
+                          side: const BorderSide(color: Colors.red, width: 1),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+
                     // --- FOOTER ---
                     const AppFooter(),
 
