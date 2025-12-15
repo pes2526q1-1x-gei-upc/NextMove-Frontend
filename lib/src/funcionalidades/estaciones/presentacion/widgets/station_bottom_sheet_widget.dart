@@ -152,44 +152,7 @@ class StationBottomSheet extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                // --- Favorite toggle button ---
-                                BlocBuilder<StationListBloc, StationListState>(
-                                  builder: (context, state) {
-                                    final currentStation =
-                                        (state is StationListLoaded ||
-                                            state is StationListToggleError)
-                                        ? (state is StationListLoaded
-                                                  ? state.stations
-                                                  : (state as StationListToggleError)
-                                                        .stations)
-                                              .where((s) => s.id == station.id)
-                                              .firstOrNull
-                                        : null;
-                                    final isFavorite =
-                                        currentStation?.isFavorite ??
-                                        station.isFavorite;
-                                    final starColor = switch (isFavorite) {
-                                      true => Colors.yellow[700],
-                                      false => null,
-                                      null => Colors.grey[300],
-                                    };
-                                    return IconButton(
-                                      icon: Icon(
-                                        (isFavorite ?? false)
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        color: starColor,
-                                      ),
-                                      onPressed: () {
-                                        context.read<StationListBloc>().add(
-                                          ToggleFavoriteEvent(
-                                            stationId: station.id,
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
+                                FavoriteToggleButton(station: station),
                               ],
                             ),
                           ],
@@ -309,6 +272,56 @@ class StationBottomSheet extends StatelessWidget {
               },
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class FavoriteToggleButton extends StatelessWidget {
+  const FavoriteToggleButton({
+    super.key,
+    required this.station,
+  });
+
+  final StationDetails station;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<StationListBloc, StationListState>(
+      builder: (context, state) {
+        final currentStation =
+            (state is StationListLoaded ||
+                state is StationListToggleError)
+            ? (state is StationListLoaded
+                      ? state.stations
+                      : (state as StationListToggleError)
+                            .stations)
+                  .where((s) => s.id == station.id)
+                  .firstOrNull
+            : null;
+        final isFavorite =
+            currentStation?.isFavorite ??
+            station.isFavorite;
+        final starColor = switch (isFavorite) {
+          true => Colors.yellow[700],
+          false => null,
+          null => Colors.grey[300],
+        };
+        return IconButton(
+          icon: Icon(
+            (isFavorite ?? false)
+                ? Icons.star
+                : Icons.star_border,
+            color: starColor,
+          ),
+          onPressed: () {
+            context.read<StationListBloc>().add(
+              ToggleFavoriteEvent(
+                stationId: station.id,
+              ),
+            );
+          },
         );
       },
     );
