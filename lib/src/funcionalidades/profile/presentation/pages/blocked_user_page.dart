@@ -36,7 +36,7 @@ class BlockedUserPage extends StatelessWidget {
 
                 // Título
                 Text(
-                  'Cuenta suspendida',
+                  l10n.accountSuspended,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
@@ -48,7 +48,7 @@ class BlockedUserPage extends StatelessWidget {
 
                 // Mensaje explicativo
                 Text(
-                  'Tu cuenta ha sido suspendida temporalmente.',
+                  l10n.accountSuspendedMessage,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Theme.of(context).textTheme.bodyMedium?.color,
                         height: 1.5,
@@ -80,28 +80,28 @@ class BlockedUserPage extends StatelessWidget {
                       _buildInfoRow(
                         context,
                         Icons.access_time_rounded,
-                        'Duración',
-                        'Suspensión temporal',
+                        l10n.duration,
+                        'XX días?',
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
                         Icons.warning_rounded,
-                        'Motivo de suspensión',
-                        'Violación de normas de comunidad',
+                        l10n.suspensionReason,
+                        l10n.communityGuidelinesViolation,
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
                         Icons.support_agent_rounded,
-                        '¿Necesitas ayuda?',
-                        'Contacta con soporte',
+                        l10n.needHelp,
+                        l10n.contactSupport,
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
                         Icons.email_rounded,
-                        'Email',
+                        l10n.emailAddress,
                         'support@nextmove.com',
                       ),
                     ],
@@ -137,7 +137,7 @@ class BlockedUserPage extends StatelessWidget {
 
                 // Nota adicional
                 Text(
-                  'Revisa nuestras normas de comunidad para evitar futuras suspensiones.',
+                  l10n.reviewCommunityGuidelines,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                       ),

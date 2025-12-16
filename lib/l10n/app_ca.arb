@@ -231,5 +231,12 @@
     "errorDeletingAccount": "Error en eliminar el compte.",
     "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
-    "social": "Social"
+    "social": "Social",
+    "accountSuspendedMessage": "El seu compte ha sigut suspès.",
+    "accountSuspended": "Compte suspès",
+    "suspensionReason": "Motiu de la suspensió",
+    "communityGuidelinesViolation": "Incompliment de les normes de la comunitat",
+    "needHelp": "Necessites ajuda?",
+    "contactSupport": "Contacta amb el suport",
+    "reviewCommunityGuidelines": "Revisa les nostres normes de la comunitat per evitar futures suspensions."
 }
