@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -203,13 +204,17 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
+        _isBanned = meData['isBanned'] as bool? ?? false;
+
+        if (_isBanned) {
+          return;
+        }
+
         userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
-
-        _isBanned = true;
 
         final preferredLanguage = meData['preferredLanguage'] as String?;
         if (preferredLanguage != null) {
@@ -253,14 +258,23 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       debugPrint("User banned?: $_isBanned");
     }
 
-    return _isLoggedIn
-        ? _isBanned
-              ? const BlockedUserPage()
-              : const MainScreen()
-        : BlocProvider(
-            create: (context) => AuthBloc(),
-            child: const WelcomePage(),
-          );
+    if (_isBanned) {
+      UserRemoteDataProvider().logout();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushNamed('/blocked-user');
+      });
+      return BlocProvider(
+        create: (context) => AuthBloc(),
+        child: const WelcomePage(),
+      );
+    } else {
+      return _isLoggedIn
+          ? const MainScreen()
+          : BlocProvider(
+              create: (context) => AuthBloc(),
+              child: const WelcomePage(),
+            );
+    }
   }
 }
 
