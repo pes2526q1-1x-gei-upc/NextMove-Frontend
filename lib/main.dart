@@ -24,8 +24,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_user_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart'; 
-
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -112,9 +111,9 @@ class NextMoveAppState extends State<NextMoveApp> {
               themeMode: theme.themeMode,
               routes: {
                 '/login': (context) => BlocProvider(
-                      create: (context) => AuthBloc(),
-                      child: const WelcomePage(),
-                    ),
+                  create: (context) => AuthBloc(),
+                  child: const WelcomePage(),
+                ),
                 '/blocked-user': (context) => const BlockedUserPage(),
               },
               home: AuthStateHandler(
@@ -146,12 +145,31 @@ class AuthStateHandler extends StatefulWidget {
 class _AuthStateHandlerState extends State<AuthStateHandler> {
   bool _isLoadingUserData = true;
   bool _isLoggedIn = false;
+  bool _isBanned = false;
 
   @override
   void initState() {
     super.initState();
     _isLoggedIn = widget.isLoggedIn;
+    if (_isLoggedIn) {
+      _handleUserLogin(FirebaseAuth.instance.currentUser!);
+    }
     _setupAuthListener();
+  }
+
+  Future<void> _handleUserLogin(User user) async {
+    await _loadUserData(user);
+
+    if (mounted) {
+      context.read<UserBloc>().add(LoadUserProfile(user.uid));
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = true;
+        _isLoadingUserData = false;
+      });
+    }
   }
 
   void _setupAuthListener() {
@@ -161,18 +179,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       debugPrint("========================");
 
       if (user != null) {
-        await _loadUserData(user);
-
-        if (mounted) {
-          context.read<UserBloc>().add(LoadUserProfile(user.uid));
-        }
-
-        if (mounted) {
-          setState(() {
-            _isLoggedIn = true;
-            _isLoadingUserData = false;
-          });
-        }
+        await _handleUserLogin(user);
       } else {
         if (mounted) {
           userProvider.clearUser();
@@ -180,6 +187,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
           setState(() {
             _isLoggedIn = false;
             _isLoadingUserData = false;
+            _isBanned = false;
           });
         }
       }
@@ -187,9 +195,11 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
   }
 
   Future<void> _loadUserData(User user) async {
+    debugPrint("Loading user data for ${user.email}");
     try {
       final authService = AuthService(widget.client.value);
       final meData = await authService.getCurrentUser();
+      debugPrint("meData: $meData");
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
@@ -198,6 +208,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
+
+        _isBanned = true;
 
         final preferredLanguage = meData['preferredLanguage'] as String?;
         if (preferredLanguage != null) {
@@ -237,8 +249,14 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
+    if (kDebugMode) {
+      debugPrint("User banned?: $_isBanned");
+    }
+
     return _isLoggedIn
-        ? const MainScreen()
+        ? _isBanned
+              ? const BlockedUserPage()
+              : const MainScreen()
         : BlocProvider(
             create: (context) => AuthBloc(),
             child: const WelcomePage(),
@@ -303,7 +321,8 @@ class _MainScreenState extends State<MainScreen> {
               bottomNavTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
           selectedItemColor:
               bottomNavTheme.selectedItemColor ?? theme.colorScheme.primary,
-          unselectedItemColor: bottomNavTheme.unselectedItemColor ??
+          unselectedItemColor:
+              bottomNavTheme.unselectedItemColor ??
               theme.colorScheme.onSurface.withValues(alpha: 0.6),
           showSelectedLabels: false,
           showUnselectedLabels: false,
