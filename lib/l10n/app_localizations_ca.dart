@@ -618,4 +618,42 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get accountSuspendedMessage => 'El seu compte ha sigut suspès.';
+
+  @override
+  String get accountSuspended => 'Compte suspès';
+
+  @override
+  String get suspensionReason => 'Motiu de la suspensió';
+
+  @override
+  String get communityGuidelinesViolation =>
+      'Incompliment de les normes de la comunitat';
+
+  @override
+  String get needHelp => 'Necessites ajuda?';
+
+  @override
+  String get contactSupport => 'Contacta amb el suport';
+
+  @override
+  String get reviewCommunityGuidelines =>
+      'Revisa les nostres normes de la comunitat per evitar futures suspensions.';
+
+  @override
+  String get description => 'Descripció';
+
+  @override
+  String get days => 'dies';
+
+  @override
+  String get hours => 'hores';
+
+  @override
+  String get minutes => 'minuts';
+
+  @override
+  String get permanent => 'Permanent';
 }
