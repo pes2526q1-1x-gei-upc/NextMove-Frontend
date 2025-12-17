@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class BlockedUserPage extends StatelessWidget {
-  const BlockedUserPage({super.key});
+  final Map<String, dynamic>? banInfo;
+
+  const BlockedUserPage({super.key, this.banInfo});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(title: Text(l10n.accountSuspended)),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 20.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -38,9 +44,9 @@ class BlockedUserPage extends StatelessWidget {
                 Text(
                   l10n.accountSuspended,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -50,9 +56,9 @@ class BlockedUserPage extends StatelessWidget {
                 Text(
                   l10n.accountSuspendedMessage,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                        height: 1.5,
-                      ),
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    height: 1.5,
+                  ),
                   textAlign: TextAlign.center,
                 ),
 
@@ -77,18 +83,31 @@ class BlockedUserPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildInfoRow(
+                        _buildInfoRow(
                         context,
                         Icons.access_time_rounded,
                         l10n.duration,
-                        'XX días?',
+                        banInfo != null && banInfo!['duration'] != null
+                          ? _formatDurationInSeconds(banInfo!['duration'], l10n)
+                          : "N/A",
+                        ),
+                      const SizedBox(height: 16),
+                      _buildInfoRow(
+                        context,
+                        Icons.abc,
+                        l10n.description,
+                        banInfo != null
+                            ? (banInfo!['description'] as String?) ?? "N/A"
+                            : "N/A",
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
                         Icons.warning_rounded,
                         l10n.suspensionReason,
-                        l10n.communityGuidelinesViolation,
+                        banInfo != null
+                            ? (banInfo!['reason'] as String?) ?? "N/A"
+                            : "N/A",
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
@@ -118,7 +137,9 @@ class BlockedUserPage extends StatelessWidget {
                       // Aquí iría la lógica para contactar soporte
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Funcionalidad de contacto próximamente'),
+                          content: Text(
+                            'Funcionalidad de contacto próximamente',
+                          ),
                         ),
                       );
                     },
@@ -139,8 +160,10 @@ class BlockedUserPage extends StatelessWidget {
                 Text(
                   l10n.reviewCommunityGuidelines,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                      ),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -151,7 +174,12 @@ class BlockedUserPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, IconData icon, String title, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String value,
+  ) {
     return Row(
       children: [
         Container(
@@ -175,15 +203,17 @@ class BlockedUserPage extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                    ),
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                ),
               ),
               Text(
                 value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -191,4 +221,23 @@ class BlockedUserPage extends StatelessWidget {
       ],
     );
   }
+}
+
+String _formatDurationInSeconds(String i, AppLocalizations l10n) {
+  final int duration = int.tryParse(i) ?? 0;
+
+  if (duration <= 0) {
+    return l10n.permanent;
+  }
+
+  final days = duration ~/ 86400;
+  final hours = (duration % 86400) ~/ 3600;
+  final minutes = (duration % 3600) ~/ 60;
+
+  final parts = <String>[];
+  if (days > 0) parts.add('$days ${l10n.days}');
+  if (hours > 0) parts.add('$hours ${l10n.hours}');
+  if (minutes > 0) parts.add('$minutes ${l10n.minutes}');
+
+  return parts.join(' ');
 }

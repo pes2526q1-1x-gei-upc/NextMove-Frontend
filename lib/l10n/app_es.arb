@@ -248,5 +248,10 @@
     "communityGuidelinesViolation": "Violación de las normas de la comunidad",
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contacta con soporte",
-    "reviewCommunityGuidelines": "Revisa nuestras normas de comunidad para evitar futuras suspensiones."
+    "reviewCommunityGuidelines": "Revisa nuestras normas de comunidad para evitar futuras suspensiones.",
+    "description": "Descripción",
+    "days": "días",
+    "hours": "horas",
+    "minutes": "minutos",
+    "permanent": "Permanente"
 }

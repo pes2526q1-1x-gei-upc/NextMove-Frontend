@@ -14,6 +14,11 @@ class GraphQLQueries {
       preferredLanguage
       createdAt
       isBanned
+      banInfo {
+        reason
+        description
+        duration
+      }
     }
   }
   ''';

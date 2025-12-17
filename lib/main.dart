@@ -115,7 +115,6 @@ class NextMoveAppState extends State<NextMoveApp> {
                   create: (context) => AuthBloc(),
                   child: const WelcomePage(),
                 ),
-                '/blocked-user': (context) => const BlockedUserPage(),
               },
               home: AuthStateHandler(
                 client: GraphQLConfig.client,
@@ -147,6 +146,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
   bool _isLoadingUserData = true;
   bool _isLoggedIn = false;
   bool _isBanned = false;
+  Map<String, dynamic>? _banInfo;
+  bool _hasPushedBlockedPage = false;
 
   @override
   void initState() {
@@ -189,6 +190,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
             _isLoggedIn = false;
             _isLoadingUserData = false;
             _isBanned = false;
+            _hasPushedBlockedPage = false;
           });
         }
       }
@@ -207,6 +209,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         _isBanned = meData['isBanned'] as bool? ?? false;
 
         if (_isBanned) {
+          _banInfo = meData['banInfo'] as Map<String, dynamic>?;
           return;
         }
 
@@ -259,15 +262,23 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
     }
 
     if (_isBanned) {
-      UserRemoteDataProvider().logout();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushNamed('/blocked-user');
-      });
+      if (!_hasPushedBlockedPage) {
+        _hasPushedBlockedPage = true;
+        UserRemoteDataProvider().logout();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => BlockedUserPage(banInfo: _banInfo),
+            ),
+          );
+        });
+      }
       return BlocProvider(
         create: (context) => AuthBloc(),
         child: const WelcomePage(),
       );
     } else {
+      _hasPushedBlockedPage = false;
       return _isLoggedIn
           ? const MainScreen()
           : BlocProvider(

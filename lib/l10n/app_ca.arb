@@ -238,5 +238,10 @@
     "communityGuidelinesViolation": "Incompliment de les normes de la comunitat",
     "needHelp": "Necessites ajuda?",
     "contactSupport": "Contacta amb el suport",
-    "reviewCommunityGuidelines": "Revisa les nostres normes de la comunitat per evitar futures suspensions."
+    "reviewCommunityGuidelines": "Revisa les nostres normes de la comunitat per evitar futures suspensions.",
+    "description": "Descripció",
+    "days": "dies",
+    "hours": "hores",
+    "minutes": "minuts",
+    "permanent": "Permanent"
 }
