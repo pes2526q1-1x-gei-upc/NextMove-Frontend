@@ -1,4 +1,5 @@
 // lib/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -8,37 +9,8 @@ import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import 'chat_room_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-
-// Query para listar amigos (del módulo de friendship existente)
-const String listFriendsQuery = r'''
-  query ListFriends {
-    ListFriends {
-      name
-      photo
-    }
-  }
-''';
-
-// Query para obtener email de un usuario por nickname
-const String getUserEmailQuery = r'''
-  query GetUserEmail($nickname: String!) {
-    UsersByNickname(nickname: $nickname) {
-      nickname
-      email
-    }
-  }
-''';
-
-// Mutation para abrir chat directo
-const String getOrCreateDirectChatMutation = r'''
-  query GetOrCreateDirectChat($userEmail: String!) {
-    getOrCreateDirectChat(userEmail: $userEmail) {
-      id
-      type
-      name
-    }
-  }
-''';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/datasources/chat_queries.dart';
+import '../../../../../graphql/queries.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -48,6 +20,20 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -69,7 +55,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _openChatWithFriend(
     BuildContext context,
     String friendNickname,
-    String? friendEmail, // Pasar email directamente
+    String? friendEmail,
   ) async {
     final client = GraphQLProvider.of(context).value;
 
@@ -80,7 +66,7 @@ class _ChatListPageState extends State<ChatListPage> {
       if (email.isEmpty) {
         final emailResult = await client.query(
           QueryOptions(
-            document: gql(getUserEmailQuery),
+            document: gql(GraphQLQueries.getUsersByNickname),
             variables: {'nickname': friendNickname},
             fetchPolicy: FetchPolicy.networkOnly,
           ),
@@ -105,7 +91,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
       final chatResult = await client.query(
         QueryOptions(
-          document: gql(getOrCreateDirectChatMutation),
+          document: gql(getOrCreateDirectChatQuery),
           variables: {'userEmail': email},
           fetchPolicy: FetchPolicy.networkOnly,
         ),
@@ -146,171 +132,289 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chats'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implementar búsqueda
-            },
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
           ),
-        ],
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Chats',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
       ),
-      body: BlocBuilder<ChatBloc, ChatState>(
-        builder: (context, chatState) {
-          if (chatState is ChatConnecting) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Conectando al servidor...'),
-                ],
-              ),
-            );
-          }
-
-          if (chatState is ChatConnectionError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text('Error de conexión', style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 8),
-                  Text(chatState.message, textAlign: TextAlign.center),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _initializeChat,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Reintentar'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          // Cargar lista de amigos
-          return Query(
-            options: QueryOptions(
-              document: gql(listFriendsQuery),
-              fetchPolicy: FetchPolicy.networkOnly,
-            ),
-            builder: (result, {fetchMore, refetch}) {
-              if (result.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (result.hasException) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: theme.colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text('Error cargando amigos'),
-                      const SizedBox(height: 8),
-                      Text(result.exception.toString()),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => refetch!(),
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              final friends =
-                  result.data?['ListFriends'] as List<dynamic>? ?? [];
-
-              if (friends.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.people_outline,
-                        size: 64,
-                        color: theme.colorScheme.onSurface.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No tienes amigos aún',
-                        style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text('Agrega amigos para empezar a chatear'),
-                    ],
-                  ),
-                );
-              }
-
-              return RefreshIndicator(
-                onRefresh: () async => refetch!(),
-                child: ListView.separated(
-                  itemCount: friends.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                  itemBuilder: (context, index) {
-                    final friend = friends[index];
-                    final nickname = friend['name'] as String;
-                    final photo = friend['photo'] as String?;
-                    // El email ya no viene en ListFriends por problemas de schema backend
-                    final String? email = null;
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: photo != null
-                            ? NetworkImage(photo)
-                            : null,
-                        backgroundColor: theme.colorScheme.primaryContainer,
-                        child: photo == null
-                            ? Text(
-                                nickname[0].toUpperCase(),
-                                style: TextStyle(
-                                  color: theme.colorScheme.onPrimaryContainer,
-                                ),
-                              )
-                            : null,
-                      ),
-                      title: Text(nickname, style: theme.textTheme.titleMedium),
-                      subtitle: Text(
-                        'Toca para chatear',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                      trailing: Icon(
-                        Icons.chat_bubble_outline,
-                        color: theme.colorScheme.primary,
-                      ),
-                      onTap: () => _openChatWithFriend(context, nickname, email),
-                    );
-                  },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: Theme.of(context).brightness == Brightness.dark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
-              );
-            },
-          );
-        },
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  decoration: InputDecoration(
+                    hintText: 'Buscar chats...',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: _buildChatList(context),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
+
+  Widget _buildChatList(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, chatState) {
+        if (chatState is ChatConnecting) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Conectando al servidor...'),
+              ],
+            ),
+          );
+        }
+
+        if (chatState is ChatConnectionError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text('Error de conexión', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(chatState.message, textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: _initializeChat,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reintentar'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Cargar lista de amigos para mostrar como chats potenciales
+        return Query(
+          options: QueryOptions(
+            document: gql(GraphQLQueries.getFriends),
+            fetchPolicy: FetchPolicy.networkOnly,
+          ),
+          builder: (result, {fetchMore, refetch}) {
+            if (result.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (result.hasException) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Error cargando amigos'),
+                    const SizedBox(height: 8),
+                    Text(result.exception.toString()),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => refetch!(),
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final friends = result.data?['ListFriends'] as List<dynamic>? ?? [];
+
+            // Filtrar amigos basado en la búsqueda
+            final filteredFriends = _searchQuery.isEmpty
+                ? friends
+                : friends.where((friend) {
+                    final name = friend['name'] as String? ?? '';
+                    return name.toLowerCase().contains(_searchQuery.toLowerCase());
+                  }).toList();
+
+            if (friends.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 64,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No tienes amigos aún',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('Agrega amigos para empezar a chatear'),
+                  ],
+                ),
+              );
+            }
+
+            if (filteredFriends.isEmpty && _searchQuery.isNotEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search_off,
+                      size: 64,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No se encontraron amigos',
+                      style: theme.textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text('Prueba con otro término de búsqueda'),
+                  ],
+                ),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0, left: 4),
+                  child: Text(
+                    _searchQuery.isNotEmpty ? 'Resultados' : 'Tus amigos',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async => refetch!(),
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: filteredFriends.length,
+                      separatorBuilder: (context, index) => Divider(
+                        height: 1,
+                        color: theme.colorScheme.outlineVariant,
+                      ),
+                      itemBuilder: (context, index) {
+                        final friend = filteredFriends[index];
+                        return _buildFriendChatItem(context, friend);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFriendChatItem(BuildContext context, Map<String, dynamic> friend) {
+    final theme = Theme.of(context);
+    final friendName = friend['name'] as String;
+    final friendPhoto = friend['photo'] as String?;
+
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: friendPhoto != null
+            ? NetworkImage(friendPhoto)
+            : null,
+        backgroundColor: theme.colorScheme.primaryContainer,
+        child: friendPhoto == null
+            ? Text(
+                friendName[0].toUpperCase(),
+                style: TextStyle(
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+              )
+            : null,
+      ),
+      title: Text(friendName, style: theme.textTheme.titleMedium),
+      subtitle: Text(
+        'Toca para chatear',
+        style: theme.textTheme.bodySmall?.copyWith(
+          fontStyle: FontStyle.italic,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        ),
+      ),
+      trailing: Icon(
+        Icons.chat_bubble_outline,
+        color: theme.colorScheme.primary,
+      ),
+      onTap: () => _openChatWithFriend(context, friendName, null),
+    );
+  }
+
 }
