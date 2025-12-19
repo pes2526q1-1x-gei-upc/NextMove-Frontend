@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import '../../../../../config/socket_config.dart';
-import '../models/message_model.dart';
+import '../../../../../../config/socket_config.dart';
+import '../../models/message_model.dart';
 
 /// DataSource para comunicación en tiempo real con Socket.IO
 class SocketDataSource {

@@ -26,7 +26,7 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_pr
 
 import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/chat/datos/datasources/socket_datasource.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/data/dataproviders/socket_datasource.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository_impl.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();

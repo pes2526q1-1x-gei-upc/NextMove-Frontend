@@ -1,5 +1,5 @@
-import '../entities/message.dart';
-import '../entities/chat_room.dart';
+import '../../../dominio/entities/message.dart';
+import '../../../dominio/entities/chat_room.dart';
 
 /// Repositorio abstracto para operaciones de chat
 /// Define el contrato que debe cumplir la implementación

@@ -9,7 +9,6 @@ import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import 'chat_room_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/chat/datos/datasources/chat_queries.dart';
 import '../../../../../graphql/queries.dart';
 import '../widgets/chat_list_widgets.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';

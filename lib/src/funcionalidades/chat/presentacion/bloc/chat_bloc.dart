@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import '../../dominio/repositories/chat_repository.dart';
+import '../../datos/data/repositories/chat_repository.dart';
 import '../../dominio/entities/message.dart';
 import '../../datos/repositories/chat_repository_impl.dart';
 import '../../../../../config/socket_config.dart';

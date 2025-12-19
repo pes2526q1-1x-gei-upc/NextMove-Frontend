@@ -1,7 +1,7 @@
 import '../../dominio/entities/message.dart';
 import '../../dominio/entities/chat_room.dart';
-import '../../dominio/repositories/chat_repository.dart';
-import '../datasources/socket_datasource.dart';
+import '../data/repositories/chat_repository.dart';
+import '../data/dataproviders/socket_datasource.dart';
 
 /// Implementación concreta del ChatRepository
 /// Utiliza SocketDataSource para comunicación en tiempo real
