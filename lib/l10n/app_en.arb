@@ -239,5 +239,22 @@
     "errorDeletingAccount": "Error deleting account.",
     "accountDeletedSuccessfully": "The account has been deleted successfully.",
     "userMismatch": "The user does not match the current user.",
-    "social": "Social"
+    "social": "Social",
+
+    "chats": "Chats",
+    "connectingToServer": "Connecting to server...",
+    "connectionError": "Connection error",
+    "retry": "Retry",
+    "errorLoadingFriends": "Error loading friends",
+    "noFriendsYet": "You don't have friends yet",
+    "addFriendsToStartChatting": "Add friends to start chatting",
+    "noFriendsFound": "No friends found",
+    "tryAnotherSearchTerm": "Try another search term",
+    "results": "Results",
+    "groupResults": "Group results",
+    "tapToChat": "Tap to chat",
+    "searchChats": "Search chats...",
+    "searchGroups": "Search groups...",
+    "noGroupsAvailable": "You haven't joined any groups yet",
+    "groupsComingSoon": "Search groups to join one"
 }

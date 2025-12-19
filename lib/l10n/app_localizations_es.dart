@@ -380,7 +380,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noFriendsAdded => 'Aún no tienes amigos añadidos.';
 
   @override
-  String get results => 'RESULTADOS';
+  String get results => 'Resultados';
 
   @override
   String get yourFriends => 'TUS AMIGOS';
@@ -618,4 +618,47 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get chats => 'Chats';
+
+  @override
+  String get connectingToServer => 'Conectando al servidor...';
+
+  @override
+  String get connectionError => 'Error de conexión';
+
+  @override
+  String get errorLoadingFriends => 'Error cargando amigos';
+
+  @override
+  String get noFriendsYet => 'No tienes amigos aún';
+
+  @override
+  String get addFriendsToStartChatting =>
+      'Agrega amigos para empezar a chatear';
+
+  @override
+  String get noFriendsFound => 'No se encontraron amigos';
+
+  @override
+  String get tryAnotherSearchTerm => 'Prueba con otro término de búsqueda';
+
+  @override
+  String get groupResults => 'Resultados de grupos';
+
+  @override
+  String get tapToChat => 'Toca para chatear';
+
+  @override
+  String get searchChats => 'Buscar chats...';
+
+  @override
+  String get searchGroups => 'Buscar grupos...';
+
+  @override
+  String get noGroupsAvailable => 'No te has unido a ningún grupo aún';
+
+  @override
+  String get groupsComingSoon => 'Busca grupos para unirte a uno';
 }

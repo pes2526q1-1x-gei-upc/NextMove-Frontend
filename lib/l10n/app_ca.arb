@@ -231,5 +231,22 @@
     "errorDeletingAccount": "Error en eliminar el compte.",
     "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
-    "social": "Social"
+    "social": "Social",
+
+    "chats": "Xats",
+    "connectingToServer": "Connectant al servidor...",
+    "connectionError": "Error de connexió",
+    "retry": "Tornar-ho a provar",
+    "errorLoadingFriends": "Error carregant amics",
+    "noFriendsYet": "Encara no tens amics",
+    "addFriendsToStartChatting": "Afegeix amics per començar a xatejar",
+    "noFriendsFound": "No s'han trobat amics",
+    "tryAnotherSearchTerm": "Prova amb un altre terme de cerca",
+    "results": "Resultats",
+    "groupResults": "Resultats de grups",
+    "tapToChat": "Toca per xatejar",
+    "searchChats": "Cercar xats...",
+    "searchGroups": "Cercar grups...",
+    "noGroupsAvailable": "No t'has unit a cap grup encara",
+    "groupsComingSoon": "Busca grups per unir-te a un"
 }

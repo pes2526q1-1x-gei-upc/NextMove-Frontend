@@ -241,5 +241,22 @@
     "errorDeletingAccount": "Error al eliminar la cuenta.",
     "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
     "userMismatch": "El usuario no coincide con el usuario actual.",
-    "social": "Social"
+    "social": "Social",
+
+    "chats": "Chats",
+    "connectingToServer": "Conectando al servidor...",
+    "connectionError": "Error de conexión",
+    "retry": "Reintentar",
+    "errorLoadingFriends": "Error cargando amigos",
+    "noFriendsYet": "No tienes amigos aún",
+    "addFriendsToStartChatting": "Agrega amigos para empezar a chatear",
+    "noFriendsFound": "No se encontraron amigos",
+    "tryAnotherSearchTerm": "Prueba con otro término de búsqueda",
+    "results": "Resultados",
+    "groupResults": "Resultados de grupos",
+    "tapToChat": "Toca para chatear",
+    "searchChats": "Buscar chats...",
+    "searchGroups": "Buscar grupos...",
+    "noGroupsAvailable": "No te has unido a ningún grupo aún",
+    "groupsComingSoon": "Busca grupos para unirte a uno"
 }

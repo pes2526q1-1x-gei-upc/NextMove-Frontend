@@ -811,7 +811,7 @@ abstract class AppLocalizations {
   /// No description provided for @results.
   ///
   /// In en, this message translates to:
-  /// **'RESULTS'**
+  /// **'Results'**
   String get results;
 
   /// No description provided for @yourFriends.
@@ -1257,6 +1257,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Social'**
   String get social;
+
+  /// No description provided for @chats.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get chats;
+
+  /// No description provided for @connectingToServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to server...'**
+  String get connectingToServer;
+
+  /// No description provided for @connectionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error'**
+  String get connectionError;
+
+  /// No description provided for @errorLoadingFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading friends'**
+  String get errorLoadingFriends;
+
+  /// No description provided for @noFriendsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have friends yet'**
+  String get noFriendsYet;
+
+  /// No description provided for @addFriendsToStartChatting.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friends to start chatting'**
+  String get addFriendsToStartChatting;
+
+  /// No description provided for @noFriendsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends found'**
+  String get noFriendsFound;
+
+  /// No description provided for @tryAnotherSearchTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another search term'**
+  String get tryAnotherSearchTerm;
+
+  /// No description provided for @groupResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Group results'**
+  String get groupResults;
+
+  /// No description provided for @tapToChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to chat'**
+  String get tapToChat;
+
+  /// No description provided for @searchChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Search chats...'**
+  String get searchChats;
+
+  /// No description provided for @searchGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Search groups...'**
+  String get searchGroups;
+
+  /// No description provided for @noGroupsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t joined any groups yet'**
+  String get noGroupsAvailable;
+
+  /// No description provided for @groupsComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Search groups to join one'**
+  String get groupsComingSoon;
 }
 
 class _AppLocalizationsDelegate

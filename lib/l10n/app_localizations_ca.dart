@@ -380,7 +380,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get noFriendsAdded => 'Encara no tens amics afegits.';
 
   @override
-  String get results => 'RESULTATS';
+  String get results => 'Resultats';
 
   @override
   String get yourFriends => 'ELS TEUS AMICS';
@@ -571,7 +571,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get errorLoadingReviews => 'Error en carregar les valoracions';
 
   @override
-  String get retry => 'Reintentar';
+  String get retry => 'Tornar-ho a provar';
 
   @override
   String get firstToReview => 'Sigues el primer a valorar aquesta estació!';
@@ -618,4 +618,47 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get chats => 'Xats';
+
+  @override
+  String get connectingToServer => 'Connectant al servidor...';
+
+  @override
+  String get connectionError => 'Error de connexió';
+
+  @override
+  String get errorLoadingFriends => 'Error carregant amics';
+
+  @override
+  String get noFriendsYet => 'Encara no tens amics';
+
+  @override
+  String get addFriendsToStartChatting =>
+      'Afegeix amics per començar a xatejar';
+
+  @override
+  String get noFriendsFound => 'No s\'han trobat amics';
+
+  @override
+  String get tryAnotherSearchTerm => 'Prova amb un altre terme de cerca';
+
+  @override
+  String get groupResults => 'Resultats de grups';
+
+  @override
+  String get tapToChat => 'Toca per xatejar';
+
+  @override
+  String get searchChats => 'Cercar xats...';
+
+  @override
+  String get searchGroups => 'Cercar grups...';
+
+  @override
+  String get noGroupsAvailable => 'No t\'has unit a cap grup encara';
+
+  @override
+  String get groupsComingSoon => 'Busca grups per unir-te a un';
 }
