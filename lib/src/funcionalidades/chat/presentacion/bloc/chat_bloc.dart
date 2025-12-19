@@ -161,16 +161,13 @@ Future<void> _onInitializeChat(
 
       // Unirse a la nueva sala
       await _chatRepository.joinRoom(event.roomId);
-      
+
       _currentRoomId = event.roomId;
       _messages.clear();
       _usersTyping.clear();
 
-      emit(ChatRoomActive(
-        roomId: event.roomId,
-        messages: List.from(_messages),
-        usersTyping: Set.from(_usersTyping),
-      ));
+      // Cargar historial de mensajes después de unirse
+      add(LoadMessageHistory(roomId: event.roomId, limit: 50));
 
       debugPrint('[ChatBloc] ✅ Unido a sala: ${event.roomId}');
     } catch (e) {
