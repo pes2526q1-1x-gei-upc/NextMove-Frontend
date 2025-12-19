@@ -137,13 +137,6 @@ class _ChatListPageState extends State<ChatListPage> {
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            size: 20,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Text(
           'Chats',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -359,13 +352,10 @@ class _ChatListPageState extends State<ChatListPage> {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async => refetch!(),
-                    child: ListView.separated(
+                    child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(top: 8, bottom: 16),
                       itemCount: filteredFriends.length,
-                      separatorBuilder: (context, index) => Divider(
-                        height: 1,
-                        color: theme.colorScheme.outlineVariant,
-                      ),
                       itemBuilder: (context, index) {
                         final friend = filteredFriends[index];
                         return _buildFriendChatItem(context, friend);
@@ -386,34 +376,59 @@ class _ChatListPageState extends State<ChatListPage> {
     final friendName = friend['name'] as String;
     final friendPhoto = friend['photo'] as String?;
 
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: friendPhoto != null
-            ? NetworkImage(friendPhoto)
-            : null,
-        backgroundColor: theme.colorScheme.primaryContainer,
-        child: friendPhoto == null
-            ? Text(
-                friendName[0].toUpperCase(),
-                style: TextStyle(
-                  color: theme.colorScheme.onPrimaryContainer,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: theme.brightness == Brightness.dark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              )
-            : null,
+              ],
       ),
-      title: Text(friendName, style: theme.textTheme.titleMedium),
-      subtitle: Text(
-        'Toca para chatear',
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontStyle: FontStyle.italic,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        leading: CircleAvatar(
+          radius: 28,
+          backgroundImage: friendPhoto != null
+              ? NetworkImage(friendPhoto)
+              : null,
+          backgroundColor: theme.colorScheme.primaryContainer,
+          child: friendPhoto == null
+              ? Text(
+                  friendName[0].toUpperCase(),
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                )
+              : null,
+        ),
+        title: Text(
+          friendName,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        subtitle: Text(
+          'Toca para chatear',
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontStyle: FontStyle.italic,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        onTap: () => _openChatWithFriend(context, friendName, null),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
       ),
-      trailing: Icon(
-        Icons.chat_bubble_outline,
-        color: theme.colorScheme.primary,
-      ),
-      onTap: () => _openChatWithFriend(context, friendName, null),
     );
   }
 
