@@ -661,4 +661,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get groupsComingSoon => 'Busca grupos para unirte a uno';
+
+  @override
+  String get noMessagesYet => 'No hay mensajes aún.\n¡Envía el primero!';
+
+  @override
+  String get typing => 'escribiendo...';
+
+  @override
+  String get back => 'Volver';
+
+  @override
+  String get loadingRoom => 'Cargando sala...';
+
+  @override
+  String get writeAMessage => 'Escribe un mensaje...';
 }

@@ -661,4 +661,20 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get groupsComingSoon => 'Busca grups per unir-te a un';
+
+  @override
+  String get noMessagesYet =>
+      'No hi ha missatges encara.\nSigues el primer a enviar-ne!';
+
+  @override
+  String get typing => 'escrivint...';
+
+  @override
+  String get back => 'Enrere';
+
+  @override
+  String get loadingRoom => 'Carregant sala...';
+
+  @override
+  String get writeAMessage => 'Escriu un missatge...';
 }

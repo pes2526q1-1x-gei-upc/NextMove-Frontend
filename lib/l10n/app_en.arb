@@ -256,5 +256,10 @@
     "searchChats": "Search chats...",
     "searchGroups": "Search groups...",
     "noGroupsAvailable": "You haven't joined any groups yet",
-    "groupsComingSoon": "Search groups to join one"
+    "groupsComingSoon": "Search groups to join one",
+    "noMessagesYet": "No messages yet.\nBe the first to send one!",
+    "typing": "typing...",
+    "back": "Back",
+    "loadingRoom": "Loading room...",
+    "writeAMessage": "Write a message..."
 }

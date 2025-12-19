@@ -1341,6 +1341,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search groups to join one'**
   String get groupsComingSoon;
+
+  /// No description provided for @noMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet.\nBe the first to send one!'**
+  String get noMessagesYet;
+
+  /// No description provided for @typing.
+  ///
+  /// In en, this message translates to:
+  /// **'typing...'**
+  String get typing;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @loadingRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading room...'**
+  String get loadingRoom;
+
+  /// No description provided for @writeAMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message...'**
+  String get writeAMessage;
 }
 
 class _AppLocalizationsDelegate

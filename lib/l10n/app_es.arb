@@ -258,5 +258,10 @@
     "searchChats": "Buscar chats...",
     "searchGroups": "Buscar grupos...",
     "noGroupsAvailable": "No te has unido a ningún grupo aún",
-    "groupsComingSoon": "Busca grupos para unirte a uno"
+    "groupsComingSoon": "Busca grupos para unirte a uno",
+    "noMessagesYet": "No hay mensajes aún.\n¡Envía el primero!",
+    "typing": "escribiendo...",
+    "back": "Volver",
+    "loadingRoom": "Cargando sala...",
+    "writeAMessage": "Escribe un mensaje..."
 }

@@ -6,6 +6,7 @@ class Message extends Equatable {
   final String roomId;
   final String senderId;
   final String senderName;
+  final String? senderPhoto;
   final String content;
   final String type;
   final DateTime timestamp;
@@ -16,6 +17,7 @@ class Message extends Equatable {
     required this.roomId,
     required this.senderId,
     required this.senderName,
+    this.senderPhoto,
     required this.content,
     this.type = 'text',
     required this.timestamp,
@@ -38,6 +40,7 @@ class Message extends Equatable {
     String? roomId,
     String? senderId,
     String? senderName,
+    String? senderPhoto,
     String? content,
     String? type,
     DateTime? timestamp,
@@ -48,6 +51,7 @@ class Message extends Equatable {
       roomId: roomId ?? this.roomId,
       senderId: senderId ?? this.senderId,
       senderName: senderName ?? this.senderName,
+      senderPhoto: senderPhoto ?? this.senderPhoto,
       content: content ?? this.content,
       type: type ?? this.type,
       timestamp: timestamp ?? this.timestamp,
@@ -61,6 +65,7 @@ class Message extends Equatable {
         roomId,
         senderId,
         senderName,
+        senderPhoto,
         content,
         type,
         timestamp,

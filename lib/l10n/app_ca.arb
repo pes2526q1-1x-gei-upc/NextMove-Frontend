@@ -248,5 +248,10 @@
     "searchChats": "Cercar xats...",
     "searchGroups": "Cercar grups...",
     "noGroupsAvailable": "No t'has unit a cap grup encara",
-    "groupsComingSoon": "Busca grups per unir-te a un"
+    "groupsComingSoon": "Busca grups per unir-te a un",
+    "noMessagesYet": "No hi ha missatges encara.\nSigues el primer a enviar-ne!",
+    "typing": "escrivint...",
+    "back": "Enrere",
+    "loadingRoom": "Carregant sala...",
+    "writeAMessage": "Escriu un missatge..."
 }

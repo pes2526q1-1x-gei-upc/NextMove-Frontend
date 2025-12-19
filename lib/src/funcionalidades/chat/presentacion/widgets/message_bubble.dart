@@ -6,12 +6,14 @@ class MessageBubble extends StatelessWidget {
   final Message message;
   final bool isMe;
   final bool showSender;
+  final bool showMyAvatar;
 
   const MessageBubble({
     super.key,
     required this.message,
     required this.isMe,
     this.showSender = true,
+    this.showMyAvatar = false,
   });
 
   @override
@@ -30,13 +32,18 @@ class MessageBubble extends StatelessWidget {
             CircleAvatar(
               radius: 16,
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                message.senderName[0].toUpperCase(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onPrimaryContainer,
-                ),
-              ),
+              backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                  ? NetworkImage(message.senderPhoto!)
+                  : null,
+              child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                  ? Text(
+                      message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 8),
           ],
@@ -99,7 +106,26 @@ class MessageBubble extends StatelessWidget {
               ],
             ),
           ),
-          if (isMe) const SizedBox(width: 40),
+          if (showMyAvatar && isMe) ...[
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: theme.colorScheme.secondaryContainer,
+              backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                  ? NetworkImage(message.senderPhoto!)
+                  : null,
+              child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                  ? Text(
+                      message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.colorScheme.onSecondaryContainer,
+                      ),
+                    )
+                  : null,
+            ),
+          ] else if (isMe)
+            const SizedBox(width: 40),
           if (!isMe) const SizedBox(width: 40),
         ],
       ),

@@ -654,4 +654,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get groupsComingSoon => 'Search groups to join one';
+
+  @override
+  String get noMessagesYet => 'No messages yet.\nBe the first to send one!';
+
+  @override
+  String get typing => 'typing...';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get loadingRoom => 'Loading room...';
+
+  @override
+  String get writeAMessage => 'Write a message...';
 }
