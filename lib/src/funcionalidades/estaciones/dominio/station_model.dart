@@ -101,7 +101,7 @@ class BicycleStationDetails extends StationDetails {
 
   factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
     // print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
-    /*if (kDebugMode) {
+    if (kDebugMode) {
       if (data['id'] == null) print('id is null for bicycle station');
       if (data['nombre'] == null) print('nombre is null for bicycle station id: ${data['id']}');
       if (data['direccion'] == null) print('direccion is null for bicycle station id: ${data['id']}');
@@ -114,7 +114,7 @@ class BicycleStationDetails extends StationDetails {
       if (data['sePuedeAnclarBicis'] == null) print('sePuedeAnclarBicis is null for bicycle station id: ${data['id']}');
       if (data['sePuedenAlquilarBicis'] == null) print('sePuedenAlquilarBicis is null for bicycle station id: ${data['id']}');
       if (data['estado'] == null) print('estado is null for bicycle station id: ${data['id']}');
-    }*/
+    }
     return BicycleStationDetails(
       id: data['id'],
       name: data['nombre'] as String?,
@@ -198,12 +198,11 @@ class EVStationDetails extends StationDetails {
     if (data['connectors'] != null) {
       connectors = [];
       for (var connectorData in data['connectors']) {
-        /*
         if (kDebugMode) {
           if (connectorData['type'] == null) print('connector type is null for EV station id: ${data['id']}');
           if (connectorData['powerKw'] == null) print('connector powerKw is null for EV station id: ${data['id']}');
           if (connectorData['status'] == null) print('connector status is null for EV station id: ${data['id']}');
-        }*/
+        }
         connectors.add(Connector(
           connectionType: ConnectionType.values.firstWhere(
             (e) => e.name.toUpperCase() == (connectorData['type'] as String?)?.toUpperCase(),
@@ -217,7 +216,6 @@ class EVStationDetails extends StationDetails {
         ));
       }
     }
-    /*
     if (kDebugMode) {
       if (data['id'] == null) print('id is null for EV station');
       if (data['name'] == null) print('name is null for EV station id: ${data['id']}');
@@ -225,7 +223,7 @@ class EVStationDetails extends StationDetails {
       if (data['coordinates'] == null || data['coordinates']['latitude'] == null || data['coordinates']['longitude'] == null) print('coordinates is null for EV station id: ${data['id']}');
       if (data['isSuperFast'] == null) print('isSuperFast is null for EV station id: ${data['id']}');
       if (data['accessType'] == null) print('accessType is null for EV station id: ${data['id']}');
-    }*/
+    }
     // print('Parsing EV station: id=${data['id']}, name=${data['name']}');
     return EVStationDetails(
       id: data['id'],

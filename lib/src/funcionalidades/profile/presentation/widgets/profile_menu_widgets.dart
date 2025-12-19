@@ -29,6 +29,10 @@ class ProfileHeaderWidget extends StatelessWidget {
     } else {
       backgroundImage = null;
       avatarChild = const Icon(Icons.person, size: 40, color: Colors.grey);
+
+      if (kDebugMode) {
+        print('ProfileHeader: No photo URL provided, showing default icon');
+      }
     }
 
     return Row(
