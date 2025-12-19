@@ -36,13 +36,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.didChangeDependencies();
     // Guardar referencia al ChatBloc para usarlo en dispose()
     _chatBloc = context.read<ChatBloc>();
+    // Unirse a la sala al entrar (aquí ya tenemos acceso al ChatBloc)
+    _chatBloc.add(JoinChatRoom(widget.roomId));
   }
 
   @override
   void initState() {
     super.initState();
-    // Unirse a la sala al entrar
-    _chatBloc.add(JoinChatRoom(widget.roomId));
+    // initState() se ejecuta antes que didChangeDependencies()
   }
 
   @override
