@@ -11,6 +11,8 @@ import 'chat_room_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/datos/datasources/chat_queries.dart';
 import '../../../../../graphql/queries.dart';
+import '../widgets/chat_list_widgets.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -22,6 +24,16 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _showFriends = true; // true = amigos, false = grupos
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializar chat automáticamente al abrir la pantalla
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeChat();
+    });
+  }
 
   @override
   void dispose() {
@@ -33,11 +45,6 @@ class _ChatListPageState extends State<ChatListPage> {
     setState(() {
       _searchQuery = query;
     });
-  }
-  @override
-  void initState() {
-    super.initState();
-    _initializeChat();
   }
 
   Future<void> _initializeChat() async {
@@ -57,6 +64,7 @@ class _ChatListPageState extends State<ChatListPage> {
     String friendNickname,
     String? friendEmail,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final client = GraphQLProvider.of(context).value;
 
     try {
@@ -109,7 +117,7 @@ class _ChatListPageState extends State<ChatListPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error}: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -132,13 +140,14 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Chats',
+          l10n.chats,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: 26,
                 fontWeight: FontWeight.w600,
@@ -147,50 +156,22 @@ class _ChatListPageState extends State<ChatListPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: Theme.of(context).brightness == Brightness.dark
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: 'Buscar chats...',
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                _searchQuery = '';
-                              });
-                            },
-                          )
-                        : null,
-                  ),
-                ),
+              // Barra de búsqueda y toggle
+              ChatSearchBar(
+                controller: _searchController,
+                showFriends: _showFriends,
+                onToggleChanged: (isFriends) {
+                  setState(() {
+                    _showFriends = isFriends;
+                  });
+                },
+                onSearchChanged: _onSearchChanged,
               ),
+
               const SizedBox(height: 24),
               Expanded(
                 child: _buildChatList(context),
@@ -204,17 +185,18 @@ class _ChatListPageState extends State<ChatListPage> {
 
   Widget _buildChatList(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, chatState) {
         if (chatState is ChatConnecting) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Conectando al servidor...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.connectingToServer),
               ],
             ),
           );
@@ -231,14 +213,14 @@ class _ChatListPageState extends State<ChatListPage> {
                   color: theme.colorScheme.error,
                 ),
                 const SizedBox(height: 16),
-                Text('Error de conexión', style: theme.textTheme.titleLarge),
-                const SizedBox(height: 8),
-                Text(chatState.message, textAlign: TextAlign.center),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: _initializeChat,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reintentar'),
+                  Text(l10n.connectionError, style: theme.textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  Text(chatState.message, textAlign: TextAlign.center),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _initializeChat,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(l10n.retry),
                 ),
               ],
             ),
@@ -246,6 +228,8 @@ class _ChatListPageState extends State<ChatListPage> {
         }
 
         // Cargar lista de amigos para mostrar como chats potenciales
+        // TODO: Cuando se implemente grupos en el backend, aquí debería hacerse una query diferente
+        // o agregar una segunda query para obtener los grupos del usuario
         return Query(
           options: QueryOptions(
             document: gql(GraphQLQueries.getFriends),
@@ -261,19 +245,19 @@ class _ChatListPageState extends State<ChatListPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: theme.colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Error cargando amigos'),
-                    const SizedBox(height: 8),
-                    Text(result.exception.toString()),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => refetch!(),
-                      child: const Text('Reintentar'),
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(l10n.errorLoadingFriends),
+                      const SizedBox(height: 8),
+                      Text(result.exception.toString()),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => refetch!(),
+                        child: Text(l10n.retry),
                     ),
                   ],
                 ),
@@ -290,23 +274,33 @@ class _ChatListPageState extends State<ChatListPage> {
                     return name.toLowerCase().contains(_searchQuery.toLowerCase());
                   }).toList();
 
+            // TODO: Implementar búsqueda de grupos cuando esté disponible en el backend
+            // Cuando se implemente la query para obtener grupos del usuario:
+            // final groups = result.data?['userGroups'] as List<dynamic>? ?? [];
+            // final filteredGroups = _searchQuery.isEmpty
+            //     ? groups
+            //     : groups.where((group) {
+            //         final name = group['name'] as String? ?? '';
+            //         return name.toLowerCase().contains(_searchQuery.toLowerCase());
+            //       }).toList();
+
             if (friends.isEmpty) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.people_outline,
-                      size: 64,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No tienes amigos aún',
-                      style: theme.textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text('Agrega amigos para empezar a chatear'),
+                      Icon(
+                        Icons.people_outline,
+                        size: 64,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.noFriendsYet,
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(l10n.addFriendsToStartChatting),
                   ],
                 ),
               );
@@ -324,11 +318,11 @@ class _ChatListPageState extends State<ChatListPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No se encontraron amigos',
+                      l10n.noFriendsFound,
                       style: theme.textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
-                    Text('Prueba con otro término de búsqueda'),
+                    Text(l10n.tryAnotherSearchTerm),
                   ],
                 ),
               );
@@ -337,98 +331,36 @@ class _ChatListPageState extends State<ChatListPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0, left: 4),
-                  child: Text(
-                    _searchQuery.isNotEmpty ? 'Resultados' : 'Tus amigos',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
-                      letterSpacing: 0.8,
+                // Título de resultados
+                if (_searchQuery.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0, left: 4),
+                    child: Text(
+                      _showFriends ? l10n.results : l10n.groupResults, // TODO: Cambiar cuando se implemente búsqueda de grupos
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[600],
+                        letterSpacing: 0.8,
+                      ),
                     ),
                   ),
-                ),
+
                 Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () async => refetch!(),
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.only(top: 8, bottom: 16),
-                      itemCount: filteredFriends.length,
-                      itemBuilder: (context, index) {
-                        final friend = filteredFriends[index];
-                        return _buildFriendChatItem(context, friend);
-                      },
-                    ),
-                  ),
+                  child: _showFriends
+                      ? FriendsList(
+                          theme: theme,
+                          filteredFriends: filteredFriends,
+                          onRefresh: () => refetch!(),
+                          onFriendTap: (friend) => _openChatWithFriend(context, friend['name'] as String, null),
+                        )
+                      : GroupsList(theme: theme), // TODO: Pasar filteredGroups cuando se implemente búsqueda de grupos
                 ),
               ],
             );
           },
         );
       },
-    );
-  }
-
-  Widget _buildFriendChatItem(BuildContext context, Map<String, dynamic> friend) {
-    final theme = Theme.of(context);
-    final friendName = friend['name'] as String;
-    final friendPhoto = friend['photo'] as String?;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: theme.brightness == Brightness.dark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: CircleAvatar(
-          radius: 28,
-          backgroundImage: friendPhoto != null
-              ? NetworkImage(friendPhoto)
-              : null,
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: friendPhoto == null
-              ? Text(
-                  friendName[0].toUpperCase(),
-                  style: TextStyle(
-                    color: theme.colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                  ),
-                )
-              : null,
-        ),
-        title: Text(
-          friendName,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          'Toca para chatear',
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontStyle: FontStyle.italic,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
-        onTap: () => _openChatWithFriend(context, friendName, null),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-      ),
     );
   }
 
