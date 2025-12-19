@@ -26,21 +26,29 @@ class ChatRoomPage extends StatefulWidget {
 class _ChatRoomPageState extends State<ChatRoomPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
-  
+
   bool _isTyping = false;
   DateTime? _lastTypingTime;
+  late ChatBloc _chatBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Guardar referencia al ChatBloc para usarlo en dispose()
+    _chatBloc = context.read<ChatBloc>();
+  }
 
   @override
   void initState() {
     super.initState();
     // Unirse a la sala al entrar
-    context.read<ChatBloc>().add(JoinChatRoom(widget.roomId));
+    _chatBloc.add(JoinChatRoom(widget.roomId));
   }
 
   @override
   void dispose() {
     // Salir de la sala al cerrar
-    context.read<ChatBloc>().add(LeaveChatRoom(widget.roomId));
+    _chatBloc.add(LeaveChatRoom(widget.roomId));
     _scrollController.dispose();
     _messageController.dispose();
     super.dispose();
