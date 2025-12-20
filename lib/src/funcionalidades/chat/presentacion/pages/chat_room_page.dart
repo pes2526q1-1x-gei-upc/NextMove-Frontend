@@ -7,7 +7,6 @@ import '../bloc/chat_bloc.dart';
 import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import '../widgets/message_bubble.dart';
-import '../widgets/typing_indicator.dart';
 import '../../dominio/entities/message.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
@@ -278,7 +277,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             return Center(child: Text(l10n.loadingRoom));
           }
           final messages = state.messages;
-          final usersTyping = state.usersTyping;
+          
           return Column(
             children: [
               Expanded(
@@ -295,14 +294,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     : ListView.builder(
                         controller: _scrollController,
                         padding: const EdgeInsets.all(16),
-                        itemCount: messages.length + (usersTyping.isNotEmpty ? 1 : 0),
+                        itemCount: messages.length,
                         itemBuilder: (context, index) {
-                          if (index == messages.length && usersTyping.isNotEmpty) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: TypingIndicator(),
-                            );
-                          }
                           final message = messages[index];
                           final isMe = message.isSentByMe(currentUserEmail);
                           final showSender = index == 0 || messages[index - 1].senderId != message.senderId;
@@ -322,11 +315,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         },
                       ),
               ),
-              if (usersTyping.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: TypingIndicator(),
-                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 30),
                 child: Row(
