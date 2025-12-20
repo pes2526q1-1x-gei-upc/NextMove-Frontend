@@ -14,6 +14,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
+import 'package:nextmove_app/config/socket_config.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
@@ -54,9 +55,60 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      // Cuando la app vuelve al foreground, recargar mensajes para asegurar que se muestren los nuevos
-      debugPrint('[ChatRoomPage] App vuelve al foreground, recargando mensajes...');
+      // Cuando la app vuelve al foreground, verificar conexión y recargar mensajes
+      debugPrint('[ChatRoomPage] App vuelve al foreground...');
+      
+      // Verificar si el socket está conectado
+      final isConnected = SocketConfig.isConnected;
+      debugPrint('[ChatRoomPage] Socket conectado: $isConnected');
+      
+      if (!isConnected) {
+        // Si no está conectado, reconectar
+        debugPrint('[ChatRoomPage] Socket desconectado, reconectando...');
+        _reconnectSocket();
+      } else {
+        // Si está conectado, solo recargar mensajes
+        _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
+      }
+    }
+  }
+
+  /// Reconectar el socket cuando se detecta desconexión
+  Future<void> _reconnectSocket() async {
+    try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) {
+        debugPrint('[ChatRoomPage] No hay usuario autenticado');
+        return;
+      }
+
+      // Obtener un token fresco de Firebase
+      final firebaseToken = await firebaseUser.getIdToken();
+      final firebaseUserId = firebaseUser.uid;
+
+      if (firebaseToken == null || firebaseToken.isEmpty) {
+        debugPrint('[ChatRoomPage] No se pudo obtener token de Firebase');
+        return;
+      }
+
+      // Reconectar el socket
+      await SocketConfig.connect(firebaseToken, firebaseUserId);
+      
+      // Esperar un poco para que se establezca la conexión
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Disparar evento de reconexión que manejará la reconfiguración de listeners
+      _chatBloc.add(const SocketReconnected());
+      
+      // Volver a unirse a la sala
+      _chatBloc.add(JoinChatRoom(widget.roomId));
+      
+      // Recargar mensajes
       _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
+      
+      debugPrint('[ChatRoomPage] ✅ Socket reconectado exitosamente');
+    } catch (error) {
+      debugPrint('[ChatRoomPage] ❌ Error reconectando socket: $error');
     }
   }
 
