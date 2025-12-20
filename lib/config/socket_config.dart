@@ -26,16 +26,26 @@ class SocketConfig {
     _socket = IO.io(
       serverUrl,
       IO.OptionBuilder()
-          .setTransports(['websocket', 'polling'])
-          .enableAutoConnect()
-          .enableReconnection()
-          .setReconnectionDelay(1000)
-          .setReconnectionAttempts(5)
-          .setAuth({'token': firebaseToken})
-          .build(),
+        .setTransports(['websocket', 'polling'])
+        .enableAutoConnect()
+        .enableReconnection()
+        .setReconnectionDelay(1000)
+        .setReconnectionDelayMax(5000)
+        .setReconnectionAttempts(999) // Intentos ilimitados
+        .setTimeout(20000)
+        .setAuth({'token': firebaseToken})
+        .build(),
     );
 
     _setupEventHandlers();
+  }
+
+  // Callback para notificar reconexión
+  static Function()? _onReconnectCallback;
+
+  /// Configurar callback para reconexión
+  static void setReconnectCallback(Function() callback) {
+    _onReconnectCallback = callback;
   }
 
   /// Configurar listeners básicos de conexión
@@ -59,7 +69,11 @@ class SocketConfig {
     });
 
     _socket?.onReconnect((attempt) {
-      debugPrint('[SocketIO] 🔄 Reconectando (intento $attempt)');
+      debugPrint('[SocketIO] 🔄 Reconectado exitosamente (intento $attempt)');
+      // Notificar reconexión
+      if (_onReconnectCallback != null) {
+        _onReconnectCallback!();
+      }
     });
 
     _socket?.on('error', (data) {

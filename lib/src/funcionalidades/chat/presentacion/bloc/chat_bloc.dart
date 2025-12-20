@@ -21,6 +21,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   String? _currentRoomId;
   final List<Message> _messages = [];
   final Set<String> _usersTyping = {};
+  Timer? _keepAliveTimer;
 
   ChatBloc(this._chatRepository) : super(const ChatInitial()) {
     // Registrar handlers de eventos
@@ -39,6 +40,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<LoadMessageHistory>(_onLoadMessageHistory);
     on<DisconnectChat>(_onDisconnectChat);
     on<ChatError>(_onChatError);
+    on<SocketReconnected>(_onSocketReconnected);
   }
 
   /// Inicializar conexión de chat
@@ -62,6 +64,14 @@ Future<void> _onInitializeChat(
     // Configurar listeners de streams
     _chatRepository.setupSocketListeners();
     _setupStreamListeners();
+
+    // Configurar callback de reconexión
+    SocketConfig.setReconnectCallback(() {
+      add(const SocketReconnected());
+    });
+
+    // Iniciar keep-alive periódico (cada 30 segundos)
+    _startKeepAlive();
 
     emit(ChatConnected(event.userId));
     debugPrint('[ChatBloc] ✅ Chat inicializado correctamente');
@@ -370,6 +380,7 @@ Future<void> _onInitializeChat(
 
   /// Desconectar del chat
   void _onDisconnectChat(DisconnectChat event, Emitter<ChatState> emit) {
+    _stopKeepAlive();
     SocketConfig.disconnect();
     _currentRoomId = null;
     _messages.clear();
@@ -385,8 +396,58 @@ Future<void> _onInitializeChat(
     }
   }
 
+  /// Manejar reconexión del socket
+  Future<void> _onSocketReconnected(
+    SocketReconnected event,
+    Emitter<ChatState> emit,
+  ) async {
+    try {
+      debugPrint('[ChatBloc] 🔄 Manejando reconexión del socket...');
+      
+      // Reconfigurar listeners de streams
+      _chatRepository.setupSocketListeners();
+      
+      // Si hay una sala activa, volver a unirse
+      if (_currentRoomId != null) {
+        debugPrint('[ChatBloc] Re-uniéndose a sala: $_currentRoomId');
+        await _chatRepository.joinRoom(_currentRoomId!);
+        
+        // Si estamos en una sala activa, mantener el estado
+        if (state is ChatRoomActive) {
+          final currentState = state as ChatRoomActive;
+          emit(currentState);
+        }
+      }
+      
+      debugPrint('[ChatBloc] ✅ Reconexión manejada correctamente');
+    } catch (e) {
+      debugPrint('[ChatBloc] ❌ Error manejando reconexión: $e');
+    }
+  }
+
+  /// Iniciar keep-alive periódico para mantener la conexión viva
+  void _startKeepAlive() {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (SocketConfig.isConnected) {
+        SocketConfig.ping();
+        debugPrint('[ChatBloc] 🏓 Keep-alive ping enviado');
+      } else {
+        debugPrint('[ChatBloc] ⚠️ Socket no conectado, cancelando keep-alive');
+        timer.cancel();
+      }
+    });
+  }
+
+  /// Detener keep-alive
+  void _stopKeepAlive() {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = null;
+  }
+
   @override
   Future<void> close() {
+    _stopKeepAlive();
     _messageSubscription?.cancel();
     _typingSubscription?.cancel();
     _userJoinedSubscription?.cancel();

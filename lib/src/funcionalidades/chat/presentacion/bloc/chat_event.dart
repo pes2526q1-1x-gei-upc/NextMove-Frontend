@@ -193,3 +193,8 @@ class ChatError extends ChatEvent {
   @override
   List<Object?> get props => [message];
 }
+
+/// Reconexión del socket
+class SocketReconnected extends ChatEvent {
+  const SocketReconnected();
+}

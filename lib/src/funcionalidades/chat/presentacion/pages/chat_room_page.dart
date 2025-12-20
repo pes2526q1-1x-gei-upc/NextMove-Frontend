@@ -41,7 +41,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.didChangeDependencies();
     _chatBloc = context.read<ChatBloc>();
     _chatBloc.add(JoinChatRoom(widget.roomId));
-    // Cargar mensajes históricos después de unirse a la sala
     _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
   }
 
@@ -54,9 +53,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void _scrollToBottom() {
+    // Al usar reverse: true, el "fondo" es la posición 0.0
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        0.0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
@@ -99,48 +99,34 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       content: content,
     ));
     _messageController.clear();
+    // Pequeño delay para asegurar que la UI se actualice antes de hacer scroll
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
   }
 
-  /// Obtener el nickname del otro usuario desde los mensajes
   String? _getOtherUserNickname(List<Message> messages, String currentUserEmail) {
     if (messages.isEmpty) {
-      // Si no hay mensajes, usar el roomName como fallback
       return widget.roomName.isNotEmpty ? widget.roomName : null;
     }
-    
-    // Buscar el primer mensaje que no sea del usuario actual
     for (final message in messages) {
       if (!message.isSentByMe(currentUserEmail)) {
         return message.senderName;
       }
     }
-    
-    // Si todos los mensajes son del usuario actual, usar roomName
     return widget.roomName.isNotEmpty ? widget.roomName : null;
   }
 
-  /// Obtener la foto del otro usuario desde los mensajes
   String? _getOtherUserPhoto(List<Message> messages, String currentUserEmail) {
-    if (messages.isEmpty) {
-      return null;
-    }
-    
-    // Buscar el primer mensaje que no sea del usuario actual
+    if (messages.isEmpty) return null;
     for (final message in messages) {
       if (!message.isSentByMe(currentUserEmail)) {
         return message.senderPhoto;
       }
     }
-    
     return null;
   }
 
-  /// Navegar a la página de detalles del amigo
   void _navigateToFriendDetail(String nickname) {
     if (nickname.isEmpty) return;
-    
-    // Obtener el nickname del usuario actual para cargar la lista de amigos
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUserNickname = userProvider.user?['nickname'] as String?;
     
@@ -159,7 +145,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               BlocProvider<SocialBloc>(
                 create: (context) {
                   final socialBloc = SocialBloc();
-                  // Cargar la lista de amigos si tenemos el nickname del usuario actual
                   if (currentUserNickname != null && currentUserNickname.isNotEmpty) {
                     socialBloc.add(LoadFriendsEvent(currentUserNickname));
                   }
@@ -178,13 +163,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userProvider = Provider.of<UserProvider>(context);
-    // Obtener el email del usuario actual para comparar con senderId de los mensajes
     final currentUserEmail = userProvider.email ?? 
                             userProvider.user?['email'] as String? ?? 
                             FirebaseAuth.instance.currentUser?.email ?? '';
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      // Importante: permite que el layout cambie cuando sale el teclado
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         titleSpacing: 0,
@@ -289,68 +275,82 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           return Column(
             children: [
               Expanded(
-                child: messages.isEmpty
-                    ? Center(
-                        child: Text(
-                          l10n.noMessagesYet,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                // 1. GestureDetector para cerrar teclado al tocar el fondo
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: messages.isEmpty
+                      ? Center(
+                          child: Text(
+                            l10n.noMessagesYet,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          reverse: true,
+                          // 2. keyboardDismissBehavior para cerrar teclado al hacer scroll
+                          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) {
+                            // Invertir índice porque usamos reverse: true
+                            final message = messages[messages.length - 1 - index];
+                            final isMe = message.isSentByMe(currentUserEmail);
+                            return MessageBubble(
+                              message: message,
+                              isMe: isMe,
+                            );
+                          },
                         ),
-                      )
-                    : ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final message = messages[index];
-                          final isMe = message.isSentByMe(currentUserEmail);
-                          return MessageBubble(
-                            message: message,
-                            isMe: isMe,
-                          );
-                        },
-                      ),
-              ),
-              // CAJA DE TEXTO Y BOTON DE ENVIAR
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 12,
-                  right: 12,
-                  top: 4,      // <-- Solo 8px arriba: pega la barra a los mensajes
-                  bottom: 40,  // <-- 40px abajo: devuelve el "aire" necesario con el borde inferior
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        onChanged: _handleTyping,
-                        decoration: InputDecoration(
-                          hintText: l10n.writeAMessage,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
+              ),
+              
+              // 3. SafeArea para el input: Maneja el padding inferior automáticamente
+              Container(
+                color: theme.colorScheme.surface, 
+                child: SafeArea(
+                  top: false,
+                  bottom: true, // Esto añade ~34px si no hay teclado, y 0 si hay teclado
+                  child: Padding(
+                    // Padding adicional pequeño para que no quede pegado
+                    padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _messageController,
+                            onChanged: _handleTyping,
+                            decoration: InputDecoration(
+                              hintText: l10n.writeAMessage,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: theme.colorScheme.surfaceVariant,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            ),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) => _sendMessage(),
                           ),
-                          filled: true,
-                          fillColor: theme.colorScheme.surfaceVariant,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         ),
-                        textInputAction: TextInputAction.send,
-                        onSubmitted: (_) => _sendMessage(),
-                      ),
+                        const SizedBox(width: 8),
+                        Material(
+                          color: theme.colorScheme.primary,
+                          shape: const CircleBorder(),
+                          child: IconButton(
+                            icon: Icon(Icons.send, color: theme.colorScheme.onPrimary),
+                            onPressed: _sendMessage,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Material(
-                      color: theme.colorScheme.primary,
-                      shape: const CircleBorder(),
-                      child: IconButton(
-                        icon: Icon(Icons.send, color: theme.colorScheme.onPrimary),
-                        onPressed: _sendMessage,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
