@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
-import '../../datos/data/repositories/chat_repository.dart';
+import '../../datos/repositories/chat_repository.dart';
 import '../../dominio/entities/message.dart';
-import '../../datos/repositories/chat_repository_impl.dart';
 import '../../../../../config/socket_config.dart';
 import 'chat_event.dart';
 import 'chat_state.dart';
@@ -61,7 +60,7 @@ Future<void> _onInitializeChat(
     }
 
     // Configurar listeners de streams
-    (_chatRepository as ChatRepositoryImpl).socketDataSource.setupSocketListeners();
+    _chatRepository.setupSocketListeners();
     _setupStreamListeners();
 
     emit(ChatConnected(event.userId));
@@ -232,7 +231,10 @@ Future<void> _onInitializeChat(
       return;
     }
 
+    // Agregar mensaje y mantener orden cronológico
     _messages.add(message);
+    _messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    
     debugPrint('[ChatBloc] ✅ Mensaje agregado: ${message.content}');
 
     if (state is ChatRoomActive) {
@@ -341,7 +343,12 @@ Future<void> _onInitializeChat(
         limit: event.limit,
       );
 
+      // Los mensajes históricos ya vienen ordenados (más antiguos primero)
+      // Los insertamos al principio de la lista
       _messages.insertAll(0, messages);
+
+      // Asegurar que todos los mensajes estén ordenados por timestamp
+      _messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
       if (state is ChatRoomActive) {
         final currentState = state as ChatRoomActive;
@@ -350,8 +357,10 @@ Future<void> _onInitializeChat(
           isLoadingHistory: false,
         ));
       }
+
+      debugPrint('[ChatBloc] ✅ Historial cargado: ${messages.length} mensajes');
     } catch (e) {
-      debugPrint('[ChatBloc] Error cargando historial: $e');
+      debugPrint('[ChatBloc] ❌ Error cargando historial: $e');
       if (state is ChatRoomActive) {
         final currentState = state as ChatRoomActive;
         emit(currentState.copyWith(isLoadingHistory: false));

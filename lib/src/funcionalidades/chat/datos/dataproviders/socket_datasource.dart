@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import '../../../../../../config/socket_config.dart';
-import '../../models/message_model.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/config/graphql_config.dart';
+import '../../../../../config/socket_config.dart';
+import '../../dominio/models/message_model.dart';
 
 /// DataSource para comunicación en tiempo real con Socket.IO
 class SocketDataSource {
@@ -18,6 +21,17 @@ class SocketDataSource {
 
   bool _listenersConfigured = false;
   SocketDataSource();
+
+  GraphQLClient get client => GraphQLConfig.client.value;
+
+  Future<String?> get _authHeader async {
+    final fireBaseUser = FirebaseAuth.instance.currentUser;
+    if (fireBaseUser != null) {
+      final token = await fireBaseUser.getIdToken();
+      return 'Bearer $token';
+    }
+    return null;
+  }
 
   /// Streams públicos para escuchar eventos
   Stream<MessageModel> get messageStream => _messageController.stream;

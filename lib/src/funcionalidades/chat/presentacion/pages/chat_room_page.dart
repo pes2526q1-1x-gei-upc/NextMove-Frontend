@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../bloc/chat_bloc.dart';
@@ -7,7 +8,14 @@ import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/typing_indicator.dart';
+import '../../dominio/entities/message.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
@@ -35,6 +43,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.didChangeDependencies();
     _chatBloc = context.read<ChatBloc>();
     _chatBloc.add(JoinChatRoom(widget.roomId));
+    // Cargar mensajes históricos después de unirse a la sala
+    _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
   }
 
   @override
@@ -94,56 +104,136 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
   }
 
+  /// Obtener el nickname del otro usuario desde los mensajes
+  String? _getOtherUserNickname(List<Message> messages, String currentUserEmail) {
+    if (messages.isEmpty) {
+      // Si no hay mensajes, usar el roomName como fallback
+      return widget.roomName.isNotEmpty ? widget.roomName : null;
+    }
+    
+    // Buscar el primer mensaje que no sea del usuario actual
+    for (final message in messages) {
+      if (!message.isSentByMe(currentUserEmail)) {
+        return message.senderName;
+      }
+    }
+    
+    // Si todos los mensajes son del usuario actual, usar roomName
+    return widget.roomName.isNotEmpty ? widget.roomName : null;
+  }
+
+  /// Navegar a la página de detalles del amigo
+  void _navigateToFriendDetail(String nickname) {
+    if (nickname.isEmpty) return;
+    
+    // Obtener el nickname del usuario actual para cargar la lista de amigos
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUserNickname = userProvider.user?['nickname'] as String?;
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<UserBloc>(
+                create: (context) {
+                  final bloc = UserBloc();
+                  bloc.add(LoadUserProfile(nickname));
+                  return bloc;
+                },
+              ),
+              BlocProvider<SocialBloc>(
+                create: (context) {
+                  final socialBloc = SocialBloc();
+                  // Cargar la lista de amigos si tenemos el nickname del usuario actual
+                  if (currentUserNickname != null && currentUserNickname.isNotEmpty) {
+                    socialBloc.add(LoadFriendsEvent(currentUserNickname));
+                  }
+                  return socialBloc;
+                },
+              ),
+            ],
+            child: const FriendDetailsPage(),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Navegar a la página de edición de perfil del usuario actual
+  void _navigateToEditProfile() {
+    final userBloc = context.read<UserBloc>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: userBloc,
+          child: const EditUserDataPreferencesPage(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final userProvider = Provider.of<UserProvider>(context);
-    final currentUserId = userProvider.firebaseUserId ?? '';
+    // Obtener el email del usuario actual para comparar con senderId de los mensajes
+    final currentUserEmail = userProvider.email ?? 
+                            userProvider.user?['email'] as String? ?? 
+                            FirebaseAuth.instance.currentUser?.email ?? '';
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
         titleSpacing: 0,
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                widget.roomName.isNotEmpty ? widget.roomName[0].toUpperCase() : '',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: theme.colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        title: BlocBuilder<ChatBloc, ChatState>(
+          builder: (context, state) {
+            final messages = state is ChatRoomActive ? state.messages : <Message>[];
+            final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
+            
+            return GestureDetector(
+              onTap: () {
+                if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
+                  _navigateToFriendDetail(otherUserNickname);
+                }
+              },
+              child: Row(
                 children: [
-                  Text(
-                    widget.roomName,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    child: Text(
+                      widget.roomName.isNotEmpty ? widget.roomName[0].toUpperCase() : '',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ),
-                  BlocBuilder<ChatBloc, ChatState>(
-                    builder: (context, state) {
-                      if (state is ChatRoomActive && state.usersTyping.isNotEmpty) {
-                        return Text(
-                          l10n.typing,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.primary,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.roomName,
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        if (state is ChatRoomActive && state.usersTyping.isNotEmpty)
+                          Text(
+                            l10n.typing,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+            );
+          },
         ),
         elevation: 1,
       ),
@@ -214,7 +304,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             );
                           }
                           final message = messages[index];
-                          final isMe = message.isSentByMe(currentUserId);
+                          final isMe = message.isSentByMe(currentUserEmail);
                           final showSender = index == 0 || messages[index - 1].senderId != message.senderId;
                           // Mostrar avatar del usuario actual solo en el último mensaje seguido
                           final isLastMessageFromMe = index == messages.length - 1 || 
@@ -225,6 +315,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             isMe: isMe,
                             showSender: showSender && !isMe,
                             showMyAvatar: showMyAvatar,
+                            onAvatarTap: isMe
+                                ? _navigateToEditProfile
+                                : () => _navigateToFriendDetail(message.senderName),
                           );
                         },
                       ),

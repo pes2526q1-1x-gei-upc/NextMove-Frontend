@@ -7,6 +7,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMe;
   final bool showSender;
   final bool showMyAvatar;
+  final VoidCallback? onAvatarTap;
 
   const MessageBubble({
     super.key,
@@ -14,6 +15,7 @@ class MessageBubble extends StatelessWidget {
     required this.isMe,
     this.showSender = true,
     this.showMyAvatar = false,
+    this.onAvatarTap,
   });
 
   @override
@@ -29,21 +31,24 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
-                  ? NetworkImage(message.senderPhoto!)
-                  : null,
-              child: message.senderPhoto == null || message.senderPhoto!.isEmpty
-                  ? Text(
-                      message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                    )
-                  : null,
+            GestureDetector(
+              onTap: onAvatarTap,
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: theme.colorScheme.primaryContainer,
+                backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                    ? NetworkImage(message.senderPhoto!)
+                    : null,
+                child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                    ? Text(
+                        message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
+                      )
+                    : null,
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -80,10 +85,11 @@ class MessageBubble extends StatelessWidget {
                     ),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                     children: [
                       Text(
                         message.content,
+                        textAlign: isMe ? TextAlign.right : TextAlign.left,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: isMe
                               ? theme.colorScheme.onPrimary
@@ -93,6 +99,7 @@ class MessageBubble extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         timeFormat.format(message.timestamp),
+                        textAlign: isMe ? TextAlign.right : TextAlign.left,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 11,
                           color: isMe
@@ -108,21 +115,24 @@ class MessageBubble extends StatelessWidget {
           ),
           if (showMyAvatar && isMe) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.colorScheme.secondaryContainer,
-              backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
-                  ? NetworkImage(message.senderPhoto!)
-                  : null,
-              child: message.senderPhoto == null || message.senderPhoto!.isEmpty
-                  ? Text(
-                      message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: theme.colorScheme.onSecondaryContainer,
-                      ),
-                    )
-                  : null,
+            GestureDetector(
+              onTap: onAvatarTap,
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                    ? NetworkImage(message.senderPhoto!)
+                    : null,
+                child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                    ? Text(
+                        message.senderName.isNotEmpty ? message.senderName[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.colorScheme.onSecondaryContainer,
+                        ),
+                      )
+                    : null,
+              ),
             ),
           ] else if (isMe)
             const SizedBox(width: 40),

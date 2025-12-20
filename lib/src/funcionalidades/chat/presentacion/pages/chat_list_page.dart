@@ -28,6 +28,7 @@ class _ChatListPageState extends State<ChatListPage> {
   @override
   void initState() {
     super.initState();
+
     // Inicializar chat automáticamente al abrir la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeChat();

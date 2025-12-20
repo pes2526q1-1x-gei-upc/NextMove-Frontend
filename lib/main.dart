@@ -26,8 +26,8 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_pr
 
 import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/chat/datos/data/dataproviders/socket_datasource.dart';
-import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository_impl.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket_datasource.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -203,7 +203,11 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
-
+        final fireBaseUser = FirebaseAuth.instance.currentUser;
+        if (fireBaseUser != null) {
+          final token = await fireBaseUser.getIdToken();
+          debugPrint('Bearer $token') ;
+        }
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
         }
@@ -351,7 +355,7 @@ class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
   void initState() {
     super.initState();
     _chatBloc = ChatBloc(
-      ChatRepositoryImpl(SocketDataSource()),
+      ChatRepository(SocketDataSource()),
     );
   }
 
