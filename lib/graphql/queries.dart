@@ -326,6 +326,10 @@ const String chatMessagesQuery = r'''
       content
       type
       createdAt
+      deleted
+      deletedAt
+      edited
+      editedAt
     }
   }
 ''';

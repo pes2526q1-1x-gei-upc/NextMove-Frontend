@@ -85,6 +85,30 @@ class ChatRepository {
     return await _socketDataSource.getRoomUsers(roomId);
   }
 
+  /// Eliminar mensaje
+  Future<void> deleteMessage({
+    required String messageId,
+    required String roomId,
+  }) async {
+    return await _socketDataSource.deleteMessage(
+      messageId: messageId,
+      roomId: roomId,
+    );
+  }
+
+  /// Editar mensaje
+  Future<void> editMessage({
+    required String messageId,
+    required String roomId,
+    required String newContent,
+  }) async {
+    return await _socketDataSource.editMessage(
+      messageId: messageId,
+      roomId: roomId,
+      newContent: newContent,
+    );
+  }
+
   /// Obtener lista de salas de chat del usuario
   /// TODO: Implementar cuando tengas el endpoint GraphQL
   Future<List<ChatRoom>> getUserChatRooms() async {
@@ -159,6 +183,10 @@ class ChatRepository {
           // createdAt puede ser String o número, MessageModel.fromJson lo manejará
           'createdAt': json['createdAt'],
           'timestamp': json['createdAt'],
+          'deleted': json['deleted'] as bool? ?? false,
+          'deletedAt': json['deletedAt'],
+          'edited': json['edited'] as bool? ?? false,
+          'editedAt': json['editedAt'],
         };
 
         final messageModel = MessageModel.fromJson(messageJson);

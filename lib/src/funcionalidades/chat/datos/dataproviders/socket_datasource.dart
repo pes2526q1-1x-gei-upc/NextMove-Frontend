@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
@@ -18,20 +17,15 @@ class SocketDataSource {
       StreamController<Map<String, dynamic>>.broadcast();
   final StreamController<Map<String, dynamic>> _roomJoinedController =
       StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _messageDeletedController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<MessageModel> _messageEditedController =
+      StreamController<MessageModel>.broadcast();
 
   bool _listenersConfigured = false;
   SocketDataSource();
 
   GraphQLClient get client => GraphQLConfig.client.value;
-
-  Future<String?> get _authHeader async {
-    final fireBaseUser = FirebaseAuth.instance.currentUser;
-    if (fireBaseUser != null) {
-      final token = await fireBaseUser.getIdToken();
-      return 'Bearer $token';
-    }
-    return null;
-  }
 
   /// Streams públicos para escuchar eventos
   Stream<MessageModel> get messageStream => _messageController.stream;
@@ -42,6 +36,10 @@ class SocketDataSource {
       _userLeftController.stream;
   Stream<Map<String, dynamic>> get roomJoinedStream =>
       _roomJoinedController.stream;
+  Stream<Map<String, dynamic>> get messageDeletedStream =>
+      _messageDeletedController.stream;
+  Stream<MessageModel> get messageEditedStream =>
+      _messageEditedController.stream;
 
   /// Configurar listeners de Socket.IO
   void setupSocketListeners() {
@@ -115,6 +113,24 @@ class SocketDataSource {
     socket.on('message:read:confirmed', (data) {
       debugPrint('[SocketDataSource] ✓ Mensaje leído: $data');
     });
+
+    // Mensaje eliminado
+    socket.on('message:deleted', (data) {
+      debugPrint('[SocketDataSource] 🗑️ Mensaje eliminado: $data');
+      _messageDeletedController.add(data as Map<String, dynamic>);
+    });
+
+    // Mensaje editado
+    socket.on('message:edited', (data) {
+      debugPrint('[SocketDataSource] ✏️ Mensaje editado: $data');
+      try {
+        final message = MessageModel.fromJson(data as Map<String, dynamic>);
+        _messageEditedController.add(message);
+      } catch (e) {
+        debugPrint('[SocketDataSource] ❌ Error procesando mensaje editado: $e');
+      }
+    });
+
     _listenersConfigured = true;
     debugPrint('[SocketDataSource] Listeners configurados');
   }
@@ -200,6 +216,42 @@ class SocketDataSource {
     socket.emit('room:users:get', {'roomId': roomId});
   }
 
+  /// Eliminar mensaje
+  Future<void> deleteMessage({
+    required String messageId,
+    required String roomId,
+  }) async {
+    final socket = SocketConfig.socket;
+    if (socket == null || !socket.connected) {
+      throw Exception('Socket no conectado');
+    }
+
+    debugPrint('[SocketDataSource] 🗑️ Eliminando mensaje $messageId');
+    socket.emit('message:delete', {
+      'messageId': messageId,
+      'roomId': roomId,
+    });
+  }
+
+  /// Editar mensaje
+  Future<void> editMessage({
+    required String messageId,
+    required String roomId,
+    required String newContent,
+  }) async {
+    final socket = SocketConfig.socket;
+    if (socket == null || !socket.connected) {
+      throw Exception('Socket no conectado');
+    }
+
+    debugPrint('[SocketDataSource] ✏️ Editando mensaje $messageId');
+    socket.emit('message:edit', {
+      'messageId': messageId,
+      'roomId': roomId,
+      'content': newContent,
+    });
+  }
+
   /// Limpiar recursos
   void dispose() {
     _messageController.close();
@@ -207,5 +259,7 @@ class SocketDataSource {
     _userJoinedController.close();
     _userLeftController.close();
     _roomJoinedController.close();
+    _messageDeletedController.close();
+    _messageEditedController.close();
   }
 }

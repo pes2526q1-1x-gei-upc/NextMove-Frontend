@@ -11,6 +11,10 @@ class Message extends Equatable {
   final String type;
   final DateTime timestamp;
   final List<String> readBy;
+  final bool deleted;
+  final DateTime? deletedAt;
+  final bool edited;
+  final DateTime? editedAt;
 
   const Message({
     required this.id,
@@ -22,6 +26,10 @@ class Message extends Equatable {
     this.type = 'text',
     required this.timestamp,
     this.readBy = const [],
+    this.deleted = false,
+    this.deletedAt,
+    this.edited = false,
+    this.editedAt,
   });
 
   /// Verificar si el mensaje fue leído por un usuario específico
@@ -45,6 +53,10 @@ class Message extends Equatable {
     String? type,
     DateTime? timestamp,
     List<String>? readBy,
+    bool? deleted,
+    DateTime? deletedAt,
+    bool? edited,
+    DateTime? editedAt,
   }) {
     return Message(
       id: id ?? this.id,
@@ -56,6 +68,10 @@ class Message extends Equatable {
       type: type ?? this.type,
       timestamp: timestamp ?? this.timestamp,
       readBy: readBy ?? this.readBy,
+      deleted: deleted ?? this.deleted,
+      deletedAt: deletedAt ?? this.deletedAt,
+      edited: edited ?? this.edited,
+      editedAt: editedAt ?? this.editedAt,
     );
   }
 
@@ -70,6 +86,10 @@ class Message extends Equatable {
         type,
         timestamp,
         readBy,
+        deleted,
+        deletedAt,
+        edited,
+        editedAt,
       ];
 
   @override

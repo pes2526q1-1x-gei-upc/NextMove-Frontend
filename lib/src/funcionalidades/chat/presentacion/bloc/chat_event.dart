@@ -198,3 +198,57 @@ class ChatError extends ChatEvent {
 class SocketReconnected extends ChatEvent {
   const SocketReconnected();
 }
+
+/// Eliminar mensaje
+class DeleteMessage extends ChatEvent {
+  final String messageId;
+  final String roomId;
+
+  const DeleteMessage({
+    required this.messageId,
+    required this.roomId,
+  });
+
+  @override
+  List<Object?> get props => [messageId, roomId];
+}
+
+/// Mensaje eliminado (evento recibido desde Socket.IO)
+class MessageDeleted extends ChatEvent {
+  final String messageId;
+  final String roomId;
+
+  const MessageDeleted({
+    required this.messageId,
+    required this.roomId,
+  });
+
+  @override
+  List<Object?> get props => [messageId, roomId];
+}
+
+/// Editar mensaje
+class EditMessage extends ChatEvent {
+  final String messageId;
+  final String roomId;
+  final String newContent;
+
+  const EditMessage({
+    required this.messageId,
+    required this.roomId,
+    required this.newContent,
+  });
+
+  @override
+  List<Object?> get props => [messageId, roomId, newContent];
+}
+
+/// Mensaje editado (evento recibido desde Socket.IO)
+class MessageEdited extends ChatEvent {
+  final Message message;
+
+  const MessageEdited(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

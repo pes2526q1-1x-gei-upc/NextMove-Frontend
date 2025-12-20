@@ -13,6 +13,10 @@ class MessageModel extends Message {
     super.type,
     required super.timestamp,
     super.readBy,
+    super.deleted,
+    super.deletedAt,
+    super.edited,
+    super.editedAt,
   });
 
   /// Helper para parsear fechas desde diferentes formatos
@@ -67,6 +71,16 @@ class MessageModel extends Message {
     final senderEmail = json['senderEmail'] as String? ?? json['sender_email'] as String?;
     final senderId = senderEmail ?? json['senderId'] as String? ?? '';
     
+    // Parsear deleted y deletedAt
+    final deleted = json['deleted'] as bool? ?? false;
+    final deletedAtValue = json['deletedAt'] as String? ?? json['deleted_at'] as String?;
+    final deletedAt = deletedAtValue != null ? _parseTimestamp(deletedAtValue) : null;
+    
+    // Parsear edited y editedAt
+    final edited = json['edited'] as bool? ?? false;
+    final editedAtValue = json['editedAt'] as String? ?? json['edited_at'] as String?;
+    final editedAt = editedAtValue != null ? _parseTimestamp(editedAtValue) : null;
+    
     return MessageModel(
       id: json['id'] as String,
       roomId: json['roomId'] as String? ?? json['chatId'] as String? ?? json['chat_id'] as String? ?? '',
@@ -79,6 +93,10 @@ class MessageModel extends Message {
       readBy: json['readBy'] != null
           ? List<String>.from(json['readBy'] as List)
           : [],
+      deleted: deleted,
+      deletedAt: deletedAt,
+      edited: edited,
+      editedAt: editedAt,
     );
   }
 
@@ -94,6 +112,10 @@ class MessageModel extends Message {
       'type': type,
       'timestamp': timestamp.toIso8601String(),
       'readBy': readBy,
+      'deleted': deleted,
+      'deletedAt': deletedAt?.toIso8601String(),
+      'edited': edited,
+      'editedAt': editedAt?.toIso8601String(),
     };
   }
 
@@ -109,6 +131,10 @@ class MessageModel extends Message {
       type: type,
       timestamp: timestamp,
       readBy: readBy,
+      deleted: deleted,
+      deletedAt: deletedAt,
+      edited: edited,
+      editedAt: editedAt,
     );
   }
 
@@ -124,6 +150,10 @@ class MessageModel extends Message {
       type: message.type,
       timestamp: message.timestamp,
       readBy: message.readBy,
+      deleted: message.deleted,
+      deletedAt: message.deletedAt,
+      edited: message.edited,
+      editedAt: message.editedAt,
     );
   }
 
@@ -138,6 +168,10 @@ class MessageModel extends Message {
     String? type,
     DateTime? timestamp,
     List<String>? readBy,
+    bool? deleted,
+    DateTime? deletedAt,
+    bool? edited,
+    DateTime? editedAt,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -149,6 +183,10 @@ class MessageModel extends Message {
       type: type ?? this.type,
       timestamp: timestamp ?? this.timestamp,
       readBy: readBy ?? this.readBy,
+      deleted: deleted ?? this.deleted,
+      deletedAt: deletedAt ?? this.deletedAt,
+      edited: edited ?? this.edited,
+      editedAt: editedAt ?? this.editedAt,
     );
   }
 }

@@ -16,6 +16,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<Map<String, dynamic>>? _typingSubscription;
   StreamSubscription<Map<String, dynamic>>? _userJoinedSubscription;
   StreamSubscription<Map<String, dynamic>>? _userLeftSubscription;
+  StreamSubscription<Map<String, dynamic>>? _messageDeletedSubscription;
+  StreamSubscription<Message>? _messageEditedSubscription;
 
   // Estado local
   String? _currentRoomId;
@@ -41,6 +43,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<DisconnectChat>(_onDisconnectChat);
     on<ChatError>(_onChatError);
     on<SocketReconnected>(_onSocketReconnected);
+    on<DeleteMessage>(_onDeleteMessage);
+    on<MessageDeleted>(_onMessageDeleted);
+    on<EditMessage>(_onEditMessage);
+    on<MessageEdited>(_onMessageEdited);
   }
 
   /// Inicializar conexión de chat
@@ -83,6 +89,14 @@ Future<void> _onInitializeChat(
 
   /// Configurar listeners de los streams del repositorio
   void _setupStreamListeners() {
+    // Cancelar suscripciones anteriores si existen
+    _messageSubscription?.cancel();
+    _typingSubscription?.cancel();
+    _userJoinedSubscription?.cancel();
+    _userLeftSubscription?.cancel();
+    _messageDeletedSubscription?.cancel();
+    _messageEditedSubscription?.cancel();
+
     // Escuchar mensajes nuevos
     _messageSubscription = _chatRepository.messageStream.listen(
       (message) {
@@ -152,7 +166,37 @@ Future<void> _onInitializeChat(
       },
     );
 
-    debugPrint('[ChatBloc] Stream listeners configurados');
+    // Escuchar mensajes eliminados
+    _messageDeletedSubscription = _chatRepository.socketDataSource.messageDeletedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] 📨 Evento message:deleted recibido: $data');
+        final messageId = data['messageId'] as String?;
+        final roomId = data['roomId'] as String?;
+        
+        if (messageId != null && roomId != null) {
+          debugPrint('[ChatBloc] 🗑️ Procesando eliminación de mensaje $messageId en sala $roomId');
+          add(MessageDeleted(messageId: messageId, roomId: roomId));
+        } else {
+          debugPrint('[ChatBloc] ⚠️ Datos incompletos en message:deleted: messageId=$messageId, roomId=$roomId');
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en messageDeleted stream: $error');
+      },
+    );
+
+    // Escuchar mensajes editados
+    _messageEditedSubscription = _chatRepository.socketDataSource.messageEditedStream.listen(
+      (messageModel) {
+        debugPrint('[ChatBloc] 📨 Evento message:edited recibido: ${messageModel.id}');
+        add(MessageEdited(messageModel.toEntity()));
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en messageEdited stream: $error');
+      },
+    );
+
+    debugPrint('[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted y messageEdited)');
   }
 
   /// Unirse a una sala de chat
@@ -460,6 +504,165 @@ Future<void> _onInitializeChat(
     _keepAliveTimer = null;
   }
 
+  /// Eliminar mensaje
+  Future<void> _onDeleteMessage(
+    DeleteMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    int? messageIndex;
+    try {
+      debugPrint('[ChatBloc] 🗑️ Eliminando mensaje ${event.messageId}');
+      
+      // Actualizar estado local inmediatamente para feedback visual rápido
+      messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
+      if (messageIndex != -1 && state is ChatRoomActive) {
+        final message = _messages[messageIndex];
+        _messages[messageIndex] = message.copyWith(
+          deleted: true,
+          deletedAt: DateTime.now(),
+        );
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+        debugPrint('[ChatBloc] ✅ Estado local actualizado inmediatamente');
+      }
+      
+      await _chatRepository.deleteMessage(
+        messageId: event.messageId,
+        roomId: event.roomId,
+      );
+
+      // El mensaje también se actualizará cuando llegue el evento message:deleted via socket
+      // (esto asegura sincronización con otros usuarios)
+    } catch (e) {
+      debugPrint('[ChatBloc] ❌ Error eliminando mensaje: $e');
+      // Revertir cambio local si falla
+      if (messageIndex != null && messageIndex != -1 && state is ChatRoomActive) {
+        final message = _messages[messageIndex];
+        _messages[messageIndex] = message.copyWith(
+          deleted: false,
+          deletedAt: null,
+        );
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+      }
+      emit(ChatRoomError(roomId: event.roomId, message: e.toString()));
+    }
+  }
+
+  /// Mensaje eliminado (recibido desde Socket.IO)
+  void _onMessageDeleted(
+    MessageDeleted event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] 🔄 Handler _onMessageDeleted llamado: messageId=${event.messageId}, roomId=${event.roomId}, currentRoomId=$_currentRoomId');
+    
+    if (event.roomId != _currentRoomId) {
+      debugPrint('[ChatBloc] ⚠️ Mensaje eliminado de otra sala ignorado (${event.roomId} != $_currentRoomId)');
+      return;
+    }
+
+    // Buscar el mensaje en la lista y marcarlo como eliminado
+    final messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
+    debugPrint('[ChatBloc] 📋 Buscando mensaje ${event.messageId} en lista de ${_messages.length} mensajes. Índice encontrado: $messageIndex');
+    
+    if (messageIndex != -1) {
+      final message = _messages[messageIndex];
+      _messages[messageIndex] = message.copyWith(
+        deleted: true,
+        deletedAt: DateTime.now(),
+      );
+      
+      debugPrint('[ChatBloc] ✅ Mensaje marcado como eliminado: ${event.messageId}. Estado actual: ${state.runtimeType}');
+
+      if (state is ChatRoomActive) {
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+        debugPrint('[ChatBloc] ✅ Estado actualizado con mensaje eliminado');
+      } else {
+        debugPrint('[ChatBloc] ⚠️ Estado no es ChatRoomActive, no se puede actualizar');
+      }
+    } else {
+      debugPrint('[ChatBloc] ⚠️ Mensaje a eliminar no encontrado en la lista: ${event.messageId}');
+      debugPrint('[ChatBloc] 📋 IDs de mensajes en lista: ${_messages.map((m) => m.id).toList()}');
+    }
+  }
+
+  /// Editar mensaje
+  Future<void> _onEditMessage(
+    EditMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    int? messageIndex;
+    try {
+      debugPrint('[ChatBloc] ✏️ Editando mensaje ${event.messageId}');
+      
+      // Actualizar estado local inmediatamente para feedback visual rápido
+      messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
+      if (messageIndex != -1 && state is ChatRoomActive) {
+        final message = _messages[messageIndex];
+        _messages[messageIndex] = message.copyWith(
+          content: event.newContent,
+          edited: true,
+          editedAt: DateTime.now(),
+        );
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+        debugPrint('[ChatBloc] ✅ Estado local actualizado inmediatamente');
+      }
+      
+      await _chatRepository.editMessage(
+        messageId: event.messageId,
+        roomId: event.roomId,
+        newContent: event.newContent,
+      );
+
+      // El mensaje también se actualizará cuando llegue el evento message:edited via socket
+      // (esto asegura sincronización con otros usuarios)
+    } catch (e) {
+      debugPrint('[ChatBloc] ❌ Error editando mensaje: $e');
+      // Revertir cambio local si falla
+      if (messageIndex != null && messageIndex != -1 && state is ChatRoomActive) {
+        final originalMessage = _messages[messageIndex];
+        // Buscar el mensaje original en el estado anterior
+        _messages[messageIndex] = originalMessage.copyWith(
+          edited: false,
+          editedAt: null,
+        );
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+      }
+      emit(ChatRoomError(roomId: event.roomId, message: e.toString()));
+    }
+  }
+
+  /// Mensaje editado (recibido desde Socket.IO)
+  void _onMessageEdited(
+    MessageEdited event,
+    Emitter<ChatState> emit,
+  ) {
+    final editedMessage = event.message;
+    
+    if (editedMessage.roomId != _currentRoomId) {
+      debugPrint('[ChatBloc] ⚠️ Mensaje editado de otra sala ignorado');
+      return;
+    }
+
+    // Buscar el mensaje en la lista y actualizarlo
+    final messageIndex = _messages.indexWhere((m) => m.id == editedMessage.id);
+    
+    if (messageIndex != -1) {
+      _messages[messageIndex] = editedMessage;
+      debugPrint('[ChatBloc] ✅ Mensaje actualizado: ${editedMessage.id}');
+
+      if (state is ChatRoomActive) {
+        final currentState = state as ChatRoomActive;
+        emit(currentState.copyWith(messages: List.from(_messages)));
+      }
+    } else {
+      debugPrint('[ChatBloc] ⚠️ Mensaje editado no encontrado en la lista: ${editedMessage.id}');
+    }
+  }
+
   @override
   Future<void> close() {
     _stopKeepAlive();
@@ -467,6 +670,8 @@ Future<void> _onInitializeChat(
     _typingSubscription?.cancel();
     _userJoinedSubscription?.cancel();
     _userLeftSubscription?.cancel();
+    _messageDeletedSubscription?.cancel();
+    _messageEditedSubscription?.cancel();
     return super.close();
   }
 }
