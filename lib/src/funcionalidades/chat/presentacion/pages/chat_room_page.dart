@@ -14,7 +14,6 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
@@ -121,6 +120,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     return widget.roomName.isNotEmpty ? widget.roomName : null;
   }
 
+  /// Obtener la foto del otro usuario desde los mensajes
+  String? _getOtherUserPhoto(List<Message> messages, String currentUserEmail) {
+    if (messages.isEmpty) {
+      return null;
+    }
+    
+    // Buscar el primer mensaje que no sea del usuario actual
+    for (final message in messages) {
+      if (!message.isSentByMe(currentUserEmail)) {
+        return message.senderPhoto;
+      }
+    }
+    
+    return null;
+  }
+
   /// Navegar a la página de detalles del amigo
   void _navigateToFriendDetail(String nickname) {
     if (nickname.isEmpty) return;
@@ -159,19 +174,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  /// Navegar a la página de edición de perfil del usuario actual
-  void _navigateToEditProfile() {
-    final userBloc = context.read<UserBloc>();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: userBloc,
-          child: const EditUserDataPreferencesPage(),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -190,6 +192,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           builder: (context, state) {
             final messages = state is ChatRoomActive ? state.messages : <Message>[];
             final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
+            final otherUserPhoto = _getOtherUserPhoto(messages, currentUserEmail);
             
             return GestureDetector(
               onTap: () {
@@ -202,13 +205,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Text(
-                      widget.roomName.isNotEmpty ? widget.roomName[0].toUpperCase() : '',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
+                    backgroundImage: otherUserPhoto != null && otherUserPhoto.isNotEmpty
+                        ? NetworkImage(otherUserPhoto)
+                        : null,
+                    child: otherUserPhoto == null || otherUserPhoto.isEmpty
+                        ? Text(
+                            widget.roomName.isNotEmpty ? widget.roomName[0].toUpperCase() : '',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -298,25 +306,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         itemBuilder: (context, index) {
                           final message = messages[index];
                           final isMe = message.isSentByMe(currentUserEmail);
-                          final showSender = index == 0 || messages[index - 1].senderId != message.senderId;
-                          // Mostrar avatar del usuario actual solo en el último mensaje seguido
-                          final isLastMessageFromMe = index == messages.length - 1 || 
-                              (index < messages.length - 1 && messages[index + 1].senderId != message.senderId);
-                          final showMyAvatar = isMe && isLastMessageFromMe;
                           return MessageBubble(
                             message: message,
                             isMe: isMe,
-                            showSender: showSender && !isMe,
-                            showMyAvatar: showMyAvatar,
-                            onAvatarTap: isMe
-                                ? _navigateToEditProfile
-                                : () => _navigateToFriendDetail(message.senderName),
                           );
                         },
                       ),
               ),
+              // CAJA DE TEXTO Y BOTON DE ENVIAR
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 30),
+                padding: const EdgeInsets.only(
+                  left: 12,
+                  right: 12,
+                  top: 4,      // <-- Solo 8px arriba: pega la barra a los mensajes
+                  bottom: 40,  // <-- 40px abajo: devuelve el "aire" necesario con el borde inferior
+                ),
                 child: Row(
                   children: [
                     Expanded(
