@@ -353,9 +353,24 @@ Future<void> _onInitializeChat(
         limit: event.limit,
       );
 
-      // Los mensajes históricos ya vienen ordenados (más antiguos primero)
-      // Los insertamos al principio de la lista
-      _messages.insertAll(0, messages);
+      // Crear un mapa de mensajes existentes por ID para evitar duplicados
+      final existingMessagesMap = <String, Message>{};
+      for (final msg in _messages) {
+        existingMessagesMap[msg.id] = msg;
+      }
+      
+      // Agregar o actualizar mensajes del historial
+      int newCount = 0;
+      for (final message in messages) {
+        if (!existingMessagesMap.containsKey(message.id)) {
+          _messages.add(message);
+          newCount++;
+        }
+      }
+      
+      if (newCount > 0) {
+        debugPrint('[ChatBloc] 📥 Agregando $newCount mensajes nuevos del historial');
+      }
 
       // Asegurar que todos los mensajes estén ordenados por timestamp
       _messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -368,7 +383,7 @@ Future<void> _onInitializeChat(
         ));
       }
 
-      debugPrint('[ChatBloc] ✅ Historial cargado: ${messages.length} mensajes');
+      debugPrint('[ChatBloc] ✅ Historial cargado: ${messages.length} mensajes totales, ${_messages.length} en lista');
     } catch (e) {
       debugPrint('[ChatBloc] ❌ Error cargando historial: $e');
       if (state is ChatRoomActive) {

@@ -29,12 +29,18 @@ class ChatRoomPage extends StatefulWidget {
   State<ChatRoomPage> createState() => _ChatRoomPageState();
 }
 
-class _ChatRoomPageState extends State<ChatRoomPage> {
+class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   bool _isTyping = false;
   DateTime? _lastTypingTime;
   late ChatBloc _chatBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   @override
   void didChangeDependencies() {
@@ -45,7 +51,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Cuando la app vuelve al foreground, recargar mensajes para asegurar que se muestren los nuevos
+      debugPrint('[ChatRoomPage] App vuelve al foreground, recargando mensajes...');
+      _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _chatBloc.add(LeaveChatRoom(widget.roomId));
     _scrollController.dispose();
     _messageController.dispose();
