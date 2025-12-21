@@ -14,6 +14,7 @@ class RankingUserList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      key: ValueKey(Theme.of(context).brightness),
       itemCount: rankingData.length,
       itemBuilder: (context, index) {
         final entry = rankingData[index];
@@ -21,7 +22,7 @@ class RankingUserList extends StatelessWidget {
           leading: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.blueAccent,
+              color: Theme.of(context).colorScheme.primary,
             ),
             width: 40,
             height: 40,
@@ -31,6 +32,7 @@ class RankingUserList extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
             ),
