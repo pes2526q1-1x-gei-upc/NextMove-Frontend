@@ -19,3 +19,12 @@ final class RankingLoaded extends RankingState {
   @override
   List<Object> get props => [rankingData];
 }
+
+final class RankingError extends RankingState {
+  final String message;
+
+  const RankingError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

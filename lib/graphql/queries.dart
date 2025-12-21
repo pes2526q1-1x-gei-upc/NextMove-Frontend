@@ -300,4 +300,48 @@ class GraphQLQueries {
       deleteFavStation(stationId: $stationId, type: $stationType)
     }
   ''';
+
+  // === Ranking ===
+
+  static const String getRanking = r'''
+  query getRanking($metric: String!) {
+    ranking(metric: $metric) {
+      email
+    }
+  }''';
+
+  static const String getGlobalStats = r'''
+  query global {
+    globalStats {
+      total_usuarios
+      usuarios_activos
+      usuarios_inactivos
+      km_recorridos_totales
+      km_promedio
+      km_recorridos_maximo
+      rutas_totales
+      elevacion_positiva_total
+      calorias_quemadas_total
+      co2_total_ahorrado
+    }
+  }''';
+
+  static const String getUserStats = r'''
+  query userStats($email: String!, $metric: String!) {
+    userStats(email: $email, metric: $metric) {
+      email
+      num_rutas
+      km_recorridos
+      elevacion_positiva
+      calorias_quemadas
+      co2_ahorrado
+    }
+  }''';
+
+  static const String getTopUsers = r'''
+  query top($limit: Int!, $metric: String!) {
+    topUsers(limit: $limit, metric: $metric) {
+      email
+    }
+  }''';
 }
