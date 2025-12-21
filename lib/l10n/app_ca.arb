@@ -231,5 +231,7 @@
     "errorDeletingAccount": "Error en eliminar el compte.",
     "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
-    "social": "Social"
+    "social": "Social",
+    "ranking": "Rànquing",
+    "numberOfRoutes": "Nombre de rutes"
 }

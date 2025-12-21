@@ -612,4 +612,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get ranking => 'Ranking';
+
+  @override
+  String get numberOfRoutes => 'Number of routes';
 }

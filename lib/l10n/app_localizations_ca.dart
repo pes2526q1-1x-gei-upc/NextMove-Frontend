@@ -618,4 +618,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get ranking => 'Rànquing';
+
+  @override
+  String get numberOfRoutes => 'Nombre de rutes';
 }

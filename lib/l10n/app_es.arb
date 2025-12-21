@@ -241,5 +241,7 @@
     "errorDeletingAccount": "Error al eliminar la cuenta.",
     "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
     "userMismatch": "El usuario no coincide con el usuario actual.",
-    "social": "Social"
+    "social": "Social",
+    "ranking": "Ránquing",
+    "numberOfRoutes": "Número de rutas"
 }

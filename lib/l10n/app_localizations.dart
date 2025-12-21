@@ -1257,6 +1257,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Social'**
   String get social;
+
+  /// No description provided for @ranking.
+  ///
+  /// In en, this message translates to:
+  /// **'Ranking'**
+  String get ranking;
+
+  /// No description provided for @numberOfRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of routes'**
+  String get numberOfRoutes;
 }
 
 class _AppLocalizationsDelegate

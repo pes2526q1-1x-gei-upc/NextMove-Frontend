@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -197,6 +198,10 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
           firebaseToken: firebaseToken,
         );
 
+        if (kDebugMode) {
+          print("Firebase token: $firebaseToken");
+        }
+        
         final preferredLanguage = meData['preferredLanguage'] as String?;
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
@@ -282,7 +287,7 @@ class _MainScreenState extends State<MainScreen> {
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(2)
-              ? const RankingPlaceholder()
+              ? const RankingPage()
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(3)
@@ -342,17 +347,6 @@ class ChatsPlaceholder extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Chats")),
       body: const Center(child: Text("Pantalla de Chats")),
-    );
-  }
-}
-
-class RankingPlaceholder extends StatelessWidget {
-  const RankingPlaceholder({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Ranking")),
-      body: const Center(child: Text("Pantalla de Ranking")),
     );
   }
 }
