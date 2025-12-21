@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/presentation/bloc/ranking_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_user_list.dart';
+import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_metric_selector.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -32,22 +34,6 @@ class _RankingPageState extends State<RankingPage> {
   Widget build(BuildContext context) {
     AppLocalizations l10n = AppLocalizations.of(context)!;
 
-    List<Map<String, String>> metrics = [
-      {'key': 'calorias_quemadas', 'label': l10n.caloriesBurned},
-      {'key': 'km_recorridos', 'label': l10n.distance},
-      {'key': 'num_rutas', 'label': l10n.numberOfRoutes},
-      {'key': 'elevacion_positiva', 'label': l10n.elevationGain},
-    ];
-
-    List<DropdownMenuItem<String>> metricsDropdownItems = metrics
-        .map(
-          (metric) => DropdownMenuItem<String>(
-            value: metric['key'],
-            child: Text(metric['label']!),
-          ),
-        )
-        .toList();
-
     return BlocProvider.value(
       value: _rankingBloc,
       child: BlocListener<RankingBloc, RankingState>(
@@ -67,10 +53,9 @@ class _RankingPageState extends State<RankingPage> {
               appBar: AppBar(title: Text(l10n.ranking)),
               body: Column(
                 children: [
-                  DropdownButton<String>(
-                    value: selectedMetric,
-                    items: metricsDropdownItems,
-                    onChanged: (value) {
+                  RankingMetricSelector(
+                    selectedMetric: selectedMetric,
+                    onMetricChanged: (value) {
                       setState(() {
                         selectedMetric = value;
                       });
@@ -81,41 +66,9 @@ class _RankingPageState extends State<RankingPage> {
                     const Center(child: CircularProgressIndicator())
                   else if (state is RankingLoaded)
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: state.rankingData.length,
-                        itemBuilder: (context, index) {
-                          final entry = state.rankingData[index];
-                          return ListTile(
-                            leading: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.blueAccent,
-                              ),
-                              width: 40,
-                              height: 40,
-                              child: Center(
-                                child: Text(
-                                  '${index + 1}',
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                ),
-                              ),
-                            ),
-                            title: Text(entry.email),
-                            subtitle: Text(
-                              selectedMetric == 'calorias_quemadas'
-                                  ? '${entry.caloriesBurned ?? 0} kcal'
-                                  : selectedMetric == 'km_recorridos'
-                                  ? '${entry.distance ?? 0} km'
-                                  : selectedMetric == 'num_rutas'
-                                  ? '${entry.numberOfRoutes ?? 0}'
-                                  : '${entry.elevationGain ?? 0} m',
-                            ),
-                          );
-                        },
+                      child: RankingUserList(
+                        selectedMetric: selectedMetric,
+                        rankingData: state.rankingData,
                       ),
                     )
                   else if (state is RankingError)
