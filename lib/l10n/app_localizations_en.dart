@@ -612,4 +612,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get social => 'Social';
+
+  @override
+  String get accountSuspendedMessage => 'Your account has been suspended.';
+
+  @override
+  String get accountSuspended => 'Account suspended';
+
+  @override
+  String get suspensionReason => 'Suspension reason';
+
+  @override
+  String get communityGuidelinesViolation => 'Community guidelines violation';
+
+  @override
+  String get needHelp => 'Need help?';
+
+  @override
+  String get contactSupport => 'Contact support';
+
+  @override
+  String get reviewCommunityGuidelines =>
+      'Review our community guidelines to avoid future suspensions.';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get days => 'days';
+
+  @override
+  String get hours => 'hours';
+
+  @override
+  String get minutes => 'minutes';
+
+  @override
+  String get permanent => 'Permanent';
 }

@@ -239,5 +239,17 @@
     "errorDeletingAccount": "Error deleting account.",
     "accountDeletedSuccessfully": "The account has been deleted successfully.",
     "userMismatch": "The user does not match the current user.",
-    "social": "Social"
+    "social": "Social",
+    "accountSuspendedMessage": "Your account has been suspended.",
+    "accountSuspended": "Account suspended",
+    "suspensionReason": "Suspension reason",
+    "communityGuidelinesViolation": "Community guidelines violation",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "reviewCommunityGuidelines": "Review our community guidelines to avoid future suspensions.",
+    "description": "Description",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "permanent": "Permanent"
 }
