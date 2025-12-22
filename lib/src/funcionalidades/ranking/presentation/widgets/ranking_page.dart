@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/presentation/bloc/ranking_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_user_list.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_metric_selector.dart';

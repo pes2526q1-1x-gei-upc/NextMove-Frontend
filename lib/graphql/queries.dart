@@ -324,6 +324,13 @@ class GraphQLQueries {
   query getRanking($metric: String!) {
     ranking(metric: $metric) {
       email
+      num_rutas
+      km_recorridos
+      elevacion_positiva
+      co2_ahorrado
+      calorias_quemadas
+      num_retos_participados
+      num_retos_completados
     }
   }''';
 

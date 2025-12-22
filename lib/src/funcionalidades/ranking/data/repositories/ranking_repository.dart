@@ -14,8 +14,7 @@ class RankingRepository {
   ) async {
     try {
       final rankingData = await rankingRemoteDataProvider.getRanking(metric);
-      // final rankingEntries = rankingData?.map((entry) => RankingEntry.fromJson(entry)).toList();
-      final rankingEntries = rankingData?.map((entry) => RankingEntry(email: entry)).toList();
+      final rankingEntries = rankingData?.map((entry) => RankingEntry.fromJson(entry)).toList();
       return Right(rankingEntries);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

@@ -8,7 +8,7 @@ import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/au
 class RankingRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
-  Future<List<String>?> getRanking(String metric) async {
+  Future<List<Map<String, dynamic>>?> getRanking(String metric) async {
     final authHeader = await AuthRemoteDataProvider().authHeader;
 
     final QueryOptions options = QueryOptions(
@@ -33,8 +33,7 @@ class RankingRemoteDataProvider {
     }
 
     return data != null
-        // ? List<String>.from(data.map((item) => item as String))
-        ? List<String>.from(data.map((item) => item['email'] as String))
+        ? List<Map<String, dynamic>>.from(data)
         : null;
   }
 }
