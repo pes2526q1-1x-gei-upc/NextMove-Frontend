@@ -29,6 +29,19 @@ class UserRepository {
     }
   }
 
+  Future<Either<Failure, UserEntity>> getUserProfileByEmail(String email) async {
+    try {
+      final user = await remoteDataProvider.getUserProfileByEmail(email);
+      return Right(user);
+    } on custom_exceptions.ServerException catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    } on custom_exceptions.AuthException catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
   Future<Either<Failure, UserEntity>> updateUserProfile(
     UserEntity userEntity,
   ) async {

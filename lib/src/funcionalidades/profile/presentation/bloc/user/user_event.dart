@@ -18,6 +18,14 @@ class LoadUserProfile extends UserEvent {
   List<Object?> get props => [userId];
 }
 
+class LoadUserProfileByEmail extends UserEvent {
+  final String email;
+  const LoadUserProfileByEmail(this.email);
+
+  @override
+  List<Object?> get props => [email];
+}
+
 class UpdateUserProfile extends UserEvent {
   final UserEntity updatedUser;
   final File? profilePhoto;

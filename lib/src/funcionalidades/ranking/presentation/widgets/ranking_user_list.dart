@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 
 class RankingUserList extends StatelessWidget {
   const RankingUserList({
@@ -19,6 +24,30 @@ class RankingUserList extends StatelessWidget {
       itemBuilder: (context, index) {
         final entry = rankingData[index];
         return ListTile(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return MultiBlocProvider(
+                    providers: [
+                      BlocProvider<UserBloc>(
+                        create: (context) {
+                          final bloc = UserBloc();
+                          bloc.add(LoadUserProfileByEmail(entry.email));
+                          return bloc;
+                        },
+                      ),
+                      BlocProvider<SocialBloc>(
+                        create: (context) => SocialBloc(),
+                      ),
+                    ],
+                    child: const FriendDetailsPage(),
+                  );
+                },
+              ),
+            );
+          },
           leading: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
