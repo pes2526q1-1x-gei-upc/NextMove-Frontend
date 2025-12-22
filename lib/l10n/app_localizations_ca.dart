@@ -612,4 +612,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
+
+  @override
+  String get start => 'Iniciar';
+
+  @override
+  String get estTime => 'Temps estimat';
+
+  @override
+  String get uLoc => 'La Teva Ubicació';
 }

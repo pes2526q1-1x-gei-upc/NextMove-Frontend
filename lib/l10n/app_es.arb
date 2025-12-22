@@ -245,5 +245,8 @@
     "accountDeleted": "Tu cuenta ha sido eliminada correctamente.",
     "errorDeletingAccount": "Error al eliminar la cuenta.",
     "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
-    "userMismatch": "El usuario no coincide con el usuario actual."
+    "userMismatch": "El usuario no coincide con el usuario actual.",
+    "start": "Iniciar",
+    "estTime": "Tiempo estimado",
+    "uLoc" : "Tu ubicación"
 }

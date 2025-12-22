@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class RoutePreviewWidget extends StatelessWidget {
   final NavigationRoute route;
@@ -15,6 +16,8 @@ class RoutePreviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -78,7 +81,7 @@ class RoutePreviewWidget extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 28),
                           child: Text(
-                            'Tiempo estimado',
+                            l10n.estTime,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey[600],
@@ -122,7 +125,7 @@ class RoutePreviewWidget extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(right: 28),
                           child: Text(
-                            'Distancia total',
+                            l10n.distance,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey[600],
@@ -155,13 +158,13 @@ class RoutePreviewWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.navigation_rounded),
                             SizedBox(width: 8),
                             Text(
-                              'Iniciar',
+                              l10n.start,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -188,8 +191,8 @@ class RoutePreviewWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: const Text(
-                          'Cancelar',
+                        child: Text(
+                          l10n.cancel,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,

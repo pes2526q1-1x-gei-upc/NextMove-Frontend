@@ -1245,6 +1245,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The user does not match the current user.'**
   String get userMismatch;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// No description provided for @estTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel time'**
+  String get estTime;
+
+  /// No description provided for @uLoc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Location'**
+  String get uLoc;
 }
 
 class _AppLocalizationsDelegate

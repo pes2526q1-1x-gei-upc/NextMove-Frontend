@@ -606,4 +606,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userMismatch => 'The user does not match the current user.';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get estTime => 'Travel time';
+
+  @override
+  String get uLoc => 'Your Location';
 }

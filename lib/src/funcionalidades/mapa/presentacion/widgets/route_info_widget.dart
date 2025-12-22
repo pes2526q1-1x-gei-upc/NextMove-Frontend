@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
+
 
 class RouteInfoWidget extends StatelessWidget {
   final LatLng origin;
@@ -14,6 +16,7 @@ class RouteInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       decoration: BoxDecoration(
@@ -44,7 +47,7 @@ class RouteInfoWidget extends StatelessWidget {
               _buildLocationRow(
                 icon: Icons.my_location,
                 iconColor: Colors.blue,
-                text: 'Tu ubicación',
+                text: l10n.uLoc,
               ),
               _buildConnectorLine(),
               _buildLocationRow(
