@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -192,37 +193,51 @@ class _MapPageState extends State<MapPage> {
                           origin: state.userLocation!,
                           destination: state.selectedStation!,
                         )
-                      )
+                      ),
+                      if(state.navigationRoute != null)
+                      Positioned(
+                        bottom: 30,
+                        left: 16,
+                        right: 16,
+                        child: RoutePreviewWidget(
+                          route: state.navigationRoute!,
+                          onStartPressed: () {
+                            // Acción al iniciar (puedes loguear o llamar evento)
+                            debugPrint("Iniciar navegación presionado");
+                          },
+                        ),
+                      ),
                     ],
                     
 
                     // Barra de búsqueda
                     if(!state.isNavigationMode)...[
-                    SearchBarWidget(
-                      hintText: AppLocalizations.of(context)!.searchStation,
-                      onChanged: (query) {
-                        if (kDebugMode) {
-                          print('Searching: $query');
-                        }
-                      },
-                      onFocusChanged: (isFocused) {
-                        print('📍 MapPage received focus change: $isFocused');
-                        setState(() {
-                          _isSearchBarFocused = isFocused;
-                        });
-                      },
-                    ),
+                      SearchBarWidget(
+                        hintText: AppLocalizations.of(context)!.searchStation,
+                        onChanged: (query) {
+                          if (kDebugMode) {
+                            print('Searching: $query');
+                          }
+                        },
+                        onFocusChanged: (isFocused) {
+                          print('📍 MapPage received focus change: $isFocused');
+                          setState(() {
+                            _isSearchBarFocused = isFocused;
+                          });
+                        },
+                      ),
 
-                    // Botón de lista de estaciones
-                    StationListButtonWidget(
-                      currentMode: state.currentMode,
-                      userLocation: state.userLocation,
-                    ),
+                      // Botón de lista de estaciones
+                      StationListButtonWidget(
+                        currentMode: state.currentMode,
+                        userLocation: state.userLocation,
+                      ),
 
-                    // Avatar de perfil
-                    //ProfileAvatarWidget(context: context),
-                    // Route history button
-                    RouteHistoryButtonWidget()],
+                      // Avatar de perfil
+                      //ProfileAvatarWidget(context: context),
+                      // Route history button
+                      RouteHistoryButtonWidget(),
+                   
 
                     // Columna de controles del mapa (botones combinados)
                     MapControlsColumnWidget(
@@ -243,6 +258,7 @@ class _MapPageState extends State<MapPage> {
                         isSearchBarFocused: _isSearchBarFocused,
                       ),
                     ),
+                    ],
                   ],
                 );
               }
