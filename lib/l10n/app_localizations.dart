@@ -1287,6 +1287,77 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No statistics available for this user.'**
   String get noStatisticsAvailable;
+  /// No description provided for @accountSuspendedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been suspended.'**
+  String get accountSuspendedMessage;
+
+  /// No description provided for @accountSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Account suspended'**
+  String get accountSuspended;
+
+  /// No description provided for @suspensionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension reason'**
+  String get suspensionReason;
+
+  /// No description provided for @communityGuidelinesViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Community guidelines violation'**
+  String get communityGuidelinesViolation;
+
+  /// No description provided for @needHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help?'**
+  String get needHelp;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support'**
+  String get contactSupport;
+
+  /// No description provided for @reviewCommunityGuidelines.
+  ///
+  /// In en, this message translates to:
+  /// **'Review our community guidelines to avoid future suspensions.'**
+  String get reviewCommunityGuidelines;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get hours;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @permanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent'**
+  String get permanent;
 }
 
 class _AppLocalizationsDelegate

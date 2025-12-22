@@ -634,4 +634,40 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noStatisticsAvailable =>
       'No hay estadísticas disponibles para este usuario.';
+  String get accountSuspendedMessage => 'Tu cuenta ha sido suspendida.';
+
+  @override
+  String get accountSuspended => 'Cuenta suspendida';
+
+  @override
+  String get suspensionReason => 'Motivo de la suspensión';
+
+  @override
+  String get communityGuidelinesViolation =>
+      'Violación de las normas de la comunidad';
+
+  @override
+  String get needHelp => '¿Necesitas ayuda?';
+
+  @override
+  String get contactSupport => 'Contacta con soporte';
+
+  @override
+  String get reviewCommunityGuidelines =>
+      'Revisa nuestras normas de comunidad para evitar futuras suspensiones.';
+
+  @override
+  String get description => 'Descripción';
+
+  @override
+  String get days => 'días';
+
+  @override
+  String get hours => 'horas';
+
+  @override
+  String get minutes => 'minutos';
+
+  @override
+  String get permanent => 'Permanente';
 }

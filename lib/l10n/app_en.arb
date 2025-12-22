@@ -244,5 +244,17 @@
     "numberOfRoutes": "Number of routes",
     "challengesParticipated": "Challenges participated",
     "challengesCompleted": "Challenges completed",
-    "noStatisticsAvailable": "No statistics available for this user."
+    "noStatisticsAvailable": "No statistics available for this user.",
+    "accountSuspendedMessage": "Your account has been suspended.",
+    "accountSuspended": "Account suspended",
+    "suspensionReason": "Suspension reason",
+    "communityGuidelinesViolation": "Community guidelines violation",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "reviewCommunityGuidelines": "Review our community guidelines to avoid future suspensions.",
+    "description": "Description",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "permanent": "Permanent"
 }

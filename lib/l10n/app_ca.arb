@@ -236,5 +236,17 @@
     "numberOfRoutes": "Nombre de rutes",
     "challengesParticipated": "Reptes participats",
     "challengesCompleted": "Reptes completats",
-    "noStatisticsAvailable": "No hi ha estadístiques disponibles per a aquest usuari."
+    "noStatisticsAvailable": "No hi ha estadístiques disponibles per a aquest usuari.",
+    "accountSuspendedMessage": "El seu compte ha sigut suspès.",
+    "accountSuspended": "Compte suspès",
+    "suspensionReason": "Motiu de la suspensió",
+    "communityGuidelinesViolation": "Incompliment de les normes de la comunitat",
+    "needHelp": "Necessites ajuda?",
+    "contactSupport": "Contacta amb el suport",
+    "reviewCommunityGuidelines": "Revisa les nostres normes de la comunitat per evitar futures suspensions.",
+    "description": "Descripció",
+    "days": "dies",
+    "hours": "hores",
+    "minutes": "minuts",
+    "permanent": "Permanent"
 }
