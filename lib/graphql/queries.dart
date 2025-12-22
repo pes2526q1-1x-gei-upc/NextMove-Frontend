@@ -1,6 +1,6 @@
 class GraphQLQueries {
   // === Perfil ===
-  static const String getUserProfileQuery = r'''
+  static const String getMeQuery = r'''
   query Me {
     me {
       email
@@ -16,6 +16,23 @@ class GraphQLQueries {
     }
   }
   ''';
+
+  static const String getUserQuery = r'''
+      query User($email: String!) {
+        User(email: $email) {
+          email
+          name
+          nickname
+          photo
+          phoneNumber
+          bioDescription
+          preferredMode
+          preferredLanguage
+          birthDate
+          createdAt
+        }
+      }
+    ''';
 
   static const String existsUserQuery = r'''
     query ExistsUser ($email: String!) {

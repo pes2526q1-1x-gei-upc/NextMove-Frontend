@@ -20,6 +20,7 @@ class RankingMetricSelector extends StatelessWidget {
       {'key': 'km_recorridos', 'label': l10n.distance},
       {'key': 'num_rutas', 'label': l10n.numberOfRoutes},
       {'key': 'elevacion_positiva', 'label': l10n.elevationGain},
+      {'key': 'co2_ahorrado', 'label': l10n.co2Saved},
     ];
 
     List<DropdownMenuItem<String>> metricsDropdownItems = metrics

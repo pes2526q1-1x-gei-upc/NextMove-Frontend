@@ -10,7 +10,7 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getUserProfileQuery),
+      document: gql(GraphQLQueries.getMeQuery),
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
