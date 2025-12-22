@@ -626,6 +626,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get social => 'Social';
 
   @override
+  String get ranking => 'Ranking';
+
+  @override
+  String get numberOfRoutes => 'Number of routes';
+
+  @override
+  String get challengesParticipated => 'Challenges participated';
+
+  @override
+  String get challengesCompleted => 'Challenges completed';
+
+  @override
+  String get noStatisticsAvailable => 'No statistics available for this user.';
   String get accountSuspendedMessage => 'Your account has been suspended.';
 
   @override

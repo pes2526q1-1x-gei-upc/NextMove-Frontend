@@ -1282,6 +1282,35 @@ abstract class AppLocalizations {
   /// **'Social'**
   String get social;
 
+  /// No description provided for @ranking.
+  ///
+  /// In en, this message translates to:
+  /// **'Ranking'**
+  String get ranking;
+
+  /// No description provided for @numberOfRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of routes'**
+  String get numberOfRoutes;
+
+  /// No description provided for @challengesParticipated.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges participated'**
+  String get challengesParticipated;
+
+  /// No description provided for @challengesCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges completed'**
+  String get challengesCompleted;
+
+  /// No description provided for @noStatisticsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No statistics available for this user.'**
+  String get noStatisticsAvailable;
   /// No description provided for @accountSuspendedMessage.
   ///
   /// In en, this message translates to:

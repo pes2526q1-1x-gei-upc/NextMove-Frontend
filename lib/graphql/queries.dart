@@ -1,6 +1,6 @@
 class GraphQLQueries {
   // === Perfil ===
-  static const String getUserProfileQuery = r'''
+  static const String getMeQuery = r'''
   query Me {
     me {
       email
@@ -22,6 +22,23 @@ class GraphQLQueries {
     }
   }
   ''';
+
+  static const String getUserQuery = r'''
+      query User($email: String!) {
+        User(email: $email) {
+          email
+          name
+          nickname
+          photo
+          phoneNumber
+          bioDescription
+          preferredMode
+          preferredLanguage
+          birthDate
+          createdAt
+        }
+      }
+    ''';
 
   static const String existsUserQuery = r'''
     query ExistsUser ($email: String!) {
@@ -371,4 +388,58 @@ class GraphQLQueries {
       deleteFavStation(stationId: $stationId, type: $stationType)
     }
   ''';
+
+  // === Ranking ===
+
+  static const String getRanking = r'''
+  query getRanking($metric: String!) {
+    ranking(metric: $metric) {
+      email
+      num_rutas
+      km_recorridos
+      elevacion_positiva
+      co2_ahorrado
+      calorias_quemadas
+      num_retos_participados
+      num_retos_completados
+    }
+  }''';
+
+  static const String getGlobalStats = r'''
+  query global {
+    globalStats {
+      total_usuarios
+      usuarios_activos
+      usuarios_inactivos
+      km_recorridos_totales
+      km_promedio
+      km_recorridos_maximo
+      rutas_totales
+      elevacion_positiva_total
+      calorias_quemadas_total
+      co2_total_ahorrado
+    }
+  }''';
+
+  static const String getUserStats = r'''
+  query userStats($email: String!) {
+    userStats(email: $email) {
+      email
+      num_rutas
+      km_recorridos
+      co2_ahorrado
+      calorias_quemadas
+      elevacion_positiva
+      num_retos_participados
+      num_retos_completados
+      num_rutas
+    }
+  }''';
+
+  static const String getTopUsers = r'''
+  query top($limit: Int!, $metric: String!) {
+    topUsers(limit: $limit, metric: $metric) {
+      email
+    }
+  }''';
 }

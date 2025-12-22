@@ -10,6 +10,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   UserBloc() : super(UserInitial()) {
     on<LoadUserProfile>(_onLoadUserProfile);
+    on<LoadUserProfileByEmail>(_onLoadUserProfileByEmail);
     on<UpdateUserProfile>(_onUpdateUserProfile);
     on<CreateUserProfile>(_onCreateUserProfile);
     on<LogoutUser>(_onLogoutUser);
@@ -36,6 +37,33 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           print(
           "UserBloc: Loaded profile for ${user.apodo} (Email: ${user.email})",
         );
+        }
+        emit(UserLoaded(user));
+      },
+    );
+  }
+
+  Future<void> _onLoadUserProfileByEmail(
+    LoadUserProfileByEmail event,
+    Emitter<UserState> emit,
+  ) async {
+    if (kDebugMode) {
+      print("UserBloc: Loading profile for email ${event.email}");
+    }
+    emit(UserLoading());
+    final result = await userRepository.getUserProfileByEmail(event.email);
+    result.fold(
+      (failure) {
+        if (kDebugMode) {
+          print("UserBloc: Failed to load profile: ${failure.message}");
+        }
+        emit(UserNeedsToSignUp());
+      },
+      (user) {
+        if (kDebugMode) {
+          print(
+            "UserBloc: Loaded profile for ${user.apodo} (Email: ${user.email})",
+          );
         }
         emit(UserLoaded(user));
       },
