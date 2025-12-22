@@ -242,5 +242,7 @@
     "social": "Social",
     "ranking": "Ranking",
     "numberOfRoutes": "Number of routes",
+    "challengesParticipated": "Challenges participated",
+    "challengesCompleted": "Challenges completed",
     "noStatisticsAvailable": "No statistics available for this user."
 }

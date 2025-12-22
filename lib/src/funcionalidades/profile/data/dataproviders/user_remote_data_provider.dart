@@ -122,8 +122,7 @@ class UserRemoteDataProvider {
   Future<dynamic> _fetchStatistics(String email) async {
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getUserStats),
-      //TODO: incloure totes les mètriques
-      variables: {'email': email, 'metric': 'km_recorridos'},
+      variables: {'email': email},
       fetchPolicy: FetchPolicy.networkOnly,
     );
 

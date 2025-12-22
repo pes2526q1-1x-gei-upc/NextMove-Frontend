@@ -209,6 +209,18 @@ class _StatisticsGrid extends StatelessWidget {
         value: '${statistics.co2Saved.toStringAsFixed(1)} kg',
         color: Colors.teal,
       ),
+      _StatItem(
+        icon: Icons.emoji_events,
+        label: l10n.challengesParticipated,
+        value: statistics.challengesParticipated.toStringAsFixed(0),
+        color: Colors.purple,
+      ),
+      _StatItem(
+        icon: Icons.check_circle,
+        label: l10n.challengesCompleted,
+        value: statistics.challengesCompleted.toStringAsFixed(0),
+        color: Colors.amber,
+      ),
     ];
 
     return Container(

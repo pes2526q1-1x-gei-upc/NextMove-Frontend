@@ -1270,6 +1270,18 @@ abstract class AppLocalizations {
   /// **'Number of routes'**
   String get numberOfRoutes;
 
+  /// No description provided for @challengesParticipated.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges participated'**
+  String get challengesParticipated;
+
+  /// No description provided for @challengesCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges completed'**
+  String get challengesCompleted;
+
   /// No description provided for @noStatisticsAvailable.
   ///
   /// In en, this message translates to:

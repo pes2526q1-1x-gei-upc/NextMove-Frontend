@@ -53,14 +53,19 @@ class UserEntity extends Equatable {
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
       photo: data['photo'] ?? '',
       regWithGoogle: data['regWithGoogle'] ?? false,
-      // TODO: Completar estadístiques
       statistics: data['statistics'] != null
           ? UserStatistics(
               totalRoutes: data['statistics']['num_rutas'] ?? 0,
               distance: (data['statistics']['km_recorridos'] ?? 0).toDouble(),
-              elevationGain: (data['statistics']['elevacion_positiva'] ?? 0).toDouble(),
-              caloriesBurned: (data['statistics']['calorias_quemadas'] ?? 0).toDouble(),
+              elevationGain: (data['statistics']['elevacion_positiva'] ?? 0)
+                  .toDouble(),
+              caloriesBurned: (data['statistics']['calorias_quemadas'] ?? 0)
+                  .toDouble(),
               co2Saved: (data['statistics']['co2_ahorrado'] ?? 0).toDouble(),
+              challengesParticipated:
+                  (data['statistics']['num_retos_participados'] ?? 0).toDouble(),
+              challengesCompleted:
+                  (data['statistics']['num_retos_completados'] ?? 0).toDouble(),
             )
           : null,
     );
@@ -186,9 +191,11 @@ class UserEntity extends Equatable {
 class UserStatistics {
   final int totalRoutes;
   final double distance;
-  final double elevationGain;
-  final double caloriesBurned;
   final double co2Saved;
+  final double caloriesBurned;
+  final double elevationGain;
+  final double challengesParticipated;
+  final double challengesCompleted;
 
   UserStatistics({
     required this.totalRoutes,
@@ -196,5 +203,7 @@ class UserStatistics {
     required this.elevationGain,
     required this.caloriesBurned,
     required this.co2Saved,
+    required this.challengesParticipated,
+    required this.challengesCompleted,
   });
 }

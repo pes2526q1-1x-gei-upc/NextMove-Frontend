@@ -244,5 +244,7 @@
     "social": "Social",
     "ranking": "Ránquing",
     "numberOfRoutes": "Número de rutas",
+    "challengesParticipated": "Retos participados",
+    "challengesCompleted": "Retos completados",
     "noStatisticsAvailable": "No hay estadísticas disponibles para este usuario."
 }

@@ -344,14 +344,17 @@ class GraphQLQueries {
   }''';
 
   static const String getUserStats = r'''
-  query userStats($email: String!, $metric: String!) {
-    userStats(email: $email, metric: $metric) {
+  query userStats($email: String!) {
+    userStats(email: $email) {
       email
       num_rutas
       km_recorridos
-      elevacion_positiva
-      calorias_quemadas
       co2_ahorrado
+      calorias_quemadas
+      elevacion_positiva
+      num_retos_participados
+      num_retos_completados
+      num_rutas
     }
   }''';
 
