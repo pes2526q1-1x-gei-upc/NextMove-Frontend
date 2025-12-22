@@ -17,10 +17,12 @@ class RouteInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -45,12 +47,14 @@ class RouteInfoWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildLocationRow(
+                context,
                 icon: Icons.my_location,
                 iconColor: Colors.blue,
                 text: l10n.uLoc,
               ),
               _buildConnectorLine(),
               _buildLocationRow(
+                context,
                 icon: Icons.location_on,
                 iconColor: Colors.red,
                 text: destination.name!,
@@ -62,11 +66,14 @@ class RouteInfoWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationRow({
+  Widget _buildLocationRow(
+    BuildContext context, {
     required IconData icon,
     required Color iconColor,
     required String text,
   }) {
+    final theme = Theme.of(context);
+    
     return Row(
       children: [
         Icon(icon, color: iconColor, size: 24),
@@ -74,10 +81,10 @@ class RouteInfoWidget extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: Color.fromARGB(255, 97, 97, 97),
+              color: theme.colorScheme.onSurface.withOpacity(0.8),
               letterSpacing: -0.2,
             ),
             maxLines: 1,

@@ -17,11 +17,13 @@ class RoutePreviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -41,7 +43,7 @@ class RoutePreviewWidget extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -69,10 +71,10 @@ class RoutePreviewWidget extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               route.duration,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.black87,
+                                color: theme.colorScheme.onSurface,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -84,7 +86,7 @@ class RoutePreviewWidget extends StatelessWidget {
                             l10n.estTime,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -96,7 +98,7 @@ class RoutePreviewWidget extends StatelessWidget {
                     Container(
                       height: 40,
                       width: 1,
-                      color: Colors.grey[200],
+                      color: theme.dividerColor,
                     ),
 
                     // Distance - Secondary Info
@@ -107,10 +109,10 @@ class RoutePreviewWidget extends StatelessWidget {
                           children: [
                              Text(
                               route.distance,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.black87,
+                                color: theme.colorScheme.onSurface,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -128,7 +130,7 @@ class RoutePreviewWidget extends StatelessWidget {
                             l10n.distance,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey[600],
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -161,11 +163,11 @@ class RoutePreviewWidget extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.navigation_rounded),
-                            SizedBox(width: 8),
+                            const Icon(Icons.navigation_rounded),
+                            const SizedBox(width: 8),
                             Text(
                               l10n.start,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -193,7 +195,7 @@ class RoutePreviewWidget extends StatelessWidget {
                         ),
                         child: Text(
                           l10n.cancel,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
