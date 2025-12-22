@@ -4,11 +4,13 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.da
 class RoutePreviewWidget extends StatelessWidget {
   final NavigationRoute route;
   final VoidCallback onStartPressed;
+  final VoidCallback onCancelPressed;
 
   const RoutePreviewWidget({
     super.key,
     required this.route,
     required this.onStartPressed,
+    required this.onCancelPressed,
   });
 
   @override
@@ -29,7 +31,7 @@ class RoutePreviewWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle bar implementation for visual cue (optional but good for bottom sheets)
+          // Handle bar implementation
           Center(
             child: Container(
               margin: const EdgeInsets.only(top: 12),
@@ -43,7 +45,7 @@ class RoutePreviewWidget extends StatelessWidget {
           ),
           
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16), // Reduced bottom padding
             child: Column(
               children: [
                 // Route Stats Row
@@ -133,37 +135,69 @@ class RoutePreviewWidget extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 16), // Reduced spacing
 
                 // Start Navigation Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: onStartPressed,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[600],
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                // Buttons Column
+                Column( // Changed from Row to Column
+                  children: [
+                    // Start Navigation Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: onStartPressed,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[600],
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.navigation_rounded),
+                            SizedBox(width: 8),
+                            Text(
+                              'Iniciar',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.navigation_rounded),
-                        SizedBox(width: 12),
-                        Text(
-                          'Iniciar Ruta',
+
+                    const SizedBox(height: 12), // Vertical spacing
+
+                    // Cancel Navigation Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: onCancelPressed,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancelar',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

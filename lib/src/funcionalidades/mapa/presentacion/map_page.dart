@@ -173,19 +173,6 @@ class _MapPageState extends State<MapPage> {
                     //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
                     if (state.isNavigationMode)...[
                       Positioned(
-                        top: 160,
-                        right: 16,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<MapBloc>().add(CancelNavigationEvent());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                          ),
-                          child: Text("Cancelar Navegación"),
-                        ),
-                      ),
-                      Positioned(
                         top:60,
                         left:0,
                         right:0,
@@ -204,6 +191,9 @@ class _MapPageState extends State<MapPage> {
                           onStartPressed: () {
                             // Acción al iniciar (puedes loguear o llamar evento)
                             debugPrint("Iniciar navegación presionado");
+                          },
+                          onCancelPressed: () {
+                             context.read<MapBloc>().add(CancelNavigationEvent());
                           },
                         ),
                       ),
