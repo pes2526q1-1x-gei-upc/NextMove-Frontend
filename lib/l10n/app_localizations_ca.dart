@@ -445,6 +445,9 @@ class AppLocalizationsCa extends AppLocalizations {
       'No s\'han gravat prou punts per desar la ruta enregistrada.';
 
   @override
+  String get howToGetThere => 'Indicacions';
+
+  @override
   String get routeHistory => 'Historial de recorreguts enregistrats';
 
   @override
@@ -615,6 +618,15 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get userMismatch => 'L\'usuari no coincideix amb l\'usuari actual.';
+
+  @override
+  String get start => 'Iniciar';
+
+  @override
+  String get estTime => 'Temps estimat';
+
+  @override
+  String get uLoc => 'La Teva Ubicació';
 
   @override
   String get social => 'Social';

@@ -6,10 +6,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+import 'package:nextmove_app/src/shared/domain/route_input.dart';
+import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'map_events.dart';
 import 'map_state.dart';
@@ -25,6 +29,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final TrackRepository trackRepository;
   final RecordedRoutesRepository recordedRoutesRepository;
   final SearchHistoryService searchHistoryService;
+  final NavigationRouteRepository navigationRouteRepository;
   final StationsCache stationsCache;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
@@ -37,14 +42,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
+  final StationType? _initialMode;
+
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
     required this.recordedRoutesRepository,
+    required this.navigationRouteRepository,
     required this.searchHistoryService,
     required this.stationsCache,
     required this.onMarkerTapped,
-  }) : super(const MapInitialState()) {
+    StationType? initialMode,
+  }) : _initialMode = initialMode,
+       super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
@@ -58,6 +68,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
     on<AddRoutePointEvent>(_onAddRoutePoint);
     on<UpdateRecordingElapsedTimeEvent>(_onUpdateRecordingElapsedTime);
+    on<ShowRouteToStationEvent>(_onShowRouteToStation);
+    on<CancelNavigationEvent>(_onCancelNavigation);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -114,13 +126,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evStations,
       );
 
+      // Determinar el modo inicial: usar el modo preferido del usuario o bici por defecto
+      final initialMode = _initialMode ?? StationType.bicycle;
+
       // Emitir estado cargado
       emit(
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
           userLocation: null,
-          currentMode: StationType.bicycle,
+          currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
@@ -130,7 +145,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isSearching: false,
           routePolyline: defaultPolyline,
           recentBikeSearches: recentBikeSearches,  
-          recentEvSearches: recentEvSearches,      
+          recentEvSearches: recentEvSearches,     
+          decodedPolyline: null,
         ),
       );
 
@@ -652,6 +668,98 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
       emit(currentState.copyWith(
         recordingElapsedTime: newElapsedTime,
+      ));
+    }
+  }
+
+  void _onShowRouteToStation (
+    ShowRouteToStationEvent event,
+    Emitter<MapState> emit,
+  ) async{
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      
+      emit(currentState.copyWith(
+        isNavigationMode: true,
+        selectedStation: event.station,
+        searchQuery: null,
+        searchResults: [],
+      ));
+
+      final routeInput = RouteInput(
+        origin: currentState.userLocation!, 
+        destination: LatLng(event.station.latitude!, event.station.longitude!),  
+        mode: currentState.currentMode == StationType.bicycle ? TravelModeEnum.BICYCLE : TravelModeEnum.DRIVE, 
+        routingPreference: RoutingPreferenceEnum.TRAFFIC_AWARE,
+      );
+
+      try{
+          final result = await navigationRouteRepository.fetchNavigationRoute(routeInput);
+
+          if(emit.isDone){
+            debugPrint('Bloc closed, aborting navigation route fetch.');
+            return;
+          }
+          result.fold(
+            (failure) {
+              if (kDebugMode) {
+                print('Error fetching navigation route: ${failure.message}');
+              }
+            },
+            (navigationRoute) {
+              if (kDebugMode) {
+                print('Navigation route fetched successfully.');
+              }
+              final List<PointLatLng> decodedPoints = PolylinePoints.decodePolyline(navigationRoute.polyline);
+
+              final List<LatLng> polylinePointsCoordinates = decodedPoints
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+
+              // 3. Crear el objeto Polyline
+              final Polyline navigationPolyline = Polyline(
+                polylineId: const PolylineId('navigation_route'),
+                points: polylinePointsCoordinates,
+                color:  currentState.currentMode == StationType.bicycle ? Colors.blue : Colors.green,
+                width: 5,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              );
+
+              emit(currentState.copyWith(
+                navigationRoute: navigationRoute,
+                decodedPolyline: navigationPolyline,
+                routeViewport: navigationRoute.viewport,
+                isNavigationMode: true,
+                selectedStation: event.station,
+                searchQuery: null,
+                searchResults: [],
+              ));
+            },
+          );
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error fetching navigation route: $e');
+            }
+          }
+
+    }
+
+    
+  }
+
+  void _onCancelNavigation(
+    CancelNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(
+        isNavigationMode: false,
+        selectedStation: null,
+        navigationRoute: null,
+        decodedPolyline: Polyline(polylineId: PolylineId('no_route')),
+        routeViewport: null,
       ));
     }
   }

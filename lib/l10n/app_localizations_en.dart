@@ -439,6 +439,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not enough points were recorded to save the recorded route.';
 
   @override
+  String get howToGetThere => 'Directions';
+
+  @override
   String get routeHistory => 'Recorded route history';
 
   @override
@@ -609,6 +612,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userMismatch => 'The user does not match the current user.';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get estTime => 'Travel time';
+
+  @override
+  String get uLoc => 'Your Location';
 
   @override
   String get social => 'Social';

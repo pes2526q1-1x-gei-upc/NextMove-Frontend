@@ -445,6 +445,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se han registrado suficientes puntos para guardar la ruta grabada.';
 
   @override
+  String get howToGetThere => 'Cómo llegar';
+
+  @override
   String get routeHistory => 'Historial de recorridos grabados';
 
   @override
@@ -615,6 +618,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get userMismatch => 'El usuario no coincide con el usuario actual.';
+
+  @override
+  String get start => 'Iniciar';
+
+  @override
+  String get estTime => 'Tiempo estimado';
+
+  @override
+  String get uLoc => 'Tu ubicación';
 
   @override
   String get social => 'Social';

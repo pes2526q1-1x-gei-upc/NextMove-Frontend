@@ -146,6 +146,13 @@ class AuthRemoteDataProvider {
       final firebaseUserId = user.uid;
       final firebaseToken = await user.getIdToken();
 
+      
+      if (kDebugMode) {
+        print("Firebase ID Token (usa este en el header): $firebaseToken");
+        print("Email: ${user.email}");
+        print("Display Name: ${user.displayName}");
+      }
+
       final authService = AuthService(client);
 
       // For sign in, user should already exist, so just fetch meData

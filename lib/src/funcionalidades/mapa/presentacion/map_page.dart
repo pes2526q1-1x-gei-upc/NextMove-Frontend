@@ -8,7 +8,10 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cac
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -16,6 +19,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
@@ -28,6 +32,8 @@ import 'widgets/toggle_map_mode_widget.dart';
 import 'widgets/search_bar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_list_widget.dart';
 import 'widgets/map_controls_column_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -40,15 +46,19 @@ class _MapPageState extends State<MapPage> {
   // Controllers & state
   // -----------------------------------------------------------------------
   GoogleMapController? _mapController;
+  BuildContext? _blocContext;
   List<StationDetails> stations = [];
   List<StationDetails> bikeStations = [];
   StationRepository stationRepository = StationRepository();
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
+  NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
+  bool _hasCenteredOnUser = false;
 
   
   StreamSubscription<Position>? _positionStream;
@@ -71,21 +81,52 @@ class _MapPageState extends State<MapPage> {
   // UI helpers
   // -----------------------------------------------------------------------
 
+  /// Convierte el modo preferido del usuario (string de la API) a StationType
+  StationType? _getPreferredModeFromUser(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    
+    if (user == null) return null;
+    
+    final preferredMode = user['preferredMode'] as String?;
+    if (preferredMode == null) return null;
+    
+    // Convertir "BIKE" o "CAR" a StationType
+    switch (preferredMode.toUpperCase()) {
+      case 'BIKE':
+        return StationType.bicycle;
+      case 'CAR':
+        return StationType.electricVehicle;
+      default:
+        return null;
+    }
+  }
+
   // -----------------------------------------------------------------------
   // Build
   // -----------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    // Obtener el modo preferido del usuario (o null si no tiene)
+    final preferredMode = _getPreferredModeFromUser(context);
+    
     return BlocProvider(
       create: (context) => MapBloc(
         stationRepository: stationRepository,
         trackRepository: trackRepository,
         recordedRoutesRepository: recordedRoutesRepository,
         searchHistoryService: searchHistoryService,
+        navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
         onMarkerTapped: _showStationBottomSheet,
+        initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
-      child: _buildUI(context),
+      child: Builder(  // ← AÑADE ESTE Builder
+        builder: (blocContext) {
+          _blocContext = blocContext;  // ← GUARDA el context
+          return _buildUI(blocContext);
+        },
+      ),    
     );
   }
 
@@ -113,6 +154,23 @@ class _MapPageState extends State<MapPage> {
                 ),
               );
             }
+            if(state is MapLoadedState && state.routeViewport != null){
+              _setZoomToViewport(state.routeViewport!); 
+            }
+            // Centrar la cámara en la ubicación del usuario la primera vez que se obtiene
+            if (state is MapLoadedState && 
+                state.userLocation != null && 
+                !_hasCenteredOnUser && 
+                _mapController != null) {
+              _hasCenteredOnUser = true;
+
+              _mapController!.animateCamera(
+                CameraUpdate.newLatLngZoom(
+                  state.userLocation!,
+                  15.0,
+                ),
+              );
+            }
           },
           child: BlocBuilder<MapBloc, MapState>(
             builder: (context, state) {
@@ -124,9 +182,20 @@ class _MapPageState extends State<MapPage> {
               }
 
               if (state is MapLoadedState) {
-                final markersToShow = state.currentMode == StationType.bicycle
-                    ? state.bikeMarkers
-                    : state.carMarkers;
+                final Set<Marker> markersToShow;
+                if (state.isNavigationMode && state.selectedStation != null) {
+                   final sourceMarkers = state.currentMode == StationType.bicycle
+                      ? state.bikeMarkers
+                      : state.carMarkers;
+                      
+                   markersToShow = sourceMarkers.where(
+                      (m) => m.markerId.value == state.selectedStation!.id
+                   ).toSet();
+                } else {
+                   markersToShow = state.currentMode == StationType.bicycle
+                      ? state.bikeMarkers
+                      : state.carMarkers;
+                }
 
                 return Stack(
                   children: [
@@ -141,36 +210,75 @@ class _MapPageState extends State<MapPage> {
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
                       onMapCreated: _onMapCreated,
+                      navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : const Polyline(polylineId: PolylineId('No route')),
+                      myLocationEnabled: state.userLocation != null,
+                      padding: state.isNavigationMode 
+                        ? const EdgeInsets.only(
+                            top: 180,    // Espacio para RouteInfoWidget
+                            bottom: 240, // Espacio para RoutePreviewWidget
+                            left: 20,
+                            right: 20,
+                          )
+                        : EdgeInsets.zero,
                     ),
+
+                    //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
+                    if (state.isNavigationMode)...[
+                      Positioned(
+                        top:60,
+                        left:0,
+                        right:0,
+                        child: RouteInfoWidget(
+                          origin: state.userLocation!,
+                          destination: state.selectedStation!,
+                        )
+                      ),
+                      if(state.navigationRoute != null)
+                      Positioned(
+                        bottom: 30,
+                        left: 16,
+                        right: 16,
+                        child: RoutePreviewWidget(
+                          route: state.navigationRoute!,
+                          onStartPressed: () {
+                            // Acción al iniciar (puedes loguear o llamar evento)
+                            debugPrint("Iniciar navegación presionado");
+                          },
+                          onCancelPressed: () {
+                             context.read<MapBloc>().add(CancelNavigationEvent());
+                          },
+                        ),
+                      ),
+                    ],
+                    
 
                     // Barra de búsqueda
-                    SearchBarWidget(
-                      hintText: AppLocalizations.of(context)!.searchStation,
-                      onChanged: (query) {
-                        if (kDebugMode) {
-                          print('Searching: $query');
-                        }
-                      },
-                      onFocusChanged: (isFocused) {
-                        if (kDebugMode) {
-                          print('📍 MapPage received focus change: $isFocused');
-                        }
-                        setState(() {
-                          _isSearchBarFocused = isFocused;
-                        });
-                      },
-                    ),
+                    if(!state.isNavigationMode)...[
+                      SearchBarWidget(
+                        hintText: AppLocalizations.of(context)!.searchStation,
+                        onChanged: (query) {
+                          if (kDebugMode) {
+                            print('Searching: $query');
+                          }
+                        },
+                        onFocusChanged: (isFocused) {
+                          setState(() {
+                            _isSearchBarFocused = isFocused;
+                          });
+                        },
+                      ),
 
-                    // Botón de lista de estaciones
-                    StationListButtonWidget(
-                      currentMode: state.currentMode,
-                      userLocation: state.userLocation,
-                    ),
+                      // Botón de lista de estaciones
+                      StationListButtonWidget(
+                        currentMode: state.currentMode,
+                        userLocation: state.userLocation,
+                      ),
 
-                    // Avatar de perfil
-                    //ProfileAvatarWidget(context: context),
-                    // Route history button
-                    RouteHistoryButtonWidget(),
+                      // Avatar de perfil
+                      //ProfileAvatarWidget(context: context),
+                      // Route history button
+                      RouteHistoryButtonWidget(),
+                   
 
                     // Columna de controles del mapa (botones combinados)
                     MapControlsColumnWidget(
@@ -190,6 +298,7 @@ class _MapPageState extends State<MapPage> {
                         isSearchBarFocused: _isSearchBarFocused,
                       ),
                     ),
+                    ],
                   ],
                 );
               }
@@ -201,11 +310,26 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Markers
-  // -----------------------------------------------------------------------
+ void _setZoomToViewport(RouteViewport viewport) {
+    if (_mapController == null) return;
+  
+  final bounds = LatLngBounds(
+    southwest: viewport.low,
+    northeast: viewport.high,
+  );
+  
+  // Opción A: Con padding fijo (relativo al area visible del mapa)
+  _mapController!.animateCamera(
+    CameraUpdate.newLatLngBounds(
+      bounds,
+      50, 
+    ),
+  );
+  }
 
   void _showStationBottomSheet(StationDetails station, MapLoadedState state) {
+    final mapBloc = _blocContext!.read<MapBloc>();
+
     _mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
@@ -214,15 +338,21 @@ class _MapPageState extends State<MapPage> {
         ),
       ),
     );
-
+    
     showModalBottomSheet(
-      context: context,
+      context: _blocContext!,
       backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) =>
-          StationBottomSheet(context: context, stationId: station.id, state: state),
+      builder: (_) => BlocProvider<MapBloc>.value(
+      value: mapBloc,
+      child: StationBottomSheet(
+        context: context,
+        stationId: station.id,
+        state: state
+      ),
+    ),
     );
   }
 }
