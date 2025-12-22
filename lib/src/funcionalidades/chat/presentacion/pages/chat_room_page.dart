@@ -194,12 +194,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     return null;
   }
 
-  void _navigateToFriendDetail(String nickname) {
+  Future<void> _navigateToFriendDetail(String nickname) async {
     if (nickname.isEmpty) return;
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUserNickname = userProvider.user?['nickname'] as String?;
     
-    Navigator.of(context).push(
+    // Navegar al perfil y esperar el resultado
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) {
           return MultiBlocProvider(
@@ -226,6 +227,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         },
       ),
     );
+    
+    // Si se eliminó la amistad o se bloqueó el usuario (result == true), volver a la lista de chats
+    if (result == true && mounted) {
+      // Salir de la sala de chat
+      _chatBloc.add(LeaveChatRoom(widget.roomId));
+      
+      // Navegar de vuelta a la lista de chats y pasar true para indicar que se eliminó un amigo o se bloqueó un usuario
+      // Esto permitirá que ChatListPage refresque la lista
+      Navigator.of(context).pop(true);
+    }
   }
 
   @override
@@ -259,17 +270,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: theme.colorScheme.primaryContainer,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     backgroundImage: otherUserPhoto != null && otherUserPhoto.isNotEmpty
                         ? NetworkImage(otherUserPhoto)
                         : null,
                     child: otherUserPhoto == null || otherUserPhoto.isEmpty
-                        ? Text(
-                            widget.roomName.isNotEmpty ? widget.roomName[0].toUpperCase() : '',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: theme.colorScheme.onPrimaryContainer,
-                            ),
+                        ? Icon(
+                            Icons.person,
+                            size: 20,
+                            color: theme.iconTheme.color?.withValues(alpha: 0.8),
                           )
                         : null,
                   ),

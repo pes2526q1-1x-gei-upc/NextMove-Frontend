@@ -24,17 +24,15 @@ class FriendChatItem extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       leading: CircleAvatar(
         radius: 24,
-        backgroundImage: friendPhoto != null
+        backgroundImage: friendPhoto != null && friendPhoto.isNotEmpty
             ? NetworkImage(friendPhoto)
             : null,
-        backgroundColor: theme.colorScheme.primaryContainer,
-        child: friendPhoto == null
-            ? Text(
-                friendName[0].toUpperCase(),
-                style: TextStyle(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
+        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+        child: friendPhoto == null || friendPhoto.isEmpty
+            ? Icon(
+                Icons.person,
+                size: 24,
+                color: theme.iconTheme.color?.withValues(alpha: 0.8),
               )
             : null,
       ),

@@ -18,12 +18,22 @@ class ChatListPage extends StatefulWidget {
 
   @override
   State<ChatListPage> createState() => _ChatListPageState();
+  
+  /// Método estático para refrescar la lista desde fuera
+  /// Requiere un GlobalKey<State<ChatListPage>>
+  static void refresh(GlobalKey<State<ChatListPage>>? key) {
+    final state = key?.currentState;
+    if (state is _ChatListPageState) {
+      state.refreshChatList();
+    }
+  }
 }
 
 class _ChatListPageState extends State<ChatListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _showFriends = true; // true = amigos, false = grupos
+  Future<QueryResult<Object?>?> Function()? _refetchFunction;
 
   @override
   void initState() {
@@ -57,6 +67,13 @@ class _ChatListPageState extends State<ChatListPage> {
         InitializeChat(firebaseToken: firebaseToken, userId: userId),
       );
     }
+  }
+
+  /// Método público para refrescar la lista de chats
+  /// Se llama cuando el usuario vuelve a la página de chats desde la navegación
+  void refreshChatList() {
+    // Refrescar la query de GraphQL si existe
+    _refetchFunction?.call();
   }
 
   Future<void> _openChatWithFriend(
@@ -125,10 +142,11 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  void _navigateToRoom(String roomId, String roomName) {
+  Future<void> _navigateToRoom(String roomId, String roomName) async {
     final chatBloc = context.read<ChatBloc>();
 
-    Navigator.of(context).push(
+    // Navegar a la sala de chat y esperar el resultado
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: chatBloc,
@@ -136,6 +154,11 @@ class _ChatListPageState extends State<ChatListPage> {
         ),
       ),
     );
+
+    // Si se volvió después de eliminar un amigo (result == true), refrescar la lista
+    if (result == true && mounted) {
+      refreshChatList();
+    }
   }
 
   @override
@@ -236,6 +259,10 @@ class _ChatListPageState extends State<ChatListPage> {
             fetchPolicy: FetchPolicy.networkOnly,
           ),
           builder: (result, {fetchMore, refetch}) {
+            // Guardar la función refetch para poder llamarla desde fuera
+            if (refetch != null) {
+              _refetchFunction = refetch;
+            }
             if (result.isLoading) {
               return const Center(child: CircularProgressIndicator());
             }

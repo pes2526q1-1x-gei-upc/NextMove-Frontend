@@ -265,12 +265,20 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final Set<int> _visitedIndices = {0};
+  final GlobalKey<_ChatsPlaceholderState> _chatsPlaceholderKey = GlobalKey<_ChatsPlaceholderState>();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       _visitedIndices.add(index);
     });
+    
+    // Si se selecciona la página de chats (índice 1), refrescar la lista
+    if (index == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _chatsPlaceholderKey.currentState?.refreshChatList();
+      });
+    }
   }
 
   @override
@@ -284,7 +292,7 @@ class _MainScreenState extends State<MainScreen> {
           const MapPage(),
 
           _visitedIndices.contains(1)
-              ? const ChatsPlaceholder()
+              ? ChatsPlaceholder(key: _chatsPlaceholderKey)
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(2)
@@ -350,6 +358,7 @@ class ChatsPlaceholder extends StatefulWidget {
 
 class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
   late final ChatBloc _chatBloc;
+  final GlobalKey<State<ChatListPage>> _chatListPageKey = GlobalKey<State<ChatListPage>>();
 
   @override
   void initState() {
@@ -365,11 +374,17 @@ class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
     super.dispose();
   }
 
+  /// Método público para refrescar la lista de chats
+  /// Se llama desde MainScreen cuando se selecciona el índice de chat
+  void refreshChatList() {
+    ChatListPage.refresh(_chatListPageKey);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _chatBloc,
-      child: const ChatListPage(),
+      child: ChatListPage(key: _chatListPageKey),
     );
   }
 }
