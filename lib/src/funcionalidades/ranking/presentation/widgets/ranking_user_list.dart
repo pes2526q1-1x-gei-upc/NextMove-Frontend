@@ -114,7 +114,7 @@ class _RankingUserTileState extends State<RankingUserTile> {
                     create: (context) => SocialBloc(),
                   ),
                 ],
-                child: const FriendDetailsPage(),
+                child: const FriendDetailsPage(showSocialButtons: false),
               );
             },
           ),

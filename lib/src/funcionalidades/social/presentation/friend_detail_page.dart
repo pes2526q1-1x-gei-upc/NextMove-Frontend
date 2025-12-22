@@ -12,7 +12,12 @@ import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class FriendDetailsPage extends StatelessWidget {
-  const FriendDetailsPage({super.key});
+  const FriendDetailsPage({
+    super.key,
+    this.showSocialButtons = true,
+  });
+
+  final bool showSocialButtons;
 
   // --- Lógica para Bloquear Usuario ---
   Future<void> _onBlockPressed(BuildContext context, String userToBlock) async {
@@ -94,24 +99,26 @@ class FriendDetailsPage extends StatelessWidget {
         centerTitle: true,
 
         // === BOTÓN DE BLOQUEO EN APPBAR ===
-        actions: [
-          BlocBuilder<UserBloc, UserState>(
-            builder: (context, state) {
-              if (state is UserLoaded) {
-                return IconButton(
-                  icon: const Icon(
-                    Icons.block_rounded,
-                    color: Colors.redAccent,
-                  ),
-                  tooltip: "Bloquear usuario",
-                  onPressed: () => _onBlockPressed(context, state.user.apodo),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+        actions: showSocialButtons
+            ? [
+                BlocBuilder<UserBloc, UserState>(
+                  builder: (context, state) {
+                    if (state is UserLoaded) {
+                      return IconButton(
+                        icon: const Icon(
+                          Icons.block_rounded,
+                          color: Colors.redAccent,
+                        ),
+                        tooltip: "Bloquear usuario",
+                        onPressed: () => _onBlockPressed(context, state.user.apodo),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+                const SizedBox(width: 8),
+              ]
+            : null,
       ),
 
       body: BlocListener<SocialBloc, SocialState>(
@@ -164,40 +171,41 @@ class FriendDetailsPage extends StatelessWidget {
             ),
 
             // --- BOTÓN DE ELIMINAR AMIGO ---
-            BlocBuilder<UserBloc, UserState>(
-              builder: (context, userState) {
-                if (userState is UserLoaded) {
-                  final viewedUser = userState.user;
+            if (showSocialButtons)
+              BlocBuilder<UserBloc, UserState>(
+                builder: (context, userState) {
+                  if (userState is UserLoaded) {
+                    final viewedUser = userState.user;
 
-                  return BlocBuilder<SocialBloc, SocialState>(
-                    builder: (context, socialState) {
-                      final userProvider = Provider.of<UserProvider>(context, listen: false);
-                      final currentUserEmail = userProvider.email;
+                    return BlocBuilder<SocialBloc, SocialState>(
+                      builder: (context, socialState) {
+                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                        final currentUserEmail = userProvider.email;
 
-                      if (viewedUser.email == currentUserEmail) {
-                        return const SizedBox.shrink();
-                      }
+                        if (viewedUser.email == currentUserEmail) {
+                          return const SizedBox.shrink();
+                        }
 
-                      // Verificamos si está en la lista de amigos
-                      final isFriend = socialState.friends.any(
-                        (friend) => friend.apodo == viewedUser.apodo,
-                      );
+                        // Verificamos si está en la lista de amigos
+                        final isFriend = socialState.friends.any(
+                          (friend) => friend.apodo == viewedUser.apodo,
+                        );
 
-                      if (isFriend) {
-                        return _DeleteFriendButton(
+                        if (isFriend) {
+                          return _DeleteFriendButton(
+                            friendNickname: viewedUser.apodo,
+                          );
+                        }
+
+                        return _AddFriendButton(
                           friendNickname: viewedUser.apodo,
                         );
-                      }
-
-                      return _AddFriendButton(
-                        friendNickname: viewedUser.apodo,
-                      );
-                    },
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
           ],
         ),
       ),
