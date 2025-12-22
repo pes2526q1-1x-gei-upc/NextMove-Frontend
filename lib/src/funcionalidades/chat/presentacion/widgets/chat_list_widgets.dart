@@ -1,9 +1,10 @@
 // lib/src/funcionalidades/chat/presentacion/widgets/chat_list_widgets.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
 /// Widget para mostrar un elemento de chat de amigo
-class FriendChatItem extends StatelessWidget {
+class FriendChatItem extends StatefulWidget {
   final Map<String, dynamic> friend;
   final VoidCallback onTap;
 
@@ -14,21 +15,39 @@ class FriendChatItem extends StatelessWidget {
   });
 
   @override
+  State<FriendChatItem> createState() => _FriendChatItemState();
+}
+
+class _FriendChatItemState extends State<FriendChatItem> {
+  bool _imageError = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final friendName = friend['name'] as String;
-    final friendPhoto = friend['photo'] as String?;
+    final friendName = widget.friend['name'] as String;
+    final friendPhoto = widget.friend['photo'] as String?;
 
+    final hasPhoto = friendPhoto != null && friendPhoto.isNotEmpty && !_imageError;
+    final photoUrl = friendPhoto;
+    
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       leading: CircleAvatar(
         radius: 24,
-        backgroundImage: friendPhoto != null && friendPhoto.isNotEmpty
-            ? NetworkImage(friendPhoto)
-            : null,
+        backgroundImage: hasPhoto && photoUrl != null ? NetworkImage(photoUrl) : null,
         backgroundColor: theme.colorScheme.surfaceContainerHighest,
-        child: friendPhoto == null || friendPhoto.isEmpty
+        onBackgroundImageError: hasPhoto && photoUrl != null
+            ? (exception, stackTrace) {
+                debugPrint('Error cargando foto de amigo en lista de chats: $exception');
+                if (mounted) {
+                  setState(() {
+                    _imageError = true;
+                  });
+                }
+              }
+            : null,
+        child: !hasPhoto
             ? Icon(
                 Icons.person,
                 size: 24,
@@ -49,7 +68,7 @@ class FriendChatItem extends StatelessWidget {
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
       ),
-      onTap: onTap,
+      onTap: widget.onTap,
     );
   }
 }

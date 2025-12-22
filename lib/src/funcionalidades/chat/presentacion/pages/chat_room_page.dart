@@ -19,11 +19,13 @@ import 'package:nextmove_app/config/socket_config.dart';
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
   final String roomName;
+  final String? otherUserPhoto; // Foto del otro usuario pasada desde la lista
 
   const ChatRoomPage({
     super.key,
     required this.roomId,
     required this.roomName,
+    this.otherUserPhoto,
   });
 
   @override
@@ -258,7 +260,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
           builder: (context, state) {
             final messages = state is ChatRoomActive ? state.messages : <Message>[];
             final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
-            final otherUserPhoto = _getOtherUserPhoto(messages, currentUserEmail);
+            // Usar la foto de los mensajes si está disponible, sino usar la foto pasada desde la lista
+            final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
+            final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
             
             return GestureDetector(
               onTap: () {

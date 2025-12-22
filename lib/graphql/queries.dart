@@ -304,6 +304,12 @@ const String myChatsQuery = r'''
       type
       name
       description
+      participants {
+        userEmail
+        nickname
+        photoUrl
+        joinedAt
+      }
       lastMessage {
         content
         sender
