@@ -249,9 +249,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closed => 'Closed';
 
   @override
-  String get available => 'Available';
-
-  @override
   String get occupied => 'Occupied';
 
   @override
@@ -265,9 +262,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Unknown power';
 
   @override
   String get unknown => 'Unknown';
@@ -366,6 +360,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark mode';
 
   @override
+  String get systemMode => 'Use system setting';
+
+  @override
   String get preliminarVersion => 'Preliminary version';
 
   @override
@@ -387,9 +384,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String friendAdded(String nickname) {
     return '$nickname has been added to your friends.';
   }
-
-  @override
-  String get friends => 'Friends';
 
   @override
   String get memberSince => 'Member since';
@@ -423,6 +417,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get block => 'Block';
+
+  @override
+  String get friends => 'Friends';
+
+  @override
+  String get addFriend => 'Add friend';
 
   @override
   String get minCharsSearchHint =>
@@ -499,6 +499,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get opinions => 'Reviews';
 
   @override
+  String get unknownPower => 'Unknown power';
+
+  @override
   String get station => 'Station';
 
   @override
@@ -527,6 +530,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get free => 'Free';
+
+  @override
+  String get available => 'Available';
 
   @override
   String get charge => 'Charge';
@@ -615,4 +621,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get uLoc => 'Your Location';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get accountSuspendedMessage => 'Your account has been suspended.';
+
+  @override
+  String get accountSuspended => 'Account suspended';
+
+  @override
+  String get suspensionReason => 'Suspension reason';
+
+  @override
+  String get communityGuidelinesViolation => 'Community guidelines violation';
+
+  @override
+  String get needHelp => 'Need help?';
+
+  @override
+  String get contactSupport => 'Contact support';
+
+  @override
+  String get reviewCommunityGuidelines =>
+      'Review our community guidelines to avoid future suspensions.';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get days => 'days';
+
+  @override
+  String get hours => 'hours';
+
+  @override
+  String get minutes => 'minutes';
+
+  @override
+  String get permanent => 'Permanent';
 }

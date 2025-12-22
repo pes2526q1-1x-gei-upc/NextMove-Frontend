@@ -18,3 +18,10 @@ final class StationListError extends StationListState {
 
   StationListError(this.message);
 }
+
+final class StationListToggleError extends StationListState {
+  final String message;
+  final List<StationDetails> stations;
+
+  StationListToggleError(this.message, this.stations);
+}

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_details_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_connectors_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_features_widget.dart';
@@ -9,9 +13,6 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_shared_widgets.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_stats_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 
 class StationDetailsPage extends StatelessWidget {
   final StationType stationType;
@@ -25,8 +26,6 @@ class StationDetailsPage extends StatelessWidget {
     this.stationDetails,
   });
 
-  final Color _backgroundColor = const Color(0xFFF5F5F7);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -34,10 +33,8 @@ class StationDetailsPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => StationDetailsBloc()
-            ..add(
-              LoadStationDetailsEvent(stationID, stationType, stationDetails),
-            ),
+          create: (context) => StationDetailsBloc(context.read<StationsCache>())
+            ..add(LoadStationDetailsEvent(stationID, stationType, stationDetails)),
         ),
         BlocProvider(
           create: (context) =>
@@ -50,12 +47,10 @@ class StationDetailsPage extends StatelessWidget {
         builder: (context, state) {
           if (state is StationDetailsLoading) {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               body: const Center(child: CircularProgressIndicator()),
             );
           } else if (state is StationDetailsError) {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               appBar: AppBar(title: Text(l10n.error)),
               body: Center(child: Text(state.message)),
             );
@@ -63,7 +58,6 @@ class StationDetailsPage extends StatelessWidget {
             return _buildDetailsPage(context, state.stationDetails);
           } else {
             return Scaffold(
-              backgroundColor: _backgroundColor,
               body: Center(child: Text(l10n.unknownState)),
             );
           }
@@ -78,23 +72,22 @@ class StationDetailsPage extends StatelessWidget {
   ) {
     final l10n = AppLocalizations.of(context)!;
     final isBike = stationType == StationType.bicycle;
-    final themeColor = isBike ? Colors.blue : Colors.green;
+    final theme = Theme.of(context);
+    final themeColor =
+        isBike ? theme.colorScheme.secondary : theme.colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           l10n.information,
-          style: const TextStyle(
+          style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A1A),
           ),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -114,6 +107,9 @@ class StationDetailsPage extends StatelessWidget {
                   return StationHeaderWidget(
                     station: displayStation,
                     themeColor: themeColor,
+                    onToggleFavorite: () => context.read<StationDetailsBloc>().add(
+                      ToggleFavoriteEvent(displayStation.id),
+                    ),
                   );
                 },
               ),

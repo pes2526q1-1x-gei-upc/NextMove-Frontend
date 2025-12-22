@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import '../../domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart'
     as custom_exceptions;
@@ -20,20 +21,26 @@ class UserRemoteDataProvider {
 
   Future<UserEntity> getUserProfile(String identifier) async {
     final currentUser = firebaseAuth.currentUser;
-    print(
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: getUserProfile for $identifier. CurrentUser UID: ${currentUser?.uid}",
     );
+    }
 
     // Cargar el perfil del usuario logeado
     if (currentUser != null && identifier == currentUser.uid) {
-      print("UserRemoteDataProvider: Fetching MY profile");
+      if (kDebugMode) {
+        print("UserRemoteDataProvider: Fetching MY profile");
+      }
       return _fetchMyProfile(currentUser.email!);
     }
     // Cargar el perfil de otro usuario por su nickname
     else {
-      print(
+      if (kDebugMode) {
+        print(
         "UserRemoteDataProvider: Fetching profile by nickname: $identifier",
       );
+      }
       return _fetchUserProfileByNickname(identifier);
     }
   }
@@ -104,14 +111,20 @@ class UserRemoteDataProvider {
     final List<dynamic> data = result.data?['UsersByNickname'] ?? [];
 
     if (data.isEmpty) {
-      print("UserRemoteDataProvider: No users found for nickname $nickname");
+      if (kDebugMode) {
+        print("UserRemoteDataProvider: No users found for nickname $nickname");
+      }
       throw custom_exceptions.ServerException('Perfil de amigo no encontrado');
     }
     final currentUser = firebaseAuth.currentUser;
-    print("El usuario actual es: ${currentUser?.email}");
-    print(
+    if (kDebugMode) {
+      print("El usuario actual es: ${currentUser?.email}");
+    }
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
     );
+    }
 
     // Buscar coincidencia exacta
     final exactMatch = data.firstWhere(
@@ -119,9 +132,11 @@ class UserRemoteDataProvider {
           (userJson['nickname'] as String).toLowerCase() ==
           nickname.toLowerCase(),
       orElse: () {
-        print(
+        if (kDebugMode) {
+          print(
           "UserRemoteDataProvider: Exact match for '$nickname' not found in results.",
         );
+        }
         return null;
       },
     );
@@ -130,9 +145,11 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('Usuario no encontrado');
     }
 
-    print(
+    if (kDebugMode) {
+      print(
       "UserRemoteDataProvider: Found user: ${exactMatch['nickname']} (Email: ${exactMatch['email']})",
     );
+    }
 
     return UserEntity.fromRawData(exactMatch);
   }
@@ -146,7 +163,7 @@ class UserRemoteDataProvider {
       );
     }
 
-    const String updateUserMutation = GraphQLQueries.updateUserMutation;
+    const String updateUserMutation = GraphQLMutations.updateUserMutation;
 
     String? formatBirthDate(DateTime? date) {
       if (date == null) return null;
@@ -256,7 +273,7 @@ class UserRemoteDataProvider {
     }
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.createUserMutation),
+      document: gql(GraphQLMutations.createUserMutation),
       variables: {
         'input': {
           'email': userEntity.email,
@@ -330,7 +347,9 @@ class UserRemoteDataProvider {
     final baseUrl = endpoint.replaceAll('/graphql', '');
     final uploadUrl = '$baseUrl/api/upload-profile-photo';
 
-    print('Uploading photo to: $uploadUrl');
+    if (kDebugMode) {
+      print('Uploading photo to: $uploadUrl');
+    }
 
     try {
       final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
@@ -361,13 +380,17 @@ class UserRemoteDataProvider {
         final jsonResponse = jsonDecode(response.body);
         return jsonResponse['imageUrl'];
       } else {
-        print('Upload failed: ${response.statusCode} - ${response.body}');
+        if (kDebugMode) {
+          print('Upload failed: ${response.statusCode} - ${response.body}');
+        }
         throw custom_exceptions.ServerException(
           'Error al subir foto: ${response.statusCode}',
         );
       }
     } catch (e) {
-      print('Exception uploading photo: $e');
+      if (kDebugMode) {
+        print('Exception uploading photo: $e');
+      }
       throw custom_exceptions.ServerException(
         'Error de conexión al subir foto',
       );

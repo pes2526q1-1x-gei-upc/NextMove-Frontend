@@ -8,12 +8,14 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/la
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/logout_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_menu_widgets.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/appearance_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -23,7 +25,6 @@ class ProfilePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, state) {
@@ -103,6 +104,29 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+                    // --- SECCIÓN 2: SOCIAL ---
+                    ProfileSectionLabel(text: l10n.social),
+                    ProfileStyledCard(
+                      children: [
+                        ProfileMenuOption(
+                          icon: Icons.person_outline_rounded,
+                          text: l10n.friends,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => SocialBloc(),
+                                  child: const SocialPage(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         const ProfileMenuDivider(),
                         ProfileMenuOption(
                           icon: Icons.block_rounded,
@@ -119,12 +143,11 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
+                        
                       ],
                     ),
-
                     const SizedBox(height: 20),
-
-                    // --- SECCIÓN 2: PREFERENCIAS ---
+                    // --- SECCIÓN 3: PREFERENCIAS ---
                     ProfileSectionLabel(text: l10n.settings),
                     ProfileStyledCard(
                       children: [
@@ -160,10 +183,7 @@ class ProfilePage extends StatelessWidget {
                         ProfileMenuOption(
                           icon: Icons.dark_mode_outlined,
                           text: l10n.appearance,
-                          onTap: () => {
-                            // ignore: avoid_print
-                            if (kDebugMode) {print("Click en Modo Oscuro")},
-                          },
+                          onTap: () => AppearanceSelector.show(context),
                         ),
                       ],
                     ),
@@ -179,6 +199,7 @@ class ProfilePage extends StatelessWidget {
                     const DeleteAccountButton(),
                     
                     const SizedBox(height: 30),
+
                     // --- FOOTER ---
                     const AppFooter(),
 

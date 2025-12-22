@@ -14,6 +14,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_histo
 import 'package:nextmove_app/src/shared/domain/route_input.dart';
 import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -29,6 +30,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final RecordedRoutesRepository recordedRoutesRepository;
   final SearchHistoryService searchHistoryService;
   final NavigationRouteRepository navigationRouteRepository;
+  final StationsCache stationsCache;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -46,6 +48,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.recordedRoutesRepository,
     required this.navigationRouteRepository,
     required this.searchHistoryService,
+    required this.stationsCache,
     required this.onMarkerTapped,
   }) : super(const MapInitialState()) {
     // Registro de handlers para cada evento
@@ -139,6 +142,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           decodedPolyline: null,
         ),
       );
+
+      // Update cache
+      stationsCache.updateStations([...bikeStations, ...evStations]);
 
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
@@ -435,8 +441,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     // Get the current position immediately
     try {
+      const LocationSettings locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+      );
       Position currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: locationSettings,
       );
       add(
         UpdateUserLocationEvent(

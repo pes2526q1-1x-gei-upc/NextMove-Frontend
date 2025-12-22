@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/main.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
@@ -12,6 +13,16 @@ import 'package:email_validator/email_validator.dart';
 
 class AuthRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
+
+  Future<String?> get authHeader async {
+    final fireBaseUser = FirebaseAuth.instance.currentUser;
+    String? authHeader = '';
+    if (fireBaseUser != null) {
+      final token = await fireBaseUser.getIdToken();
+      authHeader = 'Bearer $token';
+    }
+    return authHeader;
+  }
 
   Future<void> deleteAccount(String password) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -62,7 +73,7 @@ class AuthRemoteDataProvider {
 
     // Step 2: Delete from GraphQL backend FIRST
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.deleteUserMutation),
+      document: gql(GraphQLMutations.deleteUserMutation),
       variables: {'email': userEmail},
       fetchPolicy: FetchPolicy.networkOnly,
     );

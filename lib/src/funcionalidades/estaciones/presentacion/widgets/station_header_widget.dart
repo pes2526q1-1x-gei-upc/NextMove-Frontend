@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/station_assessments_page.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/utils/create_star_rating_row.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/assessments/presentation/pages/rate_station_bottom_sheet_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class StationHeaderWidget extends StatelessWidget {
   final StationDetails station;
   final Color themeColor;
+  final VoidCallback? onToggleFavorite;
 
   const StationHeaderWidget({
     super.key,
     required this.station,
     required this.themeColor,
+    this.onToggleFavorite,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onSurface;
+    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     final assessmentState = context.watch<AssessmentBloc>().state;
+
+    final onPressed = onToggleFavorite;
 
     double? displayRating;
 
@@ -45,28 +54,54 @@ class StationHeaderWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- NOMBRE DE LA ESTACIÓN ---
-        Text(
-          station.name ?? l10n.unknown,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-            height: 1.2,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                station.name ?? l10n.unknown,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                  height: 1.2,
+                ),
+              ),
+            ),
+            Consumer<StationsCache>(
+              builder: (context, cache, child) {
+                final currentStation = cache.getStation(station.id);
+                final isFavorite = currentStation?.isFavorite ?? station.isFavorite;
+                final starColor = switch (isFavorite) {
+                  true => Colors.yellow[700],
+                  false => null,
+                  null => Colors.grey[300],
+                };
+                return IconButton(
+                  icon: Icon(
+                    (isFavorite ?? false) ? Icons.star : Icons.star_border,
+                    color: starColor,
+                  ),
+                  onPressed: onPressed,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                );
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 8),
 
         // --- DIRECCIÓN ---
         Row(
           children: [
-            Icon(Icons.location_on_rounded, size: 18, color: Colors.grey[600]),
+            Icon(Icons.location_on_rounded, size: 18, color: mutedColor),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 station.address ?? l10n.unknown,
-                style: TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: mutedColor,
                   height: 1.3,
                 ),
               ),
@@ -87,14 +122,14 @@ class StationHeaderWidget extends StatelessWidget {
               createStarRatingRow((displayRating * 2).round()),
               Text(
                 '(${displayRating.toStringAsFixed(1)})',
-                style: const TextStyle(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
               ),
 
               // Separador vertical
-              Container(width: 1, height: 16, color: Colors.grey[300]),
+              Container(width: 1, height: 16, color: theme.dividerColor),
 
               // Link "Ver opiniones"
               InkWell(
@@ -108,10 +143,11 @@ class StationHeaderWidget extends StatelessWidget {
                   child: Text(
                     "${l10n.seeOpinions} (${assessmentState.totalAssessments})",
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: themeColor,
                       fontSize: 13,
+                      fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.grey[400],
+                      decorationColor: themeColor,
                     ),
                   ),
                 ),
@@ -126,7 +162,7 @@ class StationHeaderWidget extends StatelessWidget {
                   child: Text(
                     l10n.withoutOpinions,
                     style: TextStyle(
-                      color: Colors.grey[500],
+                      color: mutedColor,
                       fontSize: 13,
                       decoration: TextDecoration.underline,
                     ),
@@ -168,7 +204,7 @@ class StationHeaderWidget extends StatelessWidget {
 
                 AssessmentEntity? existingReview;
 
-                if (userHasAssessed && currentState.assessments.isNotEmpty) {
+                if (userHasAssessed && currentState.assessments.isNotEmpty && context.mounted) {
                   final currentUser = FirebaseAuth.instance.currentUser;
                   if (currentUser != null) {
                     // Try to get nickname from UserProvider first, fallback to Firebase displayName
@@ -228,9 +264,9 @@ class StationHeaderWidget extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: themeColor.withOpacity(0.1),
+                  color: themeColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: themeColor.withOpacity(0.2)),
+                  border: Border.all(color: themeColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

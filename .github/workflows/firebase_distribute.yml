@@ -1,0 +1,67 @@
+name: Firebase App Distribution
+
+on:
+  workflow_call:
+    inputs:
+      groups:
+        required: true
+        type: string
+
+jobs:
+  firebase_distribution:
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for ENV_FILE secret
+        run: |
+          if [ -z "${{ secrets.ENV_FILE }}" ]; then
+            echo "Error: ENV_FILE secret is not set. Please set it in repository secrets."
+            exit 1
+          fi
+
+      - name: Create .env file from ENV_FILE
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.3"
+          channel: "stable"
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.BETA_KEYSTORE_BASE64 }}" | base64 --decode > android/app/beta-keystore.jks
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+        env:
+          BETA_KEYSTORE_PASSWORD: ${{ secrets.BETA_KEYSTORE_PASSWORD }}
+          BETA_KEY_ALIAS: ${{ secrets.BETA_KEY_ALIAS }}
+          BETA_KEY_PASSWORD: ${{ secrets.BETA_KEY_PASSWORD }}
+
+      - name: Check if APK file is in expected location
+        run: |
+          if [ ! -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            echo "Error: APK file not found at build/app/outputs/flutter-apk/app-release.apk"
+            exit 1
+          fi
+
+      - name: Upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          groups: ${{ inputs.groups }}
+          file: build/app/outputs/flutter-apk/app-release.apk

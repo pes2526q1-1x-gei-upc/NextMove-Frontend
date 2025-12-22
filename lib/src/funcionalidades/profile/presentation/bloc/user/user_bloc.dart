@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/repositories/user_repository.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'user_event.dart';
@@ -19,18 +19,24 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     LoadUserProfile event,
     Emitter<UserState> emit,
   ) async {
-    print("UserBloc: Loading profile for ${event.userId}");
+    if (kDebugMode) {
+      print("UserBloc: Loading profile for ${event.userId}");
+    }
     emit(UserLoading());
     final result = await userRepository.getUserProfile(event.userId);
     result.fold(
       (failure) {
-        print("UserBloc: Failed to load profile: ${failure.message}");
+        if (kDebugMode) {
+          print("UserBloc: Failed to load profile: ${failure.message}");
+        }
         emit(UserNeedsToSignUp());
       },
       (user) {
-        print(
+        if (kDebugMode) {
+          print(
           "UserBloc: Loaded profile for ${user.apodo} (Email: ${user.email})",
         );
+        }
         emit(UserLoaded(user));
       },
     );

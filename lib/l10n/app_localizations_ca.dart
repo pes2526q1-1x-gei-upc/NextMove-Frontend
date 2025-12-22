@@ -75,7 +75,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'La contrasenya és incorrecta. Si has utilitzat aquesta adreça de correu electrònic per registrar-te amb Google, inicia sessió amb Google.';
 
   @override
-  String get userDataPreferences => 'Acaba de completar el teu perfil';
+  String get userDataPreferences => 'Completa el teu perfil';
 
   @override
   String get nickname => 'Sobrenom';
@@ -253,9 +253,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String get closed => 'Tancat';
 
   @override
-  String get available => 'Disponibles';
-
-  @override
   String get occupied => 'Ocupat';
 
   @override
@@ -269,9 +266,6 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get error => 'Error';
-
-  @override
-  String get unknownPower => 'Potència desconeguda';
 
   @override
   String get unknown => 'Desconegut';
@@ -371,6 +365,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get darkMode => 'Mode fosc';
 
   @override
+  String get systemMode => 'Utilitza el mode del sistema';
+
+  @override
   String get preliminarVersion => 'Versió preliminar';
 
   @override
@@ -392,9 +389,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String friendAdded(String nickname) {
     return '$nickname s\'ha afegit als teus amics.';
   }
-
-  @override
-  String get friends => 'Amics';
 
   @override
   String get memberSince => 'Membre des de';
@@ -428,6 +422,12 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get block => 'Bloquejar';
+
+  @override
+  String get friends => 'Amics';
+
+  @override
+  String get addFriend => 'Afegeix amic';
 
   @override
   String get minCharsSearchHint =>
@@ -505,6 +505,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get opinions => 'Valoracions';
 
   @override
+  String get unknownPower => 'Potència desconeguda';
+
+  @override
   String get station => 'Estació';
 
   @override
@@ -533,6 +536,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get free => 'Lliures';
+
+  @override
+  String get available => 'Disponible';
 
   @override
   String get charge => 'Càrrega';
@@ -621,4 +627,45 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get uLoc => 'La Teva Ubicació';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get accountSuspendedMessage => 'El seu compte ha sigut suspès.';
+
+  @override
+  String get accountSuspended => 'Compte suspès';
+
+  @override
+  String get suspensionReason => 'Motiu de la suspensió';
+
+  @override
+  String get communityGuidelinesViolation =>
+      'Incompliment de les normes de la comunitat';
+
+  @override
+  String get needHelp => 'Necessites ajuda?';
+
+  @override
+  String get contactSupport => 'Contacta amb el suport';
+
+  @override
+  String get reviewCommunityGuidelines =>
+      'Revisa les nostres normes de la comunitat per evitar futures suspensions.';
+
+  @override
+  String get description => 'Descripció';
+
+  @override
+  String get days => 'dies';
+
+  @override
+  String get hours => 'hores';
+
+  @override
+  String get minutes => 'minuts';
+
+  @override
+  String get permanent => 'Permanent';
 }

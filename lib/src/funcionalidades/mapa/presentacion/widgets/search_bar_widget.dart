@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
@@ -32,7 +33,9 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
     _focusNode = FocusNode();
     
     _focusNode.addListener(() {
-      print('🔍 Focus changed: ${_focusNode.hasFocus}');
+      if (kDebugMode) {
+        print('🔍 Focus changed: ${_focusNode.hasFocus}');
+      }
       widget.onFocusChanged?.call(_focusNode.hasFocus);
     });
   }
@@ -52,6 +55,12 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final baseColor = theme.cardColor;
+    final iconColor = theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
+
     return Positioned(
       top: 70,
       left: 16,
@@ -59,13 +68,14 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: baseColor,
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 2,
-              blurRadius: 5,
+              color: shadowColor,
+              spreadRadius: 1,
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -74,10 +84,10 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
           focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            prefixIcon: Icon(Icons.search, color: iconColor),
             suffixIcon: _searchController.text.isNotEmpty ? 
               IconButton(
-                icon: const Icon(Icons.clear, color: Colors.grey),
+                icon: Icon(Icons.clear, color: iconColor),
                 onPressed: () {
                   _searchController.clear();
                   context.read<MapBloc>().add(const ClearSearchEvent());

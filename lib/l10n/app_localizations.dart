@@ -556,12 +556,6 @@ abstract class AppLocalizations {
   /// **'Closed'**
   String get closed;
 
-  /// No description provided for @available.
-  ///
-  /// In en, this message translates to:
-  /// **'Available'**
-  String get available;
-
   /// No description provided for @occupied.
   ///
   /// In en, this message translates to:
@@ -591,12 +585,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error'**
   String get error;
-
-  /// No description provided for @unknownPower.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown power'**
-  String get unknownPower;
 
   /// No description provided for @unknown.
   ///
@@ -790,6 +778,12 @@ abstract class AppLocalizations {
   /// **'Dark mode'**
   String get darkMode;
 
+  /// No description provided for @systemMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use system setting'**
+  String get systemMode;
+
   /// No description provided for @preliminarVersion.
   ///
   /// In en, this message translates to:
@@ -831,12 +825,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{nickname} has been added to your friends.'**
   String friendAdded(String nickname);
-
-  /// No description provided for @friends.
-  ///
-  /// In en, this message translates to:
-  /// **'Friends'**
-  String get friends;
 
   /// No description provided for @memberSince.
   ///
@@ -891,6 +879,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block'**
   String get block;
+
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// No description provided for @addFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get addFriend;
 
   /// No description provided for @minCharsSearchHint.
   ///
@@ -1036,6 +1036,12 @@ abstract class AppLocalizations {
   /// **'Reviews'**
   String get opinions;
 
+  /// No description provided for @unknownPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown power'**
+  String get unknownPower;
+
   /// No description provided for @station.
   ///
   /// In en, this message translates to:
@@ -1095,6 +1101,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free'**
   String get free;
+
+  /// No description provided for @available.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
 
   /// No description provided for @charge.
   ///
@@ -1263,6 +1275,83 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Location'**
   String get uLoc;
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
+
+  /// No description provided for @accountSuspendedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been suspended.'**
+  String get accountSuspendedMessage;
+
+  /// No description provided for @accountSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Account suspended'**
+  String get accountSuspended;
+
+  /// No description provided for @suspensionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension reason'**
+  String get suspensionReason;
+
+  /// No description provided for @communityGuidelinesViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Community guidelines violation'**
+  String get communityGuidelinesViolation;
+
+  /// No description provided for @needHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help?'**
+  String get needHelp;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support'**
+  String get contactSupport;
+
+  /// No description provided for @reviewCommunityGuidelines.
+  ///
+  /// In en, this message translates to:
+  /// **'Review our community guidelines to avoid future suspensions.'**
+  String get reviewCommunityGuidelines;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get hours;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @permanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent'**
+  String get permanent;
 }
 
 class _AppLocalizationsDelegate

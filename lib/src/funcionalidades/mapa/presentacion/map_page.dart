@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -71,19 +72,6 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    _setMapStyle();
-  }
-
-  void _setMapStyle() async {
-    const style = '''
-    [
-      {
-        "featureType": "poi",
-        "stylers": [{"visibility": "off"}]
-      }
-    ]
-    ''';
-    _mapController?.setMapStyle(style);
   }
 
   // -----------------------------------------------------------------------
@@ -102,6 +90,7 @@ class _MapPageState extends State<MapPage> {
         recordedRoutesRepository: recordedRoutesRepository,
         searchHistoryService: searchHistoryService,
         navigationRouteRepository: navigationRouteRepository,
+        stationsCache: context.read<StationsCache>(),
         onMarkerTapped: _showStationBottomSheet,
       )..add(const LoadMapDataEvent()),
       child: Builder(  // ← AÑADE ESTE Builder
@@ -177,6 +166,7 @@ class _MapPageState extends State<MapPage> {
                       markers: markersToShow,
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
+                      darkMode: Theme.of(context).brightness == Brightness.dark,
                       onMapCreated: _onMapCreated,
                       navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : const Polyline(polylineId: PolylineId('No route')),
                       padding: state.isNavigationMode 
@@ -258,7 +248,6 @@ class _MapPageState extends State<MapPage> {
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
-                    // ESTO LO HE MOVIDO AL FINAL DEL STACK PARA QUE APAREZCA POR ENCIMA DE TODO
                     Positioned(
                       top: 130,
                       left: 16,
@@ -310,14 +299,16 @@ class _MapPageState extends State<MapPage> {
     
     showModalBottomSheet(
       context: _blocContext!,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => BlocProvider<MapBloc>.value(
       value: mapBloc,
       child: StationBottomSheet(
-        station: station,
-        state: state,
+        context: context,
+        stationId: station.id,
+        state: state
       ),
     ),
     );

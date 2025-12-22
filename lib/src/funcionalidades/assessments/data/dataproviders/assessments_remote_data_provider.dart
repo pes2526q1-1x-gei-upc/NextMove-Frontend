@@ -1,23 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_info_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 
 class AssessmentRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
-
-  Future<String?> get _authHeader async {
-    final fireBaseUser = FirebaseAuth.instance.currentUser;
-    if (fireBaseUser != null) {
-      final token = await fireBaseUser.getIdToken();
-      return 'Bearer $token';
-    }
-    return null;
-  }
 
   Future<void> createAssessment(
     String stationId,
@@ -25,10 +17,10 @@ class AssessmentRemoteDataProvider {
     String description,
   ) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.createAssessmentQuery),
+        document: gql(GraphQLMutations.createAssessmentQuery),
         variables: {
           'station_id': stationId,
           'score': score,
@@ -63,7 +55,7 @@ class AssessmentRemoteDataProvider {
     String stationId,
   ) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final QueryOptions options = QueryOptions(
         document: gql(GraphQLQueries.getAssessmentsByStationIdQuery),
@@ -93,10 +85,10 @@ class AssessmentRemoteDataProvider {
       return rawList.map((item) {
         return AssessmentEntity(
           nickname: item['nickname'] ?? 'Anónimo',
-          station_id: stationId,
+          stationId: stationId,
           score: (item['score'] as num).toInt(),
           description: item['comments'] ?? '',
-          created_at:
+          createdAt:
               DateTime.tryParse(item['created_at'].toString()) ??
               DateTime.now(),
         );
@@ -112,7 +104,7 @@ class AssessmentRemoteDataProvider {
     String stationId,
   ) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final QueryOptions options = QueryOptions(
         document: gql(GraphQLQueries.getStationAssessmentInfoQuery),
@@ -159,10 +151,10 @@ class AssessmentRemoteDataProvider {
     String description,
   ) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.editAssessmentQuery),
+        document: gql(GraphQLMutations.editAssessmentQuery),
         variables: {
           'station_id': stationId,
           'score': score,
@@ -197,10 +189,9 @@ class AssessmentRemoteDataProvider {
   // --- ELIMINAR VALORACIÓN ---
   Future<void> deleteAssessment(String stationId) async {
     try {
-      final authHeader = await _authHeader;
-
+      final authHeader = await AuthRemoteDataProvider().authHeader;
       final MutationOptions options = MutationOptions(
-        document: gql(GraphQLQueries.deleteAssessmentQuery),
+        document: gql(GraphQLMutations.deleteAssessmentQuery),
         variables: {'station_id': stationId},
         context: Context().withEntry(
           HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
@@ -231,7 +222,7 @@ class AssessmentRemoteDataProvider {
   // --- CHECK IF USER HAS ASSESSED ---
   Future<bool> checkAssessed(String stationId) async {
     try {
-      final authHeader = await _authHeader;
+      final authHeader = await AuthRemoteDataProvider().authHeader;
 
       final QueryOptions options = QueryOptions(
         document: gql(GraphQLQueries.checkAssessed),

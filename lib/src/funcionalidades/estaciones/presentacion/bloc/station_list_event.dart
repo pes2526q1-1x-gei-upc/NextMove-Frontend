@@ -16,3 +16,9 @@ class SearchStationListEvent extends StationListEvent {
 
   SearchStationListEvent({required this.query});
 }
+
+class ToggleFavoriteEvent extends StationListEvent {
+  final String stationId;
+
+  ToggleFavoriteEvent({required this.stationId});
+}
