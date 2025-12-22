@@ -1275,6 +1275,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Location'**
   String get uLoc;
+
   /// No description provided for @social.
   ///
   /// In en, this message translates to:

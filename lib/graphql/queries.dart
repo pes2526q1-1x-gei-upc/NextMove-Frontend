@@ -295,14 +295,6 @@ class GraphQLQueries {
     } 
   ''';
 
-  static const String existsUserQuery = r'''
-    query ExistsUser ($email: String!) {
-      ExistsUser (email: $email) {
-        exists
-        isRegWithGoogle
-      }
-    }''';
-
     static const String getNavigationRouteQuery = r'''
       query ComputeRoute(
         $origin: CoordinatesInput!
