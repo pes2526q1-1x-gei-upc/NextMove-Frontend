@@ -167,7 +167,15 @@ class _MapPageState extends State<MapPage> {
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       onMapCreated: _onMapCreated,
-                      navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : Polyline(polylineId: PolylineId('No route')),
+                      navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : const Polyline(polylineId: PolylineId('No route')),
+                      padding: state.isNavigationMode 
+                        ? const EdgeInsets.only(
+                            top: 180,    // Espacio para RouteInfoWidget
+                            bottom: 240, // Espacio para RoutePreviewWidget
+                            left: 20,
+                            right: 20,
+                          )
+                        : EdgeInsets.zero,
                     ),
 
                     //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
@@ -268,11 +276,11 @@ class _MapPageState extends State<MapPage> {
     northeast: viewport.high,
   );
   
-  // Opción A: Con padding fijo
+  // Opción A: Con padding fijo (relativo al area visible del mapa)
   _mapController!.animateCamera(
     CameraUpdate.newLatLngBounds(
       bounds,
-      100,  // padding en píxeles alrededor de la ruta
+      50, 
     ),
   );
   }

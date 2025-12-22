@@ -10,6 +10,8 @@ class MapWidget extends StatefulWidget {
   final void Function(GoogleMapController)? onMapCreated;
 
 
+  final EdgeInsets padding;
+
   const MapWidget({
     super.key,
     required this.initialCameraPosition,
@@ -18,6 +20,7 @@ class MapWidget extends StatefulWidget {
     required this.navigationRoutePolyline,
     required this.mapType,
     this.onMapCreated,
+    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -29,6 +32,7 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
+      padding: widget.padding,
       onMapCreated: widget.onMapCreated,
       initialCameraPosition: widget.initialCameraPosition,
       markers: widget.markers,
