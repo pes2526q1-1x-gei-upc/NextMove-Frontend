@@ -32,6 +32,8 @@ import 'widgets/toggle_map_mode_widget.dart';
 import 'widgets/search_bar_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_list_widget.dart';
 import 'widgets/map_controls_column_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -78,11 +80,35 @@ class _MapPageState extends State<MapPage> {
   // UI helpers
   // -----------------------------------------------------------------------
 
+  /// Convierte el modo preferido del usuario (string de la API) a StationType
+  StationType? _getPreferredModeFromUser(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    
+    if (user == null) return null;
+    
+    final preferredMode = user['preferredMode'] as String?;
+    if (preferredMode == null) return null;
+    
+    // Convertir "BIKE" o "CAR" a StationType
+    switch (preferredMode.toUpperCase()) {
+      case 'BIKE':
+        return StationType.bicycle;
+      case 'CAR':
+        return StationType.electricVehicle;
+      default:
+        return null;
+    }
+  }
+
   // -----------------------------------------------------------------------
   // Build
   // -----------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    // Obtener el modo preferido del usuario (o null si no tiene)
+    final preferredMode = _getPreferredModeFromUser(context);
+    
     return BlocProvider(
       create: (context) => MapBloc(
         stationRepository: stationRepository,
@@ -92,6 +118,7 @@ class _MapPageState extends State<MapPage> {
         navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
         onMarkerTapped: _showStationBottomSheet,
+        initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
       child: Builder(  // ← AÑADE ESTE Builder
         builder: (blocContext) {

@@ -42,6 +42,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
+  final StationType? _initialMode;
+
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
@@ -50,7 +52,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.searchHistoryService,
     required this.stationsCache,
     required this.onMarkerTapped,
-  }) : super(const MapInitialState()) {
+    StationType? initialMode,
+  }) : _initialMode = initialMode,
+       super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
@@ -122,13 +126,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evStations,
       );
 
+      // Determinar el modo inicial: usar el modo preferido del usuario o bici por defecto
+      final initialMode = _initialMode ?? StationType.bicycle;
+
       // Emitir estado cargado
       emit(
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
           userLocation: null,
-          currentMode: StationType.bicycle,
+          currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
