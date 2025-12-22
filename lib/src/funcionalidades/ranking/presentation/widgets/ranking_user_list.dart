@@ -132,7 +132,7 @@ class _RankingUserTileState extends State<RankingUserTile> {
               ),
             )
           : null,
-      leading: Container(
+      leading: SizedBox(
         width: 40,
         height: 40,
         child: Stack(
