@@ -20,6 +20,11 @@ class ChatRepository {
     _socketDataSource.setupSocketListeners();
   }
 
+  /// Resetear y reconfigurar listeners de Socket.IO (por ejemplo tras reconexión)
+  void resetSocketListeners() {
+    _socketDataSource.resetSocketListeners();
+  }
+
   /// Stream de mensajes nuevos
   Stream<Message> get messageStream =>
       _socketDataSource.messageStream.map((model) => model.toEntity());

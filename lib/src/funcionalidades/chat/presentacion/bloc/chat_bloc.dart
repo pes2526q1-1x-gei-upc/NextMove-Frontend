@@ -463,8 +463,9 @@ Future<void> _onInitializeChat(
     try {
       debugPrint('[ChatBloc] 🔄 Manejando reconexión del socket...');
       
-      // Reconfigurar listeners de streams
-      _chatRepository.setupSocketListeners();
+      // Reconfigurar listeners de Socket.IO y streams
+      _chatRepository.resetSocketListeners();
+      _setupStreamListeners();
       
       // Si hay una sala activa, volver a unirse
       if (_currentRoomId != null) {

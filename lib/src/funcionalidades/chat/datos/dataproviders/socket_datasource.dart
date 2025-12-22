@@ -43,9 +43,8 @@ class SocketDataSource {
 
   /// Configurar listeners de Socket.IO
   void setupSocketListeners() {
-
     if (_listenersConfigured) {
-      debugPrint('[SocketDataSource] Listeners ya configurados');
+      debugPrint('[SocketDataSource] Listeners ya configurados, reusando configuración existente');
       return;
     }
 
@@ -261,5 +260,29 @@ class SocketDataSource {
     _roomJoinedController.close();
     _messageDeletedController.close();
     _messageEditedController.close();
+  }
+
+  /// Forzar reconfiguración de listeners tras una reconexión de socket
+  void resetSocketListeners() {
+    debugPrint('[SocketDataSource] 🔄 Reseteando listeners de socket');
+
+    final socket = SocketConfig.socket;
+    if (socket != null) {
+      // Eliminar handlers previos para evitar duplicados
+      socket.off('message:new');
+      socket.off('typing:user');
+      socket.off('typing:stop');
+      socket.off('user:joined');
+      socket.off('user:left');
+      socket.off('user:disconnected');
+      socket.off('room:joined');
+      socket.off('room:left');
+      socket.off('message:read:confirmed');
+      socket.off('message:deleted');
+      socket.off('message:edited');
+    }
+
+    _listenersConfigured = false;
+    setupSocketListeners();
   }
 }
