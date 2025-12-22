@@ -5,6 +5,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 
 class RankingUserList extends StatelessWidget {
   const RankingUserList({
@@ -23,6 +25,11 @@ class RankingUserList extends StatelessWidget {
       itemCount: rankingData.length,
       itemBuilder: (context, index) {
         final entry = rankingData[index];
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final currentUserEmail = userProvider.email;
+        final isCurrentUser = entry.email == currentUserEmail;
+
         return ListTile(
           onTap: () {
             Navigator.push(
@@ -48,10 +55,32 @@ class RankingUserList extends StatelessWidget {
               ),
             );
           },
+          tileColor: isCurrentUser
+              ? Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.3)
+              : null,
+          shape: isCurrentUser
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                )
+              : null,
           leading: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.primary,
+              color: isCurrentUser
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.primary,
+              border: isCurrentUser
+                  ? Border.all(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      width: 2,
+                    )
+                  : null,
             ),
             width: 40,
             height: 40,
@@ -66,7 +95,12 @@ class RankingUserList extends StatelessWidget {
               ),
             ),
           ),
-          title: Text(entry.email),
+          title: Text(
+            entry.email,
+            style: TextStyle(
+              fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
           subtitle: Text(
             selectedMetric == 'calorias_quemadas'
                 ? '${entry.caloriesBurned ?? 0} kcal'
@@ -75,6 +109,9 @@ class RankingUserList extends StatelessWidget {
                 : selectedMetric == 'num_rutas'
                 ? '${entry.numberOfRoutes ?? 0}'
                 : '${entry.elevationGain ?? 0} m',
+            style: TextStyle(
+              fontWeight: isCurrentUser ? FontWeight.w500 : FontWeight.normal,
+            ),
           ),
         );
       },
