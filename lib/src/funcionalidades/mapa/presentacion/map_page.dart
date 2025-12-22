@@ -163,6 +163,7 @@ class _MapPageState extends State<MapPage> {
                 !_hasCenteredOnUser && 
                 _mapController != null) {
               _hasCenteredOnUser = true;
+
               _mapController!.animateCamera(
                 CameraUpdate.newLatLngZoom(
                   state.userLocation!,
@@ -210,6 +211,7 @@ class _MapPageState extends State<MapPage> {
                       darkMode: Theme.of(context).brightness == Brightness.dark,
                       onMapCreated: _onMapCreated,
                       navigationRoutePolyline: state.decodedPolyline != null ? state.decodedPolyline! : const Polyline(polylineId: PolylineId('No route')),
+                      myLocationEnabled: state.userLocation != null,
                       padding: state.isNavigationMode 
                         ? const EdgeInsets.only(
                             top: 180,    // Espacio para RouteInfoWidget

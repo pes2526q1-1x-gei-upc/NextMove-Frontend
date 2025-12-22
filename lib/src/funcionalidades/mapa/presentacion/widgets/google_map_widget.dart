@@ -9,8 +9,8 @@ class MapWidget extends StatefulWidget {
   final MapType mapType;
   final void Function(GoogleMapController)? onMapCreated;
   final bool darkMode;
-
   final EdgeInsets padding;
+  final bool myLocationEnabled;
 
   const MapWidget({
     super.key,
@@ -22,6 +22,7 @@ class MapWidget extends StatefulWidget {
     this.onMapCreated,
     this.padding = EdgeInsets.zero,
     this.darkMode = false,
+    this.myLocationEnabled = false,
   });
 
   @override
@@ -39,7 +40,7 @@ class _MapWidgetState extends State<MapWidget> {
       markers: widget.markers,
       polylines: {widget.polyline, widget.navigationRoutePolyline},
       mapType: widget.mapType,
-      myLocationEnabled: true,
+      myLocationEnabled: widget.myLocationEnabled,
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       compassEnabled: true,
