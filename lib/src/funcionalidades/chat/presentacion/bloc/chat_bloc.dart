@@ -23,7 +23,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   String? _currentRoomId;
   final List<Message> _messages = [];
   final Set<String> _usersTyping = {};
-  Timer? _keepAliveTimer;
 
   ChatBloc(this._chatRepository) : super(const ChatInitial()) {
     // Registrar handlers de eventos
@@ -76,8 +75,8 @@ Future<void> _onInitializeChat(
       add(const SocketReconnected());
     });
 
-    // Iniciar keep-alive periódico (cada 30 segundos)
-    _startKeepAlive();
+    // Socket.IO maneja el heartbeat automáticamente con ping/pong nativo
+    // No es necesario un keep-alive personalizado
 
     emit(ChatConnected(event.userId));
     debugPrint('[ChatBloc] ✅ Chat inicializado correctamente');
@@ -439,7 +438,6 @@ Future<void> _onInitializeChat(
 
   /// Desconectar del chat
   void _onDisconnectChat(DisconnectChat event, Emitter<ChatState> emit) {
-    _stopKeepAlive();
     SocketConfig.disconnect();
     _currentRoomId = null;
     _messages.clear();
@@ -485,25 +483,6 @@ Future<void> _onInitializeChat(
     }
   }
 
-  /// Iniciar keep-alive periódico para mantener la conexión viva
-  void _startKeepAlive() {
-    _keepAliveTimer?.cancel();
-    _keepAliveTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (SocketConfig.isConnected) {
-        SocketConfig.ping();
-        debugPrint('[ChatBloc] 🏓 Keep-alive ping enviado');
-      } else {
-        debugPrint('[ChatBloc] ⚠️ Socket no conectado, cancelando keep-alive');
-        timer.cancel();
-      }
-    });
-  }
-
-  /// Detener keep-alive
-  void _stopKeepAlive() {
-    _keepAliveTimer?.cancel();
-    _keepAliveTimer = null;
-  }
 
   /// Eliminar mensaje
   Future<void> _onDeleteMessage(
@@ -666,7 +645,6 @@ Future<void> _onInitializeChat(
 
   @override
   Future<void> close() {
-    _stopKeepAlive();
     _messageSubscription?.cancel();
     _typingSubscription?.cancel();
     _userJoinedSubscription?.cancel();
