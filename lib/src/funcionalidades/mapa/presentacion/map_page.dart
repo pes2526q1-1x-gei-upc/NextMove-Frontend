@@ -262,7 +262,6 @@ class _MapPageState extends State<MapPage> {
                           }
                         },
                         onFocusChanged: (isFocused) {
-                          print('📍 MapPage received focus change: $isFocused');
                           setState(() {
                             _isSearchBarFocused = isFocused;
                           });

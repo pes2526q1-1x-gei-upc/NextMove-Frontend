@@ -27,7 +27,7 @@ class RoutePreviewWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -86,7 +86,7 @@ class RoutePreviewWidget extends StatelessWidget {
                             l10n.estTime,
                             style: TextStyle(
                               fontSize: 13,
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -130,7 +130,7 @@ class RoutePreviewWidget extends StatelessWidget {
                             l10n.distance,
                             style: TextStyle(
                               fontSize: 13,
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
