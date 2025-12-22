@@ -1269,6 +1269,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Number of routes'**
   String get numberOfRoutes;
+
+  /// No description provided for @noStatisticsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No statistics available for this user.'**
+  String get noStatisticsAvailable;
 }
 
 class _AppLocalizationsDelegate

@@ -233,5 +233,6 @@
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
     "social": "Social",
     "ranking": "Rànquing",
-    "numberOfRoutes": "Nombre de rutes"
+    "numberOfRoutes": "Nombre de rutes",
+    "noStatisticsAvailable": "No hi ha estadístiques disponibles per a aquest usuari."
 }

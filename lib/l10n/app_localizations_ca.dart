@@ -624,4 +624,8 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get numberOfRoutes => 'Nombre de rutes';
+
+  @override
+  String get noStatisticsAvailable =>
+      'No hi ha estadístiques disponibles per a aquest usuari.';
 }

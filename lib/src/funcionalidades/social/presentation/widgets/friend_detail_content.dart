@@ -151,8 +151,207 @@ class FriendDetailsContent extends StatelessWidget {
               ),
             ],
           ),
+
+          const SizedBox(height: 20),
+
+          // --- SECCIÓN: ESTADÍSTICAS ---
+          ProfileSectionLabel(text: "Statistics"),
+          user.statistics != null
+              ? _StatisticsGrid(statistics: user.statistics!)
+              : _NoStatisticsMessage(),
             
           const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatisticsGrid extends StatelessWidget {
+  final UserStatistics statistics;
+
+  const _StatisticsGrid({required this.statistics});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Debug: print statistics data
+    debugPrint('_StatisticsGrid: statistics = $statistics');
+
+    final statItems = [
+      _StatItem(
+        icon: Icons.route,
+        label: l10n.numberOfRoutes,
+        value: '${statistics.totalRoutes}',
+        color: Colors.blue,
+      ),
+      _StatItem(
+        icon: Icons.straighten,
+        label: l10n.distance,
+        value: '${statistics.distance.toStringAsFixed(1)} km',
+        color: Colors.green,
+      ),
+      _StatItem(
+        icon: Icons.trending_up,
+        label: l10n.elevationGain,
+        value: '${statistics.elevationGain.toStringAsFixed(0)} m',
+        color: Colors.orange,
+      ),
+      _StatItem(
+        icon: Icons.local_fire_department,
+        label: l10n.caloriesBurned,
+        value: '${statistics.caloriesBurned.toStringAsFixed(0)} kcal',
+        color: Colors.red,
+      ),
+      _StatItem(
+        icon: Icons.eco,
+        label: l10n.co2Saved,
+        value: '${statistics.co2Saved.toStringAsFixed(1)} kg',
+        color: Colors.teal,
+      ),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        children: statItems.map((item) => _StatCard(item: item)).toList(),
+      ),
+    );
+  }
+}
+
+class _StatItem {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+}
+
+class _StatCard extends StatelessWidget {
+  final _StatItem item;
+
+  const _StatCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              item.icon,
+              color: item.color,
+              size: 20,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            item.value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            item.label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoStatisticsMessage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Icon(
+            Icons.bar_chart_outlined,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.noStatisticsAvailable,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

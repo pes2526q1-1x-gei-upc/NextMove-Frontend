@@ -241,5 +241,6 @@
     "userMismatch": "The user does not match the current user.",
     "social": "Social",
     "ranking": "Ranking",
-    "numberOfRoutes": "Number of routes"
+    "numberOfRoutes": "Number of routes",
+    "noStatisticsAvailable": "No statistics available for this user."
 }

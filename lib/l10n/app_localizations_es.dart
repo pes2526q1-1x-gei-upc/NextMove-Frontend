@@ -624,4 +624,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get numberOfRoutes => 'Número de rutas';
+
+  @override
+  String get noStatisticsAvailable =>
+      'No hay estadísticas disponibles para este usuario.';
 }
