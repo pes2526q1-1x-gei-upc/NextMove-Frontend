@@ -151,9 +151,20 @@ class _MapPageState extends State<MapPage> {
               }
 
               if (state is MapLoadedState) {
-                final markersToShow = state.currentMode == StationType.bicycle
-                    ? state.bikeMarkers
-                    : state.carMarkers;
+                final Set<Marker> markersToShow;
+                if (state.isNavigationMode && state.selectedStation != null) {
+                   final sourceMarkers = state.currentMode == StationType.bicycle
+                      ? state.bikeMarkers
+                      : state.carMarkers;
+                      
+                   markersToShow = sourceMarkers.where(
+                      (m) => m.markerId.value == state.selectedStation!.id
+                   ).toSet();
+                } else {
+                   markersToShow = state.currentMode == StationType.bicycle
+                      ? state.bikeMarkers
+                      : state.carMarkers;
+                }
 
                 return Stack(
                   children: [
