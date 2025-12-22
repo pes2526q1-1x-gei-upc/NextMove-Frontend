@@ -58,6 +58,7 @@ class _MapPageState extends State<MapPage> {
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
+  bool _hasCenteredOnUser = false;
 
   
   StreamSubscription<Position>? _positionStream;
@@ -155,6 +156,19 @@ class _MapPageState extends State<MapPage> {
             }
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
+            }
+            // Centrar la cámara en la ubicación del usuario la primera vez que se obtiene
+            if (state is MapLoadedState && 
+                state.userLocation != null && 
+                !_hasCenteredOnUser && 
+                _mapController != null) {
+              _hasCenteredOnUser = true;
+              _mapController!.animateCamera(
+                CameraUpdate.newLatLngZoom(
+                  state.userLocation!,
+                  15.0,
+                ),
+              );
             }
           },
           child: BlocBuilder<MapBloc, MapState>(
