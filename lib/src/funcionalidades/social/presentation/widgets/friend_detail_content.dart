@@ -178,9 +178,6 @@ class _StatisticsGrid extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Debug: print statistics data
-    debugPrint('_StatisticsGrid: statistics = $statistics');
-
     final statItems = [
       _StatItem(
         icon: Icons.route,

@@ -171,6 +171,13 @@ class FriendDetailsPage extends StatelessWidget {
 
                   return BlocBuilder<SocialBloc, SocialState>(
                     builder: (context, socialState) {
+                      final userProvider = Provider.of<UserProvider>(context, listen: false);
+                      final currentUserEmail = userProvider.email;
+
+                      if (viewedUser.email == currentUserEmail) {
+                        return const SizedBox.shrink();
+                      }
+
                       // Verificamos si está en la lista de amigos
                       final isFriend = socialState.friends.any(
                         (friend) => friend.apodo == viewedUser.apodo,

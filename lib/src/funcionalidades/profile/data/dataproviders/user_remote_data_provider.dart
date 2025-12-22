@@ -113,7 +113,7 @@ class UserRemoteDataProvider {
     final statsData = await _fetchStatistics(email);
 
     if (statsData != null) {
-      data['statistics'] = statsData['userStats'];
+      data['statistics'] = statsData;
     }
 
     return UserEntity.fromRawData(data);
