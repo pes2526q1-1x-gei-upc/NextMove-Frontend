@@ -646,6 +646,8 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noStatisticsAvailable =>
       'No hay estadísticas disponibles para este usuario.';
+
+  @override
   String get accountSuspendedMessage => 'Tu cuenta ha sido suspendida.';
 
   @override

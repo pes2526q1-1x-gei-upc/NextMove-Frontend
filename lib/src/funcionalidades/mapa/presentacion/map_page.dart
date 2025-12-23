@@ -167,7 +167,7 @@ class _MapPageState extends State<MapPage> {
               _mapController!.animateCamera(
                 CameraUpdate.newLatLngZoom(
                   state.userLocation!,
-                  15.0,
+                  12.0,
                 ),
               );
             }
@@ -197,6 +197,11 @@ class _MapPageState extends State<MapPage> {
                       : state.carMarkers;
                 }
 
+                // Seleccionar el ClusterManager según el modo actual
+                final clusterManagerToShow = state.currentMode == StationType.bicycle
+                    ? state.bikeClusterManager
+                    : state.evClusterManager;
+
                 return Stack(
                   children: [
                     // Widget del mapa 
@@ -206,6 +211,9 @@ class _MapPageState extends State<MapPage> {
                         zoom: 12,
                       ),
                       markers: markersToShow,
+                      clusterManagers: clusterManagerToShow != null 
+                          ? {clusterManagerToShow} 
+                          : {},
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,

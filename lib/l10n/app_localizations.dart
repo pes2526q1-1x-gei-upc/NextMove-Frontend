@@ -1311,6 +1311,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No statistics available for this user.'**
   String get noStatisticsAvailable;
+
   /// No description provided for @accountSuspendedMessage.
   ///
   /// In en, this message translates to:

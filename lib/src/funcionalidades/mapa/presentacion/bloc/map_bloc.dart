@@ -99,17 +99,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         (stations) => stations as List<EVStationDetails>? ?? [],
       );
 
+      // Crear ClusterManagerIds
+      final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
+      final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+
+      // Crear ClusterManagers
+      final bikeClusterManager = ClusterManager(
+        clusterManagerId: bikeClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🔵 Cluster de bicicletas tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
+      final evClusterManager = ClusterManager(
+        clusterManagerId: evClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟢 Cluster de EV tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
       // Construir marcadores iniciales para bicicletas
       final bikeMarkers = _buildMarkersForStations(
         bikeStations,
         null,
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        bikeClusterManagerId,
       );
 
       final carMarkers = _buildMarkersForStations(
         null,
         evStations,
         BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        evClusterManagerId,
       );
 
       // Cargar búsquedas recientes guardadas
@@ -147,6 +172,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           recentBikeSearches: recentBikeSearches,  
           recentEvSearches: recentEvSearches,     
           decodedPolyline: null,
+          bikeClusterManager: bikeClusterManager,
+          evClusterManager: evClusterManager,
         ),
       );
 
@@ -473,6 +500,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     List<BicycleStationDetails>? bikeStations,
     List<EVStationDetails>? evStations,
     BitmapDescriptor icon,
+    ClusterManagerId clusterManagerId,
   ) {
     if (bikeStations == null && evStations != null) {
       return evStations
@@ -484,6 +512,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
               icon: icon,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })
@@ -498,6 +527,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
               icon: icon,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })

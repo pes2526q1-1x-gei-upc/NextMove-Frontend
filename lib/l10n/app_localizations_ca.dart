@@ -646,6 +646,8 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get noStatisticsAvailable =>
       'No hi ha estadístiques disponibles per a aquest usuari.';
+
+  @override
   String get accountSuspendedMessage => 'El seu compte ha sigut suspès.';
 
   @override
