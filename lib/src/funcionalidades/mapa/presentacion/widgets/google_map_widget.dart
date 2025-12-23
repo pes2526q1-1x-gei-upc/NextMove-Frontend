@@ -12,6 +12,7 @@ class MapWidget extends StatefulWidget {
   final EdgeInsets padding;
   final bool myLocationEnabled;
   final Set<ClusterManager>? clusterManagers;
+  final void Function(CameraPosition)? onCameraMove;
 
   const MapWidget({
     super.key,
@@ -25,6 +26,7 @@ class MapWidget extends StatefulWidget {
     this.darkMode = false,
     this.myLocationEnabled = false,
     this.clusterManagers,
+    this.onCameraMove,
   });
 
   @override
@@ -44,6 +46,7 @@ class _MapWidgetState extends State<MapWidget> {
       mapType: widget.mapType,
       myLocationEnabled: widget.myLocationEnabled,
       clusterManagers: widget.clusterManagers ?? {},
+      onCameraMove: widget.onCameraMove, 
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       compassEnabled: true,

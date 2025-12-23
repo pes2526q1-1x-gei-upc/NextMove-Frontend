@@ -63,10 +63,19 @@ class _MapPageState extends State<MapPage> {
   
   StreamSubscription<Position>? _positionStream;
 
+  LatLngBounds? _currentViewportBounds;
+  
+  Timer? _viewportUpdateTimer;
+  
+  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 300);
+  
+  static const double _viewportPadding = 0.1;
+
   @override
   void dispose() {
     _mapController?.dispose();
     _positionStream?.cancel();
+    _viewportUpdateTimer?.cancel();
     super.dispose();
   }
 
@@ -75,6 +84,68 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
+    
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (mounted && _mapController != null) {
+        _updateViewportBounds();
+      }
+    });
+  }
+
+  // =======================================================================
+
+  Future<void> _updateViewportBounds() async {
+    if (_mapController == null) return;
+    
+    try {
+      final visibleRegion = await _mapController!.getVisibleRegion();
+      
+      final latSpan = visibleRegion.northeast.latitude - visibleRegion.southwest.latitude;
+      final lngSpan = visibleRegion.northeast.longitude - visibleRegion.southwest.longitude;
+      
+      final latPadding = latSpan * _viewportPadding;
+      final lngPadding = lngSpan * _viewportPadding;
+      
+      if (mounted) {
+        setState(() {
+          _currentViewportBounds = LatLngBounds(
+            southwest: LatLng(
+              visibleRegion.southwest.latitude - latPadding,
+              visibleRegion.southwest.longitude - lngPadding,
+            ),
+            northeast: LatLng(
+              visibleRegion.northeast.latitude + latPadding,
+              visibleRegion.northeast.longitude + lngPadding,
+            ),
+          );
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting visible region: $e');
+      }
+    }
+  }
+
+  Set<Marker> _filterMarkersByViewport(Set<Marker> allMarkers, LatLngBounds? bounds) {
+    if (bounds == null) {
+      return allMarkers;
+    }
+    
+    return allMarkers.where((marker) {
+      final position = marker.position;
+      return bounds.contains(position);
+    }).toSet();
+  }
+  
+  void _onCameraMoveThrottled(CameraPosition position) {
+    _viewportUpdateTimer?.cancel();
+    
+    _viewportUpdateTimer = Timer(_viewportUpdateThrottle, () {
+      if (mounted) {
+        _updateViewportBounds();
+      }
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -182,22 +253,28 @@ class _MapPageState extends State<MapPage> {
               }
 
               if (state is MapLoadedState) {
-                final Set<Marker> markersToShow;
+                // Obtener todos los marcadores según el modo y estado de navegación
+                final Set<Marker> sourceMarkers;
                 if (state.isNavigationMode && state.selectedStation != null) {
-                   final sourceMarkers = state.currentMode == StationType.bicycle
+                   final tempMarkers = state.currentMode == StationType.bicycle
                       ? state.bikeMarkers
                       : state.carMarkers;
                       
-                   markersToShow = sourceMarkers.where(
+                   sourceMarkers = tempMarkers.where(
                       (m) => m.markerId.value == state.selectedStation!.id
                    ).toSet();
                 } else {
-                   markersToShow = state.currentMode == StationType.bicycle
+                   sourceMarkers = state.currentMode == StationType.bicycle
                       ? state.bikeMarkers
                       : state.carMarkers;
                 }
 
-                // Seleccionar el ClusterManager según el modo actual
+                
+                final Set<Marker> markersToShow = _filterMarkersByViewport(
+                  sourceMarkers,
+                  _currentViewportBounds,
+                );
+
                 final clusterManagerToShow = state.currentMode == StationType.bicycle
                     ? state.bikeClusterManager
                     : state.evClusterManager;
@@ -214,6 +291,7 @@ class _MapPageState extends State<MapPage> {
                       clusterManagers: clusterManagerToShow != null 
                           ? {clusterManagerToShow} 
                           : {},
+                      onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
@@ -222,15 +300,14 @@ class _MapPageState extends State<MapPage> {
                       myLocationEnabled: state.userLocation != null,
                       padding: state.isNavigationMode 
                         ? const EdgeInsets.only(
-                            top: 180,    // Espacio para RouteInfoWidget
-                            bottom: 240, // Espacio para RoutePreviewWidget
+                            top: 180,   
+                            bottom: 240, 
                             left: 20,
                             right: 20,
                           )
                         : EdgeInsets.zero,
                     ),
 
-                    //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
                     if (state.isNavigationMode)...[
                       Positioned(
                         top:60,
@@ -249,7 +326,6 @@ class _MapPageState extends State<MapPage> {
                         child: RoutePreviewWidget(
                           route: state.navigationRoute!,
                           onStartPressed: () {
-                            // Acción al iniciar (puedes loguear o llamar evento)
                             debugPrint("Iniciar navegación presionado");
                           },
                           onCancelPressed: () {
