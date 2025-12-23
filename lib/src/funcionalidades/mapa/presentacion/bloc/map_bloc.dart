@@ -44,6 +44,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   final StationType? _initialMode;
 
+  // =======================================================================
+  // CONFIGURACIÓN DE TAMAÑOS DE ICONOS - Cambia estos valores para ajustar el tamaño
+  // =======================================================================
+  static const Size bikeIconSize = Size(60, 60);  // Tamaño del icono de bicicleta
+  static const Size evIconSize = Size(20, 20);     // Tamaño de los iconos EV
+
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
@@ -122,18 +128,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       );
 
-      // Construir marcadores iniciales para bicicletas
-      final bikeMarkers = _buildMarkersForStations(
+      // Construir marcadores iniciales para bicicletas con iconos personalizados
+      final bikeMarkers = await _buildMarkersForStations(
         bikeStations,
         null,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         bikeClusterManagerId,
       );
 
-      final carMarkers = _buildMarkersForStations(
+      // Construir marcadores iniciales para EV con iconos personalizados
+      final carMarkers = await _buildMarkersForStations(
         null,
         evStations,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         evClusterManagerId,
       );
 
@@ -495,29 +500,87 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  /// Construir marcadores para una lista de estaciones
-  Set<Marker> _buildMarkersForStations(
+  // =======================================================================
+  // PERSONALIZACIÓN DE ICONOS - Cargar iconos desde assets
+  // =======================================================================
+
+  /// Carga un BitmapDescriptor desde un asset con tamaño configurable
+  Future<BitmapDescriptor> _loadIconFromAsset(String assetPath, {bool isBikeIcon = false}) async {
+    final Size iconSize = isBikeIcon ? bikeIconSize : evIconSize;
+    final ImageConfiguration imageConfig = ImageConfiguration(size: iconSize);
+    final BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(
+      imageConfig,
+      assetPath,
+    );
+    return bitmapDescriptor;
+  }
+
+  /// Determina qué icono usar para una estación EV según su nivel de potencia
+  Future<BitmapDescriptor> _getEVIcon(EVStationDetails station) async {
+    // Si es super rápida, usar icono super
+    if (station.isSuperFast == true) {
+      return await _loadIconFromAsset('assets/evSuper_icon.png');
+    }
+
+    // Calcular potencia máxima de los conectores
+    double? maxPower;
+    if (station.connectors != null && station.connectors!.isNotEmpty) {
+      for (var connector in station.connectors!) {
+        if (connector.powerKw != null) {
+          if (maxPower == null || connector.powerKw! > maxPower) {
+            maxPower = connector.powerKw;
+          }
+        }
+      }
+    }
+
+    // Determinar icono según potencia
+    if (maxPower == null || maxPower == 0) {
+      return await _loadIconFromAsset('assets/evLow_icon.png');
+    } else if (maxPower >= 50) {
+      return await _loadIconFromAsset('assets/evHigh_icon.png');
+    } else if (maxPower >= 22) {
+      return await _loadIconFromAsset('assets/evMid_icon.png');
+    } else {
+      return await _loadIconFromAsset('assets/evLow_icon.png');
+    }
+  }
+
+  /// Obtiene el icono para estaciones de bicicletas
+  Future<BitmapDescriptor> _getBikeIcon() async {
+    return await _loadIconFromAsset('assets/bikePin_custom.png', isBikeIcon: true);
+  }
+
+  /// Construir marcadores para una lista de estaciones con iconos personalizados
+  Future<Set<Marker>> _buildMarkersForStations(
     List<BicycleStationDetails>? bikeStations,
     List<EVStationDetails>? evStations,
-    BitmapDescriptor icon,
     ClusterManagerId clusterManagerId,
-  ) {
+  ) async {
     if (bikeStations == null && evStations != null) {
-      return evStations
-          .where(
-            (station) => station.latitude != null && station.longitude != null,
-          )
-          .map((station) {
-            return Marker(
+      // Construir marcadores para estaciones EV con iconos personalizados
+      final Set<Marker> markers = {};
+      
+      for (var station in evStations) {
+        if (station.latitude != null && station.longitude != null) {
+          final icon = await _getEVIcon(station);
+          markers.add(
+            Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
               icon: icon,
               clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
-            );
-          })
-          .toSet();
+            ),
+          );
+        }
+      }
+      
+      return markers;
     } else if (evStations == null && bikeStations != null) {
+      // Construir marcadores para estaciones de bicicletas con icono personalizado
+      final bikeIcon = await _getBikeIcon();
+      
       return bikeStations
           .where(
             (station) => station.latitude != null && station.longitude != null,
@@ -526,7 +589,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             return Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
-              icon: icon,
+              icon: bikeIcon,
               clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
