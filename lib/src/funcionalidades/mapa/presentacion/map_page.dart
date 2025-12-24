@@ -63,19 +63,10 @@ class _MapPageState extends State<MapPage> {
   
   StreamSubscription<Position>? _positionStream;
 
-  LatLngBounds? _currentViewportBounds;
-  
-  Timer? _viewportUpdateTimer;
-  
-  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 50);
-  
-  static const double _viewportPadding = 0.1;
-
   @override
   void dispose() {
     _mapController?.dispose();
     _positionStream?.cancel();
-    _viewportUpdateTimer?.cancel();
     super.dispose();
   }
 
@@ -84,68 +75,6 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    
-    Future.delayed(const Duration(milliseconds: 250), () {
-      if (mounted && _mapController != null) {
-        _updateViewportBounds();
-      }
-    });
-  }
-
-  // =======================================================================
-
-  Future<void> _updateViewportBounds() async {
-    if (_mapController == null) return;
-    
-    try {
-      final visibleRegion = await _mapController!.getVisibleRegion();
-      
-      final latSpan = visibleRegion.northeast.latitude - visibleRegion.southwest.latitude;
-      final lngSpan = visibleRegion.northeast.longitude - visibleRegion.southwest.longitude;
-      
-      final latPadding = latSpan * _viewportPadding;
-      final lngPadding = lngSpan * _viewportPadding;
-      
-      if (mounted) {
-        setState(() {
-          _currentViewportBounds = LatLngBounds(
-            southwest: LatLng(
-              visibleRegion.southwest.latitude - latPadding,
-              visibleRegion.southwest.longitude - lngPadding,
-            ),
-            northeast: LatLng(
-              visibleRegion.northeast.latitude + latPadding,
-              visibleRegion.northeast.longitude + lngPadding,
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error getting visible region: $e');
-      }
-    }
-  }
-
-  Set<Marker> _filterMarkersByViewport(Set<Marker> allMarkers, LatLngBounds? bounds) {
-    if (bounds == null) {
-      return allMarkers;
-    }
-    
-    return allMarkers.where((marker) {
-      final position = marker.position;
-      return bounds.contains(position);
-    }).toSet();
-  }
-  
-  void _onCameraMoveThrottled(CameraPosition position) {
-    _viewportUpdateTimer?.cancel();
-    
-    _viewportUpdateTimer = Timer(_viewportUpdateThrottle, () {
-      if (mounted) {
-        _updateViewportBounds();
-      }
-    });
   }
 
   // -----------------------------------------------------------------------
@@ -269,11 +198,8 @@ class _MapPageState extends State<MapPage> {
                       : state.carMarkers;
                 }
 
-                
-                final Set<Marker> markersToShow = _filterMarkersByViewport(
-                  sourceMarkers,
-                  _currentViewportBounds,
-                );
+                 // Render all markers and let the native clustering engine handle density.
+                 final Set<Marker> markersToShow = sourceMarkers;
 
                 final clusterManagerToShow = state.currentMode == StationType.bicycle
                     ? state.bikeClusterManager
@@ -291,7 +217,6 @@ class _MapPageState extends State<MapPage> {
                       clusterManagers: clusterManagerToShow != null 
                           ? {clusterManagerToShow} 
                           : {},
-                      onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
