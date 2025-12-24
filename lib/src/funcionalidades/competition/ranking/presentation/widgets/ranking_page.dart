@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/bloc/ranking_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/widgets/ranking_user_list.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/widgets/ranking_metric_selector.dart';
@@ -31,8 +30,6 @@ class _RankingPageState extends State<RankingPage> {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations l10n = AppLocalizations.of(context)!;
-
     return BlocProvider.value(
       value: _rankingBloc,
       child: BlocListener<RankingBloc, RankingState>(

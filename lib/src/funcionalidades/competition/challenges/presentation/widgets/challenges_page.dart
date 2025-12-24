@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/challenge_card.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_card.dart';
 
 class ChallengesPage extends StatefulWidget {
   const ChallengesPage({super.key});
