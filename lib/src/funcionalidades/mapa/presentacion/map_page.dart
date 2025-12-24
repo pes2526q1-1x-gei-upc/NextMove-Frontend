@@ -332,17 +332,46 @@ class _MapPageState extends State<MapPage> {
                         )
                       ),
                       if(state.navigationRoute != null)
-                      Positioned(
-                        bottom: 30,
-                        left: 16,
-                        right: 16,
-                        child: RoutePreviewWidget(
-                          route: state.navigationRoute!,
-                          onStartPressed: () {
-                            debugPrint("Iniciar navegación presionado");
-                          },
-                          onCancelPressed: () {
-                             context.read<MapBloc>().add(CancelNavigationEvent());
+                      Positioned.fill(
+                        bottom: 0,
+                        child: DraggableScrollableSheet(
+                          initialChildSize: 0.28,
+                          minChildSize: 0.22,
+                          maxChildSize: 0.28,
+                          builder: (context, scrollController) {
+                            return NotificationListener<DraggableScrollableNotification>(
+                              onNotification: (notification) {
+                                // Cuando el usuario suelta el drag y está en el mínimo
+                                if (notification.extent <= notification.minExtent + 0.01) {
+                                  Future.delayed(const Duration(milliseconds: 150), () {
+                                    if (context.mounted) {
+                                      context.read<MapBloc>().add(CancelNavigationEvent());
+                                    }
+                                  });
+                                }
+                                return true;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(24),
+                                  ),
+                                ),
+                                child: SingleChildScrollView(
+                                  controller: scrollController,
+                                  child: RoutePreviewWidget(
+                                    route: state.navigationRoute!,
+                                    onStartPressed: () {
+                                      debugPrint("Iniciar navegación presionado");
+                                    },
+                                    onCancelPressed: () {
+                                      context.read<MapBloc>().add(CancelNavigationEvent());
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),

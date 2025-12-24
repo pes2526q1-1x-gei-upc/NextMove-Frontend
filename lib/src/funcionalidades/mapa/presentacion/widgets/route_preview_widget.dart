@@ -18,50 +18,37 @@ class RoutePreviewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar implementation
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Handle bar (similar to StationBottomSheet)
+        Center(
+          child: Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.dividerColor,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16), // Reduced bottom padding
-            child: Column(
+        ),
+        
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+          child: Column(
               children: [
                 // Route Stats Row
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Duration - Primary Info
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
                               Icons.access_time_filled_rounded,
@@ -70,7 +57,10 @@ class RoutePreviewWidget extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              route.duration,
+                              route.duration.replaceAllMapped(
+                                RegExp(r'(\d+)(min|h)'),
+                                (match) => '${match.group(1)} ${match.group(2)}',
+                              ),
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w800,
@@ -80,19 +70,19 @@ class RoutePreviewWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 28),
-                          child: Text(
-                            l10n.estTime,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w500,
-                            ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.estTime,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
+                    
+                    const SizedBox(width: 24),
                     
                     // Divider
                     Container(
@@ -100,14 +90,17 @@ class RoutePreviewWidget extends StatelessWidget {
                       width: 1,
                       color: theme.dividerColor,
                     ),
+                    
+                    const SizedBox(width: 24),
 
                     // Distance - Secondary Info
-                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                             Text(
+                            Text(
                               route.distance,
                               style: TextStyle(
                                 fontSize: 24,
@@ -124,15 +117,13 @@ class RoutePreviewWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 28),
-                          child: Text(
-                            l10n.distance,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w500,
-                            ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.distance,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -208,7 +199,6 @@ class RoutePreviewWidget extends StatelessWidget {
             ),
           ),
         ],
-      ),
     );
   }
 }
