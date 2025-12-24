@@ -234,7 +234,7 @@
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
     "start": "Iniciar",
     "estTime": "Temps estimat",
-    "uLoc" : "La Teva Ubicació",
+    "uLoc": "La teva ubicació",
     "social": "Social",
     "ranking": "Rànquing",
     "numberOfRoutes": "Nombre de rutes",
@@ -252,5 +252,9 @@
     "days": "dies",
     "hours": "hores",
     "minutes": "minuts",
-    "permanent": "Permanent"
+    "permanent": "Permanent",
+    "challenges": "Reptes",
+    "competition": "Competició",
+    "noChallengesAvailable": "No hi ha reptes disponibles.",
+    "points": "{count, plural, =1{{count} punt} other{{count} punts}}"
 }

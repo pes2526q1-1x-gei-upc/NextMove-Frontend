@@ -2,8 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/data/dataproviders/ranking_remote_data_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/data/dataproviders/ranking_remote_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/domain/ranking_entry.dart';
 
 class RankingRepository {
   final RankingRemoteDataProvider rankingRemoteDataProvider;

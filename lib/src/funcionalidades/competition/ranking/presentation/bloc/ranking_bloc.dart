@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/data/repositories/ranking_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/data/repositories/ranking_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/domain/ranking_entry.dart';
 
 part 'ranking_event.dart';
 part 'ranking_state.dart';

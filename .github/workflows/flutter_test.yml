@@ -35,10 +35,16 @@ jobs:
         run: ./.github/workflows/generate_test_with_all_imports.sh
       - name: Create .env file from ENV_FILE secret
         run: echo "$ENV_FILE" > .env
+      - name: Generate localization files
+        run: flutter gen-l10n
       - name: Setup testRocket
         run: dart pub global activate test_rocket
-      - name: Run tests with coverage information
+      - name: Run test with testRocket with coverage information
         run: testRocket run --coverage
+        continue-on-error: true
+      - name: Run tests with flutter test with coverage information (check for errors here if testRocket fails)
+        run: flutter test --coverage
+        if: failure()
       - name: Upload coverage reports for coverage job
         uses: actions/upload-artifact@v5
         with:
