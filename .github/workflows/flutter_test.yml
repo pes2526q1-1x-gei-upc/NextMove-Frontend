@@ -35,10 +35,12 @@ jobs:
         run: ./.github/workflows/generate_test_with_all_imports.sh
       - name: Create .env file from ENV_FILE secret
         run: echo "$ENV_FILE" > .env
-      - name: Setup testRocket
-        run: dart pub global activate test_rocket
+      # - name: Setup testRocket
+      #   run: dart pub global activate test_rocket
+      # - name: Run tests with coverage information
+      #   run: testRocket run --coverage
       - name: Run tests with coverage information
-        run: testRocket run --coverage
+        run: flutter test --coverage
       - name: Upload coverage reports for coverage job
         uses: actions/upload-artifact@v5
         with:
