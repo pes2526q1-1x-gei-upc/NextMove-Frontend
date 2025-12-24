@@ -682,4 +682,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yesterday => 'Ayer';
+
+  @override
+  String get groupDetails => 'Detalles del grupo';
+
+  @override
+  String get participants => 'Participantes';
 }

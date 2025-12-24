@@ -675,4 +675,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yesterday => 'Yesterday';
+
+  @override
+  String get groupDetails => 'Group details';
+
+  @override
+  String get participants => 'Participants';
 }

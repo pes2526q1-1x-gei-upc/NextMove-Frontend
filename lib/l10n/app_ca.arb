@@ -255,5 +255,7 @@
     "loadingRoom": "Carregant sala...",
     "writeAMessage": "Escriu un missatge...",
     "today": "Avui",
-    "yesterday": "Ahir"
+    "yesterday": "Ahir",
+    "groupDetails": "Detalls del grup",
+    "participants": "Participants"
 }

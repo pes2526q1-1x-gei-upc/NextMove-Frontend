@@ -131,4 +131,28 @@ class GraphQLMutations {
       editAssessment(station_id: $station_id, score: $score, comments: $comments)
     }
   ''';
+
+  // === Chat ===
+  static const String leaveGroupMutation = r'''
+    mutation LeaveGroup($chatId: ID!) {
+      leaveGroup(chatId: $chatId)
+    }
+  ''';
+
+  static const String updateGroupChatMutation = r'''
+    mutation UpdateGroupChat($chatId: ID!, $name: String, $description: String) {
+      updateGroupChat(chatId: $chatId, name: $name, description: $description) {
+        id
+        name
+        description
+        type
+      }
+    }
+  ''';
+
+  static const String addParticipantToGroupMutation = r'''
+    mutation AddParticipantToGroup($chatId: ID!, $userEmail: String!) {
+      addParticipantToGroup(chatId: $chatId, userEmail: $userEmail)
+    }
+  ''';
 }

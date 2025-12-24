@@ -683,4 +683,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get yesterday => 'Ahir';
+
+  @override
+  String get groupDetails => 'Detalls del grup';
+
+  @override
+  String get participants => 'Participants';
 }

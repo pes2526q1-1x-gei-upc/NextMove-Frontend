@@ -340,6 +340,25 @@ const String chatMessagesQuery = r'''
   }
 ''';
 
+const String getChatDetailsQuery = r'''
+  query GetChatDetails($chatId: ID!) {
+    myChats {
+      id
+      type
+      name
+      description
+      participants {
+        userEmail
+        nickname
+        photoUrl
+        joinedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+''';
+
 const String createGroupChatMutation = r'''
   mutation CreateGroupChat($name: String!, $description: String, $participantEmails: [String!]!) {
     createGroupChat(name: $name, description: $description, participantEmails: $participantEmails) {

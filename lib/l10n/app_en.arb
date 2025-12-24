@@ -263,5 +263,7 @@
     "loadingRoom": "Loading room...",
     "writeAMessage": "Write a message...",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "groupDetails": "Group details",
+    "participants": "Participants"
 }

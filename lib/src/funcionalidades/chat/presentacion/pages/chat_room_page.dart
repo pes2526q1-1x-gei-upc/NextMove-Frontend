@@ -8,6 +8,7 @@ import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/date_separator.dart';
+import 'chat_room_details_page.dart';
 import '../../dominio/entities/message.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
@@ -51,11 +52,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   bool _isTyping = false;
   DateTime? _lastTypingTime;
   late ChatBloc _chatBloc;
+  String? _currentRoomName; // Nombre actual del grupo/chat
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _currentRoomName = widget.roomName; // Inicializar con el nombre pasado
   }
 
   @override
@@ -313,8 +316,33 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
             
             return GestureDetector(
-              onTap: () {
-                if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
+              onTap: () async {
+                if (widget.isGroup) {
+                  // Si es un grupo, navegar a la página de detalles del grupo
+                  final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+                    MaterialPageRoute(
+                      builder: (context) => ChatRoomDetailsPage(
+                        chatId: widget.roomId,
+                        chatName: _currentRoomName ?? widget.roomName,
+                        chatDescription: null, // Podríamos pasar la descripción si la tenemos
+                      ),
+                    ),
+                  );
+                  
+                  // Si se salió del grupo, volver a la lista de chats
+                  if (result != null && result['leftGroup'] == true && mounted) {
+                    Navigator.of(context).pop(true); // Devolver true para indicar que se debe refrescar
+                    return;
+                  }
+                  
+                  // Si se actualizó el nombre del grupo, actualizar el estado
+                  if (result != null && result['name'] != null && mounted) {
+                    setState(() {
+                      _currentRoomName = result['name'] as String;
+                    });
+                  }
+                } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
+                  // Si es chat directo, navegar al perfil del amigo
                   _navigateToFriendDetail(otherUserNickname);
                 }
               },
@@ -322,17 +350,25 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    backgroundImage: otherUserPhoto != null && otherUserPhoto.isNotEmpty
+                    backgroundColor: widget.isGroup
+                        ? theme.colorScheme.primaryContainer
+                        : theme.colorScheme.surfaceContainerHighest,
+                    backgroundImage: !widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
                         ? NetworkImage(otherUserPhoto)
                         : null,
-                    child: otherUserPhoto == null || otherUserPhoto.isEmpty
+                    child: widget.isGroup
                         ? Icon(
-                            Icons.person,
+                            Icons.group,
                             size: 20,
-                            color: theme.iconTheme.color?.withValues(alpha: 0.8),
+                            color: theme.colorScheme.onPrimaryContainer,
                           )
-                        : null,
+                        : (otherUserPhoto == null || otherUserPhoto.isEmpty
+                            ? Icon(
+                                Icons.person,
+                                size: 20,
+                                color: theme.iconTheme.color?.withValues(alpha: 0.8),
+                              )
+                            : null),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -340,7 +376,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.roomName,
+                          _currentRoomName ?? widget.roomName,
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         if (state is ChatRoomActive && state.usersTyping.isNotEmpty)

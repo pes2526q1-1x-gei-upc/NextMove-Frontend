@@ -1383,6 +1383,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yesterday'**
   String get yesterday;
+
+  /// No description provided for @groupDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Group details'**
+  String get groupDetails;
+
+  /// No description provided for @participants.
+  ///
+  /// In en, this message translates to:
+  /// **'Participants'**
+  String get participants;
 }
 
 class _AppLocalizationsDelegate
