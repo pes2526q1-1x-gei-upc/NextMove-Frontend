@@ -13,6 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_pro
 import '../../../../../graphql/queries.dart';
 import '../widgets/chat_list_widgets.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'create_group_page.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -20,8 +21,6 @@ class ChatListPage extends StatefulWidget {
   @override
   State<ChatListPage> createState() => _ChatListPageState();
   
-  /// Método estático para refrescar la lista desde fuera
-  /// Requiere un GlobalKey<State<ChatListPage>>
   static void refresh(GlobalKey<State<ChatListPage>>? key) {
     final state = key?.currentState;
     if (state is _ChatListPageState) {
@@ -33,11 +32,10 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  bool _showFriends = true; // true = amigos, false = grupos
-  int _refreshKey = 0; // Clave para forzar reconstrucción del Query cuando se necesita refrescar
-  Future<List<dynamic>>? _friendsFuture; // Future para cargar amigos cuando hay búsqueda
-  Future<List<dynamic>>? _friendsForFilterFuture; // Future para cargar amigos para filtrar chats
-
+  bool _showFriends = true;
+  int _refreshKey = 0;
+  Future<List<dynamic>>? _friendsFuture;
+  Future<List<dynamic>>? _friendsForFilterFuture;
 
   @override
   void dispose() {
@@ -48,8 +46,6 @@ class _ChatListPageState extends State<ChatListPage> {
   @override
   void initState() {
     super.initState();
-
-    // Inicializar chat automáticamente al abrir la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeChat();
       _loadFriendsForFilter();
@@ -59,7 +55,6 @@ class _ChatListPageState extends State<ChatListPage> {
   void _onSearchChanged(String query) {
     setState(() {
       _searchQuery = query;
-      // Si hay búsqueda, cargar amigos
       if (query.isNotEmpty) {
         _loadFriendsForSearch();
       } else {
@@ -110,18 +105,10 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  /// Método público para refrescar la lista de chats
-  /// Se llama cuando el usuario vuelve a la página de chats desde la navegación
-  /// 
-  /// Nota: Usamos una clave única para forzar la reconstrucción del Query widget
-  /// en lugar de usar refetch, ya que refetch puede no ser seguro en todos los estados
   void refreshChatList() {
-    // Forzar reconstrucción del Query cambiando la clave
-    // Esto es más seguro que usar refetch que puede fallar
     if (mounted) {
       setState(() {
         _refreshKey++;
-        // Recargar amigos para filtrar chats actualizados
         _loadFriendsForFilter();
       });
     }
@@ -140,7 +127,6 @@ class _ChatListPageState extends State<ChatListPage> {
       String email = friendEmail ?? '';
       String? photo = friendPhoto;
 
-      // Si no tenemos el email, lo buscamos
       if (email.isEmpty) {
         final emailResult = await client.query(
           QueryOptions(
@@ -156,13 +142,11 @@ class _ChatListPageState extends State<ChatListPage> {
 
         final users = emailResult.data?['UsersByNickname'] as List<dynamic>?;
         if (users != null && users.isNotEmpty) {
-          // Buscar coincidencia exacta de nickname
           final user = users.firstWhere(
             (u) => u['nickname'] == friendNickname,
             orElse: () => users.first,
           );
           email = user['email'] as String;
-          // Si no teníamos la foto, obtenerla del usuario encontrado
           photo ??= user['photo'] as String?;
         } else {
           throw Exception('No se pudo encontrar el email del usuario');
@@ -184,7 +168,6 @@ class _ChatListPageState extends State<ChatListPage> {
       final chat = chatResult.data!['getOrCreateDirectChat'];
       final chatId = chat['id'] as String;
 
-      // Indicar que debe refrescar la lista cuando se vuelva, ya que es un chat nuevo
       _navigateToRoom(chatId, friendNickname, otherUserPhoto: photo, shouldRefreshOnReturn: true);
     } catch (e) {
       if (mounted) {
@@ -201,7 +184,6 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _navigateToRoom(String roomId, String roomName, {String? otherUserPhoto, bool shouldRefreshOnReturn = false}) async {
     final chatBloc = context.read<ChatBloc>();
 
-    // Navegar a la sala de chat y esperar el resultado
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
@@ -215,7 +197,6 @@ class _ChatListPageState extends State<ChatListPage> {
       ),
     );
 
-    // Si se volvió después de eliminar un amigo (result == true) o si se creó un chat nuevo (shouldRefreshOnReturn)
     if ((result == true || shouldRefreshOnReturn) && mounted) {
       refreshChatList();
     }
@@ -243,7 +224,6 @@ class _ChatListPageState extends State<ChatListPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Barra de búsqueda y toggle
               ChatSearchBar(
                 controller: _searchController,
                 showFriends: _showFriends,
@@ -254,7 +234,6 @@ class _ChatListPageState extends State<ChatListPage> {
                 },
                 onSearchChanged: _onSearchChanged,
               ),
-
               const SizedBox(height: 24),
               Expanded(
                 child: _buildChatList(context),
@@ -263,6 +242,23 @@ class _ChatListPageState extends State<ChatListPage> {
           ),
         ),
       ),
+      floatingActionButton: !_showFriends
+          ? FloatingActionButton.extended(
+              onPressed: () async {
+                final result = await Navigator.of(context).push<bool>(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateGroupPage(),
+                  ),
+                );
+                
+                if (result == true && mounted) {
+                  refreshChatList();
+                }
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Crear Grupo'),
+            )
+          : null,
     );
   }
 
@@ -277,9 +273,9 @@ class _ChatListPageState extends State<ChatListPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(l10n.connectingToServer),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(l10n.connectingToServer),
               ],
             ),
           );
@@ -290,43 +286,36 @@ class _ChatListPageState extends State<ChatListPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: theme.colorScheme.error,
-                ),
+                Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
                 const SizedBox(height: 16),
-                  Text(l10n.connectionError, style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 8),
-                  Text(chatState.message, textAlign: TextAlign.center),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _initializeChat,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(l10n.retry),
+                Text(l10n.connectionError, style: theme.textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(chatState.message, textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: _initializeChat,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.retry),
                 ),
               ],
             ),
           );
         }
 
-        // Cargar lista de chats que tienen mensajes
         final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
         
         return Query(
-          key: ValueKey('chats_query_$_refreshKey'), // Clave única para forzar reconstrucción
+          key: ValueKey('chats_query_$_refreshKey'),
           options: QueryOptions(
             document: gql(myChatsQuery),
             fetchPolicy: FetchPolicy.networkOnly,
           ),
           builder: (chatsResult, {fetchMore, refetch}) {
-            // Cargar amigos para filtrar chats de amigos eliminados
             return FutureBuilder<List<dynamic>>(
               future: _friendsForFilterFuture,
               builder: (context, friendsSnapshot) {
                 QueryResult? friendsResult;
                 
-                // Si hay búsqueda y tenemos un future de búsqueda, usar ese
                 if (_searchQuery.isNotEmpty && _friendsFuture != null) {
                   return FutureBuilder<List<dynamic>>(
                     future: _friendsFuture,
@@ -336,15 +325,6 @@ class _ChatListPageState extends State<ChatListPage> {
                           options: QueryOptions(document: gql(GraphQLQueries.getFriends)),
                           source: QueryResultSource.network,
                           data: {'ListFriends': searchFriendsSnapshot.data},
-                        );
-                      } else if (searchFriendsSnapshot.hasError) {
-                        friendsResult = QueryResult(
-                          options: QueryOptions(document: gql(GraphQLQueries.getFriends)),
-                          source: QueryResultSource.network,
-                          exception: OperationException(
-                            linkException: null,
-                            graphqlErrors: [GraphQLError(message: searchFriendsSnapshot.error.toString())],
-                          ),
                         );
                       }
                       
@@ -365,7 +345,6 @@ class _ChatListPageState extends State<ChatListPage> {
                     },
                   );
                 } else {
-                  // Usar el resultado del future de filtro
                   if (friendsSnapshot.hasData) {
                     friendsResult = QueryResult(
                       options: QueryOptions(document: gql(GraphQLQueries.getFriends)),
@@ -399,22 +378,16 @@ class _ChatListPageState extends State<ChatListPage> {
     ThemeData theme,
     AppLocalizations l10n,
   ) {
-    // Mostrar loading si alguna query está cargando
     if (chatsResult.isLoading || (friendsResult != null && friendsResult.isLoading)) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // Manejar errores
     if (chatsResult.hasException) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
+            Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(l10n.errorLoadingFriends),
             const SizedBox(height: 8),
@@ -431,26 +404,21 @@ class _ChatListPageState extends State<ChatListPage> {
 
     final allChats = chatsResult.data?['myChats'] as List<dynamic>? ?? [];
     
-    // Obtener lista de amigos para filtrar chats de amigos eliminados
     List<String> friendsNicknames = [];
     if (friendsResult != null && !friendsResult.hasException) {
       final friendsData = friendsResult.data?['ListFriends'] as List<dynamic>? ?? [];
       friendsNicknames = friendsData.map((f) => f['name'] as String? ?? '').where((n) => n.isNotEmpty).toList();
-    } else if (_searchQuery.isEmpty) {
-      // Si no hay búsqueda activa, cargar amigos para filtrar
-      // Esto se hace en un FutureBuilder o Query separado
     }
     
-    // Filtrar chats: solo los que tienen mensajes Y (si es directo) el otro usuario sigue siendo amigo
-    final chatsWithMessages = allChats.where((chat) {
-      final lastMessage = chat['lastMessage'];
-      if (lastMessage == null) return false;
-      
-      // Si es un chat directo, verificar que el otro participante sigue siendo amigo
+    // SEPARAR CHATS DIRECTOS Y GRUPOS
+    final directChats = allChats.where((chat) {
       final chatType = chat['type'] as String?;
-      if (chatType == 'direct' && friendsNicknames.isNotEmpty && currentUserEmail != null) {
+      final lastMessage = chat['lastMessage'];
+      
+      if (chatType != 'direct' || lastMessage == null) return false;
+      
+      if (friendsNicknames.isNotEmpty && currentUserEmail != null) {
         final participants = chat['participants'] as List<dynamic>? ?? [];
-        // Buscar el otro participante
         try {
           final otherParticipant = participants.firstWhere(
             (p) => p['userEmail'] != currentUserEmail,
@@ -458,33 +426,38 @@ class _ChatListPageState extends State<ChatListPage> {
           
           if (otherParticipant != null) {
             final otherNickname = otherParticipant['nickname'] as String?;
-            // Si el nickname del otro participante no está en la lista de amigos, filtrarlo
             if (otherNickname != null && !friendsNicknames.contains(otherNickname)) {
               return false;
             }
           }
         } catch (e) {
-          // Si no se encuentra el otro participante, mantener el chat (fallback)
+          // Mantener el chat si no se puede determinar
         }
       }
       
       return true;
     }).toList();
     
-    // Convertir chats a formato similar a friends para mantener compatibilidad
-    final friends = chatsWithMessages.map((chat) {
+    final groupChats = allChats.where((chat) {
+      final chatType = chat['type'] as String?;
+      return chatType == 'group';
+    }).toList();
+    
+    // Decidir qué mostrar según el toggle
+    final chatsToShow = _showFriends ? directChats : groupChats;
+    
+    // Convertir a formato unificado
+    final chatItems = chatsToShow.map((chat) {
       final chatType = chat['type'] as String?;
       final participants = chat['participants'] as List<dynamic>? ?? [];
       
       if (chatType == 'direct' && currentUserEmail != null) {
-        // Para chats directos, obtener el otro participante
         Map<String, dynamic>? otherParticipant;
         try {
           otherParticipant = participants.firstWhere(
             (p) => p['userEmail'] != currentUserEmail,
           ) as Map<String, dynamic>?;
         } catch (e) {
-          // Si no se encuentra, usar el primer participante (fallback)
           if (participants.isNotEmpty) {
             otherParticipant = participants.first as Map<String, dynamic>?;
           }
@@ -495,146 +468,172 @@ class _ChatListPageState extends State<ChatListPage> {
           'photo': otherParticipant?['photoUrl'] as String?,
           'chatId': chat['id'] as String,
           'email': otherParticipant?['userEmail'] as String?,
+          'type': 'direct',
         };
       } else {
-        // Para grupos, usar el nombre del grupo
         return {
           'name': chat['name'] as String? ?? 'Grupo',
           'photo': null,
           'chatId': chat['id'] as String,
           'email': null,
+          'type': 'group',
+          'description': chat['description'] as String?,
         };
       }
     }).toList();
 
-    // Obtener lista de amigos si hay búsqueda
-    List<Map<String, dynamic>> allFriendsList = [];
-    if (_searchQuery.isNotEmpty && friendsResult != null && !friendsResult.hasException) {
+    // Si mostramos amigos Y hay búsqueda, agregar amigos sin chat
+    if (_showFriends && _searchQuery.isNotEmpty && friendsResult != null && !friendsResult.hasException) {
       final friendsData = friendsResult.data?['ListFriends'] as List<dynamic>? ?? [];
-      allFriendsList = friendsData.map((friend) {
-        return {
-          'name': friend['name'] as String? ?? 'Usuario',
-          'photo': friend['photo'] as String?,
-          'chatId': null, // No tienen chat creado aún
-          'email': null, // No tenemos email en esta query
-        };
-      }).toList();
-    }
-
-    // Combinar chats y amigos, excluyendo duplicados
-    // Si hay búsqueda, incluir amigos que no tienen chat
-    List<Map<String, dynamic>> combinedList = List.from(friends);
-    if (_searchQuery.isNotEmpty) {
-      // Agregar amigos que no tienen chat creado
-      for (final friend in allFriendsList) {
+      for (final friend in friendsData) {
         final friendName = friend['name'] as String? ?? '';
-        // Verificar si ya existe en chats por nombre (ya que no tenemos email en la query de amigos)
-        final existsInChats = friends.any((chat) => 
+        final existsInChats = chatItems.any((chat) => 
           (chat['name'] as String? ?? '').toLowerCase() == friendName.toLowerCase()
         );
         if (!existsInChats) {
-          combinedList.add(friend);
+          chatItems.add({
+            'name': friendName,
+            'photo': friend['photo'] as String?,
+            'chatId': null,
+            'email': friend['email'] as String?,
+            'type': 'direct',
+          });
         }
       }
     }
 
-    // Filtrar basado en la búsqueda
-    final filteredFriends = _searchQuery.isEmpty
-        ? friends
-        : combinedList.where((item) {
+    // Filtrar por búsqueda
+    final filteredItems = _searchQuery.isEmpty
+        ? chatItems
+        : chatItems.where((item) {
             final name = item['name'] as String? ?? '';
             return name.toLowerCase().contains(_searchQuery.toLowerCase());
           }).toList();
 
-    if (chatsWithMessages.isEmpty && _searchQuery.isEmpty) {
-      return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                      Icon(
-                        Icons.chat_bubble_outline,
-                        size: 64,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.noFriendsYet,
-                        style: theme.textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(l10n.addFriendsToStartChatting),
-                  ],
-                ),
-      );
+    // Mensajes de lista vacía
+    if (filteredItems.isEmpty && _searchQuery.isEmpty) {
+      if (_showFriends) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.chat_bubble_outline, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+              const SizedBox(height: 16),
+              Text(l10n.noFriendsYet, style: theme.textTheme.titleLarge),
+              const SizedBox(height: 8),
+              Text(l10n.addFriendsToStartChatting),
+            ],
+          ),
+        );
+      } else {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.group_off, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+              const SizedBox(height: 16),
+              const Text('No tienes grupos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              const Text('Crea un grupo para empezar'),
+            ],
+          ),
+        );
+      }
     }
 
-    if (filteredFriends.isEmpty && _searchQuery.isNotEmpty) {
+    if (filteredItems.isEmpty && _searchQuery.isNotEmpty) {
       return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.search_off,
-                      size: 64,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.noFriendsFound,
-                      style: theme.textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(l10n.tryAnotherSearchTerm),
-                  ],
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
+            const SizedBox(height: 16),
+            Text(l10n.noFriendsFound, style: theme.textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Text(l10n.tryAnotherSearchTerm),
+          ],
+        ),
       );
     }
 
     return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Título de resultados
-                if (_searchQuery.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0, left: 4),
-                    child: Text(
-                      _showFriends ? l10n.results : l10n.groupResults, // TODO: Cambiar cuando se implemente búsqueda de grupos
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600],
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-
-                Expanded(
-                  child: _showFriends
-                      ? FriendsList(
-                          theme: theme,
-                          filteredFriends: filteredFriends,
-                          onRefresh: refetch,
-                          onFriendTap: (friend) {
-                            // Si ya tenemos el chatId, usarlo directamente (chat existente)
-                            final chatId = friend['chatId'] as String?;
-                            final friendName = friend['name'] as String? ?? 'Usuario';
-                            final friendPhoto = friend['photo'] as String?;
-                            if (chatId != null) {
-                              _navigateToRoom(chatId, friendName, otherUserPhoto: friendPhoto);
-                            } else {
-                              // Si no hay chatId, crear o abrir el chat (amigo sin chat)
-                              _openChatWithFriend(
-                                context,
-                                friendName,
-                                friend['email'] as String?,
-                                friendPhoto: friendPhoto,
-                              );
-                            }
-                          },
-                        )
-                      : GroupsList(theme: theme), // TODO: Pasar filteredGroups cuando se implemente búsqueda de grupos
-                ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_searchQuery.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0, left: 4),
+            child: Text(
+              _showFriends ? l10n.results : 'Resultados',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[600],
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+        Expanded(
+          child: _showFriends
+              ? FriendsList(
+                  theme: theme,
+                  filteredFriends: filteredItems,
+                  onRefresh: refetch,
+                  onFriendTap: (friend) {
+                    final chatId = friend['chatId'] as String?;
+                    final friendName = friend['name'] as String? ?? 'Usuario';
+                    final friendPhoto = friend['photo'] as String?;
+                    
+                    if (chatId != null) {
+                      _navigateToRoom(chatId, friendName, otherUserPhoto: friendPhoto);
+                    } else {
+                      _openChatWithFriend(context, friendName, friend['email'] as String?, friendPhoto: friendPhoto);
+                    }
+                  },
+                )
+              : _buildGroupsList(theme, filteredItems, refetch),
+        ),
       ],
+    );
+  }
+
+  Widget _buildGroupsList(ThemeData theme, List<Map<String, dynamic>> groups, VoidCallback onRefresh) {
+    return RefreshIndicator(
+      onRefresh: () async => onRefresh(),
+      child: ListView.separated(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8),
+        itemCount: groups.length,
+        separatorBuilder: (context, index) => Divider(
+          height: 1,
+          thickness: 0.5,
+          color: theme.colorScheme.outline.withOpacity(0.2),
+          indent: 72,
+          endIndent: 16,
+        ),
+        itemBuilder: (context, index) {
+          final group = groups[index];
+          final groupName = group['name'] as String? ?? 'Grupo';
+          final groupId = group['chatId'] as String;
+          final description = group['description'] as String?;
+          
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+            leading: CircleAvatar(
+              radius: 24,
+              backgroundColor: theme.colorScheme.primaryContainer,
+              child: Icon(Icons.group, color: theme.colorScheme.onPrimaryContainer),
+            ),
+            title: Text(
+              groupName,
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            subtitle: description != null && description.isNotEmpty
+                ? Text(description, maxLines: 1, overflow: TextOverflow.ellipsis)
+                : const Text('Grupo', style: TextStyle(fontStyle: FontStyle.italic)),
+            onTap: () => _navigateToRoom(groupId, groupName),
+          );
+        },
+      ),
     );
   }
 }
