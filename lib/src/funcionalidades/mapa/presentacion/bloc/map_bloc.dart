@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -511,7 +510,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
  
   Future<BitmapDescriptor> _getBikeCustomIcon() async {
-    final targetSize = Platform.isIOS ? const Size(200, 200) : const Size(200, 200);
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
     final ByteData data = await rootBundle.load('assets/bikePin_custom.png');
     final Uint8List bytes = data.buffer.asUint8List();
     final ui.Codec codec = await ui.instantiateImageCodec(
@@ -522,11 +521,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final ui.FrameInfo frameInfo = await codec.getNextFrame();
     final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
     final Uint8List resizedBytes = byteData!.buffer.asUint8List();
-    return BitmapDescriptor.fromBytes(resizedBytes);
+    return BitmapDescriptor.bytes(resizedBytes);
   }
 
   Future<void> _loadEvCustomIcons() async {
-    final targetSize = Platform.isIOS ? const Size(200, 200) : const Size(200, 200);
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
     final targetWidth = targetSize.width.toInt();
     final targetHeight = targetSize.height.toInt();
     
@@ -547,7 +546,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final ui.FrameInfo frameInfo = await codec.getNextFrame();
     final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
     final Uint8List resizedBytes = byteData!.buffer.asUint8List();
-    return BitmapDescriptor.fromBytes(resizedBytes);
+    return BitmapDescriptor.bytes(resizedBytes);
   }
 
   double _getMaxPowerKw(List<Connector>? connectors) {
