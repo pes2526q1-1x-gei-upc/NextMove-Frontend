@@ -63,11 +63,13 @@ class _MapPageState extends State<MapPage> {
   
   StreamSubscription<Position>? _positionStream;
 
-  LatLngBounds? _currentViewportBounds;
+  final ValueNotifier<LatLngBounds?> _viewportBoundsNotifier = 
+      ValueNotifier<LatLngBounds?>(null);
   
-  Timer? _viewportUpdateTimer;
+  DateTime? _lastViewportUpdate;
+  bool _isViewportUpdatePending = false;
   
-  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 50);
+  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 300);
   
   static const double _viewportPadding = 0.1;
 
@@ -75,7 +77,7 @@ class _MapPageState extends State<MapPage> {
   void dispose() {
     _mapController?.dispose();
     _positionStream?.cancel();
-    _viewportUpdateTimer?.cancel();
+    _viewportBoundsNotifier.dispose();
     super.dispose();
   }
 
@@ -95,7 +97,12 @@ class _MapPageState extends State<MapPage> {
   // =======================================================================
 
   Future<void> _updateViewportBounds() async {
-    if (_mapController == null) return;
+    if (_mapController == null || !mounted) return;
+    
+    // Evitar actualizaciones simultáneas
+    if (_isViewportUpdatePending) return;
+    
+    _isViewportUpdatePending = true;
     
     try {
       final visibleRegion = await _mapController!.getVisibleRegion();
@@ -106,24 +113,25 @@ class _MapPageState extends State<MapPage> {
       final latPadding = latSpan * _viewportPadding;
       final lngPadding = lngSpan * _viewportPadding;
       
-      if (mounted) {
-        setState(() {
-          _currentViewportBounds = LatLngBounds(
-            southwest: LatLng(
-              visibleRegion.southwest.latitude - latPadding,
-              visibleRegion.southwest.longitude - lngPadding,
-            ),
-            northeast: LatLng(
-              visibleRegion.northeast.latitude + latPadding,
-              visibleRegion.northeast.longitude + lngPadding,
-            ),
-          );
-        });
-      }
+      final newBounds = LatLngBounds(
+        southwest: LatLng(
+          visibleRegion.southwest.latitude - latPadding,
+          visibleRegion.southwest.longitude - lngPadding,
+        ),
+        northeast: LatLng(
+          visibleRegion.northeast.latitude + latPadding,
+          visibleRegion.northeast.longitude + lngPadding,
+        ),
+      );
+      
+      // Actualizar ValueNotifier sin setState
+      _viewportBoundsNotifier.value = newBounds;
     } catch (e) {
       if (kDebugMode) {
         print('Error getting visible region: $e');
       }
+    } finally {
+      _isViewportUpdatePending = false;
     }
   }
 
@@ -139,13 +147,16 @@ class _MapPageState extends State<MapPage> {
   }
   
   void _onCameraMoveThrottled(CameraPosition position) {
-    _viewportUpdateTimer?.cancel();
+    final now = DateTime.now();
     
-    _viewportUpdateTimer = Timer(_viewportUpdateThrottle, () {
-      if (mounted) {
-        _updateViewportBounds();
-      }
-    });
+    // Throttling real: solo ejecutar si ha pasado el tiempo mínimo desde la última actualización
+    if (_lastViewportUpdate == null || 
+        now.difference(_lastViewportUpdate!) >= _viewportUpdateThrottle) {
+      _lastViewportUpdate = now;
+      _updateViewportBounds();
+    }
+    // Si no ha pasado el tiempo suficiente, simplemente ignoramos esta llamada
+    // El siguiente frame que cumpla el throttle ejecutará la actualización
   }
 
   // -----------------------------------------------------------------------
@@ -269,29 +280,31 @@ class _MapPageState extends State<MapPage> {
                       : state.carMarkers;
                 }
 
-                
-                final Set<Marker> markersToShow = _filterMarkersByViewport(
-                  sourceMarkers,
-                  _currentViewportBounds,
-                );
-
                 final clusterManagerToShow = state.currentMode == StationType.bicycle
                     ? state.bikeClusterManager
                     : state.evClusterManager;
 
-                return Stack(
-                  children: [
-                    // Widget del mapa 
-                    MapWidget(
-                      initialCameraPosition: CameraPosition(
-                        target: _bcnCenter,
-                        zoom: 12,
-                      ),
-                      markers: markersToShow,
-                      clusterManagers: clusterManagerToShow != null 
-                          ? {clusterManagerToShow} 
-                          : {},
-                      onCameraMove: _onCameraMoveThrottled, 
+                return ValueListenableBuilder<LatLngBounds?>(
+                  valueListenable: _viewportBoundsNotifier,
+                  builder: (context, viewportBounds, _) {
+                    final Set<Marker> markersToShow = _filterMarkersByViewport(
+                      sourceMarkers,
+                      viewportBounds,
+                    );
+
+                    return Stack(
+                      children: [
+                        // Widget del mapa 
+                        MapWidget(
+                          initialCameraPosition: CameraPosition(
+                            target: _bcnCenter,
+                            zoom: 12,
+                          ),
+                          markers: markersToShow,
+                          clusterManagers: clusterManagerToShow != null 
+                              ? {clusterManagerToShow} 
+                              : {},
+                          onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
@@ -384,6 +397,8 @@ class _MapPageState extends State<MapPage> {
                     ),
                     ],
                   ],
+                );
+                  },
                 );
               }
               return const Center(child: Text('Estado desconocido'));
