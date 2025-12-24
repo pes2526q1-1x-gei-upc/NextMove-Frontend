@@ -129,7 +129,7 @@ class _MapPageState extends State<MapPage> {
 
   Set<Marker> _filterMarkersByViewport(Set<Marker> allMarkers, LatLngBounds? bounds) {
     if (bounds == null) {
-      return allMarkers;
+      return {};
     }
     
     return allMarkers.where((marker) {
