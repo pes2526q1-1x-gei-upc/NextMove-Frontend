@@ -268,6 +268,10 @@ class StationBottomSheet extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blueGrey,
                                   foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
                                 ),
                                 onPressed: () {
                                   context.read<MapBloc>().add(
@@ -276,7 +280,13 @@ class StationBottomSheet extends StatelessWidget {
                                   Navigator.of(context).pop();
                                 },
                                 icon: const Icon(Icons.directions),
-                                label: Text(l10n.howToGetThere), 
+                                label: Text(
+                                  l10n.howToGetThere,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ],

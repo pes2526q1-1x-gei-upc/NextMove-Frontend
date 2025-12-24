@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
@@ -43,6 +46,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
   final StationType? _initialMode;
+
+
+  static const Size bikeIconSize = Size(60, 60);  
+  static const Size evIconSize = Size(20, 20);     
+
+  BitmapDescriptor? evLowIcon;
+  BitmapDescriptor? evMidIcon;
+  BitmapDescriptor? evHighIcon;
+  BitmapDescriptor? evSuperIcon;
+  BitmapDescriptor? bikeIcon;
 
   MapBloc({
     required this.stationRepository,
@@ -99,17 +112,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         (stations) => stations as List<EVStationDetails>? ?? [],
       );
 
-      // Construir marcadores iniciales para bicicletas
+      // Crear ClusterManagerIds
+      final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
+      final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+
+      // Crear ClusterManagers
+      final bikeClusterManager = ClusterManager(
+        clusterManagerId: bikeClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🔵 Cluster de bicicletas tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
+      final evClusterManager = ClusterManager(
+        clusterManagerId: evClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟢 Cluster de EV tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
+      bikeIcon = await _getBikeCustomIcon();
+      await _loadEvCustomIcons();
+
       final bikeMarkers = _buildMarkersForStations(
         bikeStations,
         null,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        bikeClusterManagerId,
       );
 
       final carMarkers = _buildMarkersForStations(
         null,
         evStations,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        evClusterManagerId,
       );
 
       // Cargar búsquedas recientes guardadas
@@ -147,6 +185,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           recentBikeSearches: recentBikeSearches,  
           recentEvSearches: recentEvSearches,     
           decodedPolyline: null,
+          bikeClusterManager: bikeClusterManager,
+          evClusterManager: evClusterManager,
         ),
       );
 
@@ -468,11 +508,81 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  /// Construir marcadores para una lista de estaciones
+ 
+  Future<BitmapDescriptor> _getBikeCustomIcon() async {
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
+    final ByteData data = await rootBundle.load('assets/bikePin_custom.png');
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: targetSize.width.toInt(),
+      targetHeight: targetSize.height.toInt(),
+    );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.bytes(resizedBytes);
+  }
+
+  Future<void> _loadEvCustomIcons() async {
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
+    final targetWidth = targetSize.width.toInt();
+    final targetHeight = targetSize.height.toInt();
+    
+    evLowIcon = await _loadEvIcon('assets/evLow_icon.png', targetWidth, targetHeight);
+    evMidIcon = await _loadEvIcon('assets/evMid_icon.png', targetWidth, targetHeight);
+    evHighIcon = await _loadEvIcon('assets/evHigh_icon.png', targetWidth, targetHeight);
+    evSuperIcon = await _loadEvIcon('assets/evSuper_icon.png', targetWidth, targetHeight);
+  }
+
+  Future<BitmapDescriptor> _loadEvIcon(String assetPath, int width, int height) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: width,
+      targetHeight: height,
+    );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.bytes(resizedBytes);
+  }
+
+  double _getMaxPowerKw(List<Connector>? connectors) {
+    if (connectors == null || connectors.isEmpty) {
+      return 0.0;
+    }
+    double maxPower = 0.0;
+    for (var connector in connectors) {
+      if (connector.powerKw != null && connector.powerKw! > maxPower) {
+        maxPower = connector.powerKw!;
+      }
+    }
+    return maxPower;
+  }
+
+  BitmapDescriptor _getCarIconByPower(double powerKw, bool isSuperFast) {
+    if (isSuperFast) {
+      return evSuperIcon!;
+    }
+    
+    if (powerKw <= 11) {
+      return evLowIcon!;
+    } else if (powerKw <= 22) {
+      return evMidIcon!;
+    } else if (powerKw <= 50) {
+      return evHighIcon!;
+    } else {
+      return evSuperIcon!;
+    }
+  }
+
+  
   Set<Marker> _buildMarkersForStations(
     List<BicycleStationDetails>? bikeStations,
     List<EVStationDetails>? evStations,
-    BitmapDescriptor icon,
+    ClusterManagerId clusterManagerId,
   ) {
     if (bikeStations == null && evStations != null) {
       return evStations
@@ -480,10 +590,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             (station) => station.latitude != null && station.longitude != null,
           )
           .map((station) {
+            final power = _getMaxPowerKw(station.connectors);
+            final icon = _getCarIconByPower(power, station.isSuperFast == true);
+            
             return Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
               icon: icon,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })
@@ -497,7 +611,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             return Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
-              icon: icon,
+              icon: bikeIcon!,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })

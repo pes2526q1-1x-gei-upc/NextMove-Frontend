@@ -47,6 +47,8 @@ class MapLoadedState extends MapState {
   final NavigationRoute? navigationRoute;
   final Polyline? decodedPolyline;
   final RouteViewport? routeViewport;
+  final ClusterManager? bikeClusterManager;
+  final ClusterManager? evClusterManager;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -72,7 +74,8 @@ class MapLoadedState extends MapState {
     this.navigationRoute,
     this.decodedPolyline,
     this.routeViewport,
-
+    this.bikeClusterManager,
+    this.evClusterManager,
   });
 
   @override
@@ -100,6 +103,8 @@ class MapLoadedState extends MapState {
         navigationRoute,
         decodedPolyline,
         routeViewport,
+        bikeClusterManager,
+        evClusterManager,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -129,6 +134,8 @@ class MapLoadedState extends MapState {
     NavigationRoute? navigationRoute,
     Polyline? decodedPolyline,
     RouteViewport? routeViewport,
+    ClusterManager? bikeClusterManager,
+    ClusterManager? evClusterManager,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -154,6 +161,8 @@ class MapLoadedState extends MapState {
       navigationRoute: navigationRoute ?? this.navigationRoute,
       decodedPolyline: decodedPolyline ?? this.decodedPolyline,
       routeViewport: routeViewport ?? this.routeViewport,
+      bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
+      evClusterManager: evClusterManager ?? this.evClusterManager,
     );
   }
 

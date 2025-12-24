@@ -63,10 +63,21 @@ class _MapPageState extends State<MapPage> {
   
   StreamSubscription<Position>? _positionStream;
 
+  final ValueNotifier<LatLngBounds?> _viewportBoundsNotifier = 
+      ValueNotifier<LatLngBounds?>(null);
+  
+  DateTime? _lastViewportUpdate;
+  bool _isViewportUpdatePending = false;
+  
+  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 300);
+  
+  static const double _viewportPadding = 0.1;
+
   @override
   void dispose() {
     _mapController?.dispose();
     _positionStream?.cancel();
+    _viewportBoundsNotifier.dispose();
     super.dispose();
   }
 
@@ -75,6 +86,77 @@ class _MapPageState extends State<MapPage> {
   // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
+    
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (mounted && _mapController != null) {
+        _updateViewportBounds();
+      }
+    });
+  }
+
+  // =======================================================================
+
+  Future<void> _updateViewportBounds() async {
+    if (_mapController == null || !mounted) return;
+    
+    // Evitar actualizaciones simultáneas
+    if (_isViewportUpdatePending) return;
+    
+    _isViewportUpdatePending = true;
+    
+    try {
+      final visibleRegion = await _mapController!.getVisibleRegion();
+      
+      final latSpan = visibleRegion.northeast.latitude - visibleRegion.southwest.latitude;
+      final lngSpan = visibleRegion.northeast.longitude - visibleRegion.southwest.longitude;
+      
+      final latPadding = latSpan * _viewportPadding;
+      final lngPadding = lngSpan * _viewportPadding;
+      
+      final newBounds = LatLngBounds(
+        southwest: LatLng(
+          visibleRegion.southwest.latitude - latPadding,
+          visibleRegion.southwest.longitude - lngPadding,
+        ),
+        northeast: LatLng(
+          visibleRegion.northeast.latitude + latPadding,
+          visibleRegion.northeast.longitude + lngPadding,
+        ),
+      );
+      
+      // Actualizar ValueNotifier sin setState
+      _viewportBoundsNotifier.value = newBounds;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting visible region: $e');
+      }
+    } finally {
+      _isViewportUpdatePending = false;
+    }
+  }
+
+  Set<Marker> _filterMarkersByViewport(Set<Marker> allMarkers, LatLngBounds? bounds) {
+    if (bounds == null) {
+      return {};
+    }
+    
+    return allMarkers.where((marker) {
+      final position = marker.position;
+      return bounds.contains(position);
+    }).toSet();
+  }
+  
+  void _onCameraMoveThrottled(CameraPosition position) {
+    final now = DateTime.now();
+    
+    // Throttling real: solo ejecutar si ha pasado el tiempo mínimo desde la última actualización
+    if (_lastViewportUpdate == null || 
+        now.difference(_lastViewportUpdate!) >= _viewportUpdateThrottle) {
+      _lastViewportUpdate = now;
+      _updateViewportBounds();
+    }
+    // Si no ha pasado el tiempo suficiente, simplemente ignoramos esta llamada
+    // El siguiente frame que cumpla el throttle ejecutará la actualización
   }
 
   // -----------------------------------------------------------------------
@@ -167,7 +249,7 @@ class _MapPageState extends State<MapPage> {
               _mapController!.animateCamera(
                 CameraUpdate.newLatLngZoom(
                   state.userLocation!,
-                  15.0,
+                  12.0,
                 ),
               );
             }
@@ -182,30 +264,47 @@ class _MapPageState extends State<MapPage> {
               }
 
               if (state is MapLoadedState) {
-                final Set<Marker> markersToShow;
+                // Obtener todos los marcadores según el modo y estado de navegación
+                final Set<Marker> sourceMarkers;
                 if (state.isNavigationMode && state.selectedStation != null) {
-                   final sourceMarkers = state.currentMode == StationType.bicycle
+                   final tempMarkers = state.currentMode == StationType.bicycle
                       ? state.bikeMarkers
                       : state.carMarkers;
                       
-                   markersToShow = sourceMarkers.where(
+                   sourceMarkers = tempMarkers.where(
                       (m) => m.markerId.value == state.selectedStation!.id
                    ).toSet();
                 } else {
-                   markersToShow = state.currentMode == StationType.bicycle
+                   sourceMarkers = state.currentMode == StationType.bicycle
                       ? state.bikeMarkers
                       : state.carMarkers;
                 }
 
-                return Stack(
-                  children: [
-                    // Widget del mapa 
-                    MapWidget(
-                      initialCameraPosition: CameraPosition(
-                        target: _bcnCenter,
-                        zoom: 12,
-                      ),
-                      markers: markersToShow,
+                final clusterManagerToShow = state.currentMode == StationType.bicycle
+                    ? state.bikeClusterManager
+                    : state.evClusterManager;
+
+                return ValueListenableBuilder<LatLngBounds?>(
+                  valueListenable: _viewportBoundsNotifier,
+                  builder: (context, viewportBounds, _) {
+                    final Set<Marker> markersToShow = _filterMarkersByViewport(
+                      sourceMarkers,
+                      viewportBounds,
+                    );
+
+                    return Stack(
+                      children: [
+                        // Widget del mapa 
+                        MapWidget(
+                          initialCameraPosition: CameraPosition(
+                            target: _bcnCenter,
+                            zoom: 12,
+                          ),
+                          markers: markersToShow,
+                          clusterManagers: clusterManagerToShow != null 
+                              ? {clusterManagerToShow} 
+                              : {},
+                          onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
@@ -214,15 +313,14 @@ class _MapPageState extends State<MapPage> {
                       myLocationEnabled: state.userLocation != null,
                       padding: state.isNavigationMode 
                         ? const EdgeInsets.only(
-                            top: 180,    // Espacio para RouteInfoWidget
-                            bottom: 240, // Espacio para RoutePreviewWidget
+                            top: 180,   
+                            bottom: 240, 
                             left: 20,
                             right: 20,
                           )
                         : EdgeInsets.zero,
                     ),
 
-                    //creo botón provisional para cancelar la navegación, cuando implemente los widgets lo borro
                     if (state.isNavigationMode)...[
                       Positioned(
                         top:60,
@@ -234,18 +332,46 @@ class _MapPageState extends State<MapPage> {
                         )
                       ),
                       if(state.navigationRoute != null)
-                      Positioned(
-                        bottom: 30,
-                        left: 16,
-                        right: 16,
-                        child: RoutePreviewWidget(
-                          route: state.navigationRoute!,
-                          onStartPressed: () {
-                            // Acción al iniciar (puedes loguear o llamar evento)
-                            debugPrint("Iniciar navegación presionado");
-                          },
-                          onCancelPressed: () {
-                             context.read<MapBloc>().add(CancelNavigationEvent());
+                      Positioned.fill(
+                        bottom: 0,
+                        child: DraggableScrollableSheet(
+                          initialChildSize: 0.28,
+                          minChildSize: 0.22,
+                          maxChildSize: 0.28,
+                          builder: (context, scrollController) {
+                            return NotificationListener<DraggableScrollableNotification>(
+                              onNotification: (notification) {
+                                // Cuando el usuario suelta el drag y está en el mínimo
+                                if (notification.extent <= notification.minExtent + 0.01) {
+                                  Future.delayed(const Duration(milliseconds: 150), () {
+                                    if (context.mounted) {
+                                      context.read<MapBloc>().add(CancelNavigationEvent());
+                                    }
+                                  });
+                                }
+                                return true;
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(24),
+                                  ),
+                                ),
+                                child: SingleChildScrollView(
+                                  controller: scrollController,
+                                  child: RoutePreviewWidget(
+                                    route: state.navigationRoute!,
+                                    onStartPressed: () {
+                                      debugPrint("Iniciar navegación presionado");
+                                    },
+                                    onCancelPressed: () {
+                                      context.read<MapBloc>().add(CancelNavigationEvent());
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -300,6 +426,8 @@ class _MapPageState extends State<MapPage> {
                     ),
                     ],
                   ],
+                );
+                  },
                 );
               }
               return const Center(child: Text('Estado desconocido'));
