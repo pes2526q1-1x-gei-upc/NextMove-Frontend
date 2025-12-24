@@ -442,4 +442,18 @@ class GraphQLQueries {
       email
     }
   }''';
+
+  // === Retos ===
+
+  static const String getAllChallenges = r'''
+  query getAllChallenges {
+    getAllChallenges {
+      description
+      distance
+      ending_date
+      name
+      points
+      starting_date
+    }
+  }''';
 }
