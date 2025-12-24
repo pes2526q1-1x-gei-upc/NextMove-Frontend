@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/domain/ranking_entry.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/domain/ranking_entry.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
