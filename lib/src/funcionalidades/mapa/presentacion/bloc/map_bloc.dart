@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -507,7 +508,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
  
   Future<BitmapDescriptor> _getBikeCustomIcon() async {
-    final ImageConfiguration imageConfig = ImageConfiguration(size: bikeIconSize);
+    final ImageConfiguration imageConfig = ImageConfiguration(size: Platform.isIOS ? Size(50, 50): Size(200, 200));
     return await BitmapDescriptor.fromAssetImage(
       imageConfig,
       'assets/bikePin_custom.png',
