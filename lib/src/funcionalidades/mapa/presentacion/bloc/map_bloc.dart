@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
@@ -508,35 +511,43 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
  
   Future<BitmapDescriptor> _getBikeCustomIcon() async {
-    final ImageConfiguration imageConfig = ImageConfiguration(size: Platform.isIOS ? Size(50, 50): Size(200, 200));
-    return await BitmapDescriptor.fromAssetImage(
-      imageConfig,
-      'assets/bikePin_custom.png',
+    final targetSize = Platform.isIOS ? const Size(200, 200) : const Size(200, 200);
+    final ByteData data = await rootBundle.load('assets/bikePin_custom.png');
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: targetSize.width.toInt(),
+      targetHeight: targetSize.height.toInt(),
     );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(resizedBytes);
   }
 
   Future<void> _loadEvCustomIcons() async {
-    final ImageConfiguration imageConfig = ImageConfiguration(size: evIconSize);
+    final targetSize = Platform.isIOS ? const Size(200, 200) : const Size(200, 200);
+    final targetWidth = targetSize.width.toInt();
+    final targetHeight = targetSize.height.toInt();
     
-    evLowIcon = await BitmapDescriptor.fromAssetImage(
-      imageConfig,
-      'assets/evLow_icon.png',
+    evLowIcon = await _loadEvIcon('assets/evLow_icon.png', targetWidth, targetHeight);
+    evMidIcon = await _loadEvIcon('assets/evMid_icon.png', targetWidth, targetHeight);
+    evHighIcon = await _loadEvIcon('assets/evHigh_icon.png', targetWidth, targetHeight);
+    evSuperIcon = await _loadEvIcon('assets/evSuper_icon.png', targetWidth, targetHeight);
+  }
+
+  Future<BitmapDescriptor> _loadEvIcon(String assetPath, int width, int height) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: width,
+      targetHeight: height,
     );
-    
-    evMidIcon = await BitmapDescriptor.fromAssetImage(
-      imageConfig,
-      'assets/evMid_icon.png',
-    );
-    
-    evHighIcon = await BitmapDescriptor.fromAssetImage(
-      imageConfig,
-      'assets/evHigh_icon.png',
-    );
-    
-    evSuperIcon = await BitmapDescriptor.fromAssetImage(
-      imageConfig,
-      'assets/evSuper_icon.png',
-    );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(resizedBytes);
   }
 
   double _getMaxPowerKw(List<Connector>? connectors) {
