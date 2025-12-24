@@ -242,7 +242,7 @@
     "userMismatch": "The user does not match the current user.",
     "start" : "Start",
     "estTime" : "Travel time",
-    "uLoc" : "Your Location",
+    "uLoc" : "Your location",
     "social": "Social",
     "ranking": "Ranking",
     "numberOfRoutes": "Number of routes",
@@ -260,5 +260,7 @@
     "days": "days",
     "hours": "hours",
     "minutes": "minutes",
-    "permanent": "Permanent"
+    "permanent": "Permanent",
+    "challenges": "Challenges",
+    "competition": "Competition"
 }

@@ -262,5 +262,7 @@
     "days": "días",
     "hours": "horas",
     "minutes": "minutos",
-    "permanent": "Permanente"
+    "permanent": "Permanente",
+    "challenges": "Retos",
+    "competition": "Competición"
 }

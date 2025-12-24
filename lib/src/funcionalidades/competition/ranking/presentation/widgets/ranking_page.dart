@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/presentation/bloc/ranking_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_user_list.dart';
-import 'package:nextmove_app/src/funcionalidades/ranking/presentation/widgets/ranking_metric_selector.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/bloc/ranking_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/widgets/ranking_user_list.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/ranking/presentation/widgets/ranking_metric_selector.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -49,9 +49,9 @@ class _RankingPageState extends State<RankingPage> {
         child: BlocBuilder<RankingBloc, RankingState>(
           builder: (context, state) {
             return Scaffold(
-              appBar: AppBar(title: Text(l10n.ranking)),
               body: Column(
                 children: [
+                  const SizedBox(height: 16),
                   RankingMetricSelector(
                     selectedMetric: selectedMetric,
                     onMetricChanged: (value) {
@@ -61,6 +61,7 @@ class _RankingPageState extends State<RankingPage> {
                       context.read<RankingBloc>().add(LoadRankingEvent(value!));
                     },
                   ),
+                  const SizedBox(height: 16),
                   if (state is RankingLoading)
                     const Center(child: CircularProgressIndicator())
                   else if (state is RankingLoaded)
