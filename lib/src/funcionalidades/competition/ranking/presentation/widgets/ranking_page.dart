@@ -51,7 +51,6 @@ class _RankingPageState extends State<RankingPage> {
             return Scaffold(
               body: Column(
                 children: [
-                  const SizedBox(height: 16),
                   RankingMetricSelector(
                     selectedMetric: selectedMetric,
                     onMetricChanged: (value) {

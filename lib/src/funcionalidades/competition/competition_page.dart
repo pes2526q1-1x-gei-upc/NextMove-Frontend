@@ -22,11 +22,14 @@ class CompetitionPage extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: <Widget>[
-            Center(child: RankingPage()),
-            Center(child: ChallengesPage())
-          ],
+        body: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: const TabBarView(
+            children: <Widget>[
+              Center(child: RankingPage()),
+              Center(child: ChallengesPage()),
+            ],
+          ),
         ),
       ),
     );
