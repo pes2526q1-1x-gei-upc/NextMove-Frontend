@@ -67,7 +67,7 @@ class _MapPageState extends State<MapPage> {
   
   Timer? _viewportUpdateTimer;
   
-  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 300);
+  static const Duration _viewportUpdateThrottle = Duration(milliseconds: 50);
   
   static const double _viewportPadding = 0.1;
 
