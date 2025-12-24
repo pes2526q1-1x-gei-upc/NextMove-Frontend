@@ -11,6 +11,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMe;
   final bool showSender;
   final VoidCallback? onAvatarTap;
+  final bool isGroup; // Indica si es un chat de grupo
 
   const MessageBubble({
     super.key,
@@ -18,6 +19,7 @@ class MessageBubble extends StatelessWidget {
     required this.isMe,
     this.showSender = true,
     this.onAvatarTap,
+    this.isGroup = false,
   });
 
   void _showDeleteConfirmation(BuildContext context, ChatBloc chatBloc) {
@@ -135,6 +137,9 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final timeFormat = DateFormat('HH:mm');
+    
+    // Mostrar avatar solo en grupos y cuando el mensaje no es del usuario actual
+    final shouldShowAvatar = isGroup && !isMe;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -143,6 +148,28 @@ class MessageBubble extends StatelessWidget {
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Avatar del remitente (solo en grupos y para mensajes de otros)
+          if (shouldShowAvatar)
+            Padding(
+              padding: const EdgeInsets.only(right: 8, bottom: 4),
+              child: GestureDetector(
+                onTap: onAvatarTap,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                      ? NetworkImage(message.senderPhoto!)
+                      : null,
+                  child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 16,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        )
+                      : null,
+                ),
+              ),
+            ),
           Flexible(
             child: GestureDetector(
               onLongPress: isMe && !message.deleted
@@ -169,6 +196,19 @@ class MessageBubble extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Nombre del remitente en grupos
+                          if (shouldShowAvatar && showSender)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                message.senderName,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
                           Text(
                             message.content,
                             style: theme.textTheme.bodyMedium?.copyWith(
@@ -205,34 +245,53 @@ class MessageBubble extends StatelessWidget {
                           ),
                         ],
                       )
-                    : Row(
+                    : Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              message.deleted
-                                  ? 'Mensaje eliminado'
-                                  : message.content,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: isMe
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.onSurface,
-                                fontStyle: message.deleted
-                                    ? FontStyle.italic
-                                    : FontStyle.normal,
+                          // Nombre del remitente en grupos
+                          if (shouldShowAvatar && showSender)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                message.senderName,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            timeFormat.format(message.timestamp),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 11,
-                              color: isMe
-                                  ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                                  : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  message.deleted
+                                      ? 'Mensaje eliminado'
+                                      : message.content,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isMe
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.onSurface,
+                                    fontStyle: message.deleted
+                                        ? FontStyle.italic
+                                        : FontStyle.normal,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                timeFormat.format(message.timestamp),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 11,
+                                  color: isMe
+                                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
+                                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

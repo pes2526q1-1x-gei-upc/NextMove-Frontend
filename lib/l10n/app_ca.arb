@@ -253,5 +253,7 @@
     "typing": "escrivint...",
     "back": "Enrere",
     "loadingRoom": "Carregant sala...",
-    "writeAMessage": "Escriu un missatge..."
+    "writeAMessage": "Escriu un missatge...",
+    "today": "Avui",
+    "yesterday": "Ahir"
 }

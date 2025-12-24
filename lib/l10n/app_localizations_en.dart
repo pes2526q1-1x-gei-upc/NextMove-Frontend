@@ -669,4 +669,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get writeAMessage => 'Write a message...';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
 }

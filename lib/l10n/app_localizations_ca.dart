@@ -677,4 +677,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get writeAMessage => 'Escriu un missatge...';
+
+  @override
+  String get today => 'Avui';
+
+  @override
+  String get yesterday => 'Ahir';
 }

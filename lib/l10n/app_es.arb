@@ -263,5 +263,7 @@
     "typing": "escribiendo...",
     "back": "Volver",
     "loadingRoom": "Cargando sala...",
-    "writeAMessage": "Escribe un mensaje..."
+    "writeAMessage": "Escribe un mensaje...",
+    "today": "Hoy",
+    "yesterday": "Ayer"
 }

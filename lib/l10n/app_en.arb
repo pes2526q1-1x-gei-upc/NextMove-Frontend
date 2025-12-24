@@ -261,5 +261,7 @@
     "typing": "typing...",
     "back": "Back",
     "loadingRoom": "Loading room...",
-    "writeAMessage": "Write a message..."
+    "writeAMessage": "Write a message...",
+    "today": "Today",
+    "yesterday": "Yesterday"
 }

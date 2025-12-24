@@ -7,6 +7,7 @@ import '../bloc/chat_bloc.dart';
 import '../bloc/chat_event.dart';
 import '../bloc/chat_state.dart';
 import '../widgets/message_bubble.dart';
+import '../widgets/date_separator.dart';
 import '../../dominio/entities/message.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
@@ -16,16 +17,28 @@ import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
 import 'package:nextmove_app/config/socket_config.dart';
 
+/// Tipo para representar un item en la lista (puede ser un mensaje o un separador de fecha)
+class _ChatItem {
+  final Message? message;
+  final DateTime? date;
+  final bool isDateSeparator;
+
+  _ChatItem.message(this.message) : date = null, isDateSeparator = false;
+  _ChatItem.dateSeparator(this.date) : message = null, isDateSeparator = true;
+}
+
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
   final String roomName;
   final String? otherUserPhoto; // Foto del otro usuario pasada desde la lista
+  final bool isGroup; // Indica si es un chat de grupo
 
   const ChatRoomPage({
     super.key,
     required this.roomId,
     required this.roomName,
     this.otherUserPhoto,
+    this.isGroup = false,
   });
 
   @override
@@ -194,6 +207,41 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       }
     }
     return null;
+  }
+
+  /// Agrupa los mensajes por día y retorna una lista de items (mensajes y separadores)
+  List<_ChatItem> _groupMessagesByDay(List<Message> messages) {
+    if (messages.isEmpty) return [];
+
+    final List<_ChatItem> items = [];
+    DateTime? lastDate;
+
+    // Recorrer los mensajes en orden (del más antiguo al más reciente)
+    for (final message in messages) {
+      final messageDate = DateTime(
+        message.timestamp.year,
+        message.timestamp.month,
+        message.timestamp.day,
+      );
+
+      // Si es el primer mensaje o cambió el día, agregar separador de fecha
+      if (lastDate == null || !_isSameDay(lastDate, messageDate)) {
+        items.add(_ChatItem.dateSeparator(messageDate));
+        lastDate = messageDate;
+      }
+
+      // Agregar el mensaje
+      items.add(_ChatItem.message(message));
+    }
+
+    return items;
+  }
+
+  /// Verifica si dos fechas son del mismo día
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   Future<void> _navigateToFriendDetail(String nickname) async {
@@ -372,20 +420,38 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             ),
                           ),
                         )
-                      : ListView.builder(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          reverse: true,
-                          // 2. keyboardDismissBehavior para cerrar teclado al hacer scroll
-                          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                          itemCount: messages.length,
-                          itemBuilder: (context, index) {
-                            // Invertir índice porque usamos reverse: true
-                            final message = messages[messages.length - 1 - index];
-                            final isMe = message.isSentByMe(currentUserEmail);
-                            return MessageBubble(
-                              message: message,
-                              isMe: isMe,
+                      : Builder(
+                          builder: (context) {
+                            // Agrupar mensajes por día
+                            final groupedItems = _groupMessagesByDay(messages);
+                            
+                            return ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              reverse: true,
+                              // 2. keyboardDismissBehavior para cerrar teclado al hacer scroll
+                              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                              itemCount: groupedItems.length,
+                              itemBuilder: (context, index) {
+                                // Invertir índice porque usamos reverse: true
+                                final item = groupedItems[groupedItems.length - 1 - index];
+                                
+                                if (item.isDateSeparator && item.date != null) {
+                                  // Mostrar separador de fecha
+                                  return DateSeparator(date: item.date!);
+                                } else if (item.message != null) {
+                                  // Mostrar mensaje
+                                  final message = item.message!;
+                                  final isMe = message.isSentByMe(currentUserEmail);
+                                  return MessageBubble(
+                                    message: message,
+                                    isMe: isMe,
+                                    isGroup: widget.isGroup,
+                                  );
+                                }
+                                
+                                return const SizedBox.shrink();
+                              },
                             );
                           },
                         ),

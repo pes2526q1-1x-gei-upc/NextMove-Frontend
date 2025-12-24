@@ -181,7 +181,7 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  Future<void> _navigateToRoom(String roomId, String roomName, {String? otherUserPhoto, bool shouldRefreshOnReturn = false}) async {
+  Future<void> _navigateToRoom(String roomId, String roomName, {String? otherUserPhoto, bool shouldRefreshOnReturn = false, bool isGroup = false}) async {
     final chatBloc = context.read<ChatBloc>();
 
     final result = await Navigator.of(context).push<bool>(
@@ -192,6 +192,7 @@ class _ChatListPageState extends State<ChatListPage> {
             roomId: roomId,
             roomName: roomName,
             otherUserPhoto: otherUserPhoto,
+            isGroup: isGroup,
           ),
         ),
       ),
@@ -630,7 +631,7 @@ class _ChatListPageState extends State<ChatListPage> {
             subtitle: description != null && description.isNotEmpty
                 ? Text(description, maxLines: 1, overflow: TextOverflow.ellipsis)
                 : const Text('Grupo', style: TextStyle(fontStyle: FontStyle.italic)),
-            onTap: () => _navigateToRoom(groupId, groupName),
+            onTap: () => _navigateToRoom(groupId, groupName, isGroup: true),
           );
         },
       ),

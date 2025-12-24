@@ -676,4 +676,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get writeAMessage => 'Escribe un mensaje...';
+
+  @override
+  String get today => 'Hoy';
+
+  @override
+  String get yesterday => 'Ayer';
 }
