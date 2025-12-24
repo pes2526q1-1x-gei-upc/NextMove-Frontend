@@ -8,11 +8,10 @@ import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/c
 class ChallengesRepository {
   final ChallengesRemoteDataProvider challengesRemoteDataProvider;
   ChallengesRepository([ChallengesRemoteDataProvider? dataProvider])
-    : challengesRemoteDataProvider = dataProvider ?? ChallengesRemoteDataProvider();
+    : challengesRemoteDataProvider =
+          dataProvider ?? ChallengesRemoteDataProvider();
 
-  Future<Either<Failure, List<Challenge>?>> getChallengesData(
-    String metric,
-  ) async {
+  Future<Either<Failure, List<Challenge>?>> getallChallenges() async {
     try {
       final challengesData = await challengesRemoteDataProvider
           .getAllChallenges();

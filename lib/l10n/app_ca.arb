@@ -254,5 +254,6 @@
     "minutes": "minuts",
     "permanent": "Permanent",
     "challenges": "Reptes",
-    "competition": "Competició"
+    "competition": "Competició",
+    "noChallengesAvailable": "No hi ha reptes disponibles."
 }

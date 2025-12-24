@@ -38,7 +38,7 @@ void main() {
       ];
       when(() => mockDataProvider.getAllChallenges()).thenAnswer((_) async => mockData);
 
-      final result = await repository.getChallengesData('some_metric');
+      final result = await repository.getallChallenges();
 
       expect(result.isRight(), true);
       result.fold(
@@ -56,7 +56,7 @@ void main() {
     test('should return ServerFailure when ServerException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ServerException('Server error'));
 
-      final result = await repository.getChallengesData('some_metric');
+      final result = await repository.getallChallenges();
 
       expect(result.isLeft(), true);
       result.fold(
@@ -68,7 +68,7 @@ void main() {
     test('should return ConnectionFailure when ConnectionException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ConnectionException());
 
-      final result = await repository.getChallengesData('some_metric');
+      final result = await repository.getallChallenges();
 
       expect(result.isLeft(), true);
       result.fold(
@@ -80,7 +80,7 @@ void main() {
     test('should throw UnknownFailure for other exceptions', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(Exception('Unknown error'));
 
-      expect(() => repository.getChallengesData('some_metric'), throwsA(isA<UnknownFailure>()));
+      expect(() => repository.getallChallenges(), throwsA(isA<UnknownFailure>()));
     });
   });
 }
