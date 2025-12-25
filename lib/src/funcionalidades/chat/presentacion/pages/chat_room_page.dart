@@ -31,8 +31,8 @@ class _ChatItem {
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
   final String roomName;
-  final String? otherUserPhoto; // Foto del otro usuario pasada desde la lista
-  final bool isGroup; // Indica si es un chat de grupo
+  final String? otherUserPhoto;
+  final bool isGroup;
 
   const ChatRoomPage({
     super.key,
@@ -52,13 +52,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   bool _isTyping = false;
   DateTime? _lastTypingTime;
   late ChatBloc _chatBloc;
-  String? _currentRoomName; // Nombre actual del grupo/chat
+  String? _currentRoomName;
+  String? _currentGroupPhoto;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _currentRoomName = widget.roomName; // Inicializar con el nombre pasado
+    _currentRoomName = widget.roomName;
+    _currentGroupPhoto = widget.otherUserPhoto;
   }
 
   @override
@@ -73,25 +75,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      // Cuando la app vuelve al foreground, verificar conexión y recargar mensajes
       debugPrint('[ChatRoomPage] App vuelve al foreground...');
       
-      // Verificar si el socket está conectado
       final isConnected = SocketConfig.isConnected;
       debugPrint('[ChatRoomPage] Socket conectado: $isConnected');
       
       if (!isConnected) {
-        // Si no está conectado, reconectar
         debugPrint('[ChatRoomPage] Socket desconectado, reconectando...');
         _reconnectSocket();
       } else {
-        // Si está conectado, solo recargar mensajes
         _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
       }
     }
   }
 
-  /// Reconectar el socket cuando se detecta desconexión
   Future<void> _reconnectSocket() async {
     try {
       final firebaseUser = FirebaseAuth.instance.currentUser;
@@ -100,7 +97,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         return;
       }
 
-      // Obtener un token fresco de Firebase
       final firebaseToken = await firebaseUser.getIdToken();
       final firebaseUserId = firebaseUser.uid;
 
@@ -109,19 +105,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         return;
       }
 
-      // Reconectar el socket
       await SocketConfig.connect(firebaseToken, firebaseUserId);
-      
-      // Esperar un poco para que se establezca la conexión
       await Future.delayed(const Duration(milliseconds: 500));
       
-      // Disparar evento de reconexión que manejará la reconfiguración de listeners
       _chatBloc.add(const SocketReconnected());
-      
-      // Volver a unirse a la sala
       _chatBloc.add(JoinChatRoom(widget.roomId));
-      
-      // Recargar mensajes
       _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
       
       debugPrint('[ChatRoomPage] ✅ Socket reconectado exitosamente');
@@ -140,7 +128,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   }
 
   void _scrollToBottom() {
-    // Al usar reverse: true, el "fondo" es la posición 0.0
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         0.0,
@@ -186,7 +173,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       content: content,
     ));
     _messageController.clear();
-    // Pequeño delay para asegurar que la UI se actualice antes de hacer scroll
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
   }
 
@@ -212,14 +198,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     return null;
   }
 
-  /// Agrupa los mensajes por día y retorna una lista de items (mensajes y separadores)
   List<_ChatItem> _groupMessagesByDay(List<Message> messages) {
     if (messages.isEmpty) return [];
 
     final List<_ChatItem> items = [];
     DateTime? lastDate;
 
-    // Recorrer los mensajes en orden (del más antiguo al más reciente)
     for (final message in messages) {
       final messageDate = DateTime(
         message.timestamp.year,
@@ -227,20 +211,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         message.timestamp.day,
       );
 
-      // Si es el primer mensaje o cambió el día, agregar separador de fecha
       if (lastDate == null || !_isSameDay(lastDate, messageDate)) {
         items.add(_ChatItem.dateSeparator(messageDate));
         lastDate = messageDate;
       }
 
-      // Agregar el mensaje
       items.add(_ChatItem.message(message));
     }
 
     return items;
   }
 
-  /// Verifica si dos fechas son del mismo día
   bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
         date1.month == date2.month &&
@@ -252,7 +233,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUserNickname = userProvider.user?['nickname'] as String?;
     
-    // Navegar al perfil y esperar el resultado
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) {
@@ -281,13 +261,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       ),
     );
     
-    // Si se eliminó la amistad o se bloqueó el usuario (result == true), volver a la lista de chats
     if (result == true && mounted) {
-      // Salir de la sala de chat
       _chatBloc.add(LeaveChatRoom(widget.roomId));
-      
-      // Navegar de vuelta a la lista de chats y pasar true para indicar que se eliminó un amigo o se bloqueó un usuario
-      // Esto permitirá que ChatListPage refresque la lista
       Navigator.of(context).pop(true);
     }
   }
@@ -302,7 +277,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      // Importante: permite que el layout cambie cuando sale el teclado
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -311,38 +285,38 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
           builder: (context, state) {
             final messages = state is ChatRoomActive ? state.messages : <Message>[];
             final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
-            // Usar la foto de los mensajes si está disponible, sino usar la foto pasada desde la lista
             final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
             final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
             
             return GestureDetector(
               onTap: () async {
                 if (widget.isGroup) {
-                  // Si es un grupo, navegar a la página de detalles del grupo
                   final result = await Navigator.of(context).push<Map<String, dynamic>?>(
                     MaterialPageRoute(
                       builder: (context) => ChatRoomDetailsPage(
                         chatId: widget.roomId,
                         chatName: _currentRoomName ?? widget.roomName,
-                        chatDescription: null, // Podríamos pasar la descripción si la tenemos
+                        chatDescription: null,
                       ),
                     ),
                   );
                   
-                  // Si se salió del grupo, volver a la lista de chats
-                  if (result != null && result['leftGroup'] == true && mounted) {
-                    Navigator.of(context).pop(true); // Devolver true para indicar que se debe refrescar
-                    return;
-                  }
-                  
-                  // Si se actualizó el nombre del grupo, actualizar el estado
-                  if (result != null && result['name'] != null && mounted) {
+                  if (result != null && mounted) {
+                    if (result['leftGroup'] == true) {
+                      Navigator.of(context).pop(true);
+                      return;
+                    }
+                    
                     setState(() {
-                      _currentRoomName = result['name'] as String;
+                      if (result['name'] != null) {
+                        _currentRoomName = result['name'] as String;
+                      }
+                      if (result['photo'] != null) {
+                        _currentGroupPhoto = result['photo'] as String;
+                      }
                     });
                   }
                 } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
-                  // Si es chat directo, navegar al perfil del amigo
                   _navigateToFriendDetail(otherUserNickname);
                 }
               },
@@ -353,21 +327,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                     backgroundColor: widget.isGroup
                         ? theme.colorScheme.primaryContainer
                         : theme.colorScheme.surfaceContainerHighest,
-                    backgroundImage: !widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
-                        ? NetworkImage(otherUserPhoto)
-                        : null,
-                    child: widget.isGroup
-                        ? Icon(
-                            Icons.group,
-                            size: 20,
-                            color: theme.colorScheme.onPrimaryContainer,
-                          )
-                        : (otherUserPhoto == null || otherUserPhoto.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                size: 20,
-                                color: theme.iconTheme.color?.withValues(alpha: 0.8),
-                              )
+                    backgroundImage: (widget.isGroup && _currentGroupPhoto != null && _currentGroupPhoto!.isNotEmpty)
+                        ? NetworkImage(_currentGroupPhoto!)
+                        : (!widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
+                            ? NetworkImage(otherUserPhoto)
+                            : null),
+                    child: (widget.isGroup && (_currentGroupPhoto == null || _currentGroupPhoto!.isEmpty))
+                        ? Icon(Icons.group, size: 20, color: theme.colorScheme.onPrimaryContainer)
+                        : (!widget.isGroup && (otherUserPhoto == null || otherUserPhoto.isEmpty)
+                            ? Icon(Icons.person, size: 20, color: theme.iconTheme.color?.withOpacity(0.8))
                             : null),
                   ),
                   const SizedBox(width: 12),
@@ -441,7 +409,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
           return Column(
             children: [
               Expanded(
-                // 1. GestureDetector para cerrar teclado al tocar el fondo
                 child: GestureDetector(
                   onTap: () {
                     FocusScope.of(context).unfocus();
@@ -452,31 +419,26 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             l10n.noMessagesYet,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                         )
                       : Builder(
                           builder: (context) {
-                            // Agrupar mensajes por día
                             final groupedItems = _groupMessagesByDay(messages);
                             
                             return ListView.builder(
                               controller: _scrollController,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               reverse: true,
-                              // 2. keyboardDismissBehavior para cerrar teclado al hacer scroll
                               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                               itemCount: groupedItems.length,
                               itemBuilder: (context, index) {
-                                // Invertir índice porque usamos reverse: true
                                 final item = groupedItems[groupedItems.length - 1 - index];
                                 
                                 if (item.isDateSeparator && item.date != null) {
-                                  // Mostrar separador de fecha
                                   return DateSeparator(date: item.date!);
                                 } else if (item.message != null) {
-                                  // Mostrar mensaje
                                   final message = item.message!;
                                   final isMe = message.isSentByMe(currentUserEmail);
                                   return MessageBubble(
@@ -494,14 +456,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 ),
               ),
               
-              // 3. SafeArea para el input: Maneja el padding inferior automáticamente
               Container(
                 color: theme.colorScheme.surface, 
                 child: SafeArea(
                   top: false,
-                  bottom: true, // Esto añade ~34px si no hay teclado, y 0 si hay teclado
+                  bottom: true,
                   child: Padding(
-                    // Padding adicional pequeño para que no quede pegado
                     padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
                     child: Row(
                       children: [

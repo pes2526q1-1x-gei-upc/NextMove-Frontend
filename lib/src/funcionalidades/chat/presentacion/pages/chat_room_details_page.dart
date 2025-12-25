@@ -173,7 +173,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                         chatId: widget.chatId,
                         currentName: chat['name'] as String? ?? widget.chatName,
                         currentDescription: chat['description'] as String? ?? widget.chatDescription,
-                        currentPhotoUrl: null, // Por ahora no hay foto de grupo en el schema
+                        currentPhotoUrl: chat['photo'] as String?,
                       );
                     },
                   ),
@@ -285,15 +285,16 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                       ),
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                            child: Icon(
-                              Icons.group,
-                              size: 50,
-                              color: theme.colorScheme.onPrimaryContainer,
-                            ),
-                          ),
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: theme.colorScheme.primaryContainer,
+                              backgroundImage: chat['photo'] != null && (chat['photo'] as String).isNotEmpty
+                                  ? NetworkImage(chat['photo'] as String)
+                                  : null,
+                              child: (chat['photo'] == null || (chat['photo'] as String).isEmpty)
+                                  ? Icon(Icons.group, size: 50, color: theme.colorScheme.onPrimaryContainer)
+                                  : null,
+                            ),                      
                           const SizedBox(height: 16),
                           Text(
                             chat['name'] as String? ?? widget.chatName,
