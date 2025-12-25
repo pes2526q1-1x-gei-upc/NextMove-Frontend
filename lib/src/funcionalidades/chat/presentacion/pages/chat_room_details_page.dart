@@ -34,7 +34,7 @@ class ChatRoomDetailsPage extends StatefulWidget {
 
 class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
   int _refreshKey = 0;
-  Map<String, dynamic>? _updatedGroupData; 
+  Map<String, dynamic>? _updatedGroupData;
 
   void _showLeaveGroupDialog(BuildContext context, VoidCallback onLeave) {
     final l10n = AppLocalizations.of(context)!;
@@ -47,20 +47,38 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              l10n.cancel,
-              style: const TextStyle(color: Colors.grey),
-            ),
+            child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onLeave();
             },
-            child: const Text(
-              'Salir',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
+            child: const Text('Salir', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showKickDialog(BuildContext context, String participantNickname, String participantEmail, VoidCallback onKick) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Expulsar participante'),
+        content: Text('¿Estás seguro de que quieres expulsar a $participantNickname del grupo?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onKick();
+            },
+            child: const Text('Expulsar', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -70,7 +88,6 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
   Future<void> _navigateToUserProfile(BuildContext context, String nickname, String? currentUserNickname) async {
     if (nickname.isEmpty) return;
     
-    // Navegar al perfil del usuario
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
@@ -101,8 +118,6 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
   }
 
   void _navigateToEditProfile(BuildContext context) {
-    // Obtener el UserBloc del contexto (proporcionado globalmente en main.dart)
-    // Usamos Builder para asegurarnos de tener el contexto correcto
     final userBloc = context.read<UserBloc>();
     Navigator.push(
       context,
@@ -130,68 +145,10 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () {
-            // Devolver los datos actualizados si existen
             Navigator.pop(context, _updatedGroupData);
           },
         ),
         title: const Text('Detalles del grupo'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: 'Editar grupo',
-            onPressed: () async {
-              // Navegar a la página de edición
-              final result = await Navigator.of(context).push<Map<String, dynamic>?>(
-                MaterialPageRoute(
-                  builder: (context) => Query(
-                    options: QueryOptions(
-                      document: gql(myChatsQuery),
-                      fetchPolicy: FetchPolicy.networkOnly,
-                    ),
-                    builder: (queryResult, {fetchMore, refetch}) {
-                      if (queryResult.isLoading) {
-                        return const Scaffold(
-                          body: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-
-                      // Buscar el chat específico
-                      final chats = queryResult.data?['myChats'] as List<dynamic>? ?? [];
-                      final chat = chats.firstWhere(
-                        (c) => c['id'] == widget.chatId,
-                        orElse: () => null,
-                      );
-
-                      if (chat == null) {
-                        return Scaffold(
-                          appBar: AppBar(title: const Text('Editar grupo')),
-                          body: const Center(child: Text('Grupo no encontrado')),
-                        );
-                      }
-
-                      return EditGroupPage(
-                        chatId: widget.chatId,
-                        currentName: chat['name'] as String? ?? widget.chatName,
-                        currentDescription: chat['description'] as String? ?? widget.chatDescription,
-                        currentPhotoUrl: chat['photo'] as String?,
-                      );
-                    },
-                  ),
-                ),
-              );
-
-              // Si se actualizó el grupo, refrescar los datos y quedarse en esta página
-              if (result != null && mounted) {
-                setState(() {
-                  _refreshKey++;
-                  _updatedGroupData = result; // Guardar los datos actualizados
-                });
-                // No hacer pop, quedarse en la página de detalles
-                // El nombre se actualizará automáticamente al refrescar los datos
-              }
-            },
-          ),
-        ],
       ),
       body: Query(
         key: ValueKey('chat_details_$_refreshKey'),
@@ -224,7 +181,6 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
             );
           }
 
-          // Buscar el chat específico en la lista
           final chats = result.data?['myChats'] as List<dynamic>? ?? [];
           final chat = chats.firstWhere(
             (c) => c['id'] == widget.chatId,
@@ -236,7 +192,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.group_off, size: 64, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                  Icon(Icons.group_off, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
                   const SizedBox(height: 16),
                   Text('Grupo no encontrado', style: theme.textTheme.titleLarge),
                 ],
@@ -246,6 +202,11 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
 
           final participants = chat['participants'] as List<dynamic>? ?? [];
           final description = chat['description'] as String? ?? widget.chatDescription;
+          
+    
+          final isCurrentUserAdmin = participants.any((p) => 
+            p['userEmail'] == currentUserEmail && (p['isAdmin'] as bool? ?? false)
+          );
 
           return Mutation(
             options: MutationOptions(
@@ -255,8 +216,6 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Has salido del grupo')),
                   );
-                  // Devolver un resultado especial para indicar que se salió del grupo
-                  // Esto permitirá que ChatRoomPage y ChatListPage refresquen la lista
                   Navigator.of(context).pop({'leftGroup': true});
                 }
               },
@@ -280,27 +239,59 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                      ),
+                      decoration: const BoxDecoration(color: Colors.white),
                       child: Column(
                         children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundColor: theme.colorScheme.primaryContainer,
-                              backgroundImage: chat['photo'] != null && (chat['photo'] as String).isNotEmpty
-                                  ? NetworkImage(chat['photo'] as String)
-                                  : null,
-                              child: (chat['photo'] == null || (chat['photo'] as String).isEmpty)
-                                  ? Icon(Icons.group, size: 50, color: theme.colorScheme.onPrimaryContainer)
-                                  : null,
-                            ),                      
+                          Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundColor: theme.colorScheme.primaryContainer,
+                                backgroundImage: chat['photo'] != null && (chat['photo'] as String).isNotEmpty
+                                    ? NetworkImage(chat['photo'] as String)
+                                    : null,
+                                child: (chat['photo'] == null || (chat['photo'] as String).isEmpty)
+                                    ? Icon(Icons.group, size: 50, color: theme.colorScheme.onPrimaryContainer)
+                                    : null,
+                              ),
+                           
+                              if (isCurrentUserAdmin)
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+                                        MaterialPageRoute(
+                                          builder: (context) => EditGroupPage(
+                                            chatId: widget.chatId,
+                                            currentName: chat['name'] as String? ?? widget.chatName,
+                                            currentDescription: chat['description'] as String? ?? widget.chatDescription,
+                                            currentPhotoUrl: chat['photo'] as String?,
+                                          ),
+                                        ),
+                                      );
+
+                                      if (result != null && mounted) {
+                                        setState(() {
+                                          _refreshKey++;
+                                          _updatedGroupData = result;
+                                        });
+                                      }
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: theme.colorScheme.primary,
+                                      child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             chat['name'] as String? ?? widget.chatName,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           if (description != null && description.isNotEmpty) ...[
@@ -308,7 +299,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                             Text(
                               description,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: theme.colorScheme.onSurface.withOpacity(0.7),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -327,9 +318,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                         children: [
                           Text(
                             '${participants.length} ${participants.length == 1 ? 'miembro' : 'miembros'}',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
                           Container(
@@ -337,7 +326,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                               color: theme.colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                                color: theme.colorScheme.outline.withOpacity(0.2),
                                 width: 1,
                               ),
                             ),
@@ -350,7 +339,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                 height: 1,
                                 indent: 72,
                                 endIndent: 16,
-                                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                                color: theme.colorScheme.outline.withOpacity(0.2),
                               ),
                               itemBuilder: (context, index) {
                                 final participant = participants[index] as Map<String, dynamic>;
@@ -359,10 +348,10 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                 final participantPhoto = participant['photoUrl'] as String?;
                                 final isCurrentUser = participantEmail == currentUserEmail;
                                 final isAdmin = participant['isAdmin'] as bool? ?? false;
+
                                 return InkWell(
                                   onTap: () {
                                     if (isCurrentUser) {
-                                      // Para el usuario actual, usar el UserBloc global
                                       _navigateToEditProfile(context);
                                     } else {
                                       final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -379,11 +368,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                           ? NetworkImage(participantPhoto)
                                           : null,
                                       child: participantPhoto == null || participantPhoto.isEmpty
-                                          ? Icon(
-                                              Icons.person,
-                                              size: 28,
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                            )
+                                          ? Icon(Icons.person, size: 28, color: theme.colorScheme.onSurface.withOpacity(0.6))
                                           : null,
                                     ),
                                     title: Row(
@@ -397,6 +382,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
+                                        // ✅ Badge de Admin
                                         if (isAdmin) ...[
                                           const SizedBox(width: 8),
                                           Container(
@@ -429,17 +415,65 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        if (isCurrentUser)
-                                          Icon(
-                                            Icons.check_circle,
-                                            color: theme.colorScheme.primary,
-                                            size: 24,
+                                        if (isCurrentUserAdmin && !isCurrentUser)
+                                          Mutation(
+                                            options: MutationOptions(
+                                              document: gql(r'''
+                                                mutation Kick($chatId: ID!, $userEmail: String!) {
+                                                  kickParticipantFromGroup(chatId: $chatId, userEmail: $userEmail)
+                                                }
+                                              '''),
+                                              onCompleted: (data) {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('$participantNickname expulsado del grupo')),
+                                                  );
+                                                  setState(() => _refreshKey++);
+                                                }
+                                              },
+                                              onError: (error) {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text('Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}'),
+                                                      backgroundColor: theme.colorScheme.error,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                            builder: (runKickMutation, kickResult) {
+                                              return IconButton(
+                                                icon: Icon(
+                                                  Icons.person_remove,
+                                                  color: theme.colorScheme.error,
+                                                  size: 20,
+                                                ),
+                                                onPressed: kickResult?.isLoading == true
+                                                    ? null
+                                                    : () {
+                                                        _showKickDialog(
+                                                          context,
+                                                          participantNickname,
+                                                          participantEmail,
+                                                          () {
+                                                            runKickMutation({
+                                                              'chatId': widget.chatId,
+                                                              'userEmail': participantEmail,
+                                                            });
+                                                          },
+                                                        );
+                                                      },
+                                              );
+                                            },
                                           ),
+                                        if (isCurrentUser)
+                                          Icon(Icons.check_circle, color: theme.colorScheme.primary, size: 24),
                                         const SizedBox(width: 8),
                                         Icon(
                                           Icons.arrow_forward_ios,
                                           size: 16,
-                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                          color: theme.colorScheme.onSurface.withOpacity(0.4),
                                         ),
                                       ],
                                     ),
@@ -452,23 +486,17 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                       ),
                     ),
 
-                    // Botón para añadir participantes
+                    // Botón para añadir participantes (todos pueden añadir)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () async {
-                            // Obtener emails de participantes existentes
-                            final existingEmails = participants
-                                .map((p) => p['userEmail'] as String)
-                                .toList();
-
-                            // Navegar a la página de selección de participantes
+                            final existingEmails = participants.map((p) => p['userEmail'] as String).toList();
                             final success = await Navigator.of(context).push<bool>(
                               MaterialPageRoute(
                                 builder: (context) {
-                                  // Crear un nuevo SocialBloc para la página de añadir participantes
                                   final userProvider = Provider.of<UserProvider>(context, listen: false);
                                   final currentUserNickname = userProvider.user?['nickname'] as String?;
                                   final socialBloc = SocialBloc();
@@ -486,11 +514,8 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                               ),
                             );
 
-                            // Si se añadieron participantes exitosamente, refrescar la lista
                             if (success == true && mounted) {
-                              setState(() {
-                                _refreshKey++;
-                              });
+                              setState(() => _refreshKey++);
                             }
                           },
                           icon: const Icon(Icons.person_add),
@@ -499,9 +524,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                             backgroundColor: theme.colorScheme.primary,
                             foregroundColor: theme.colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
                       ),
@@ -527,16 +550,11 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(Icons.exit_to_app, color: Colors.red),
-                          label: const Text(
-                            'Salir del grupo',
-                            style: TextStyle(color: Colors.red),
-                          ),
+                          label: const Text('Salir del grupo', style: TextStyle(color: Colors.red)),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             side: const BorderSide(color: Colors.red),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
                       ),
