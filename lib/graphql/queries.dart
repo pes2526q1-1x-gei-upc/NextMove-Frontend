@@ -205,6 +205,7 @@ class GraphQLQueries {
     ListFriends(){
       name
       photo
+      email
     }
   }''';
 

@@ -14,7 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AddParticipantsPage extends StatefulWidget {
   final String chatId;
-  final List<String> existingParticipantEmails; // Emails de participantes existentes
+  final List<String> existingParticipantEmails;
 
   const AddParticipantsPage({
     super.key,
@@ -29,17 +29,15 @@ class AddParticipantsPage extends StatefulWidget {
 class _AddParticipantsPageState extends State<AddParticipantsPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
-  final Set<String> _selectedUserEmails = {}; // Set de emails seleccionados
-  final Map<String, UserEntity> _selectedUsers = {}; // Map email -> UserEntity
+  final Set<String> _selectedUserEmails = {};
+  final Map<String, UserEntity> _selectedUsers = {};
 
   @override
   void initState() {
     super.initState();
-    // Cargar amigos si el SocialBloc está disponible
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUserNickname = userProvider.user?['nickname'] as String?;
     if (currentUserNickname != null && currentUserNickname.isNotEmpty) {
-      // Esperar un frame para asegurarse de que el BlocProvider esté disponible
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           context.read<SocialBloc>().add(LoadFriendsEvent(currentUserNickname));
@@ -67,14 +65,26 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
   }
 
   void _toggleUserSelection(UserEntity user) {
+    // ✅ VALIDAR EMAIL
+    if (user.email.isEmpty) {
+      debugPrint('[AddParticipants] ERROR: Usuario ${user.apodo} sin email');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Este usuario no tiene email válido')),
+      );
+      return;
+    }
+
     setState(() {
       if (_selectedUserEmails.contains(user.email)) {
         _selectedUserEmails.remove(user.email);
         _selectedUsers.remove(user.email);
+        debugPrint('[AddParticipants] Deseleccionado: ${user.apodo} (${user.email})');
       } else {
         _selectedUserEmails.add(user.email);
         _selectedUsers[user.email] = user;
+        debugPrint('[AddParticipants] Seleccionado: ${user.apodo} (${user.email})');
       }
+      debugPrint('[AddParticipants] Total seleccionados: ${_selectedUserEmails.length}');
     });
   }
 
@@ -99,7 +109,17 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
     bool allSuccess = true;
     int successCount = 0;
 
+    debugPrint('[AddParticipants] Iniciando adición de ${emails.length} participantes');
+    debugPrint('[AddParticipants] Emails a añadir: $emails');
+
     for (final email in emails) {
+      if (email.isEmpty) {
+        debugPrint('[AddParticipants] SKIP: Email vacío detectado');
+        continue;
+      }
+
+      debugPrint('[AddParticipants] Añadiendo: "$email"');
+
       try {
         final result = await client.mutate(
           MutationOptions(
@@ -113,23 +133,26 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
 
         if (result.hasException) {
           allSuccess = false;
+          debugPrint('[AddParticipants] Error GraphQL: ${result.exception}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error al añadir participante: ${result.exception.toString()}'),
+                content: Text('Error al añadir $email: ${result.exception.toString()}'),
                 backgroundColor: theme.colorScheme.error,
               ),
             );
           }
         } else {
           successCount++;
+          debugPrint('[AddParticipants] ✅ Añadido: $email');
         }
       } catch (e) {
         allSuccess = false;
+        debugPrint('[AddParticipants] Exception: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error al añadir participante: $e'),
+              content: Text('Error al añadir $email: $e'),
               backgroundColor: theme.colorScheme.error,
             ),
           );
@@ -147,7 +170,6 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
         );
         Navigator.pop(context, true);
       } else if (successCount > 0) {
-        // Algunos se añadieron pero otros fallaron
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('$successCount participante(s) añadido(s), pero algunos fallaron'),
@@ -155,6 +177,13 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
           ),
         );
         Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('No se pudo añadir ningún participante'),
+            backgroundColor: theme.colorScheme.error,
+          ),
+        );
       }
     }
   }
@@ -170,55 +199,19 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
         title: const Text('Añadir participantes'),
         actions: [
           if (_selectedUserEmails.isNotEmpty)
-            Mutation(
-              options: MutationOptions(
-                document: gql(GraphQLMutations.addParticipantToGroupMutation),
-                onCompleted: (data) {
-                  // Se manejará cuando se añadan todos los participantes
-                },
-                onError: (error) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al añadir participante: ${error.toString()}'),
-                        backgroundColor: theme.colorScheme.error,
-                      ),
-                    );
-                  }
-                },
-              ),
-              builder: (runMutation, mutationResult) {
-                return TextButton(
-                  onPressed: mutationResult?.isLoading == true
-                      ? null
-                      : () {
-                          // Ejecutar todas las mutaciones en secuencia
-                          _addParticipantsSequentially(
-                            context,
-                            _selectedUserEmails.toList(),
-                            theme,
-                          );
-                        },
-                  child: mutationResult?.isLoading == true
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              theme.colorScheme.primary,
-                            ),
-                          ),
-                        )
-                      : Text(
-                          'Añadir (${_selectedUserEmails.length})',
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                );
+            TextButton(
+              onPressed: () {
+                final emails = _selectedUserEmails.toList();
+                debugPrint('[AddParticipants] Botón presionado con emails: $emails');
+                _addParticipantsSequentially(context, emails, theme);
               },
+              child: Text(
+                'Añadir (${_selectedUserEmails.length})',
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
         ],
       ),
@@ -236,7 +229,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                       ? null
                       : [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: Colors.black.withOpacity(0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -270,7 +263,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
               ),
             ),
 
-            // Lista de usuarios seleccionados (chips)
+            // Chips de usuarios seleccionados
             if (_selectedUsers.isNotEmpty)
               Container(
                 height: 60,
@@ -289,7 +282,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                               ? NetworkImage(user.photo)
                               : null,
                           child: user.photo.isEmpty
-                              ? Icon(Icons.person, size: 16)
+                              ? const Icon(Icons.person, size: 16)
                               : null,
                         ),
                         label: Text(user.apodo),
@@ -312,9 +305,25 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                       ? state.searchResults
                       : state.friends;
 
-                  // Filtrar usuarios que ya son participantes o el usuario actual
+                  // ✅ FILTRAR CORRECTAMENTE
                   final filteredUsers = usersToShow.where((user) {
-                    return !_isUserAlreadyParticipant(user) && !_isCurrentUser(user);
+                    // Verificar que tenga email
+                    if (user.email.isEmpty) {
+                      debugPrint('[AddParticipants] Usuario sin email: ${user.apodo}');
+                      return false;
+                    }
+                    
+                    // No mostrar si ya es participante
+                    if (_isUserAlreadyParticipant(user)) {
+                      return false;
+                    }
+                    
+                    // No mostrar si es el usuario actual
+                    if (_isCurrentUser(user)) {
+                      return false;
+                    }
+                    
+                    return true;
                   }).toList();
 
                   if (filteredUsers.isEmpty) {
@@ -362,7 +371,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                 ? NetworkImage(user.photo)
                                 : null,
                             child: user.photo.isEmpty
-                                ? Icon(Icons.person)
+                                ? const Icon(Icons.person)
                                 : null,
                           ),
                           title: Text(
@@ -388,4 +397,3 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
     );
   }
 }
-
