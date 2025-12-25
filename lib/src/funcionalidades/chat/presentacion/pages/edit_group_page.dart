@@ -66,6 +66,47 @@ class _EditGroupPageState extends State<EditGroupPage> {
     }
   }
 
+  Future<void> _handleSave(RunMutation runMutation) async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      String? finalPhotoUrl = widget.currentPhotoUrl;
+
+      // 1. Si hay una nueva imagen, subirla primero
+      if (_selectedImageFile != null) {
+        debugPrint('[EditGroupPage] Subiendo imagen...');
+        final remoteProvider = UserRemoteDataProvider();
+        finalPhotoUrl = await remoteProvider.uploadProfilePhoto(_selectedImageFile!);
+        debugPrint('[EditGroupPage] Imagen subida: $finalPhotoUrl');
+      }
+
+      // 2. Ejecutar mutación GraphQL
+      debugPrint('[EditGroupPage] Ejecutando mutación...');
+      final result = runMutation({
+        'chatId': widget.chatId,
+        'name': _nameController.text.trim(),
+        'description': _descriptionController.text.trim(),
+        'photo': finalPhotoUrl,
+      });
+
+      debugPrint('[EditGroupPage] Mutación ejecutada');
+      
+    } catch (e) {
+      debugPrint('[EditGroupPage] Error: $e');
+      if (mounted) {
+        setState(() => _isUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -78,22 +119,35 @@ class _EditGroupPageState extends State<EditGroupPage> {
         options: MutationOptions(
           document: gql(updateGroupChatMutation),
           onCompleted: (data) {
-            if (data != null) {
-              Navigator.pop(context, true); // Retornamos true para refrescar la pantalla anterior
+            debugPrint('[EditGroupPage] onCompleted: $data');
+            if (mounted) {
+              setState(() => _isUploading = false);
+              Navigator.pop(context, {
+                'updated': true,
+                'name': _nameController.text.trim(),
+                'description': _descriptionController.text.trim(),
+                'photo': data?['updateGroupChat']?['photo'],
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Grupo actualizado correctamente')),
               );
             }
           },
           onError: (error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}')),
-            );
+            debugPrint('[EditGroupPage] onError: $error');
+            if (mounted) {
+              setState(() => _isUploading = false);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}'),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+            }
           },
         ),
         builder: (runMutation, result) {
-          // Combinamos el estado de carga de GraphQL con el de nuestra subida de imagen
-          final isLoading = (result?.isLoading ?? false) || _isUploading;
+          final isLoading = _isUploading || (result?.isLoading ?? false);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -128,9 +182,17 @@ class _EditGroupPageState extends State<EditGroupPage> {
                               child: const Icon(Icons.edit, size: 18, color: Colors.white),
                             ),
                           ),
-                          if (_isUploading)
-                            const Positioned.fill(
-                              child: CircularProgressIndicator(),
+                          if (isLoading)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(color: Colors.white),
+                                ),
+                              ),
                             ),
                         ],
                       ),
@@ -141,6 +203,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
                   // --- CAMPOS DE TEXTO ---
                   TextFormField(
                     controller: _nameController,
+                    enabled: !isLoading,
                     decoration: const InputDecoration(
                       labelText: 'Nombre del grupo',
                       border: OutlineInputBorder(),
@@ -152,6 +215,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _descriptionController,
+                    enabled: !isLoading,
                     decoration: const InputDecoration(
                       labelText: 'Descripción',
                       border: OutlineInputBorder(),
@@ -166,37 +230,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
-                      onPressed: isLoading
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                setState(() => _isUploading = true);
-                                
-                                try {
-                                  String? finalPhotoUrl = widget.currentPhotoUrl;
-
-                                  // 1. Si hay una nueva imagen, la subimos
-                                  if (_selectedImageFile != null) {
-                                    final remoteProvider = UserRemoteDataProvider();
-                                    finalPhotoUrl = await remoteProvider.uploadProfilePhoto(_selectedImageFile!);
-                                  }
-
-                                  // 2. Ejecutamos mutación de GraphQL
-                                  runMutation({
-                                    'chatId': widget.chatId,
-                                    'name': _nameController.text.trim(),
-                                    'description': _descriptionController.text.trim(),
-                                    'photo': finalPhotoUrl,
-                                  });
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error al subir la imagen: $e')),
-                                  );
-                                } finally {
-                                  setState(() => _isUploading = false);
-                                }
-                              }
-                            },
+                      onPressed: isLoading ? null : () => _handleSave(runMutation),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -205,8 +239,18 @@ class _EditGroupPageState extends State<EditGroupPage> {
                         ),
                       ),
                       child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Guardar cambios', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Guardar cambios',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
                     ),
                   ),
                 ],
