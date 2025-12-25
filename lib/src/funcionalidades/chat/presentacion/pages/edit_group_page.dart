@@ -2,8 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:nextmove_app/l10n/app_localizations.dart';
-import 'package:nextmove_app/graphql/mutations.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
+
+const String updateGroupChatMutation = r'''
+  mutation UpdateGroupChat($chatId: ID!, $name: String, $description: String, $photo: String) {
+    updateGroupChat(chatId: $chatId, name: $name, description: $description, photo: $photo) {
+      id
+      name
+      description
+      photo
+    }
+  }
+''';
 
 class EditGroupPage extends StatefulWidget {
   final String chatId;
@@ -25,10 +35,12 @@ class EditGroupPage extends StatefulWidget {
 
 class _EditGroupPageState extends State<EditGroupPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
-  late final TextEditingController _descriptionController;
-  final ImagePicker _picker = ImagePicker();
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+  
   File? _selectedImageFile;
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -44,272 +56,157 @@ class _EditGroupPageState extends State<EditGroupPage> {
     super.dispose();
   }
 
-  void _showImageSourceActionSheet(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: Icon(
-                Icons.photo_library,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              title: Text(l10n.gallery),
-              onTap: () {
-                _pickImage(ImageSource.gallery, context);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.camera_alt,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              title: Text(l10n.camera),
-              onTap: () {
-                _pickImage(ImageSource.camera, context);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
     );
-  }
-
-  Future<void> _pickImage(ImageSource source, BuildContext context) async {
-    try {
-      final pickedFile = await _picker.pickImage(
-        source: source,
-        maxWidth: 800,
-        imageQuality: 85,
-      );
-      if (pickedFile != null) {
-        setState(() {
-          _selectedImageFile = File(pickedFile.path);
-        });
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.imagePickerError),
-          ),
-        );
-      }
+    if (pickedFile != null) {
+      setState(() => _selectedImageFile = File(pickedFile.path));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () {
-            if (mounted) {
-              Navigator.pop(context);
-            }
-          },
-        ),
-        title: const Text('Editar grupo'),
+        title: const Text('Editar Grupo'),
       ),
       body: Mutation(
         options: MutationOptions(
-          document: gql(GraphQLMutations.updateGroupChatMutation),
+          document: gql(updateGroupChatMutation),
           onCompleted: (data) {
-            if (data != null && mounted) {
+            if (data != null) {
+              Navigator.pop(context, true); // Retornamos true para refrescar la pantalla anterior
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Grupo actualizado correctamente'),
-                  backgroundColor: Colors.green,
-                ),
+                const SnackBar(content: Text('Grupo actualizado correctamente')),
               );
-              // Retornar el nuevo nombre y descripción
-              Future.microtask(() {
-                if (mounted) {
-                  Navigator.pop(context, {
-                    'name': _nameController.text.trim(),
-                    'description': _descriptionController.text.trim().isEmpty 
-                        ? null 
-                        : _descriptionController.text.trim(),
-                  });
-                }
-              });
             }
           },
           onError: (error) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error al actualizar el grupo: ${error.toString()}'),
-                  backgroundColor: theme.colorScheme.error,
-                ),
-              );
-            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}')),
+            );
           },
         ),
-        builder: (runMutation, mutationResult) {
+        builder: (runMutation, result) {
+          // Combinamos el estado de carga de GraphQL con el de nuestra subida de imagen
+          final isLoading = (result?.isLoading ?? false) || _isUploading;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Selector de foto del grupo
+                  // --- SECCIÓN DE FOTO ---
                   Center(
                     child: GestureDetector(
-                      onTap: () => _showImageSourceActionSheet(context),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
+                      onTap: isLoading ? null : _pickImage,
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundColor: theme.colorScheme.primaryContainer,
+                            backgroundImage: _selectedImageFile != null
+                                ? FileImage(_selectedImageFile!)
+                                : (widget.currentPhotoUrl != null
+                                    ? NetworkImage(widget.currentPhotoUrl!)
+                                    : null) as ImageProvider?,
+                            child: (_selectedImageFile == null && widget.currentPhotoUrl == null)
+                                ? Icon(Icons.group, size: 60, color: theme.colorScheme.onPrimaryContainer)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 4,
+                            child: CircleAvatar(
+                              radius: 18,
+                              backgroundColor: theme.colorScheme.primary,
+                              child: const Icon(Icons.edit, size: 18, color: Colors.white),
                             ),
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 60,
-                              backgroundColor: theme.colorScheme.primaryContainer,
-                              backgroundImage: _selectedImageFile != null
-                                  ? FileImage(_selectedImageFile!)
-                                  : (widget.currentPhotoUrl != null && widget.currentPhotoUrl!.isNotEmpty
-                                      ? NetworkImage(widget.currentPhotoUrl!)
-                                      : null),
-                              child: _selectedImageFile == null &&
-                                      (widget.currentPhotoUrl == null || widget.currentPhotoUrl!.isEmpty)
-                                  ? Icon(
-                                      Icons.group,
-                                      size: 60,
-                                      color: theme.colorScheme.onPrimaryContainer,
-                                    )
-                                  : null,
+                          ),
+                          if (_isUploading)
+                            const Positioned.fill(
+                              child: CircularProgressIndicator(),
                             ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
-                                ),
-                                child: const Icon(Icons.edit, size: 16, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 32),
 
-                  // Campo de nombre
+                  // --- CAMPOS DE TEXTO ---
                   TextFormField(
                     controller: _nameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Nombre del grupo',
-                      hintText: 'Ingresa el nombre del grupo',
-                      prefixIcon: const Icon(Icons.group),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.group),
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'El nombre del grupo es obligatorio';
-                      }
-                      if (value.trim().length > 20) {
-                        return 'El nombre no puede tener más de 20 caracteres';
-                      }
-                      return null;
-                    },
+                    validator: (value) =>
+                        (value == null || value.isEmpty) ? 'El nombre es obligatorio' : null,
                   ),
-                  const SizedBox(height: 24),
-
-                  // Campo de descripción
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _descriptionController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Descripción',
-                      hintText: 'Ingresa una descripción del grupo (opcional)',
-                      prefixIcon: const Icon(Icons.description),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.description),
                     ),
                     maxLines: 3,
-                    maxLength: 200,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
 
-                  // Botón de guardar
+                  // --- BOTÓN GUARDAR ---
                   SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: 55,
                     child: ElevatedButton(
-                      onPressed: mutationResult?.isLoading == true
+                      onPressed: isLoading
                           ? null
-                          : () {
+                          : () async {
                               if (_formKey.currentState!.validate()) {
-                                final name = _nameController.text.trim();
-                                final description = _descriptionController.text.trim();
+                                setState(() => _isUploading = true);
                                 
-                                // Por ahora solo actualizamos nombre y descripción
-                                // La foto se implementará cuando haya endpoint en el backend
-                                runMutation({
-                                  'chatId': widget.chatId,
-                                  'name': name,
-                                  'description': description.isEmpty ? null : description,
-                                });
+                                try {
+                                  String? finalPhotoUrl = widget.currentPhotoUrl;
+
+                                  // 1. Si hay una nueva imagen, la subimos
+                                  if (_selectedImageFile != null) {
+                                    final remoteProvider = UserRemoteDataProvider();
+                                    finalPhotoUrl = await remoteProvider.uploadProfilePhoto(_selectedImageFile!);
+                                  }
+
+                                  // 2. Ejecutamos mutación de GraphQL
+                                  runMutation({
+                                    'chatId': widget.chatId,
+                                    'name': _nameController.text.trim(),
+                                    'description': _descriptionController.text.trim(),
+                                    'photo': finalPhotoUrl,
+                                  });
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Error al subir la imagen: $e')),
+                                  );
+                                } finally {
+                                  setState(() => _isUploading = false);
+                                }
                               }
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 0,
                       ),
-                      child: mutationResult?.isLoading == true
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              l10n.saveChanges,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text('Guardar cambios', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -321,4 +218,3 @@ class _EditGroupPageState extends State<EditGroupPage> {
     );
   }
 }
-

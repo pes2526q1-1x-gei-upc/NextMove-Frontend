@@ -304,6 +304,7 @@ const String myChatsQuery = r'''
       type
       name
       description
+      photo
       participants {
         userEmail
         nickname

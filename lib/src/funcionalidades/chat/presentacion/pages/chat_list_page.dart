@@ -411,7 +411,6 @@ class _ChatListPageState extends State<ChatListPage> {
       friendsNicknames = friendsData.map((f) => f['name'] as String? ?? '').where((n) => n.isNotEmpty).toList();
     }
     
-    // SEPARAR CHATS DIRECTOS Y GRUPOS
     final directChats = allChats.where((chat) {
       final chatType = chat['type'] as String?;
       final lastMessage = chat['lastMessage'];
@@ -431,11 +430,8 @@ class _ChatListPageState extends State<ChatListPage> {
               return false;
             }
           }
-        } catch (e) {
-          // Mantener el chat si no se puede determinar
-        }
+        } catch (e) {}
       }
-      
       return true;
     }).toList();
     
@@ -444,10 +440,8 @@ class _ChatListPageState extends State<ChatListPage> {
       return chatType == 'group';
     }).toList();
     
-    // Decidir qué mostrar según el toggle
     final chatsToShow = _showFriends ? directChats : groupChats;
     
-    // Convertir a formato unificado
     final chatItems = chatsToShow.map((chat) {
       final chatType = chat['type'] as String?;
       final participants = chat['participants'] as List<dynamic>? ?? [];
@@ -472,9 +466,10 @@ class _ChatListPageState extends State<ChatListPage> {
           'type': 'direct',
         };
       } else {
+        // --- CAMBIO AQUÍ: Mapeamos la foto del grupo ---
         return {
           'name': chat['name'] as String? ?? 'Grupo',
-          'photo': null,
+          'photo': chat['photo'] as String?, // <--- Usar el campo photo del backend
           'chatId': chat['id'] as String,
           'email': null,
           'type': 'group',
@@ -483,7 +478,6 @@ class _ChatListPageState extends State<ChatListPage> {
       }
     }).toList();
 
-    // Si mostramos amigos Y hay búsqueda, agregar amigos sin chat
     if (_showFriends && _searchQuery.isNotEmpty && friendsResult != null && !friendsResult.hasException) {
       final friendsData = friendsResult.data?['ListFriends'] as List<dynamic>? ?? [];
       for (final friend in friendsData) {
@@ -503,7 +497,6 @@ class _ChatListPageState extends State<ChatListPage> {
       }
     }
 
-    // Filtrar por búsqueda
     final filteredItems = _searchQuery.isEmpty
         ? chatItems
         : chatItems.where((item) {
@@ -511,7 +504,6 @@ class _ChatListPageState extends State<ChatListPage> {
             return name.toLowerCase().contains(_searchQuery.toLowerCase());
           }).toList();
 
-    // Mensajes de lista vacía
     if (filteredItems.isEmpty && _searchQuery.isEmpty) {
       if (_showFriends) {
         return Center(
@@ -540,21 +532,6 @@ class _ChatListPageState extends State<ChatListPage> {
           ),
         );
       }
-    }
-
-    if (filteredItems.isEmpty && _searchQuery.isNotEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
-            const SizedBox(height: 16),
-            Text(l10n.noFriendsFound, style: theme.textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text(l10n.tryAnotherSearchTerm),
-          ],
-        ),
-      );
     }
 
     return Column(
@@ -616,13 +593,18 @@ class _ChatListPageState extends State<ChatListPage> {
           final groupName = group['name'] as String? ?? 'Grupo';
           final groupId = group['chatId'] as String;
           final description = group['description'] as String?;
-          
+          final groupPhoto = group['photo'] as String?; 
+
           return ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
             leading: CircleAvatar(
               radius: 24,
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Icon(Icons.group, color: theme.colorScheme.onPrimaryContainer),
+           
+              backgroundImage: groupPhoto != null ? NetworkImage(groupPhoto) : null,
+              child: groupPhoto == null
+                  ? Icon(Icons.group, color: theme.colorScheme.onPrimaryContainer)
+                  : null,
             ),
             title: Text(
               groupName,
@@ -631,7 +613,12 @@ class _ChatListPageState extends State<ChatListPage> {
             subtitle: description != null && description.isNotEmpty
                 ? Text(description, maxLines: 1, overflow: TextOverflow.ellipsis)
                 : const Text('Grupo', style: TextStyle(fontStyle: FontStyle.italic)),
-            onTap: () => _navigateToRoom(groupId, groupName, isGroup: true),
+            onTap: () => _navigateToRoom(
+              groupId, 
+              groupName, 
+              isGroup: true, 
+              otherUserPhoto: groupPhoto,
+            ),
           );
         },
       ),
