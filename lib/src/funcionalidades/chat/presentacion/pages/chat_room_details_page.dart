@@ -34,7 +34,7 @@ class ChatRoomDetailsPage extends StatefulWidget {
 
 class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
   int _refreshKey = 0;
-  Map<String, dynamic>? _updatedGroupData; // Guardar datos actualizados del grupo
+  Map<String, dynamic>? _updatedGroupData; 
 
   void _showLeaveGroupDialog(BuildContext context, VoidCallback onLeave) {
     final l10n = AppLocalizations.of(context)!;
@@ -358,7 +358,7 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                 final participantNickname = participant['nickname'] as String? ?? 'Usuario';
                                 final participantPhoto = participant['photoUrl'] as String?;
                                 final isCurrentUser = participantEmail == currentUserEmail;
-
+                                final isAdmin = participant['isAdmin'] as bool? ?? false;
                                 return InkWell(
                                   onTap: () {
                                     if (isCurrentUser) {
@@ -386,11 +386,36 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
                                             )
                                           : null,
                                     ),
-                                    title: Text(
-                                      participantNickname,
-                                      style: theme.textTheme.bodyLarge?.copyWith(
-                                        fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w500,
-                                      ),
+                                    title: Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            participantNickname,
+                                            style: theme.textTheme.bodyLarge?.copyWith(
+                                              fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (isAdmin) ...[
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.primaryContainer,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              'Admin',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: theme.colorScheme.onPrimaryContainer,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                     subtitle: isCurrentUser
                                         ? Text(

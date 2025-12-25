@@ -310,6 +310,7 @@ const String myChatsQuery = r'''
         nickname
         photoUrl
         joinedAt
+        isAdmin
       }
       lastMessage {
         content
