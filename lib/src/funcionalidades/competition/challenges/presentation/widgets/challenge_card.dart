@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
 
 class ChallengeCard extends StatelessWidget {
   const ChallengeCard({super.key, required this.challenge});
@@ -14,17 +15,18 @@ class ChallengeCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     Text startDate = Text(
-      '${challenge.startingDate.day.toString().padLeft(2, '0')}/${challenge.startingDate.month.toString().padLeft(2, '0')}/${challenge.startingDate.year}',
+      formatDate(challenge.startingDate),
       style: theme.textTheme.bodyMedium?.copyWith(
         color: theme.colorScheme.primary,
       ),
     );
     Text endDate = Text(
-      '${challenge.endingDate.day.toString().padLeft(2, '0')}/${challenge.endingDate.month.toString().padLeft(2, '0')}/${challenge.endingDate.year}',
+      formatDate(challenge.endingDate),
       style: theme.textTheme.bodyMedium?.copyWith(
         color: theme.colorScheme.primary,
       ),
     );
+
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
@@ -42,14 +44,7 @@ class ChallengeCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
-            gradient: LinearGradient(
-              colors: [
-                theme.colorScheme.surface,
-                theme.colorScheme.surface.withValues(alpha: 0.8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: theme.colorScheme.surface,
           ),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -57,7 +52,6 @@ class ChallengeCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Photo(challenge: challenge, theme: theme),
-
                 Text(
                   challenge.name,
                   style: theme.textTheme.headlineSmall?.copyWith(
@@ -69,8 +63,9 @@ class ChallengeCard extends StatelessWidget {
                 Text(
                   challenge.description,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
                   ),
+                  maxLines: 2,
                 ),
                 const SizedBox(height: 16),
                 PointsAndDistanceRow(

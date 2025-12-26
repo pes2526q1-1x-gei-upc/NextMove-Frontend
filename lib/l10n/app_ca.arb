@@ -256,5 +256,9 @@
     "challenges": "Reptes",
     "competition": "Competició",
     "noChallengesAvailable": "No hi ha reptes disponibles.",
-    "points": "{count, plural, =1{{count} punt} other{{count} punts}}"
+    "points": "{count, plural, =1{{count}   punt} other{{count} punts}}",
+    "dates": "Dates",
+    "startDate": "Data d'inici",
+    "endDate": "Data de finalització",
+    "company": "Empresa"
 }
