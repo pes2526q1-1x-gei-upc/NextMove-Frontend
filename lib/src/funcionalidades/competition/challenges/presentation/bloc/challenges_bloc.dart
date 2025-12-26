@@ -11,11 +11,11 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   ChallengesBloc()
     : challengesRepository = ChallengesRepository(),
       super(ChallengesInitial()) {
-    on<LoadChallengesEvent>(_onLoadChallengesEvent);
+    on<LoadChallengeListEvent>(_onLoadChallengesEvent);
   }
 
   Future<void> _onLoadChallengesEvent(
-    LoadChallengesEvent event,
+    LoadChallengeListEvent event,
     Emitter<ChallengesState> emit,
   ) async {
     emit(ChallengesLoading());

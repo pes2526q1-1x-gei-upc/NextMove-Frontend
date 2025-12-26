@@ -12,12 +12,30 @@ class ChallengesPage extends StatefulWidget {
 }
 
 class _ChallengesPageState extends State<ChallengesPage> {
+  late final ChallengesBloc _challengesBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _challengesBloc = ChallengesBloc()..add(const LoadChallengeListEvent());
+  }
+
+  @override
+  void dispose() {
+    _challengesBloc.close();
+    super.dispose();
+  }
+
+  Future<void> _refreshChallenges() async {
+    _challengesBloc.add(const LoadChallengeListEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      body: BlocProvider(
-        create: (context) => ChallengesBloc()..add(const LoadChallengesEvent()),
+      body: BlocProvider<ChallengesBloc>.value(
+        value: _challengesBloc,
         child: BlocBuilder<ChallengesBloc, ChallengesState>(
           builder: (context, state) {
             if (state is ChallengesLoading || state is ChallengesInitial) {
@@ -26,12 +44,15 @@ class _ChallengesPageState extends State<ChallengesPage> {
               if (state.challenges.isEmpty) {
                 return Center(child: Text(l10n.noChallengesAvailable));
               }
-              return ListView.builder(
-                itemCount: state.challenges.length,
-                itemBuilder: (context, index) {
-                  final challenge = state.challenges[index];
-                  return ChallengeCard(challenge: challenge);
-                },
+              return RefreshIndicator(
+                onRefresh: _refreshChallenges,
+                child: ListView.builder(
+                  itemCount: state.challenges.length,
+                  itemBuilder: (context, index) {
+                    final challenge = state.challenges[index];
+                    return ChallengeCard(challenge: challenge);
+                  },
+                ),
               );
             } else if (state is ChallengesError) {
               return Center(child: Text('Error: ${state.message}'));
