@@ -450,10 +450,15 @@ class GraphQLQueries {
     getAllChallenges {
       description
       distance
-      ending_date
       name
       points
       starting_date
+      ending_date
+      photo
+      company {
+        name
+        photo
+      }
     }
   }''';
 }
