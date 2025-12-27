@@ -260,5 +260,7 @@
     "dates": "Dates",
     "startDate": "Data d'inici",
     "endDate": "Data de finalització",
-    "company": "Empresa"
+    "company": "Empresa",
+    "enroll": "Inscriure's",
+    "enrolled": "Inscrit"
 }

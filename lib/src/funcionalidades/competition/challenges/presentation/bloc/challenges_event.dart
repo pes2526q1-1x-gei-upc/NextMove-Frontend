@@ -14,11 +14,11 @@ final class LoadChallengeListEvent extends ChallengesEvent {
   List<Object> get props => [];
 }
 
-final class LoadChallengeDetailsEvent extends ChallengesEvent {
-  final String challengeName;
+final class EnrollInChallengeEvent extends ChallengesEvent {
+  final String challengeId;
 
-  const LoadChallengeDetailsEvent(this.challengeName);
+  const EnrollInChallengeEvent(this.challengeId);
 
   @override
-  List<Object> get props => [challengeName];
+  List<Object> get props => [challengeId];
 }

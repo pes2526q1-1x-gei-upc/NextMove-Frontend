@@ -50,7 +50,9 @@ void main() {
           'starting_date': '1738368000000',
         },
       ];
+      final mockEnrolledNames = ['Challenge 1'];
       when(() => mockDataProvider.getAllChallenges()).thenAnswer((_) async => mockData);
+      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => mockEnrolledNames);
 
       final result = await repository.getallChallenges();
 
@@ -61,14 +63,18 @@ void main() {
           expect(challenges, isNotNull);
           expect(challenges!.length, 2);
           expect(challenges[0].name, 'Challenge 1');
+          expect(challenges[0].isEnrolled, true);
           expect(challenges[1].name, 'Challenge 2');
+          expect(challenges[1].isEnrolled, false);
         },
       );
       verify(() => mockDataProvider.getAllChallenges()).called(1);
+      verify(() => mockDataProvider.getEnrolledChallengesNames()).called(1);
     });
 
     test('should return ServerFailure when ServerException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ServerException('Server error'));
+      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       final result = await repository.getallChallenges();
 
@@ -81,6 +87,7 @@ void main() {
 
     test('should return ConnectionFailure when ConnectionException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ConnectionException());
+      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       final result = await repository.getallChallenges();
 
@@ -93,6 +100,7 @@ void main() {
 
     test('should throw UnknownFailure for other exceptions', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(Exception('Unknown error'));
+      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       expect(() => repository.getallChallenges(), throwsA(isA<UnknownFailure>()));
     });

@@ -33,4 +33,52 @@ class ChallengesRemoteDataProvider {
 
     return data != null ? List<Map<String, dynamic>>.from(data) : null;
   }
+
+  Future<List<String>?> getEnrolledChallengesNames() async {
+    final authHeader = await AuthRemoteDataProvider().authHeader;
+
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getEnrolledChallengesNames),
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final List<dynamic>? data = result.data?['getEnrolledChallenges'];
+
+    if (kDebugMode) {
+      print('Enrolled Challenges data: $data');
+    }
+
+    return data?.map((challenge) => challenge['name'] as String).toList();
+  }
+
+  Future<void> enrollInChallenge(String challengeId) async {
+    final authHeader = await AuthRemoteDataProvider().authHeader;
+
+    final MutationOptions options = MutationOptions(
+      document: gql(GraphQLQueries.enrollInChallenge),
+      variables: {'challengeId': challengeId},
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en mutation: ${result.exception.toString()}');
+    }
+
+    if (kDebugMode) {
+      print('Successfully enrolled in challenge with ID: $challengeId');
+    }
+  }
 }

@@ -269,5 +269,7 @@
     "dates": "Fechas",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de finalización",
-    "company": "Empresa"
+    "company": "Empresa",
+    "enroll": "Inscribirse",
+    "enrolled": "Inscrito"
 }

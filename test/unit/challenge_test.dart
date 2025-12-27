@@ -20,14 +20,16 @@ void main() {
           'points': 100,
           'starting_date': '1738368000000'
         };
+        final enrolledChallengesNames = ['10km Challenge', 'Another Challenge'];
 
-        final challenge = Challenge.fromJson(jsonData);
+        final challenge = Challenge.fromJson(jsonData, enrolledChallengesNames);
 
         expect(challenge.company.name, 'Test Company');
         expect(challenge.description, 'Complete a 10km run');
         expect(challenge.distance, 10.0);
         expect(challenge.name, '10km Challenge');
         expect(challenge.points, 100);
+        expect(challenge.isEnrolled, true);
         expect(challenge.endingDate, DateTime.fromMillisecondsSinceEpoch(1740009600000));
         expect(challenge.startingDate, DateTime.fromMillisecondsSinceEpoch(1738368000000));
       });
@@ -48,11 +50,13 @@ void main() {
           'points': 50,
           'starting_date': '1738368000000',
         };
+        final enrolledChallengesNames = ['Different Challenge'];
 
-        final challenge = Challenge.fromJson(jsonData);
+        final challenge = Challenge.fromJson(jsonData, enrolledChallengesNames);
 
         expect(challenge.company.name, 'Another Company');
         expect(challenge.distance, 5.0);
+        expect(challenge.isEnrolled, false);
       });
     });
   });

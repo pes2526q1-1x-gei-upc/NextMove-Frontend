@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
 
@@ -29,9 +31,13 @@ class ChallengeCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        final bloc = context.read<ChallengesBloc>();
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ChallengeDetailsPage(challenge: challenge),
+            builder: (context) => BlocProvider<ChallengesBloc>.value(
+              value: bloc,
+              child: ChallengeDetailsPage(challenge: challenge),
+            ),
           ),
         );
       },
@@ -52,13 +58,7 @@ class ChallengeCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Photo(challenge: challenge, theme: theme),
-                Text(
-                  challenge.name,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
+                TitleAndJoinButtonRow(challenge: challenge, theme: theme),
                 const SizedBox(height: 12),
                 Text(
                   challenge.description,
@@ -86,6 +86,61 @@ class ChallengeCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class TitleAndJoinButtonRow extends StatelessWidget {
+  const TitleAndJoinButtonRow({
+    super.key,
+    required this.challenge,
+    required this.theme,
+  });
+
+  final Challenge challenge;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
+
+    final bool isEnrolledToAChallenge =
+        (challengesBloc.state as ChallengesLoaded).isEnrolled;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            challenge.name,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+        if (!isEnrolledToAChallenge ||
+            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+          ElevatedButton(
+            onPressed: (challenge.isEnrolled)
+                ? null
+                : () {
+                    challengesBloc.add(EnrollInChallengeEvent(challenge.id));
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: challenge.isEnrolled
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.primary,
+            ),
+            child: Text(
+              challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: challenge.isEnrolled
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onPrimary,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
