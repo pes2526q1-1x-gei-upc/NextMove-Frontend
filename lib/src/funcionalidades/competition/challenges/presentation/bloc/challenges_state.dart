@@ -2,7 +2,7 @@ part of 'challenges_bloc.dart';
 
 sealed class ChallengesState extends Equatable {
   const ChallengesState();
-  
+
   @override
   List<Object> get props => [];
 }
@@ -13,11 +13,12 @@ final class ChallengesLoading extends ChallengesState {}
 
 final class ChallengesLoaded extends ChallengesState {
   final List<Challenge> challenges;
+  final bool isEnrolled;
 
-  const ChallengesLoaded(this.challenges);
+  const ChallengesLoaded(this.challenges, {required this.isEnrolled});
 
   @override
-  List<Object> get props => [challenges];
+  List<Object> get props => [challenges, isEnrolled];
 }
 
 final class ChallengesError extends ChallengesState {

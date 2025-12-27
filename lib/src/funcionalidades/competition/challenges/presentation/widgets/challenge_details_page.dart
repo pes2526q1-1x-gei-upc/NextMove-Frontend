@@ -285,6 +285,9 @@ class TitleAndJoinButtonRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
+    final bool isEnrolledToAChallenge =
+        (challengesBloc.state as ChallengesLoaded).isEnrolled;
     return Row(
       children: [
         Expanded(
@@ -296,28 +299,28 @@ class TitleAndJoinButtonRow extends StatelessWidget {
             ),
           ),
         ),
-        ElevatedButton(
-          onPressed: (challenge.isEnrolled)
-              ? null
-              : () {
-                  context.read<ChallengesBloc>().add(
-                    EnrollInChallengeEvent(challenge.id),
-                  );
-                },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: challenge.isEnrolled
-                ? theme.colorScheme.primaryContainer
-                : theme.colorScheme.primary,
-          ),
-          child: Text(
-            challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: challenge.isEnrolled
-                  ? theme.colorScheme.onPrimaryContainer
-                  : theme.colorScheme.onPrimary,
+        if (!isEnrolledToAChallenge ||
+            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+          ElevatedButton(
+            onPressed: (challenge.isEnrolled)
+                ? null
+                : () {
+                    challengesBloc.add(EnrollInChallengeEvent(challenge.id));
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: challenge.isEnrolled
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.primary,
+            ),
+            child: Text(
+              challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: challenge.isEnrolled
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onPrimary,
+              ),
             ),
           ),
-        ),
       ],
     );
   }

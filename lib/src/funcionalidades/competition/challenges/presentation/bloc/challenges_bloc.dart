@@ -25,7 +25,16 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
       result.fold(
         (failure) =>
             emit(ChallengesError(failure.message ?? 'An error occurred')),
-        (challenges) => emit(ChallengesLoaded(challenges ?? [])),
+        (challenges) {
+          emit(
+            ChallengesLoaded(
+              challenges ?? [],
+              isEnrolled: challenges == null
+                  ? false
+                  : challenges.any((challenge) => challenge.isEnrolled),
+            ),
+          );
+        },
       );
     } catch (e) {
       emit(ChallengesError('Failed to load challenges'));
@@ -51,7 +60,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
         }
         return challenge;
       }).toList();
-      emit(ChallengesLoaded(updatedChallenges));
+      emit(ChallengesLoaded(updatedChallenges, isEnrolled: true));
     }
   }
 }
