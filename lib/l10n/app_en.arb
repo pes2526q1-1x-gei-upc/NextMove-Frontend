@@ -268,5 +268,7 @@
     "dates": "Dates",
     "startDate": "Start date",
     "endDate": "End date",
-    "company": "Company"
+    "company": "Company",
+    "enroll": "Enroll",
+    "enrolled": "Enrolled"
 }

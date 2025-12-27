@@ -73,13 +73,7 @@ class ChallengeDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    challenge.name,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
+                  TitleAndJoinButtonRow(challenge: challenge, theme: theme),
                   const SizedBox(height: 16),
 
                   Text(
@@ -257,6 +251,53 @@ class ChallengeDetailsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class TitleAndJoinButtonRow extends StatelessWidget {
+  const TitleAndJoinButtonRow({
+    super.key,
+    required this.challenge,
+    required this.theme,
+  });
+
+  final Challenge challenge;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            challenge.name,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Action for enroll button
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: challenge.isEnrolled
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.primary,
+          ),
+          child: Text(
+            challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: challenge.isEnrolled
+                  ? theme.colorScheme.onPrimaryContainer
+                  : theme.colorScheme.onPrimary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
