@@ -15,8 +15,10 @@ class ChallengesRepository {
     try {
       final challengesData = await challengesRemoteDataProvider
           .getAllChallenges();
+      final enrolledChallengesNames =
+          await challengesRemoteDataProvider.getEnrolledChallengesNames() ?? [];
       final List<Challenge>? challengeEntries = challengesData
-          ?.map((entry) => Challenge.fromJson(entry))
+          ?.map((entry) => Challenge.fromJson(entry, enrolledChallengesNames))
           .toList();
       return Right(challengeEntries);
     } on ServerException catch (e) {

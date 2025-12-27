@@ -461,4 +461,11 @@ class GraphQLQueries {
       }
     }
   }''';
+
+  static const String getEnrolledChallengesNames = r'''
+  query getEnrolledChallenges {
+    getEnrolledChallenges {
+      name
+    }
+  }''';
 }
