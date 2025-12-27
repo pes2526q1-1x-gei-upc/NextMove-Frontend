@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
 
 class ChallengeDetailsPage extends StatelessWidget {
@@ -29,87 +31,102 @@ class ChallengeDetailsPage extends StatelessWidget {
     );
     final double photoHeight = 300;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(challenge.name), elevation: 0),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (challenge.photo != null)
-              SizedBox(
-                height: photoHeight,
-                width: double.infinity,
-                child: Image.network(
-                  challenge.photo!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: photoHeight,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 64,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    );
-                  },
-                ),
+    return BlocBuilder<ChallengesBloc, ChallengesState>(
+      builder: (context, state) {
+        final updatedChallenge = (state is ChallengesLoaded)
+            ? state.challenges.firstWhere(
+                (c) => c.id == challenge.id,
+                orElse: () => challenge,
               )
-            else
-              Container(
-                height: photoHeight,
-                color: theme.colorScheme.surfaceContainerHighest,
-                child: Center(
-                  child: Icon(
-                    Icons.workspace_premium,
-                    size: 80,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TitleAndJoinButtonRow(challenge: challenge, theme: theme),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    challenge.description,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                      height: 1.5,
+            : challenge;
+        return Scaffold(
+          appBar: AppBar(title: Text(challenge.name), elevation: 0),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (challenge.photo != null)
+                  SizedBox(
+                    height: photoHeight,
+                    width: double.infinity,
+                    child: Image.network(
+                      challenge.photo!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: photoHeight,
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 64,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Container(
+                    height: photoHeight,
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: Center(
+                      child: Icon(
+                        Icons.workspace_premium,
+                        size: 80,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
 
-                  infoRow(
-                    context,
-                    Icons.star,
-                    l10n.points(challenge.points),
-                    Icons.route,
-                    "${challenge.distance.toInt()} km",
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TitleAndJoinButtonRow(
+                        challenge: updatedChallenge,
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 16),
+
+                      Text(
+                        challenge.description,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.8,
+                          ),
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      infoRow(
+                        context,
+                        Icons.star,
+                        l10n.points(challenge.points),
+                        Icons.route,
+                        "${challenge.distance.toInt()} km",
+                      ),
+                      const SizedBox(height: 24),
+
+                      sectionTitle(context, l10n.dates),
+                      const SizedBox(height: 12),
+                      dateRow(context, l10n.startDate, startDate),
+                      const SizedBox(height: 8),
+                      dateRow(context, l10n.endDate, endDate),
+                      const SizedBox(height: 24),
+
+                      sectionTitle(context, l10n.company),
+                      const SizedBox(height: 12),
+                      companySection(context),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-
-                  sectionTitle(context, l10n.dates),
-                  const SizedBox(height: 12),
-                  dateRow(context, l10n.startDate, startDate),
-                  const SizedBox(height: 8),
-                  dateRow(context, l10n.endDate, endDate),
-                  const SizedBox(height: 24),
-
-                  sectionTitle(context, l10n.company),
-                  const SizedBox(height: 12),
-                  companySection(context),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -280,9 +297,13 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            // Action for enroll button
-          },
+          onPressed: (challenge.isEnrolled)
+              ? null
+              : () {
+                  context.read<ChallengesBloc>().add(
+                    EnrollInChallengeEvent(challenge.id),
+                  );
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: challenge.isEnrolled
                 ? theme.colorScheme.primaryContainer

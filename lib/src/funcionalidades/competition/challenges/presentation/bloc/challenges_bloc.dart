@@ -12,6 +12,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
     : challengesRepository = ChallengesRepository(),
       super(ChallengesInitial()) {
     on<LoadChallengeListEvent>(_onLoadChallengesEvent);
+    on<EnrollInChallengeEvent>(_onEnrollInChallengeEvent);
   }
 
   Future<void> _onLoadChallengesEvent(
@@ -22,11 +23,35 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
     try {
       final result = await challengesRepository.getallChallenges();
       result.fold(
-        (failure) => emit(ChallengesError(failure.message ?? 'An error occurred')),
+        (failure) =>
+            emit(ChallengesError(failure.message ?? 'An error occurred')),
         (challenges) => emit(ChallengesLoaded(challenges ?? [])),
       );
     } catch (e) {
       emit(ChallengesError('Failed to load challenges'));
+    }
+  }
+
+  Future<void> _onEnrollInChallengeEvent(
+    EnrollInChallengeEvent event,
+    Emitter<ChallengesState> emit,
+  ) async {
+    if (state is ChallengesLoaded) {
+      final currentState = state as ChallengesLoaded;
+      try {
+        await challengesRepository.enrollInChallenge(event.challengeId);
+      } on Exception catch (e) {
+        emit(ChallengesError('Failed to enroll in challenge: $e'));
+        return;
+      }
+      final updatedChallenges = currentState.challenges.map((challenge) {
+        if (challenge.id == event.challengeId) {
+          final isEnrolled = challenge.isEnrolled;
+          return challenge.copyWith(isEnrolled: !isEnrolled);
+        }
+        return challenge;
+      }).toList();
+      emit(ChallengesLoaded(updatedChallenges));
     }
   }
 }

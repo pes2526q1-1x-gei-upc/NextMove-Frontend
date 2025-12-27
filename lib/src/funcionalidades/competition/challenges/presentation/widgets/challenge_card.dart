@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
 
@@ -29,9 +31,13 @@ class ChallengeCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        final bloc = context.read<ChallengesBloc>();
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ChallengeDetailsPage(challenge: challenge),
+            builder: (context) => BlocProvider<ChallengesBloc>.value(
+              value: bloc,
+              child: ChallengeDetailsPage(challenge: challenge),
+            ),
           ),
         );
       },
@@ -109,9 +115,13 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            // Action for enroll button
-          },
+          onPressed: (challenge.isEnrolled)
+              ? null
+              : () {
+                  context.read<ChallengesBloc>().add(
+                    EnrollInChallengeEvent(challenge.id),
+                  );
+                },
           style: ElevatedButton.styleFrom(
             backgroundColor: challenge.isEnrolled
                 ? theme.colorScheme.primaryContainer

@@ -448,6 +448,7 @@ class GraphQLQueries {
   static const String getAllChallenges = r'''
   query getAllChallenges {
     getAllChallenges {
+      id
       description
       distance
       name
@@ -467,5 +468,10 @@ class GraphQLQueries {
     getEnrolledChallenges {
       name
     }
+  }''';
+
+  static const String enrollInChallenge = r'''
+  mutation enrollInChallenge($challengeId: String!) {
+    enrollChallenge(challenge_id: $challengeId)
   }''';
 }

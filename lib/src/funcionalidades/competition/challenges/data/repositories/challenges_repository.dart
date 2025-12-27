@@ -32,4 +32,20 @@ class ChallengesRepository {
       throw UnknownFailure();
     }
   }
+
+  Future<Either<Failure, void>> enrollInChallenge(String challengeId) async {
+    try {
+      await challengesRemoteDataProvider.enrollInChallenge(challengeId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in enrollInChallenge: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
 }
