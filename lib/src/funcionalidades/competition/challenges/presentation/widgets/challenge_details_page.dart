@@ -291,16 +291,19 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(
-            challenge.name,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Text(
+              challenge.name,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+            ((isEnrolledToAChallenge && challenge.isEnrolled))) ...[
           ElevatedButton(
             onPressed: (challenge.isEnrolled)
                 ? null
@@ -321,6 +324,16 @@ class TitleAndJoinButtonRow extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: 8),
+        ],
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+          ),
+          child: Icon(Icons.calendar_month),
+        ),
       ],
     );
   }

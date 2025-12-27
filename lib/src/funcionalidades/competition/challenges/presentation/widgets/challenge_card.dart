@@ -110,11 +110,14 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(
-            challenge.name,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Text(
+              challenge.name,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
         ),
