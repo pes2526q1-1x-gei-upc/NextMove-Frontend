@@ -271,5 +271,6 @@
     "endDate": "Fecha de finalización",
     "company": "Empresa",
     "enroll": "Inscribirse",
-    "enrolled": "Inscrito"
+    "enrolled": "Inscrito",
+    "errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario."
 }

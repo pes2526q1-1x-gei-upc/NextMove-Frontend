@@ -270,5 +270,6 @@
     "endDate": "End date",
     "company": "Company",
     "enroll": "Enroll",
-    "enrolled": "Enrolled"
+    "enrolled": "Enrolled",
+    "errorAddingToCalendar": "An error occurred while adding the challenge to the calendar."
 }
