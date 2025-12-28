@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -19,25 +21,6 @@ class RecordedRouteStatistics extends StatelessWidget {
     WidgetsToImageController widgetsToImageController =
         WidgetsToImageController();
 
-    // Wrap your widget
-    // WidgetsToImage(
-    //   controller: widgetsToImageController,
-    //   child: Container(
-    //     width: 200,
-    //     height: 100,
-    //     color: Colors.blue,
-    //     child: const Center(
-    //       child: Text(
-    //         'Hello World!',
-    //         style: TextStyle(color: Colors.white, fontSize: 20),
-    //       ),
-    //     ),
-    //   ),
-    // )
-
-    // // Capture the widget
-    // Uint8List? bytes = await widgetsToImageController.capture();
-
     String date = track.startTime != null
         ? '${track.startTime!.day.toString().padLeft(2, '0')}/${track.startTime!.month.toString().padLeft(2, '0')}/${track.startTime!.year}'
         : '';
@@ -51,23 +34,36 @@ class RecordedRouteStatistics extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.routeRecordedOn(date, time),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 16),
-            StatisticsWidget(
-              track: RecordedRouteWrapper(track),
-              elapsedTime: duration,
-              l10n: l10n,
+            WidgetsToImage(
+              controller: widgetsToImageController,
+              child: Column(
+                children: [
+                  Text(
+                    l10n.routeRecordedOn(date, time),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  StatisticsWidget(
+                    track: RecordedRouteWrapper(track),
+                    elapsedTime: duration,
+                    l10n: l10n,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: FloatingActionButton.extended(
-                onPressed: () {},
+                onPressed: () async {
+                  Uint8List? widgetImage = await widgetsToImageController
+                      .capturePng();
+                  print(
+                    'Captured widget image size: ${widgetImage?.lengthInBytes} bytes',
+                  );
+                },
                 icon: const Icon(Icons.share),
                 label: Text(
                   l10n.share,
