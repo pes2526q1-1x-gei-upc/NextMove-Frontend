@@ -35,15 +35,38 @@ class AssessmentRemoteDataProvider {
       final QueryResult result = await client.mutate(options);
 
       if (result.hasException) {
+<<<<<<< Updated upstream
         debugPrint(
           'Excepción devuelta por GraphQL: ${result.exception.toString()}',
         );
         throw ServerException(
           'Error al crear valoración: ${result.exception.toString()}',
         );
+=======
+        final exception = result.exception;
+        debugPrint('Excepción devuelta por GraphQL: ${exception.toString()}');
+        // Extraer el mensaje de error de GraphQL
+        String errorMessage = 'Error al crear valoración';
+        if (exception != null && exception.graphqlErrors.isNotEmpty) {
+          errorMessage = exception.graphqlErrors.first.message;
+          debugPrint('Mensaje de error extraído: $errorMessage');
+        } else if (exception?.linkException != null) {
+          errorMessage = exception!.linkException.toString();
+        } else {
+          errorMessage = exception.toString();
+        }
+        debugPrint('Lanzando ServerException con mensaje: $errorMessage');
+        throw ServerException(errorMessage);
+>>>>>>> Stashed changes
       }
 
+<<<<<<< Updated upstream
       debugPrint("Valoración creada con éxito");
+=======
+    } on ServerException {
+      // Re-lanzar ServerException sin modificar
+      rethrow;
+>>>>>>> Stashed changes
     } catch (e, stackTrace) {
       debugPrint("Error antes de enviar: $e");
       debugPrint("Stack trace: $stackTrace");
@@ -169,17 +192,38 @@ class AssessmentRemoteDataProvider {
       final QueryResult result = await client.mutate(options);
 
       if (result.hasException) {
+<<<<<<< Updated upstream
         debugPrint(
           'Excepción GraphQL al editar: ${result.exception.toString()}',
         );
         throw ServerException(
           'Error al editar valoración: ${result.exception.toString()}',
         );
+=======
+        final exception = result.exception;
+        debugPrint('Excepción GraphQL al editar: ${exception.toString()}');
+        // Extraer el mensaje de error de GraphQL
+        String errorMessage = 'Error al editar valoración';
+        if (exception != null && exception.graphqlErrors.isNotEmpty) {
+          errorMessage = exception.graphqlErrors.first.message;
+        } else if (exception?.linkException != null) {
+          errorMessage = exception!.linkException.toString();
+        } else {
+          errorMessage = exception.toString();
+        }
+        throw ServerException(errorMessage);
+>>>>>>> Stashed changes
       }
 
+<<<<<<< Updated upstream
       debugPrint(
         "Valoración editada con éxito. Nuevo promedio: ${result.data?['editAssessment']}",
       );
+=======
+    } on ServerException {
+      // Re-lanzar ServerException sin modificar
+      rethrow;
+>>>>>>> Stashed changes
     } catch (e) {
       debugPrint("Error crítico al editar: $e");
       throw ServerException('Error interno: $e');

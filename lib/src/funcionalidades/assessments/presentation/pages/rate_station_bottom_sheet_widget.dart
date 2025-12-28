@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
+import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
 
 class RateStationBottomSheet extends StatefulWidget {
@@ -26,6 +27,9 @@ class RateStationBottomSheet extends StatefulWidget {
 class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
   int _selectedScore = 0;
   late TextEditingController _commentController;
+  bool _isSubmitting = false;
+  bool _pendingOperation = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -68,6 +72,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             ? Colors.white
             : Colors.black.withValues(alpha: 0.85);
 
+<<<<<<< Updated upstream
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
@@ -81,6 +86,53 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             offset: const Offset(0, 12),
           ),
         ],
+=======
+    return BlocListener<AssessmentBloc, AssessmentState>(
+      listenWhen: (previous, current) {
+        // Solo escuchar cuando tenemos una operación pendiente y hay un cambio de estado relevante
+        if (!_pendingOperation) return false;
+        
+        // Escuchar cuando cambia de loading a success o failure
+        if (previous.status == AssessmentStatus.loading && 
+            (current.status == AssessmentStatus.success || current.status == AssessmentStatus.failure)) {
+          return true;
+        }
+        
+        return false;
+      },
+      listener: (context, state) {
+        if (!_pendingOperation) return;
+        
+        if (state.status == AssessmentStatus.failure) {
+          setState(() {
+            _isSubmitting = false;
+            _pendingOperation = false;
+            _errorMessage = state.errorMessage;
+          });
+          // No mostrar SnackBar, el error se mostrará en el TextField
+        } else if (state.status == AssessmentStatus.success && _isSubmitting) {
+          // Solo cerrar si acabamos de recibir éxito después de una operación pendiente
+          setState(() {
+            _isSubmitting = false;
+            _pendingOperation = false;
+            _errorMessage = null; // Limpiar error en caso de éxito
+          });
+          Navigator.pop(context); // Cerrar bottom sheet
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isEditing 
+                ? l10n.updatedReview
+                : l10n.thankYouForYourReview),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      },
+      child: Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+>>>>>>> Stashed changes
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomInset),
       child: Column(
@@ -210,6 +262,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           const SizedBox(height: 30),
 
           // --- CAMPO DE COMENTARIOS ---
+<<<<<<< Updated upstream
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
@@ -240,9 +293,52 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 hintText: l10n.writeYourOpinion, 
                 hintStyle: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
+=======
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F7), 
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: TextField(
+                  controller: _commentController,
+                  maxLines: 3,
+                  onChanged: (_) {
+                    // Limpiar el error cuando el usuario empiece a escribir
+                    if (_errorMessage != null) {
+                      setState(() {
+                        _errorMessage = null;
+                      });
+                    }
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: l10n.writeYourOpinion, 
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    errorText: null, // No mostrar error aquí, lo mostraremos abajo
+                    errorBorder: InputBorder.none,
+                    errorStyle: const TextStyle(height: 0),
+                  ),
+>>>>>>> Stashed changes
                 ),
               ),
-            ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
 
           const SizedBox(height: 24),
@@ -265,9 +361,14 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
                 disabledForegroundColor: buttonOnColor.withValues(alpha: 0.6),
               ),
-              onPressed: _selectedScore == 0
+              onPressed: (_selectedScore == 0 || _isSubmitting)
                   ? null
                   : () {
+                      setState(() {
+                        _pendingOperation = true;
+                        _isSubmitting = true;
+                        _errorMessage = null; // Limpiar error anterior al intentar de nuevo
+                      });
                       if (isEditing) {
                         // MODO EDICIÓN: Evento Update
                         context.read<AssessmentBloc>().add(
@@ -287,17 +388,9 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           ),
                         );
                       }
-                      
-                      Navigator.pop(context); // Cerrar
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(isEditing 
-                            ? l10n.updatedReview
-                            : l10n.thankYouForYourReview),
-                        ),
-                      );
+                      // No cerrar aquí, esperar a que el BlocListener maneje el resultado
                     },
+<<<<<<< Updated upstream
               child: Text(
                 isEditing ? l10n.updateReview : l10n.sendReview,
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -307,10 +400,26 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                   letterSpacing: 0.2,
                 ),
               ),
+=======
+              child: _isSubmitting
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      isEditing ? l10n.updateReview: l10n.sendReview, 
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+>>>>>>> Stashed changes
             ),
           ),
         ],
       ),
+    ),
     );
   }
 }
