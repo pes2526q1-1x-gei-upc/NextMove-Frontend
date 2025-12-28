@@ -23,6 +23,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.da
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/favorite_stations_button_widget.dart';
 
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
 
@@ -404,6 +405,9 @@ class _MapPageState extends State<MapPage> {
                       //ProfileAvatarWidget(context: context),
                       // Route history button
                       RouteHistoryButtonWidget(),
+
+                      // Favorite stations button
+                      FavoriteStationsButtonWidget(),
                    
 
                     // Columna de controles del mapa (botones combinados)
