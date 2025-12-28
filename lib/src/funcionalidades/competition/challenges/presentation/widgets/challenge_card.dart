@@ -4,7 +4,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
-import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
+import 'package:nextmove_app/src/shared/utils.dart';
 
 class ChallengeCard extends StatelessWidget {
   const ChallengeCard({super.key, required this.challenge});

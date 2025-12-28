@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
+import 'package:nextmove_app/src/shared/utils.dart';
 
-class BlockedUserPage extends StatelessWidget {
+class BannedUserPage extends StatelessWidget {
   final Map<String, dynamic>? banInfo;
 
-  const BlockedUserPage({super.key, this.banInfo});
+  const BannedUserPage({super.key, this.banInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,6 @@ class BlockedUserPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Icono de bloqueo
                 Container(
                   width: 120,
                   height: 120,
@@ -40,7 +40,6 @@ class BlockedUserPage extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
-                // Título
                 Text(
                   l10n.accountSuspended,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -52,7 +51,6 @@ class BlockedUserPage extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // Mensaje explicativo
                 Text(
                   l10n.accountSuspendedMessage,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -64,7 +62,6 @@ class BlockedUserPage extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Información adicional
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -83,21 +80,18 @@ class BlockedUserPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                        _buildInfoRow(
-                        context,
-                        Icons.access_time_rounded,
-                        l10n.duration,
-                        banInfo != null && banInfo!['duration'] != null
-                          ? _formatDurationInSeconds(banInfo!['duration'], l10n)
-                          : "N/A",
-                        ),
-                      const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
-                        Icons.abc,
-                        l10n.description,
+                        Icons.access_time_rounded,
+                        l10n.endDate,
                         banInfo != null
-                            ? (banInfo!['description'] as String?) ?? "N/A"
+                            ? ((banInfo!['isPermanent'] as bool) == true
+                                  ? l10n.permanent
+                                  : formatDate(
+                                      DateTime.parse(
+                                        banInfo!['bannedUntil'] as String,
+                                      ).toLocal(),
+                                    ))
                             : "N/A",
                       ),
                       const SizedBox(height: 16),
@@ -112,59 +106,21 @@ class BlockedUserPage extends StatelessWidget {
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
-                        Icons.support_agent_rounded,
-                        l10n.needHelp,
-                        l10n.contactSupport,
+                        Icons.abc,
+                        l10n.description,
+                        banInfo != null
+                            ? (banInfo!['description'] as String?) ?? "N/A"
+                            : "N/A",
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
                         Icons.email_rounded,
-                        l10n.emailAddress,
+                        l10n.contactSupport,
                         'support@nextmove.com',
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 40),
-
-                // Botón de contacto
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      // Aquí iría la lógica para contactar soporte
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Funcionalidad de contacto próximamente',
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.contact_support_rounded),
-                    label: const Text('Contactar soporte'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Nota adicional
-                Text(
-                  l10n.reviewCommunityGuidelines,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                  ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -221,23 +177,4 @@ class BlockedUserPage extends StatelessWidget {
       ],
     );
   }
-}
-
-String _formatDurationInSeconds(String i, AppLocalizations l10n) {
-  final int duration = int.tryParse(i) ?? 0;
-
-  if (duration <= 0) {
-    return l10n.permanent;
-  }
-
-  final days = duration ~/ 86400;
-  final hours = (duration % 86400) ~/ 3600;
-  final minutes = (duration % 3600) ~/ 60;
-
-  final parts = <String>[];
-  if (days > 0) parts.add('$days ${l10n.days}');
-  if (hours > 0) parts.add('$hours ${l10n.hours}');
-  if (minutes > 0) parts.add('$minutes ${l10n.minutes}');
-
-  return parts.join(' ');
 }
