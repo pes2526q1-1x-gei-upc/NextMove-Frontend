@@ -210,6 +210,12 @@ class UserRemoteDataProvider {
       );
     }
 
+    final statsData = await _fetchStatistics(exactMatch['email']);
+
+    if (statsData != null) {
+      exactMatch['statistics'] = statsData;
+    }
+
     return UserEntity.fromRawData(exactMatch);
   }
 
