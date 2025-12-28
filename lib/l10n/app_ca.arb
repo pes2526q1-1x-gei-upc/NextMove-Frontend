@@ -256,12 +256,33 @@
     "challenges": "Reptes",
     "competition": "Competició",
     "noChallengesAvailable": "No hi ha reptes disponibles.",
-    "points": "{count, plural, =1{{count}   punt} other{{count} punts}}",
+    "points": "{count, plural, =1{{count} punt} other{{count} punts}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
     "dates": "Dates",
     "startDate": "Data d'inici",
     "endDate": "Data de finalització",
     "company": "Empresa",
     "enroll": "Inscriure's",
     "enrolled": "Inscrit",
-    "share": "Compartir"
+    "share": "Compartir",
+    "routeRecordedOn": "Ruta enregistrada el dia {date} a les {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    }
 }

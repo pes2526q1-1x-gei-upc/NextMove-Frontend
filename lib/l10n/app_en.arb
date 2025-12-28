@@ -265,11 +265,32 @@
     "competition": "Competition",
     "noChallengesAvailable": "No challenges available.",
     "points": "{count, plural, =1{{count} point} other{{count} points}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
     "dates": "Dates",
     "startDate": "Start date",
     "endDate": "End date",
     "company": "Company",
     "enroll": "Enroll",
     "enrolled": "Enrolled",
-    "share": "Share"
+    "share": "Share",
+    "routeRecordedOn": "Route recorded on {date} at {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    }
 }
