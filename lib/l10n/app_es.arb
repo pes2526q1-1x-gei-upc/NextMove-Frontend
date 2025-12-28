@@ -266,11 +266,34 @@
     "competition": "Competición",
     "noChallengesAvailable": "No hay retos disponibles.",
     "points": "{count, plural, =1{{count} punto} other{{count} puntos}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
     "dates": "Fechas",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de finalización",
     "company": "Empresa",
     "enroll": "Inscribirse",
     "enrolled": "Inscrito",
-    "errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario."
+    "share": "Compartir",
+    "routeRecordedOn": "Estadísticas de la ruta grabada el día {date} a las {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    },
+    "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad."
+    ,"errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario."
 }
