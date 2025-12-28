@@ -15,9 +15,10 @@ class GraphQLQueries {
       createdAt
       isBanned
       banInfo {
-        reason
+        bannedUntil
         description
-        duration
+        reason
+        isPermanent
       }
     }
   }
