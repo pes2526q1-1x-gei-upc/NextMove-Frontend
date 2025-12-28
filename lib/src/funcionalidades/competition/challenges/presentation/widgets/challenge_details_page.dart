@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
+import 'package:eventide/eventide.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
+
 
 class ChallengeDetailsPage extends StatelessWidget {
   const ChallengeDetailsPage({super.key, required this.challenge});
@@ -291,16 +293,19 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(
-            challenge.name,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Text(
+              challenge.name,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+            ((isEnrolledToAChallenge && challenge.isEnrolled))) ...[
           ElevatedButton(
             onPressed: (challenge.isEnrolled)
                 ? null
@@ -321,7 +326,47 @@ class TitleAndJoinButtonRow extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: 8),
+        ],
+        ElevatedButton(
+          onPressed: () async {
+            await addChallengeToCalendar(context, challenge);
+          },
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+          ),
+          child: Icon(Icons.calendar_month),
+        ),
       ],
     );
+  }
+
+  Future<void> addChallengeToCalendar(
+    BuildContext context,
+    Challenge challenge,
+  ) async {
+    AppLocalizations l10n = AppLocalizations.of(context)!;
+    try {
+      await Eventide().createEventThroughNativePlatform(
+        title: challenge.name,
+        startDate: challenge.startingDate,
+        endDate: challenge.endingDate,
+        isAllDay: true,
+        description: challenge.description,
+        url: challenge.company.url,
+      );
+    } catch (e) {
+      if (e is ETPresentationException || e is ETGenericException) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${l10n.errorAddingToCalendar}: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }
