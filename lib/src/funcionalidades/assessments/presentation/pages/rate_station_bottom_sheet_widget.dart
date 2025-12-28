@@ -65,28 +65,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
     final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isEditing = widget.existingAssessment != null;
-    final theme = Theme.of(context);
-    final buttonOnColor =
-        ThemeData.estimateBrightnessForColor(widget.themeColor) ==
-                Brightness.dark
-            ? Colors.white
-            : Colors.black.withValues(alpha: 0.85);
 
-<<<<<<< Updated upstream
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 
-              theme.brightness == Brightness.dark ? 0.5 : 0.15,
-            ),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-=======
     return BlocListener<AssessmentBloc, AssessmentState>(
       listenWhen: (previous, current) {
         // Solo escuchar cuando tenemos una operación pendiente y hay un cambio de estado relevante
@@ -132,7 +111,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
->>>>>>> Stashed changes
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomInset),
       child: Column(
@@ -144,7 +122,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.dividerColor,
+                color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -159,8 +137,8 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               if (isEditing) const SizedBox(width: 48), 
               
               Text(
-                isEditing ? l10n.editReview : l10n.reviewStation,
-                style: theme.textTheme.titleLarge?.copyWith(
+                isEditing ? l10n.editReview : l10n.reviewStation, 
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -210,14 +188,11 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           ),
 
           const SizedBox(height: 8),
-              Text(
-                widget.stationName,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
+          Text(
+            widget.stationName,
+            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
 
           const SizedBox(height: 30),
 
@@ -240,7 +215,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         : Icons.star_outline_rounded,
                     color: starIndex <= _selectedScore
                         ? Colors.amber
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                        : Colors.grey[300],
                     size: 40,
                   ),
                 ),
@@ -250,10 +225,8 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           const SizedBox(height: 10),
           Text(
             _getRatingLabel(_selectedScore, l10n),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: _selectedScore > 0
-                  ? Colors.amber[700]
-                  : Colors.transparent,
+            style: TextStyle(
+              color: _selectedScore > 0 ? Colors.amber[800] : Colors.transparent,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -262,38 +235,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           const SizedBox(height: 30),
 
           // --- CAMPO DE COMENTARIOS ---
-<<<<<<< Updated upstream
-          Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
-                theme.brightness == Brightness.dark ? 0.35 : 1,
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: theme.dividerColor.withValues(alpha: 
-                  theme.brightness == Brightness.dark ? 0.4 : 0.6,
-                ),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 
-                    theme.brightness == Brightness.dark ? 0.45 : 0.08,
-                  ),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: TextField(
-              controller: _commentController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: l10n.writeYourOpinion, 
-                hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-=======
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -322,7 +263,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                     errorBorder: InputBorder.none,
                     errorStyle: const TextStyle(height: 0),
                   ),
->>>>>>> Stashed changes
                 ),
               ),
               if (_errorMessage != null) ...[
@@ -348,18 +288,14 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              // Calculamos el color de texto según el contraste del fondo
               style: ElevatedButton.styleFrom(
                 backgroundColor: widget.themeColor,
-                foregroundColor: buttonOnColor,
-                elevation: 2,
+                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                shadowColor: widget.themeColor.withValues(alpha: 0.4),
-                overlayColor: buttonOnColor.withValues(alpha: 0.08),
-                disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
-                disabledForegroundColor: buttonOnColor.withValues(alpha: 0.6),
+                disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
               ),
               onPressed: (_selectedScore == 0 || _isSubmitting)
                   ? null
@@ -390,17 +326,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                       }
                       // No cerrar aquí, esperar a que el BlocListener maneje el resultado
                     },
-<<<<<<< Updated upstream
-              child: Text(
-                isEditing ? l10n.updateReview : l10n.sendReview,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: buttonOnColor,
-                  letterSpacing: 0.2,
-                ),
-              ),
-=======
               child: _isSubmitting
                   ? SizedBox(
                       height: 20,
@@ -414,7 +339,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                       isEditing ? l10n.updateReview: l10n.sendReview, 
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
->>>>>>> Stashed changes
             ),
           ),
         ],
