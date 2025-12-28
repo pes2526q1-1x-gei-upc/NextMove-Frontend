@@ -293,6 +293,6 @@
             }
         }
     },
-    "shareRouteStatisticsMessage": "I have recorded a route by bicycle using NextMove! Check out my statistics and download the app to compete with me and the rest of the community."
+    "shareRouteStatisticsMessage": "I have recorded a route by bicycle using NextMove! Check out my statistics and download the app to compete with me and the rest of the community.",
     "errorAddingToCalendar": "An error occurred while adding the challenge to the calendar."
 }
