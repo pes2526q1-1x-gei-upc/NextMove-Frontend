@@ -24,7 +24,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_user_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/banned_user_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 
@@ -273,7 +273,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => BlockedUserPage(banInfo: _banInfo),
+              builder: (context) => BannedUserPage(banInfo: _banInfo),
             ),
           );
         });
