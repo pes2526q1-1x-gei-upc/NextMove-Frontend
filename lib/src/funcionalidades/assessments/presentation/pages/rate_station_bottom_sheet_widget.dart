@@ -88,15 +88,14 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             _pendingOperation = false;
             _errorMessage = state.errorMessage;
           });
-          // No mostrar SnackBar, el error se mostrará en el TextField
         } else if (state.status == AssessmentStatus.success && _isSubmitting) {
           // Solo cerrar si acabamos de recibir éxito después de una operación pendiente
           setState(() {
             _isSubmitting = false;
             _pendingOperation = false;
-            _errorMessage = null; // Limpiar error en caso de éxito
+            _errorMessage = null;
           });
-          Navigator.pop(context); // Cerrar bottom sheet
+          Navigator.pop(context); 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isEditing 
@@ -133,9 +132,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Espaciador invisible para centrar el título si hay icono de borrar
               if (isEditing) const SizedBox(width: 48), 
-              
               Text(
                 isEditing ? l10n.editReview : l10n.reviewStation, 
                 style: const TextStyle(
@@ -162,14 +159,12 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(ctx); // Cerrar alerta
-                              
-                              // Evento BLoC: Eliminar
+                              Navigator.pop(ctx); 
                               context.read<AssessmentBloc>().add(
                                 DeleteAssessmentEvent(stationId: widget.stationId)
                               );
                               
-                              Navigator.pop(context); // Cerrar BottomSheet
+                              Navigator.pop(context); 
                               
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(l10n.deletedReview)),
@@ -248,7 +243,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                   controller: _commentController,
                   maxLines: 3,
                   onChanged: (_) {
-                    // Limpiar el error cuando el usuario empiece a escribir
                     if (_errorMessage != null) {
                       setState(() {
                         _errorMessage = null;
@@ -259,7 +253,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                     border: InputBorder.none,
                     hintText: l10n.writeYourOpinion, 
                     hintStyle: const TextStyle(color: Colors.grey),
-                    errorText: null, // No mostrar error aquí, lo mostraremos abajo
+                    errorText: null,
                     errorBorder: InputBorder.none,
                     errorStyle: const TextStyle(height: 0),
                   ),
@@ -303,10 +297,9 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                       setState(() {
                         _pendingOperation = true;
                         _isSubmitting = true;
-                        _errorMessage = null; // Limpiar error anterior al intentar de nuevo
+                        _errorMessage = null; 
                       });
                       if (isEditing) {
-                        // MODO EDICIÓN: Evento Update
                         context.read<AssessmentBloc>().add(
                           UpdateAssessmentEvent(
                             stationId: widget.stationId,
@@ -315,7 +308,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           ),
                         );
                       } else {
-                        // MODO CREACIÓN: Evento Create
                         context.read<AssessmentBloc>().add(
                           CreateAssessmentEvent(
                             stationId: widget.stationId,
@@ -324,7 +316,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           ),
                         );
                       }
-                      // No cerrar aquí, esperar a que el BlocListener maneje el resultado
                     },
               child: _isSubmitting
                   ? SizedBox(

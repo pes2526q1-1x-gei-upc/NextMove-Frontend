@@ -83,6 +83,10 @@ class AssessmentRepository {
     try {
       await remoteDataProvider.updateAssessment(stationId, score, comment);
       return const Right(null);
+    } on SocketException {
+      return const Left(ConnectionFailure(message: "No hay conexión a internet"));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }
