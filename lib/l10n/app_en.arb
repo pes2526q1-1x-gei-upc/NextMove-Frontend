@@ -292,5 +292,6 @@
                 "example": "14:30"
             }
         }
-    }
+    },
+    "shareRouteStatisticsMessage": "I have recorded a route by bicycle using NextMove! Check out my statistics and download the app to compete with me and the rest of the community."
 }

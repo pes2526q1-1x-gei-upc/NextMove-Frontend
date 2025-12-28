@@ -6,6 +6,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/statistics_widget.dart';
 import 'package:nextmove_app/src/shared/domain/track_statistics.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
+import 'package:share_plus/share_plus.dart';
 
 class RecordedRouteStatistics extends StatelessWidget {
   final RecordedRoute track;
@@ -58,11 +59,37 @@ class RecordedRouteStatistics extends StatelessWidget {
               width: double.infinity,
               child: FloatingActionButton.extended(
                 onPressed: () async {
-                  Uint8List? widgetImage = await widgetsToImageController
-                      .capturePng();
-                  print(
-                    'Captured widget image size: ${widgetImage?.lengthInBytes} bytes',
-                  );
+                  try {
+                    Uint8List? widgetImageBytes = await widgetsToImageController
+                        .capturePng(
+                          pixelRatio: 4.0,
+                        );
+                    SharePlus.instance.share(
+                      ShareParams(
+                        title: l10n.routeStatistics,
+                        text: l10n.shareRouteStatisticsMessage,
+                        files: widgetImageBytes != null
+                            ? [
+                                XFile.fromData(
+                                  widgetImageBytes,
+                                  mimeType: 'image/png',
+                                  name:
+                                      'route_${track.endTime!.toIso8601String()}_statistics.png',
+                                ),
+                              ]
+                            : null,
+                      ),
+                    );
+                  } on Exception catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${l10n.errorOccurred}: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
                 icon: const Icon(Icons.share),
                 label: Text(
