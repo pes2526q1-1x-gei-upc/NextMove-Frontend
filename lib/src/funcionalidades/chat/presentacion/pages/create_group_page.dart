@@ -167,18 +167,47 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         children: [
           // SECCIÓN SUPERIOR: Foto + Nombre + Desc
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : null,
-                    child: _selectedImage == null
-                        ? Icon(Icons.add_a_photo, color: theme.colorScheme.onPrimaryContainer)
-                        : null,
+                Center(
+                  child: GestureDetector(
+                    onTap: _isCreating ? null : _pickImage,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundColor: theme.colorScheme.primaryContainer,
+                          backgroundImage: _selectedImage != null
+                              ? FileImage(_selectedImage!)
+                              : null,
+                          child: _selectedImage == null
+                              ? Icon(Icons.group, size: 60, color: theme.colorScheme.onPrimaryContainer)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 4,
+                          child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: theme.colorScheme.primary,
+                            child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                          ),
+                        ),
+                        if (_isCreating && _selectedImage != null)
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black26,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

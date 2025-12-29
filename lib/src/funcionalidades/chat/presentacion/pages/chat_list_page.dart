@@ -36,10 +36,13 @@ class _ChatListPageState extends State<ChatListPage> {
   int _refreshKey = 0;
   Future<List<dynamic>>? _friendsFuture;
   Future<List<dynamic>>? _friendsForFilterFuture;
+  Timer? _autoRefreshTimer;
+  Set<String> _lastKnownGroupIds = {}; // IDs de grupos conocidos para detectar cambios
 
   @override
   void dispose() {
     _searchController.dispose();
+    _autoRefreshTimer?.cancel();
     super.dispose();
   }
 
@@ -49,6 +52,50 @@ class _ChatListPageState extends State<ChatListPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeChat();
       _loadFriendsForFilter();
+      _startAutoRefresh();
+    });
+  }
+
+  void _startAutoRefresh() {
+    // Verificar si hay grupos nuevos cada 3 segundos y solo refrescar si hay cambios
+    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!mounted) return;
+      
+      try {
+        final client = GraphQLProvider.of(context).value;
+        final result = await client.query(
+          QueryOptions(
+            document: gql(myChatsQuery),
+            fetchPolicy: FetchPolicy.networkOnly,
+          ),
+        );
+        
+        if (result.hasException || !mounted) return;
+        
+        final chats = result.data?['myChats'] as List<dynamic>? ?? [];
+        final groupChats = chats.where((chat) {
+          final chatType = chat['type'] as String?;
+          return chatType == 'group';
+        }).toList();
+        
+        // Obtener IDs de grupos actuales
+        final currentGroupIds = groupChats
+            .map((chat) => chat['id'] as String? ?? '')
+            .where((id) => id.isNotEmpty)
+            .toSet();
+        
+        // Comparar con los IDs conocidos
+        if (currentGroupIds.length != _lastKnownGroupIds.length ||
+            !currentGroupIds.containsAll(_lastKnownGroupIds) ||
+            !_lastKnownGroupIds.containsAll(currentGroupIds)) {
+          // Hay cambios, refrescar la lista
+          debugPrint('[ChatListPage] 🔄 Detectados cambios en grupos, refrescando lista...');
+          _lastKnownGroupIds = currentGroupIds;
+          refreshChatList();
+        }
+      } catch (e) {
+        debugPrint('[ChatListPage] Error verificando cambios en grupos: $e');
+      }
     });
   }
 
@@ -184,7 +231,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<void> _navigateToRoom(String roomId, String roomName, {String? otherUserPhoto, bool shouldRefreshOnReturn = false, bool isGroup = false}) async {
     final chatBloc = context.read<ChatBloc>();
 
-    final result = await Navigator.of(context).push<bool>(
+    final result = await Navigator.of(context).push<Map<String, dynamic>?>(
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: chatBloc,
@@ -198,8 +245,22 @@ class _ChatListPageState extends State<ChatListPage> {
       ),
     );
 
-    if ((result == true || shouldRefreshOnReturn) && mounted) {
-      refreshChatList();
+    if (mounted) {
+      // Si se eliminó el grupo, se salió del grupo, o hay que refrescar, actualizar la lista
+      bool shouldRefresh = shouldRefreshOnReturn;
+      
+      if (result is Map<String, dynamic>) {
+        final resultMap = result;
+        shouldRefresh = shouldRefresh || 
+                       resultMap['groupDeleted'] == true || 
+                       resultMap['leftGroup'] == true;
+      } else if (result == true) {
+        shouldRefresh = true;
+      }
+      
+      if (shouldRefresh) {
+        refreshChatList();
+      }
     }
   }
 
@@ -207,7 +268,18 @@ class _ChatListPageState extends State<ChatListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
+    // Escuchar eventos de usuario añadido a grupo, grupo eliminado, y usuario expulsado para refrescar lista
+    return BlocListener<ChatBloc, ChatState>(
+      listener: (context, state) {
+        if (state is GroupUserAddedState || 
+            state is GroupDeletedState || 
+            state is UserKickedFromGroupState) {
+          // Refrescar lista de chats cuando se añade un usuario a un grupo, se elimina un grupo, o se expulsa un usuario
+          debugPrint('[ChatListPage] 🔄 Refrescando lista de chats debido a: ${state.runtimeType}');
+          refreshChatList();
+        }
+      },
+      child: Scaffold(
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -260,6 +332,7 @@ class _ChatListPageState extends State<ChatListPage> {
               label: const Text('Crear Grupo'),
             )
           : null,
+      ),
     );
   }
 
@@ -312,6 +385,24 @@ class _ChatListPageState extends State<ChatListPage> {
             fetchPolicy: FetchPolicy.networkOnly,
           ),
           builder: (chatsResult, {fetchMore, refetch}) {
+            // Actualizar los IDs conocidos cuando se carga la lista
+            if (!chatsResult.isLoading && !chatsResult.hasException && chatsResult.data != null) {
+              final chats = chatsResult.data?['myChats'] as List<dynamic>? ?? [];
+              final groupChats = chats.where((chat) {
+                final chatType = chat['type'] as String?;
+                return chatType == 'group';
+              }).toList();
+              
+              final currentGroupIds = groupChats
+                  .map((chat) => chat['id'] as String? ?? '')
+                  .where((id) => id.isNotEmpty)
+                  .toSet();
+              
+              if (currentGroupIds.isNotEmpty) {
+                _lastKnownGroupIds = currentGroupIds;
+              }
+            }
+            
             return FutureBuilder<List<dynamic>>(
               future: _friendsForFilterFuture,
               builder: (context, friendsSnapshot) {

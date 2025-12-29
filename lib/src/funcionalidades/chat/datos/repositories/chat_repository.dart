@@ -41,6 +41,22 @@ class ChatRepository {
   Stream<Map<String, dynamic>> get userLeftStream =>
       _socketDataSource.userLeftStream;
 
+  /// Stream de usuario expulsado de grupo
+  Stream<Map<String, dynamic>> get userKickedStream =>
+      _socketDataSource.userKickedStream;
+
+  /// Stream de usuario añadido a grupo
+  Stream<Map<String, dynamic>> get groupUserAddedStream =>
+      _socketDataSource.groupUserAddedStream;
+
+  /// Stream de participante expulsado de grupo
+  Stream<Map<String, dynamic>> get groupParticipantKickedStream =>
+      _socketDataSource.groupParticipantKickedStream;
+
+  /// Stream de grupo eliminado
+  Stream<Map<String, dynamic>> get groupDeletedStream =>
+      _socketDataSource.groupDeletedStream;
+
   /// Unirse a una sala de chat
   Future<void> joinRoom(String roomId) async {
     return await _socketDataSource.joinRoom(roomId);

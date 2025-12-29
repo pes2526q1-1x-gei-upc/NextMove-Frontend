@@ -11,6 +11,7 @@ import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_en
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/profile_form_widget.dart';
 
 class AddParticipantsPage extends StatefulWidget {
   final String chatId;
@@ -220,16 +221,16 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
           children: [
             // Barra de búsqueda
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(24.0),
               child: Container(
                 decoration: BoxDecoration(
                   color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: theme.brightness == Brightness.dark
                       ? null
                       : [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.03),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -237,19 +238,22 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: _onSearchChanged,
+                  onChanged: (value) {
+                    setState(() {});
+                    _onSearchChanged(value);
+                  },
                   decoration: InputDecoration(
                     hintText: l10n.searchByNickname,
-                    hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                    hintStyle: TextStyle(color: theme.colorScheme.outline),
+                    prefixIcon: Icon(Icons.search, color: theme.colorScheme.outline),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 14,
+                      vertical: 16,
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.close),
+                            icon: Icon(Icons.close, color: theme.colorScheme.outline),
                             onPressed: () {
                               _searchController.clear();
                               _debounce?.cancel();
@@ -266,8 +270,8 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
             // Chips de usuarios seleccionados
             if (_selectedUsers.isNotEmpty)
               Container(
-                height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 70,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _selectedUsers.length,
@@ -277,15 +281,28 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                       padding: const EdgeInsets.only(right: 8),
                       child: Chip(
                         avatar: CircleAvatar(
-                          radius: 12,
+                          radius: 14,
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
                           backgroundImage: user.photo.isNotEmpty
                               ? NetworkImage(user.photo)
                               : null,
                           child: user.photo.isEmpty
-                              ? const Icon(Icons.person, size: 16)
+                              ? Icon(Icons.person, size: 16, color: theme.colorScheme.onSurface)
                               : null,
                         ),
-                        label: Text(user.apodo),
+                        label: Text(
+                          user.apodo,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        deleteIcon: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
                         onDeleted: () => _toggleUserSelection(user),
                       ),
                     );
@@ -335,8 +352,8 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                             state.isSearching
                                 ? Icons.person_off_outlined
                                 : Icons.people_outline,
-                            size: 60,
-                            color: Colors.grey[300],
+                            size: 64,
+                            color: theme.colorScheme.outline.withOpacity(0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -344,9 +361,8 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                 ? l10n.noUsersFound
                                 : 'No hay usuarios disponibles para añadir',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 16,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.outline,
                             ),
                           ),
                         ],
@@ -356,34 +372,74 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
 
                   return ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     itemCount: filteredUsers.length,
                     itemBuilder: (context, index) {
                       final user = filteredUsers[index];
                       final isSelected = _selectedUserEmails.contains(user.email);
 
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            radius: 24,
-                            backgroundImage: user.photo.isNotEmpty
-                                ? NetworkImage(user.photo)
-                                : null,
-                            child: user.photo.isEmpty
-                                ? const Icon(Icons.person)
-                                : null,
-                          ),
-                          title: Text(
-                            user.apodo,
-                            style: const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          subtitle: Text(user.nombreCompleto),
-                          trailing: Checkbox(
-                            value: isSelected,
-                            onChanged: (value) => _toggleUserSelection(user),
-                          ),
-                          onTap: () => _toggleUserSelection(user),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: ProfileStyledCard(
+                          children: [
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => _toggleUserSelection(user),
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 28,
+                                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                        backgroundImage: user.photo.isNotEmpty
+                                            ? NetworkImage(user.photo)
+                                            : null,
+                                        child: user.photo.isEmpty
+                                            ? Icon(
+                                                Icons.person,
+                                                size: 28,
+                                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                              )
+                                            : null,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              user.apodo,
+                                              style: theme.textTheme.bodyLarge?.copyWith(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            if (user.nombreCompleto.isNotEmpty) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                user.nombreCompleto,
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  color: theme.colorScheme.outline,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                      Checkbox(
+                                        value: isSelected,
+                                        onChanged: (value) => _toggleUserSelection(user),
+                                        activeColor: theme.colorScheme.primary,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },

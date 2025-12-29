@@ -252,3 +252,54 @@ class MessageEdited extends ChatEvent {
   @override
   List<Object?> get props => [message];
 }
+
+/// Usuario expulsado de grupo (evento recibido desde Socket.IO)
+class UserKickedFromGroup extends ChatEvent {
+  final String chatId;
+  final String chatName;
+
+  const UserKickedFromGroup({
+    required this.chatId,
+    required this.chatName,
+  });
+
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Usuario añadido a grupo (evento recibido desde Socket.IO)
+class GroupUserAdded extends ChatEvent {
+  final String chatId;
+  final String chatName;
+
+  const GroupUserAdded({
+    required this.chatId,
+    required this.chatName,
+  });
+
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Participante expulsado de grupo (evento recibido desde Socket.IO)
+class GroupParticipantKicked extends ChatEvent {
+  final String chatId;
+  final String chatName;
+
+  const GroupParticipantKicked({
+    required this.chatId,
+    required this.chatName,
+  });
+
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Grupo eliminado
+class GroupDeleted extends ChatEvent {
+  final String chatId;
+  final String chatName;
+  const GroupDeleted({required this.chatId, required this.chatName});
+  @override
+  List<Object?> get props => [chatId, chatName];
+}

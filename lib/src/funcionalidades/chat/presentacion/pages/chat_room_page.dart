@@ -54,6 +54,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   late ChatBloc _chatBloc;
   String? _currentRoomName;
   String? _currentGroupPhoto;
+  bool _isNavigatingAway = false; // Flag para evitar múltiples navegaciones
 
   @override
   void initState() {
@@ -121,7 +122,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _chatBloc.add(LeaveChatRoom(widget.roomId));
+    // Solo intentar salir de la sala si no estamos navegando debido a una expulsión o eliminación
+    // y si el widget aún está montado
+    if (!_isNavigatingAway) {
+      try {
+        // Verificar si el BLoC aún está activo antes de agregar eventos
+        if (!_chatBloc.isClosed) {
+          _chatBloc.add(LeaveChatRoom(widget.roomId));
+        }
+      } catch (e) {
+        // Ignorar errores si el BLoC ya está cerrado
+        debugPrint('[ChatRoomPage] Error al salir de la sala en dispose: $e');
+      }
+    }
     _scrollController.dispose();
     _messageController.dispose();
     super.dispose();
@@ -261,9 +274,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       ),
     );
     
-    if (result == true && mounted) {
-      _chatBloc.add(LeaveChatRoom(widget.roomId));
-      Navigator.of(context).pop(true);
+    if (result != null && mounted) {
+      final bool shouldPop = result == true || 
+          (result is Map<String, dynamic> && 
+           ((result as Map<String, dynamic>)['leftGroup'] == true || 
+            (result as Map<String, dynamic>)['groupDeleted'] == true));
+      if (shouldPop) {
+        _chatBloc.add(LeaveChatRoom(widget.roomId));
+        final Map<String, dynamic> popResult = {
+          'leftGroup': result is Map<String, dynamic> && 
+                       (result as Map<String, dynamic>)['leftGroup'] == true,
+          'groupDeleted': result is Map<String, dynamic> && 
+                          (result as Map<String, dynamic>)['groupDeleted'] == true,
+        };
+        Navigator.of(context).pop(popResult);
+      }
     }
   }
 
@@ -293,17 +318,30 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 if (widget.isGroup) {
                   final result = await Navigator.of(context).push<Map<String, dynamic>?>(
                     MaterialPageRoute(
-                      builder: (context) => ChatRoomDetailsPage(
-                        chatId: widget.roomId,
-                        chatName: _currentRoomName ?? widget.roomName,
-                        chatDescription: null,
+                      builder: (context) => BlocProvider.value(
+                        value: _chatBloc,
+                        child: ChatRoomDetailsPage(
+                          chatId: widget.roomId,
+                          chatName: _currentRoomName ?? widget.roomName,
+                          chatDescription: null,
+                        ),
                       ),
                     ),
                   );
                   
-                  if (result != null && mounted) {
-                    if (result['leftGroup'] == true) {
-                      Navigator.of(context).pop(true);
+                  if (result is Map<String, dynamic> && mounted) {
+                    final resultMap = result;
+                    if (resultMap['leftGroup'] == true || resultMap['groupDeleted'] == true) {
+                      // Cerrar inmediatamente y volver a la lista de chats
+                      // Usar WidgetsBinding para asegurar que se ejecute después del frame actual
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          Navigator.of(context).pop({
+                            'leftGroup': resultMap['leftGroup'] == true,
+                            'groupDeleted': resultMap['groupDeleted'] == true,
+                          });
+                        }
+                      });
                       return;
                     }
                     
@@ -377,6 +415,36 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
           if (state is ChatRoomActive) {
             Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
           }
+          // Si el usuario fue expulsado del grupo o el grupo fue eliminado, cerrar la pantalla
+          if ((state is ChatDisconnected || state is GroupDeletedState) && !_isNavigatingAway) {
+            _isNavigatingAway = true;
+            String message;
+            bool isGroupDeleted = state is GroupDeletedState;
+            if (isGroupDeleted) {
+              message = 'El grupo ha sido eliminado';
+              debugPrint('[ChatRoomPage] 🗑️ Grupo eliminado, cerrando pantalla...');
+            } else {
+              message = 'Has sido expulsado del grupo';
+              debugPrint('[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...');
+            }
+            // Mostrar mensaje y navegar inmediatamente
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: theme.colorScheme.error,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+            // Navegar inmediatamente usando Future.microtask para asegurar que se ejecute
+            Future.microtask(() {
+              if (mounted && _isNavigatingAway) {
+                debugPrint('[ChatRoomPage] ✅ Navegando de vuelta a la lista de chats...');
+                Navigator.of(context).pop({'groupDeleted': isGroupDeleted, 'leftGroup': false});
+              } else {
+                debugPrint('[ChatRoomPage] ⚠️ No se puede navegar: mounted=$mounted, _isNavigatingAway=$_isNavigatingAway');
+              }
+            });
+          }
         },
         builder: (context, state) {
           if (state is ChatConnecting) {
@@ -399,6 +467,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                   ),
                 ],
               ),
+            );
+          }
+          // Si el usuario fue expulsado o el grupo fue eliminado, mostrar loading mientras se navega
+          if (state is ChatDisconnected || state is GroupDeletedState) {
+            return Scaffold(
+              backgroundColor: theme.colorScheme.surface,
+              body: const Center(child: CircularProgressIndicator()),
             );
           }
           if (state is! ChatRoomActive) {

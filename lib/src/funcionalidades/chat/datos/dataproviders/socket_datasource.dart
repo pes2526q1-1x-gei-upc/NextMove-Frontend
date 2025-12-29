@@ -21,6 +21,14 @@ class SocketDataSource {
       StreamController<Map<String, dynamic>>.broadcast();
   final StreamController<MessageModel> _messageEditedController =
       StreamController<MessageModel>.broadcast();
+  final StreamController<Map<String, dynamic>> _userKickedController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _groupUserAddedController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _groupParticipantKickedController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _groupDeletedController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   bool _listenersConfigured = false;
   SocketDataSource();
@@ -40,6 +48,14 @@ class SocketDataSource {
       _messageDeletedController.stream;
   Stream<MessageModel> get messageEditedStream =>
       _messageEditedController.stream;
+  Stream<Map<String, dynamic>> get userKickedStream =>
+      _userKickedController.stream;
+  Stream<Map<String, dynamic>> get groupUserAddedStream =>
+      _groupUserAddedController.stream;
+  Stream<Map<String, dynamic>> get groupParticipantKickedStream =>
+      _groupParticipantKickedController.stream;
+  Stream<Map<String, dynamic>> get groupDeletedStream =>
+      _groupDeletedController.stream;
 
   /// Configurar listeners de Socket.IO
   void setupSocketListeners() {
@@ -128,6 +144,30 @@ class SocketDataSource {
       } catch (e) {
         debugPrint('[SocketDataSource] ❌ Error procesando mensaje editado: $e');
       }
+    });
+
+    // Usuario expulsado de grupo
+    socket.on('user:kicked:from:group', (data) {
+      debugPrint('[SocketDataSource] 🚫 Usuario expulsado del grupo: $data');
+      _userKickedController.add(data as Map<String, dynamic>);
+    });
+
+    // Usuario añadido a grupo (para actualizar lista de chats)
+    socket.on('group:user:added', (data) {
+      debugPrint('[SocketDataSource] ➕ Usuario añadido a grupo: $data');
+      _groupUserAddedController.add(data as Map<String, dynamic>);
+    });
+
+    // Participante expulsado de grupo (para actualizar lista de miembros)
+    socket.on('group:participant:kicked', (data) {
+      debugPrint('[SocketDataSource] 🚫 Participante expulsado del grupo: $data');
+      _groupParticipantKickedController.add(data as Map<String, dynamic>);
+    });
+
+    // Grupo eliminado
+    socket.on('group:deleted', (data) {
+      debugPrint('[SocketDataSource] 🗑️ Grupo eliminado: $data');
+      _groupDeletedController.add(data as Map<String, dynamic>);
     });
 
     _listenersConfigured = true;
@@ -260,6 +300,9 @@ class SocketDataSource {
     _roomJoinedController.close();
     _messageDeletedController.close();
     _messageEditedController.close();
+    _userKickedController.close();
+    _groupUserAddedController.close();
+    _groupParticipantKickedController.close();
   }
 
   /// Forzar reconfiguración de listeners tras una reconexión de socket
@@ -280,6 +323,10 @@ class SocketDataSource {
       socket.off('message:read:confirmed');
       socket.off('message:deleted');
       socket.off('message:edited');
+      socket.off('user:kicked:from:group');
+      socket.off('group:user:added');
+      socket.off('group:participant:kicked');
+      socket.off('group:deleted');
     }
 
     _listenersConfigured = false;

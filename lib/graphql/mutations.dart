@@ -155,4 +155,16 @@ class GraphQLMutations {
       addParticipantToGroup(chatId: $chatId, userEmail: $userEmail)
     }
   ''';
+
+  static const String toggleAdminStatusMutation = r'''
+    mutation ToggleAdminStatus($chatId: ID!, $userEmail: String!) {
+      toggleAdminStatus(chatId: $chatId, userEmail: $userEmail)
+    }
+  ''';
+
+  static const String deleteGroupMutation = r'''
+    mutation DeleteGroup($chatId: ID!) {
+      deleteGroup(chatId: $chatId)
+    }
+  ''';
 }

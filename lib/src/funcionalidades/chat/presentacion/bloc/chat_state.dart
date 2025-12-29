@@ -127,3 +127,44 @@ class SendingMessage extends ChatState {
   @override
   List<Object?> get props => [roomId, content];
 }
+
+/// Participante expulsado de grupo (para notificar a la UI)
+class GroupParticipantKickedState extends ChatState {
+  final String chatId;
+  final String chatName;
+
+  const GroupParticipantKickedState({
+    required this.chatId,
+    required this.chatName,
+  });
+
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Usuario expulsado de grupo (para notificar a la UI)
+class UserKickedFromGroupState extends ChatState {
+  final String chatId;
+  final String chatName;
+  const UserKickedFromGroupState({required this.chatId, required this.chatName});
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Usuario añadido a grupo (para notificar a la UI)
+class GroupUserAddedState extends ChatState {
+  final String chatId;
+  final String chatName;
+  const GroupUserAddedState({required this.chatId, required this.chatName});
+  @override
+  List<Object?> get props => [chatId, chatName];
+}
+
+/// Grupo eliminado
+class GroupDeletedState extends ChatState {
+  final String chatId;
+  final String chatName;
+  const GroupDeletedState({required this.chatId, required this.chatName});
+  @override
+  List<Object?> get props => [chatId, chatName];
+}

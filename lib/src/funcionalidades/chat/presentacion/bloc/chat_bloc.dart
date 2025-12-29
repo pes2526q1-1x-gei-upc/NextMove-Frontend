@@ -18,6 +18,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<Map<String, dynamic>>? _userLeftSubscription;
   StreamSubscription<Map<String, dynamic>>? _messageDeletedSubscription;
   StreamSubscription<Message>? _messageEditedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _userKickedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _groupUserAddedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _groupParticipantKickedSubscription;
 
   // Estado local
   String? _currentRoomId;
@@ -46,6 +49,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<MessageDeleted>(_onMessageDeleted);
     on<EditMessage>(_onEditMessage);
     on<MessageEdited>(_onMessageEdited);
+    on<UserKickedFromGroup>(_onUserKickedFromGroup);
+    on<GroupUserAdded>(_onGroupUserAdded);
+    on<GroupParticipantKicked>(_onGroupParticipantKicked);
+    on<GroupDeleted>(_onGroupDeleted);
   }
 
   /// Inicializar conexión de chat
@@ -95,6 +102,8 @@ Future<void> _onInitializeChat(
     _userLeftSubscription?.cancel();
     _messageDeletedSubscription?.cancel();
     _messageEditedSubscription?.cancel();
+    _userKickedSubscription?.cancel();
+    _groupUserAddedSubscription?.cancel();
 
     // Escuchar mensajes nuevos
     _messageSubscription = _chatRepository.messageStream.listen(
@@ -195,7 +204,67 @@ Future<void> _onInitializeChat(
       },
     );
 
-    debugPrint('[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted y messageEdited)');
+    // Escuchar usuario expulsado de grupo
+    _userKickedSubscription = _chatRepository.userKickedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] 🚫 Usuario expulsado del grupo: $data');
+        final chatId = data['chatId'] as String?;
+        final chatName = data['chatName'] as String? ?? 'Grupo';
+        if (chatId != null) {
+          add(UserKickedFromGroup(chatId: chatId, chatName: chatName));
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en userKicked stream: $error');
+      },
+    );
+
+    // Escuchar usuario añadido a grupo
+    _groupUserAddedSubscription = _chatRepository.groupUserAddedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] ➕ Usuario añadido a grupo: $data');
+        final chatId = data['chatId'] as String?;
+        final chatName = data['chatName'] as String? ?? 'Grupo';
+        if (chatId != null) {
+          add(GroupUserAdded(chatId: chatId, chatName: chatName));
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en groupUserAdded stream: $error');
+      },
+    );
+
+    // Escuchar participante expulsado de grupo
+    _groupParticipantKickedSubscription = _chatRepository.groupParticipantKickedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] 🚫 Participante expulsado del grupo: $data');
+        final chatId = data['chatId'] as String?;
+        final chatName = data['chatName'] as String? ?? 'Grupo';
+        if (chatId != null) {
+          add(GroupParticipantKicked(chatId: chatId, chatName: chatName));
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en groupParticipantKicked stream: $error');
+      },
+    );
+
+    // Escuchar grupo eliminado
+    _chatRepository.groupDeletedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] 🗑️ Grupo eliminado: $data');
+        final chatId = data['chatId'] as String?;
+        final chatName = data['chatName'] as String? ?? 'Grupo Eliminado';
+        if (chatId != null) {
+          add(GroupDeleted(chatId: chatId, chatName: chatName));
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en groupDeleted stream: $error');
+      },
+    );
+
+    debugPrint('[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted, messageEdited, userKicked, groupUserAdded y groupParticipantKicked)');
   }
 
   /// Unirse a una sala de chat
@@ -643,6 +712,67 @@ Future<void> _onInitializeChat(
     }
   }
 
+  /// Usuario expulsado de grupo
+  void _onUserKickedFromGroup(
+    UserKickedFromGroup event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] 🚫 Usuario expulsado del grupo ${event.chatId}');
+    debugPrint('[ChatBloc] 📍 Sala actual: $_currentRoomId');
+    
+    // Emitir estado para que la UI pueda reaccionar (actualizar lista de chats)
+    emit(UserKickedFromGroupState(chatId: event.chatId, chatName: event.chatName));
+    
+    // Si el usuario está en la sala del grupo del que fue expulsado, salir
+    if (_currentRoomId == event.chatId) {
+      debugPrint('[ChatBloc] ✅ Usuario está en la sala expulsada, cerrando chat...');
+      _chatRepository.leaveRoom(event.chatId);
+      _currentRoomId = null;
+      _messages.clear();
+      _usersTyping.clear();
+      emit(const ChatDisconnected());
+    } else {
+      debugPrint('[ChatBloc] ⚠️ Usuario no está en la sala expulsada actualmente');
+    }
+  }
+
+  /// Usuario añadido a grupo
+  void _onGroupUserAdded(
+    GroupUserAdded event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] ➕ Usuario añadido al grupo ${event.chatId}');
+    // Emitir un estado específico para que la UI pueda reaccionar
+    emit(GroupUserAddedState(chatId: event.chatId, chatName: event.chatName));
+  }
+
+  /// Participante expulsado de grupo
+  void _onGroupParticipantKicked(
+    GroupParticipantKicked event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] 🚫 Participante expulsado del grupo ${event.chatId}');
+    // Emitir un estado específico para que la UI pueda reaccionar
+    emit(GroupParticipantKickedState(chatId: event.chatId, chatName: event.chatName));
+  }
+
+  /// Grupo eliminado
+  void _onGroupDeleted(
+    GroupDeleted event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] 🗑️ Grupo ${event.chatId} eliminado');
+    // Si el usuario está en la sala del grupo eliminado, salir
+    if (_currentRoomId == event.chatId) {
+      _chatRepository.leaveRoom(event.chatId);
+      _currentRoomId = null;
+      _messages.clear();
+      _usersTyping.clear();
+      emit(const ChatDisconnected());
+    }
+    emit(GroupDeletedState(chatId: event.chatId, chatName: event.chatName));
+  }
+
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
@@ -651,6 +781,8 @@ Future<void> _onInitializeChat(
     _userLeftSubscription?.cancel();
     _messageDeletedSubscription?.cancel();
     _messageEditedSubscription?.cancel();
+    _userKickedSubscription?.cancel();
+    _groupUserAddedSubscription?.cancel();
     return super.close();
   }
 }
