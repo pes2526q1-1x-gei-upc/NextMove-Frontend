@@ -174,4 +174,35 @@ class StationRepository {
       throw UnknownFailure();
     }
   }
+  Future<Either<Failure, List<String>>> getFavCarStationIds() async {
+    try {
+      final ids = await stationRemoteDataProvider.getFavCarStationIds();
+      return Right(ids);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getFavCarStationIds: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
+
+  Future<Either<Failure, List<String>>> getFavBikeStationIds() async {
+    try {
+      final ids = await stationRemoteDataProvider.getFavBikeStationIds();
+      return Right(ids);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getFavBikeStationIds: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
 }

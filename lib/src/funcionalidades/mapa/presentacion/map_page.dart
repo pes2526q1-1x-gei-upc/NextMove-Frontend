@@ -407,7 +407,9 @@ class _MapPageState extends State<MapPage> {
                       RouteHistoryButtonWidget(),
 
                       // Favorite stations button
-                      FavoriteStationsButtonWidget(),
+                      FavoriteStationsButtonWidget(
+                        currentMode: state.currentMode,
+                      ),
                    
 
                     // Columna de controles del mapa (botones combinados)

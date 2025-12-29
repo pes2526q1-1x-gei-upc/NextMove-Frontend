@@ -490,3 +490,4 @@ class GraphQLQueries {
       station_id
     }
   }'''; 
+}

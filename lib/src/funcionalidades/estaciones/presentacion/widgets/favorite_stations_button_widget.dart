@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/favorite_stations_list.dart';
 
 class FavoriteStationsButtonWidget extends StatelessWidget {
+  final StationType currentMode;
+
   const FavoriteStationsButtonWidget({
     super.key,
+    required this.currentMode,
   });
 
   void _navigateToFavoriteStations(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const FavoriteStationsList(),
+        builder: (_) => FavoriteStationsList(stationType: currentMode),
       ),
     );
   }

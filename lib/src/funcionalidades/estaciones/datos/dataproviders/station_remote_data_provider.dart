@@ -309,4 +309,53 @@ class StationRemoteDataProvider {
       );
     }
   }
+  Future<List<String>> getFavCarStationIds() async {
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getFavCarStations),
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final data = result.data?['getFavCarStations'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => item['station_id'] as String)
+          .toList();
+    }
+    return [];
+  }
+
+  Future<List<String>> getFavBikeStationIds() async {
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getFavBikeStations),
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final data = result.data?['getFavBikeStations'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => item['station_id'] as String)
+          .toList();
+    }
+    return [];
+  }
 }
