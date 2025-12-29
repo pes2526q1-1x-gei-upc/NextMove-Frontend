@@ -475,4 +475,19 @@ class GraphQLQueries {
   mutation enrollInChallenge($challengeId: String!) {
     enrollChallenge(challenge_id: $challengeId)
   }''';
+
+  static const String getFavCarStations = r'''
+  query GetFavCarStations {
+    getFavCarStations {
+      station_id
+    }
+  }
+  ''';
+
+  static const String getFavBikeStations = r'''
+  query GetFavBikeStations {
+    getFavBikeStations {
+      station_id
+    }
+  }'''; 
 }
