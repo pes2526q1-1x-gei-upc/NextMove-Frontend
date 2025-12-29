@@ -83,6 +83,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<UpdateRecordingElapsedTimeEvent>(_onUpdateRecordingElapsedTime);
     on<ShowRouteToStationEvent>(_onShowRouteToStation);
     on<CancelNavigationEvent>(_onCancelNavigation);
+    on<StartTurnByTurnNavigationEvent>(_onStartTurnByTurnNavigation);
+    on<StopTurnByTurnNavigationEvent>(_onStopTurnByTurnNavigation);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -339,6 +341,64 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         );
       }
 
+      // Turn-by-turn navigation logic
+      if (currentState.isTurnByTurnActive && 
+          currentState.navigationRoute != null && 
+          currentState.currentStepIndex != null) {
+        final route = currentState.navigationRoute!;
+        final currentStepIndex = currentState.currentStepIndex!;
+        
+        if (currentStepIndex < route.steps.length) {
+          final currentStep = route.steps[currentStepIndex];
+          
+          // Calculate distance to end of current step
+          if (currentStep.endLocation != null) {
+            final distanceToStepEnd = Geolocator.distanceBetween(
+              newLocation.latitude,
+              newLocation.longitude,
+              currentStep.endLocation!.latitude,
+              currentStep.endLocation!.longitude,
+            ).round();
+            
+            // Check if we should advance to next step (within 30 meters)
+            if (distanceToStepEnd < 30 && currentStepIndex < route.steps.length - 1) {
+              // Advance to next step
+              if (kDebugMode) {
+                print('Advancing to step ${currentStepIndex + 1}');
+              }
+              emit(currentState.copyWith(
+                userLocation: newLocation,
+                currentStepIndex: currentStepIndex + 1,
+                distanceToNextStepMeters: 0,
+                userHeading: event.heading >= 0 ? event.heading : null,
+              ));
+              return;
+            } else if (distanceToStepEnd < 20 && currentStepIndex == route.steps.length - 1) {
+              // Arrived at destination
+              if (kDebugMode) {
+                print('Arrived at destination!');
+              }
+              emit(currentState.copyWith(
+                userLocation: newLocation,
+                isTurnByTurnActive: false,
+                currentStepIndex: null,
+                distanceToNextStepMeters: null,
+                userHeading: null,
+              ));
+              return;
+            }
+            
+            // Update distance to next step and heading
+            emit(currentState.copyWith(
+              userLocation: newLocation,
+              distanceToNextStepMeters: distanceToStepEnd,
+              userHeading: event.heading >= 0 ? event.heading : null,
+            ));
+            return;
+          }
+        }
+      }
+
       emit(currentState.copyWith(userLocation: newLocation));
     }
   }
@@ -474,6 +534,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                   latitude: pos.latitude,
                   longitude: pos.longitude,
                   altitude: pos.altitude,
+                  heading: pos.heading,
                 ),
               );
             }
@@ -499,6 +560,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude,
           altitude: currentPosition.altitude,
+          heading: currentPosition.heading,
         ),
       );
     } catch (e) {
@@ -875,6 +937,61 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         navigationRoute: null,
         decodedPolyline: Polyline(polylineId: PolylineId('no_route')),
         routeViewport: null,
+        isTurnByTurnActive: false,
+        currentStepIndex: null,
+        distanceToNextStepMeters: null,
+      ));
+    }
+  }
+
+  /// Handler: Iniciar navegación turn-by-turn
+  void _onStartTurnByTurnNavigation(
+    StartTurnByTurnNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState && 
+        currentState.navigationRoute != null &&
+        currentState.navigationRoute!.steps.isNotEmpty) {
+      if (kDebugMode) {
+        print('Starting turn-by-turn navigation with ${currentState.navigationRoute!.steps.length} steps');
+      }
+      
+      // Calculate initial distance to first step
+      int? initialDistance;
+      if (currentState.userLocation != null && 
+          currentState.navigationRoute!.steps[0].endLocation != null) {
+        initialDistance = Geolocator.distanceBetween(
+          currentState.userLocation!.latitude,
+          currentState.userLocation!.longitude,
+          currentState.navigationRoute!.steps[0].endLocation!.latitude,
+          currentState.navigationRoute!.steps[0].endLocation!.longitude,
+        ).round();
+      }
+      
+      emit(currentState.copyWith(
+        isTurnByTurnActive: true,
+        currentStepIndex: 0,
+        distanceToNextStepMeters: initialDistance ?? 0,
+      ));
+    }
+  }
+
+  /// Handler: Detener navegación turn-by-turn
+  void _onStopTurnByTurnNavigation(
+    StopTurnByTurnNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      if (kDebugMode) {
+        print('Stopping turn-by-turn navigation');
+      }
+      
+      emit(currentState.copyWith(
+        isTurnByTurnActive: false,
+        currentStepIndex: null,
+        distanceToNextStepMeters: null,
       ));
     }
   }
@@ -885,3 +1002,4 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return super.close();
   }
 }
+

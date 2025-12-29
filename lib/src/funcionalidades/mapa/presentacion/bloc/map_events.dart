@@ -35,15 +35,17 @@ class UpdateUserLocationEvent extends MapEvent {
   final double latitude;
   final double longitude;
   final double altitude;
+  final double heading; // Orientación en grados (0-360)
 
   const UpdateUserLocationEvent({
     required this.latitude,
     required this.longitude,
     required this.altitude,
+    required this.heading,
   });
 
   @override
-  List<Object?> get props => [latitude, longitude, altitude];
+  List<Object?> get props => [latitude, longitude, altitude, heading];
 }
 
 /// Evento: solicitar permisos de ubicación
@@ -129,3 +131,14 @@ class ShowRouteToStationEvent extends MapEvent {
 class CancelNavigationEvent extends MapEvent {
   const CancelNavigationEvent();
 }
+
+/// Evento: iniciar navegación turn-by-turn
+class StartTurnByTurnNavigationEvent extends MapEvent {
+  const StartTurnByTurnNavigationEvent();
+}
+
+/// Evento: detener navegación turn-by-turn
+class StopTurnByTurnNavigationEvent extends MapEvent {
+  const StopTurnByTurnNavigationEvent();
+}
+
