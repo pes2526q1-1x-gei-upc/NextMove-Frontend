@@ -117,15 +117,15 @@ class UpdateRecordingElapsedTimeEvent extends MapEvent {
 
 class ShowRouteToStationEvent extends MapEvent {
   final StationDetails station;
-  //final LatLng? userLocation;
-
+  final String? languageCode;
+  
   const ShowRouteToStationEvent({
     required this.station,
-    //this.userLocation,
+    this.languageCode,
   });
 
   @override
-  List<Object?> get props => [station /*, userLocation*/];
+  List<Object?> get props => [station, languageCode];
 }
 
 class CancelNavigationEvent extends MapEvent {

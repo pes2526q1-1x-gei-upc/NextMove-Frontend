@@ -16,6 +16,10 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/bloc/station_list_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
+
+
 
 class StationBottomSheet extends StatelessWidget {
   const StationBottomSheet({
@@ -272,12 +276,16 @@ class StationBottomSheet extends StatelessWidget {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                ),
+                                ),  
                                 onPressed: () {
-                                  context.read<MapBloc>().add(
-                                    ShowRouteToStationEvent(station: station),
-                                  );
-                                  Navigator.of(context).pop();
+                                    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+                                    context.read<MapBloc>().add(
+                                      ShowRouteToStationEvent(
+                                        station: station,
+                                        languageCode: localeProvider.locale?.languageCode,
+                                      ),
+                                    );
+                                    Navigator.of(context).pop();
                                 },
                                 icon: const Icon(Icons.directions),
                                 label: Text(

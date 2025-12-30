@@ -18,6 +18,8 @@ class UserProvider with ChangeNotifier {
   String? get firebaseToken => _firebaseToken;
   String? get email => _email;
   String? get pwd => _pwd;
+  
+  String get languageCode => _user?['preferredLanguage'] ?? 'es';
 
   void setUser(
     Map<String, dynamic> userData, {
