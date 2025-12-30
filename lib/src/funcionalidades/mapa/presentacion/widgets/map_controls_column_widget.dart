@@ -52,7 +52,7 @@ class MapControlsColumnWidget extends StatelessWidget {
         }
 
         final isRecording = state.isRecordingRoute;
-
+        
         return Positioned(
           bottom: 30,
           right: 16,

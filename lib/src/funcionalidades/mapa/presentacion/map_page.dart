@@ -464,6 +464,12 @@ class _MapPageState extends State<MapPage> {
                         ),
                       ],
                     ],
+                    if(state.isTurnByTurnActive || !state.isNavigationMode)
+                      MapControlsColumnWidget(
+                        userLocation: state.userLocation,
+                        mapController: _mapController,
+                        currentMapType: state.currentMapType,
+                      ),
                     
 
                     // Barra de búsqueda
@@ -499,13 +505,6 @@ class _MapPageState extends State<MapPage> {
                       ),
                    
 
-                    // Columna de controles del mapa (botones combinados)
-                    MapControlsColumnWidget(
-                      userLocation: state.userLocation,
-                      mapController: _mapController,
-                      currentMapType: state.currentMapType,
-                    ),
-
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
@@ -517,7 +516,7 @@ class _MapPageState extends State<MapPage> {
                         isSearchBarFocused: _isSearchBarFocused,
                       ),
                     ),
-                    ],
+                  ],
                   ],
                 );
                   },
