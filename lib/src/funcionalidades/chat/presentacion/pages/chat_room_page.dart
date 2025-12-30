@@ -201,9 +201,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       return '';
     }
     
-    debugPrint('[ChatRoomPage] _getTypingText - usersTyping: $usersTyping');
-    debugPrint('[ChatRoomPage] _getTypingText - participantsMap: $participantsMap');
-    
     // Filtrar el usuario actual de la lista de usuarios escribiendo
     final filteredTypingUsers = usersTyping.entries.where((entry) {
       final userId = entry.key;
@@ -212,29 +209,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       // Excluir si userId o userName coinciden con el email del usuario actual
       if (currentUserEmail != null) {
         if (userId == currentUserEmail || userName == currentUserEmail) {
-          debugPrint('[ChatRoomPage] 🔇 Excluyendo usuario actual de typing: userId=$userId, userName=$userName');
           return false;
         }
       }
       return true;
     }).toList();
     
-    debugPrint('[ChatRoomPage] Usuarios escribiendo (filtrados): ${filteredTypingUsers.length}');
-    
     // Convertir userName a nickname (el backend ahora envía el nickname directamente en userName)
     final typingNicknames = filteredTypingUsers.map((entry) {
       final userName = entry.value; // userName del evento (ahora debería ser el nickname del backend)
-      debugPrint('[ChatRoomPage] 🔍 Obteniendo nickname para userName: "$userName"');
       
       // Si userName es un email (fallback del backend si no tiene nickname), buscar en participantsMap
       if (userName.contains('@') && participantsMap != null && participantsMap.containsKey(userName)) {
-        final nickname = participantsMap[userName]!;
-        debugPrint('[ChatRoomPage] ✅ Encontrado en participantsMap (userName era email): $nickname');
-        return nickname;
+        return participantsMap[userName]!;
       }
       
       // Si no es un email, ya es el nickname del backend, usarlo directamente
-      debugPrint('[ChatRoomPage] ✅ Usando userName como nickname (viene del backend): $userName');
       return userName;
     }).toList();
     
@@ -446,30 +436,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 Map<String, String>? participantsMap;
                 if (result.data != null) {
                   final chats = result.data?['myChats'] as List<dynamic>? ?? [];
-                  debugPrint('[ChatRoomPage] Query result - chats encontrados: ${chats.length}');
                   final chat = chats.firstWhere(
                     (c) => c['id'] == widget.roomId,
                     orElse: () => null,
                   );
                   if (chat != null) {
                     final participants = chat['participants'] as List<dynamic>? ?? [];
-                    debugPrint('[ChatRoomPage] Participantes encontrados: ${participants.length}');
                     final tempMap = <String, String>{};
                     for (var p in participants) {
                       final email = p['userEmail'] as String? ?? '';
                       final nickname = p['nickname'] as String?;
                       if (email.isNotEmpty) {
                         tempMap[email] = nickname ?? email.split('@').first;
-                        debugPrint('[ChatRoomPage] Mapeo: $email -> ${tempMap[email]}');
                       }
                     }
                     participantsMap = tempMap;
-                    debugPrint('[ChatRoomPage] participantsMap final: $participantsMap');
-                  } else {
-                    debugPrint('[ChatRoomPage] ⚠️ No se encontró el chat con id: ${widget.roomId}');
                   }
-                } else {
-                  debugPrint('[ChatRoomPage] ⚠️ Query result.data es null');
                 }
                 
                 return BlocBuilder<ChatBloc, ChatState>(
