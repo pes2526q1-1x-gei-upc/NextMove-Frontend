@@ -62,7 +62,7 @@ class TurnInstructionWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'En ${_formatDistance(distanceToNextStepMeters)}',
+                    '${l10n.enxmet} ${_formatDistance(distanceToNextStepMeters)}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,

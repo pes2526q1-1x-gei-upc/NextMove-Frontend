@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class NavigationProgressWidget extends StatelessWidget {
   final int remainingSeconds;
@@ -42,6 +43,7 @@ class NavigationProgressWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;  
     final isDark = theme.brightness == Brightness.dark;
 
     return Positioned(
@@ -89,7 +91,7 @@ class NavigationProgressWidget extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Llegada : ${_formatArrivalTime()}',
+                        '${l10n.arrival}: ${_formatArrivalTime()}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

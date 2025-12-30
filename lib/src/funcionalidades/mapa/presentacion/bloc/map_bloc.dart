@@ -868,6 +868,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         destination: LatLng(event.station.latitude!, event.station.longitude!),  
         mode: currentState.currentMode == StationType.bicycle ? TravelModeEnum.BICYCLE : TravelModeEnum.DRIVE, 
         routingPreference: RoutingPreferenceEnum.TRAFFIC_AWARE,
+        language: currentState.currentLanguage,
       );
 
       try{
