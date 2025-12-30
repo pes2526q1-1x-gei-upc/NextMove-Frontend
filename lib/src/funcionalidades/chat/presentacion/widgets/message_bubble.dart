@@ -12,6 +12,9 @@ class MessageBubble extends StatelessWidget {
   final bool showSender;
   final VoidCallback? onAvatarTap;
   final bool isGroup; // Indica si es un chat de grupo
+  final Map<String, String>? participantsMap; // Mapa de email -> nickname
+  final bool showAvatar; // Mostrar avatar (último mensaje del grupo)
+  final bool showSenderName; // Mostrar nombre (primer mensaje del grupo)
 
   const MessageBubble({
     super.key,
@@ -20,6 +23,9 @@ class MessageBubble extends StatelessWidget {
     this.showSender = true,
     this.onAvatarTap,
     this.isGroup = false,
+    this.participantsMap,
+    this.showAvatar = true, // Por defecto mostrar avatar
+    this.showSenderName = true, // Por defecto mostrar nombre
   });
 
   void _showDeleteConfirmation(BuildContext context, ChatBloc chatBloc) {
@@ -133,13 +139,43 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
+  /// Obtener el nickname del remitente, convirtiendo email a nickname si es necesario
+  String _getSenderDisplayName() {
+    String displayName = message.senderName;
+    
+    // Si senderName parece ser un email (contiene @), intentar obtener el nickname
+    if (displayName.contains('@')) {
+      // Primero intentar buscar en el mapa de participantes usando el senderName (email)
+      if (participantsMap != null && participantsMap!.containsKey(displayName)) {
+        return participantsMap![displayName]!;
+      }
+      
+      // También intentar buscar usando senderId (que debería ser el email)
+      if (participantsMap != null && message.senderId.contains('@') && participantsMap!.containsKey(message.senderId)) {
+        return participantsMap![message.senderId]!;
+      }
+      
+      // Si no se encuentra, extraer la parte antes del @ como fallback
+      return displayName.split('@').first;
+    }
+    
+    // Si senderName no es un email pero senderId sí lo es, intentar buscar en participantsMap
+    if (message.senderId.contains('@') && participantsMap != null && participantsMap!.containsKey(message.senderId)) {
+      return participantsMap![message.senderId]!;
+    }
+    
+    // Si no es un email, usar el senderName directamente (debería ser el nickname)
+    return displayName;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final timeFormat = DateFormat('HH:mm');
+    final senderDisplayName = _getSenderDisplayName();
     
-    // Mostrar avatar solo en grupos y cuando el mensaje no es del usuario actual
-    final shouldShowAvatar = isGroup && !isMe;
+    // Mostrar avatar solo en grupos, cuando el mensaje no es del usuario actual, y cuando showAvatar es true
+    final shouldShowAvatar = isGroup && !isMe && showAvatar;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -149,27 +185,30 @@ class MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Avatar del remitente (solo en grupos y para mensajes de otros)
-          if (shouldShowAvatar)
-            Padding(
-              padding: const EdgeInsets.only(right: 8, bottom: 4),
-              child: GestureDetector(
-                onTap: onAvatarTap,
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
-                      ? NetworkImage(message.senderPhoto!)
-                      : null,
-                  child: message.senderPhoto == null || message.senderPhoto!.isEmpty
-                      ? Icon(
-                          Icons.person,
-                          size: 16,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        )
-                      : null,
-                ),
-              ),
-            ),
+          // O espacio vacío para mantener el mismo espaciado cuando no se muestra el avatar
+          if (isGroup && !isMe)
+            shouldShowAvatar
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 8, bottom: 4),
+                    child: GestureDetector(
+                      onTap: onAvatarTap,
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                        backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                            ? NetworkImage(message.senderPhoto!)
+                            : null,
+                        child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                            ? Icon(
+                                Icons.person,
+                                size: 16,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              )
+                            : null,
+                      ),
+                    ),
+                  )
+                : const SizedBox(width: 40), // 32px (avatar width) + 8px (padding right)
           Flexible(
             child: GestureDetector(
               onLongPress: isMe && !message.deleted
@@ -196,12 +235,12 @@ class MessageBubble extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Nombre del remitente en grupos
-                          if (shouldShowAvatar && showSender)
+                          // Nombre del remitente en grupos (solo en el primer mensaje del grupo)
+                          if (isGroup && !isMe && showSender && showSenderName)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
-                                message.senderName,
+                                senderDisplayName,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -249,12 +288,12 @@ class MessageBubble extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Nombre del remitente en grupos
-                          if (shouldShowAvatar && showSender)
+                          // Nombre del remitente en grupos (solo en el primer mensaje del grupo)
+                          if (isGroup && !isMe && showSender && showSenderName)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
-                                message.senderName,
+                                senderDisplayName,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,

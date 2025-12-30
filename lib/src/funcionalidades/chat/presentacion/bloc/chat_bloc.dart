@@ -25,7 +25,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   // Estado local
   String? _currentRoomId;
   final List<Message> _messages = [];
-  final Set<String> _usersTyping = {};
+  final Map<String, String> _usersTyping = {}; // userId -> userName
 
   ChatBloc(this._chatRepository) : super(const ChatInitial()) {
     // Registrar handlers de eventos
@@ -120,6 +120,7 @@ Future<void> _onInitializeChat(
       (data) {
         final userId = data['userId'] as String;
         final userName = data['userName'] as String? ?? userId;
+        final userEmail = data['userEmail'] as String?; // Email si está disponible
         final roomId = data['roomId'] as String;
         final stopped = data['stopped'] as bool? ?? false;
 
@@ -130,6 +131,7 @@ Future<void> _onInitializeChat(
             roomId: roomId,
             userId: userId,
             userName: userName,
+            userEmail: userEmail,
           ));
         }
       },
@@ -290,7 +292,7 @@ Future<void> _onInitializeChat(
       emit(ChatRoomActive(
         roomId: event.roomId,
         messages: List.from(_messages),
-        usersTyping: Set.from(_usersTyping),
+        usersTyping: Map.from(_usersTyping),
       ));
 
       debugPrint('[ChatBloc] ✅ Unido a sala: ${event.roomId}');
@@ -372,11 +374,13 @@ Future<void> _onInitializeChat(
   ) {
     if (event.roomId != _currentRoomId) return;
 
-    _usersTyping.add(event.userId);
+    // Si userEmail está disponible, usarlo en lugar de userName para poder buscarlo en participantsMap
+    // Si no está disponible, usar userName como antes
+    _usersTyping[event.userId] = event.userEmail ?? event.userName;
     
     if (state is ChatRoomActive) {
       final currentState = state as ChatRoomActive;
-      emit(currentState.copyWith(usersTyping: Set.from(_usersTyping)));
+      emit(currentState.copyWith(usersTyping: Map.from(_usersTyping)));
     }
   }
 
@@ -391,7 +395,7 @@ Future<void> _onInitializeChat(
     
     if (state is ChatRoomActive) {
       final currentState = state as ChatRoomActive;
-      emit(currentState.copyWith(usersTyping: Set.from(_usersTyping)));
+      emit(currentState.copyWith(usersTyping: Map.from(_usersTyping)));
     }
   }
 
@@ -429,7 +433,7 @@ Future<void> _onInitializeChat(
       final currentState = state as ChatRoomActive;
       emit(currentState.copyWith(
         userCount: currentState.userCount - 1,
-        usersTyping: Set.from(_usersTyping),
+        usersTyping: Map.from(_usersTyping),
       ));
     }
   }

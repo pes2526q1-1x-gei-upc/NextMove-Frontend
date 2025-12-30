@@ -12,9 +12,15 @@ class SocketConfig {
   /// Inicializar conexión Socket.IO
   /// Requiere el token de Firebase para autenticación
   static Future<void> connect(String firebaseToken, String userId) async {
+    // Si ya hay una conexión pero con un usuario diferente, desconectar primero
     if (_socket != null && _socket!.connected) {
-      debugPrint('[SocketIO] Ya existe una conexión activa');
-      return;
+      if (_currentUserId != userId) {
+        debugPrint('[SocketIO] Usuario cambió de $_currentUserId a $userId, desconectando socket anterior...');
+        disconnect();
+      } else {
+        debugPrint('[SocketIO] Ya existe una conexión activa para el mismo usuario');
+        return;
+      }
     }
 
     _currentUserId = userId;

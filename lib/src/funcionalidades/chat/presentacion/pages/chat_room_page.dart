@@ -17,6 +17,8 @@ import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_deta
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_event.dart';
 import 'package:nextmove_app/config/socket_config.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/graphql/queries.dart';
 
 /// Tipo para representar un item en la lista (puede ser un mensaje o un separador de fecha)
 class _ChatItem {
@@ -189,6 +191,62 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
   }
 
+  String _getTypingText(
+    Map<String, String> usersTyping, 
+    List<Message> messages,
+    Map<String, String>? participantsMap,
+    String? currentUserEmail,
+  ) {
+    if (usersTyping.isEmpty) {
+      return '';
+    }
+    
+    debugPrint('[ChatRoomPage] _getTypingText - usersTyping: $usersTyping');
+    debugPrint('[ChatRoomPage] _getTypingText - participantsMap: $participantsMap');
+    
+    // Filtrar el usuario actual de la lista de usuarios escribiendo
+    final filteredTypingUsers = usersTyping.entries.where((entry) {
+      final userId = entry.key;
+      final userName = entry.value;
+      
+      // Excluir si userId o userName coinciden con el email del usuario actual
+      if (currentUserEmail != null) {
+        if (userId == currentUserEmail || userName == currentUserEmail) {
+          debugPrint('[ChatRoomPage] 🔇 Excluyendo usuario actual de typing: userId=$userId, userName=$userName');
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+    
+    debugPrint('[ChatRoomPage] Usuarios escribiendo (filtrados): ${filteredTypingUsers.length}');
+    
+    // Convertir userName a nickname (el backend ahora envía el nickname directamente en userName)
+    final typingNicknames = filteredTypingUsers.map((entry) {
+      final userName = entry.value; // userName del evento (ahora debería ser el nickname del backend)
+      debugPrint('[ChatRoomPage] 🔍 Obteniendo nickname para userName: "$userName"');
+      
+      // Si userName es un email (fallback del backend si no tiene nickname), buscar en participantsMap
+      if (userName.contains('@') && participantsMap != null && participantsMap.containsKey(userName)) {
+        final nickname = participantsMap[userName]!;
+        debugPrint('[ChatRoomPage] ✅ Encontrado en participantsMap (userName era email): $nickname');
+        return nickname;
+      }
+      
+      // Si no es un email, ya es el nickname del backend, usarlo directamente
+      debugPrint('[ChatRoomPage] ✅ Usando userName como nickname (viene del backend): $userName');
+      return userName;
+    }).toList();
+    
+    if (typingNicknames.length == 1) {
+      return '${typingNicknames.first} está escribiendo...';
+    } else if (typingNicknames.length == 2) {
+      return '${typingNicknames[0]} y ${typingNicknames[1]} están escribiendo...';
+    } else {
+      return '${typingNicknames[0]} y ${typingNicknames.length - 1} más están escribiendo...';
+    }
+  }
+
   String? _getOtherUserNickname(List<Message> messages, String currentUserEmail) {
     if (messages.isEmpty) {
       return widget.roomName.isNotEmpty ? widget.roomName : null;
@@ -239,6 +297,76 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
+  }
+
+  Widget _buildMessagesList(
+    List<Message> messages,
+    String currentUserEmail,
+    Map<String, String>? participantsMap,
+  ) {
+    final groupedItems = _groupMessagesByDay(messages);
+    
+    // Función auxiliar para obtener el mensaje en el índice visual dado
+    Message? _getMessageAtVisualIndex(List<_ChatItem> items, int visualIndex) {
+      final actualIndex = items.length - 1 - visualIndex;
+      if (actualIndex < 0 || actualIndex >= items.length) return null;
+      return items[actualIndex].message;
+    }
+    
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      reverse: true,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      itemCount: groupedItems.length,
+      itemBuilder: (context, index) {
+        final item = groupedItems[groupedItems.length - 1 - index];
+        
+        if (item.isDateSeparator && item.date != null) {
+          return DateSeparator(date: item.date!);
+        } else if (item.message != null) {
+          final message = item.message!;
+          final isMe = message.isSentByMe(currentUserEmail);
+          
+          // Determinar si mostrar avatar y nombre basándose en mensajes consecutivos
+          bool showAvatar = true;
+          bool showSenderName = true;
+          
+          if (widget.isGroup && !isMe) {
+            // En el ListView con reverse: true:
+            // - index 0 muestra el mensaje más reciente (arriba)
+            // - index n muestra el mensaje más antiguo (abajo)
+            // Para obtener el mensaje más reciente (arriba), usamos index - 1
+            // Para obtener el mensaje más antiguo (abajo), usamos index + 1
+            
+            // Avatar: mostrar solo en el último mensaje del grupo consecutivo
+            // El último mensaje es el más reciente, así que buscamos si hay uno más reciente del mismo usuario
+            final moreRecentMessage = index > 0 ? _getMessageAtVisualIndex(groupedItems, index - 1) : null;
+            if (moreRecentMessage != null && moreRecentMessage.senderId == message.senderId) {
+              showAvatar = false; // Hay un mensaje más reciente del mismo usuario
+            }
+            
+            // Nombre: mostrar solo en el primer mensaje del grupo consecutivo
+            // El primer mensaje es el más antiguo, así que buscamos si hay uno más antiguo del mismo usuario
+            final moreAncientMessage = _getMessageAtVisualIndex(groupedItems, index + 1);
+            if (moreAncientMessage != null && moreAncientMessage.senderId == message.senderId) {
+              showSenderName = false; // Hay un mensaje más antiguo del mismo usuario
+            }
+          }
+          
+          return MessageBubble(
+            message: message,
+            isMe: isMe,
+            isGroup: widget.isGroup,
+            participantsMap: participantsMap,
+            showAvatar: showAvatar,
+            showSenderName: showSenderName,
+          );
+        }
+        
+        return const SizedBox.shrink();
+      },
+    );
   }
 
   Future<void> _navigateToFriendDetail(String nickname) async {
@@ -295,10 +423,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userProvider = Provider.of<UserProvider>(context);
-    final currentUserEmail = userProvider.email ?? 
-                            userProvider.user?['email'] as String? ?? 
-                            FirebaseAuth.instance.currentUser?.email ?? '';
+    // Usar directamente FirebaseAuth para obtener el email actual, ya que es más confiable
+    // cuando el usuario cambia sin reiniciar la app
+    final currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? 
+                            Provider.of<UserProvider>(context, listen: false).email ?? 
+                            Provider.of<UserProvider>(context, listen: false).user?['email'] as String? ?? '';
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -306,100 +435,81 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       appBar: AppBar(
         automaticallyImplyLeading: true,
         titleSpacing: 0,
-        title: BlocBuilder<ChatBloc, ChatState>(
-          builder: (context, state) {
-            final messages = state is ChatRoomActive ? state.messages : <Message>[];
-            final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
-            final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
-            final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
-            
-            return GestureDetector(
-              onTap: () async {
-                if (widget.isGroup) {
-                  final result = await Navigator.of(context).push<Map<String, dynamic>?>(
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider.value(
-                        value: _chatBloc,
-                        child: ChatRoomDetailsPage(
-                          chatId: widget.roomId,
-                          chatName: _currentRoomName ?? widget.roomName,
-                          chatDescription: null,
-                        ),
-                      ),
-                    ),
-                  );
-                  
-                  if (result is Map<String, dynamic> && mounted) {
-                    final resultMap = result;
-                    if (resultMap['leftGroup'] == true || resultMap['groupDeleted'] == true) {
-                      // Cerrar inmediatamente y volver a la lista de chats
-                      // Usar WidgetsBinding para asegurar que se ejecute después del frame actual
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          Navigator.of(context).pop({
-                            'leftGroup': resultMap['leftGroup'] == true,
-                            'groupDeleted': resultMap['groupDeleted'] == true,
-                          });
-                        }
-                      });
-                      return;
-                    }
-                    
-                    setState(() {
-                      if (result['name'] != null) {
-                        _currentRoomName = result['name'] as String;
-                      }
-                      if (result['photo'] != null) {
-                        _currentGroupPhoto = result['photo'] as String;
-                      }
-                    });
-                  }
-                } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
-                  _navigateToFriendDetail(otherUserNickname);
-                }
-              },
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: widget.isGroup
-                        ? theme.colorScheme.primaryContainer
-                        : theme.colorScheme.surfaceContainerHighest,
-                    backgroundImage: (widget.isGroup && _currentGroupPhoto != null && _currentGroupPhoto!.isNotEmpty)
-                        ? NetworkImage(_currentGroupPhoto!)
-                        : (!widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
-                            ? NetworkImage(otherUserPhoto)
-                            : null),
-                    child: (widget.isGroup && (_currentGroupPhoto == null || _currentGroupPhoto!.isEmpty))
-                        ? Icon(Icons.group, size: 20, color: theme.colorScheme.onPrimaryContainer)
-                        : (!widget.isGroup && (otherUserPhoto == null || otherUserPhoto.isEmpty)
-                            ? Icon(Icons.person, size: 20, color: theme.iconTheme.color?.withOpacity(0.8))
-                            : null),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _currentRoomName ?? widget.roomName,
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        if (state is ChatRoomActive && state.usersTyping.isNotEmpty)
-                          Text(
-                            l10n.typing,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+        title: widget.isGroup 
+          ? Query(
+              options: QueryOptions(
+                document: gql(myChatsQuery),
+                fetchPolicy: FetchPolicy.cacheAndNetwork,
               ),
-            );
-          },
-        ),
+              builder: (result, {fetchMore, refetch}) {
+                // Crear mapa de participantes: email -> nickname
+                Map<String, String>? participantsMap;
+                if (result.data != null) {
+                  final chats = result.data?['myChats'] as List<dynamic>? ?? [];
+                  debugPrint('[ChatRoomPage] Query result - chats encontrados: ${chats.length}');
+                  final chat = chats.firstWhere(
+                    (c) => c['id'] == widget.roomId,
+                    orElse: () => null,
+                  );
+                  if (chat != null) {
+                    final participants = chat['participants'] as List<dynamic>? ?? [];
+                    debugPrint('[ChatRoomPage] Participantes encontrados: ${participants.length}');
+                    final tempMap = <String, String>{};
+                    for (var p in participants) {
+                      final email = p['userEmail'] as String? ?? '';
+                      final nickname = p['nickname'] as String?;
+                      if (email.isNotEmpty) {
+                        tempMap[email] = nickname ?? email.split('@').first;
+                        debugPrint('[ChatRoomPage] Mapeo: $email -> ${tempMap[email]}');
+                      }
+                    }
+                    participantsMap = tempMap;
+                    debugPrint('[ChatRoomPage] participantsMap final: $participantsMap');
+                  } else {
+                    debugPrint('[ChatRoomPage] ⚠️ No se encontró el chat con id: ${widget.roomId}');
+                  }
+                } else {
+                  debugPrint('[ChatRoomPage] ⚠️ Query result.data es null');
+                }
+                
+                return BlocBuilder<ChatBloc, ChatState>(
+                  builder: (context, state) {
+                    final messages = state is ChatRoomActive ? state.messages : <Message>[];
+                    final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
+                    final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
+                    final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
+                    
+                    return _buildAppBarTitle(
+                      context,
+                      state,
+                      messages,
+                      otherUserNickname,
+                      otherUserPhoto,
+                      participantsMap,
+                      currentUserEmail,
+                    );
+                  },
+                );
+              },
+            )
+          : BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state) {
+                final messages = state is ChatRoomActive ? state.messages : <Message>[];
+                final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
+                final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
+                final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
+                
+                return _buildAppBarTitle(
+                  context,
+                  state,
+                  messages,
+                  otherUserNickname,
+                  otherUserPhoto,
+                  null,
+                  currentUserEmail,
+                );
+              },
+            ),
         elevation: 1,
       ),
       body: BlocConsumer<ChatBloc, ChatState>(
@@ -498,36 +608,39 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             ),
                           ),
                         )
-                      : Builder(
-                          builder: (context) {
-                            final groupedItems = _groupMessagesByDay(messages);
-                            
-                            return ListView.builder(
-                              controller: _scrollController,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                              reverse: true,
-                              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                              itemCount: groupedItems.length,
-                              itemBuilder: (context, index) {
-                                final item = groupedItems[groupedItems.length - 1 - index];
-                                
-                                if (item.isDateSeparator && item.date != null) {
-                                  return DateSeparator(date: item.date!);
-                                } else if (item.message != null) {
-                                  final message = item.message!;
-                                  final isMe = message.isSentByMe(currentUserEmail);
-                                  return MessageBubble(
-                                    message: message,
-                                    isMe: isMe,
-                                    isGroup: widget.isGroup,
+                      : widget.isGroup
+                          ? Query(
+                              options: QueryOptions(
+                                document: gql(myChatsQuery),
+                                fetchPolicy: FetchPolicy.cacheAndNetwork,
+                              ),
+                              builder: (result, {fetchMore, refetch}) {
+                                // Crear mapa de participantes: email -> nickname
+                                Map<String, String>? participantsMap;
+                                if (result.data != null) {
+                                  final chats = result.data?['myChats'] as List<dynamic>? ?? [];
+                                  final chat = chats.firstWhere(
+                                    (c) => c['id'] == widget.roomId,
+                                    orElse: () => null,
                                   );
+                                  if (chat != null) {
+                                    final participants = chat['participants'] as List<dynamic>? ?? [];
+                                    final tempMap = <String, String>{};
+                                    for (var p in participants) {
+                                      final email = p['userEmail'] as String? ?? '';
+                                      final nickname = p['nickname'] as String?;
+                                      if (email.isNotEmpty) {
+                                        tempMap[email] = nickname ?? email.split('@').first;
+                                      }
+                                    }
+                                    participantsMap = tempMap;
+                                  }
                                 }
                                 
-                                return const SizedBox.shrink();
+                                return _buildMessagesList(messages, currentUserEmail, participantsMap);
                               },
-                            );
-                          },
-                        ),
+                            )
+                          : _buildMessagesList(messages, currentUserEmail, null),
                 ),
               ),
               
@@ -577,5 +690,106 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         },
       ),
     );
+  }
+
+  Widget _buildAppBarTitle(
+    BuildContext context,
+    ChatState state,
+    List<Message> messages,
+    String? otherUserNickname,
+    String? otherUserPhoto,
+    Map<String, String>? participantsMap,
+    String? currentUserEmail,
+  ) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    return GestureDetector(
+              onTap: () async {
+                if (widget.isGroup) {
+                  final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider.value(
+                        value: _chatBloc,
+                        child: ChatRoomDetailsPage(
+                          chatId: widget.roomId,
+                          chatName: _currentRoomName ?? widget.roomName,
+                          chatDescription: null,
+                        ),
+                      ),
+                    ),
+                  );
+                  
+                  if (result is Map<String, dynamic> && mounted) {
+                    final resultMap = result;
+                    if (resultMap['leftGroup'] == true || resultMap['groupDeleted'] == true) {
+                      // Cerrar inmediatamente y volver a la lista de chats
+                      // Usar WidgetsBinding para asegurar que se ejecute después del frame actual
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          Navigator.of(context).pop({
+                            'leftGroup': resultMap['leftGroup'] == true,
+                            'groupDeleted': resultMap['groupDeleted'] == true,
+                          });
+                        }
+                      });
+                      return;
+                    }
+                    
+                    setState(() {
+                      if (result['name'] != null) {
+                        _currentRoomName = result['name'] as String;
+                      }
+                      if (result['photo'] != null) {
+                        _currentGroupPhoto = result['photo'] as String;
+                      }
+                    });
+                  }
+                } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
+                  _navigateToFriendDetail(otherUserNickname);
+                }
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: widget.isGroup
+                        ? theme.colorScheme.primaryContainer
+                        : theme.colorScheme.surfaceContainerHighest,
+                    backgroundImage: (widget.isGroup && _currentGroupPhoto != null && _currentGroupPhoto!.isNotEmpty)
+                        ? NetworkImage(_currentGroupPhoto!)
+                        : (!widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
+                            ? NetworkImage(otherUserPhoto)
+                            : null),
+                    child: (widget.isGroup && (_currentGroupPhoto == null || _currentGroupPhoto!.isEmpty))
+                        ? Icon(Icons.group, size: 20, color: theme.colorScheme.onPrimaryContainer)
+                        : (!widget.isGroup && (otherUserPhoto == null || otherUserPhoto.isEmpty)
+                            ? Icon(Icons.person, size: 20, color: theme.iconTheme.color?.withOpacity(0.8))
+                            : null),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _currentRoomName ?? widget.roomName,
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        if (state is ChatRoomActive && state.usersTyping.isNotEmpty)
+                          Text(
+                            widget.isGroup 
+                              ? _getTypingText(state.usersTyping, state.messages, participantsMap, currentUserEmail)
+                              : l10n.typing,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
   }
 }

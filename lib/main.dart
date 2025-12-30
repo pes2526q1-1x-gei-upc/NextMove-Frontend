@@ -28,6 +28,7 @@ import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_li
 import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket_datasource.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
+import 'package:nextmove_app/config/socket_config.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -175,6 +176,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         }
       } else {
         if (mounted) {
+          // Desconectar el socket cuando el usuario cierra sesión
+          SocketConfig.disconnect();
           userProvider.clearUser();
           localeProvider.clearLocale();
           setState(() {

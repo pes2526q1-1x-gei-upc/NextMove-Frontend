@@ -74,15 +74,17 @@ class UserStartedTyping extends ChatEvent {
   final String roomId;
   final String userId;
   final String userName;
+  final String? userEmail; // Email del usuario si está disponible
 
   const UserStartedTyping({
     required this.roomId,
     required this.userId,
     required this.userName,
+    this.userEmail,
   });
 
   @override
-  List<Object?> get props => [roomId, userId, userName];
+  List<Object?> get props => [roomId, userId, userName, userEmail];
 }
 
 /// Usuario dejó de escribir

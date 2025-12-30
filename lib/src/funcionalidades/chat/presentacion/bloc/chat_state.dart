@@ -48,7 +48,7 @@ class ChatDisconnected extends ChatState {
 class ChatRoomActive extends ChatState {
   final String roomId;
   final List<Message> messages;
-  final Set<String> usersTyping;
+  final Map<String, String> usersTyping; // userId -> userName
   final int userCount;
   final bool isLoadingHistory;
 
@@ -63,7 +63,7 @@ class ChatRoomActive extends ChatState {
   ChatRoomActive copyWith({
     String? roomId,
     List<Message>? messages,
-    Set<String>? usersTyping,
+    Map<String, String>? usersTyping,
     int? userCount,
     bool? isLoadingHistory,
   }) {

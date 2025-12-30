@@ -48,6 +48,8 @@ class UserProvider with ChangeNotifier {
     _user = null;
     _firebaseUserId = null;
     _firebaseToken = null;
+    _email = null;
+    _pwd = null;
     notifyListeners();
   }
 }
