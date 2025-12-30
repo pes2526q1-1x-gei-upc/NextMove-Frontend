@@ -187,6 +187,44 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  int _calculateRemainingSeconds(NavigationRoute route, int currentStepIndex, int distanceToNextStepMeters) {
+    int remainingSeconds = 0;
+    
+    // Remaining time of current step
+    if (currentStepIndex < route.steps.length) {
+      final currentStep = route.steps[currentStepIndex];
+      if (currentStep.distanceMeters > 0) {
+        final progress = distanceToNextStepMeters / currentStep.distanceMeters;
+        // Clamp progress to 0.0 - 1.0 just in case
+        final safeProgress = progress.clamp(0.0, 1.0);
+        remainingSeconds += (currentStep.durationSeconds * safeProgress).round();
+      } else {
+        remainingSeconds += currentStep.durationSeconds;
+      }
+    }
+    
+    // Time of subsequent steps
+    for (int i = currentStepIndex + 1; i < route.steps.length; i++) {
+        remainingSeconds += route.steps[i].durationSeconds;
+    }
+    
+    return remainingSeconds;
+  }
+
+  int _calculateRemainingDistance(NavigationRoute route, int currentStepIndex, int distanceToNextStepMeters) {
+    int remainingDistance = 0;
+    
+    // Remaining distance of current step
+    remainingDistance += distanceToNextStepMeters;
+    
+    // Distance of subsequent steps
+    for (int i = currentStepIndex + 1; i < route.steps.length; i++) {
+        remainingDistance += route.steps[i].distanceMeters;
+    }
+    
+    return remainingDistance;
+  }
+
   // -----------------------------------------------------------------------
   // Build
   // -----------------------------------------------------------------------
@@ -351,8 +389,16 @@ class _MapPageState extends State<MapPage> {
                           state.navigationRoute != null && 
                           state.currentStepIndex != null) ...[
                         NavigationProgressWidget(
-                          currentStepIndex: state.currentStepIndex!,
-                          route: state.navigationRoute!,
+                          remainingSeconds: _calculateRemainingSeconds(
+                            state.navigationRoute!,
+                            state.currentStepIndex!,
+                            state.distanceToNextStepMeters ?? 0,
+                          ),
+                          remainingDistance: _calculateRemainingDistance(
+                            state.navigationRoute!,
+                            state.currentStepIndex!,
+                            state.distanceToNextStepMeters ?? 0,
+                          ),
                         ),
                         TurnInstructionWidget(
                           currentStep: state.navigationRoute!.steps[state.currentStepIndex!],

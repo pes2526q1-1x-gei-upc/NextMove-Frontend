@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 
 class NavigationProgressWidget extends StatelessWidget {
-  final int currentStepIndex;
-  final NavigationRoute route;
+  final int remainingSeconds;
+  final int remainingDistance;
 
   const NavigationProgressWidget({
     super.key,
-    required this.currentStepIndex,
-    required this.route,
+    required this.remainingSeconds,
+    required this.remainingDistance,
   });
 
   String _formatDistance(int meters) {
@@ -20,20 +19,30 @@ class NavigationProgressWidget extends StatelessWidget {
     }
   }
 
-  int _calculateRemainingDistance() {
-    int totalDistance = 0;
-    for (int i = currentStepIndex; i < route.steps.length; i++) {
-      totalDistance += route.steps[i].distanceMeters;
+  String _formatDuration(int seconds) {
+    if (seconds < 60) return '< 1 min';
+    final minutes = (seconds / 60).ceil();
+    if (minutes < 60) {
+      return '$minutes min';
+    } else {
+      final hours = minutes ~/ 60;
+      final mins = minutes % 60;
+      if (mins == 0) return '${hours} h';
+      return '${hours} h ${mins} min';
     }
-    return totalDistance;
+  }
+  
+  // Optional: Arrival time calculation if "tiempo de llegada" strictly means ETA
+  String _formatArrivalTime() {
+     final now = DateTime.now();
+     final arrival = now.add(Duration(seconds: remainingSeconds));
+     return '${arrival.hour.toString().padLeft(2, '0')}:${arrival.minute.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final remainingDistance = _calculateRemainingDistance();
-    final totalSteps = route.steps.length;
 
     return Positioned(
       top: 60,
@@ -57,22 +66,38 @@ class NavigationProgressWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Step progress
+              // Time remaining (Replaces Step Progress)
               Row(
                 children: [
-                  Icon(
-                    Icons.list_alt_rounded,
-                    size: 20,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                   Icon(
+                    Icons.access_time_filled_rounded,
+                    size: 24,
+                    color: Colors.blue[600],
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Paso ${currentStepIndex + 1}/$totalSteps',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _formatDuration(remainingSeconds),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurface,
+                          height: 1.1,
+                        ),
+                      ),
+                      Text(
+                        'Llegada : ${_formatArrivalTime()}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          height: 1.1,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

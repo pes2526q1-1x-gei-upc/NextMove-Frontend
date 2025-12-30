@@ -30,7 +30,7 @@ class TurnInstructionWidget extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Positioned(
-      top: 120,
+      top: 130,
       left: 16,
       right: 16,
       child: Material(
@@ -91,41 +91,6 @@ class TurnInstructionWidget extends StatelessWidget {
                   color: theme.colorScheme.onSurface,
                   height: 1.3,
                 ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              // Step distance and duration
-              Row(
-                children: [
-                  Icon(
-                    Icons.straighten_rounded,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    currentStep.distance,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.access_time_rounded,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    currentStep.duration,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
