@@ -175,6 +175,7 @@
     "anyStationsFound": "No s'han trobat resultats per a la teva cerca.",
     "errorSavingRoute": "Error en desar la ruta",
     "notEnoughPointsToRecordTrack": "No s'han gravat prou punts per desar la ruta enregistrada.",
+    "howToGetThere": "Indicacions",
     "routeHistory": "Historial de recorreguts enregistrats",
     "noRoutesFound": "No s'han trobat recorreguts enregistrats.",
     "avgSpeed": "Velocitat mitjana",
@@ -231,7 +232,62 @@
     "errorDeletingAccount": "Error en eliminar el compte.",
     "accountDeletedSuccessfully": "El compte s'ha eliminat correctament.",
     "userMismatch": "L'usuari no coincideix amb l'usuari actual.",
+    "start": "Iniciar",
+    "estTime": "Temps estimat",
+    "uLoc": "La teva ubicació",
     "social": "Social",
+    "ranking": "Rànquing",
+    "numberOfRoutes": "Nombre de rutes",
+    "challengesParticipated": "Reptes participats",
+    "challengesCompleted": "Reptes completats",
+    "noStatisticsAvailable": "No hi ha estadístiques disponibles per a aquest usuari.",
+    "accountSuspendedMessage": "El seu compte ha sigut suspès.",
+    "accountSuspended": "Compte suspès",
+    "suspensionReason": "Motiu de la suspensió",
+    "communityGuidelinesViolation": "Incompliment de les normes de la comunitat",
+    "needHelp": "Necessites ajuda?",
+    "contactSupport": "Contacta amb el suport",
+    "reviewCommunityGuidelines": "Revisa les nostres normes de la comunitat per evitar futures suspensions.",
+    "description": "Descripció",
+    "days": "dies",
+    "hours": "hores",
+    "minutes": "minuts",
+    "permanent": "Permanent",
+    "challenges": "Reptes",
+    "competition": "Competició",
+    "noChallengesAvailable": "No hi ha reptes disponibles.",
+    "points": "{count, plural, =1{{count} punt} other{{count} punts}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "dates": "Dates",
+    "startDate": "Data d'inici",
+    "endDate": "Data de finalització",
+    "company": "Empresa",
+    "enroll": "Inscriure's",
+    "enrolled": "Inscrit",
+    "share": "Compartir",
+    "routeRecordedOn": "Ruta enregistrada el dia {date} a les {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    },
+    "shareRouteStatisticsMessage": "He enregistrat una ruta amb bicicleta utilitzant NextMove! Mira les meves estadístiques i descarrega l'aplicació per competir amb mi i la resta de la comunitat."
+    ,"errorAddingToCalendar": "S'ha produït un error en afegir el repte al calendari.",
+        "social": "Social",
 
     "chats": "Xats",
     "connectingToServer": "Connectant al servidor...",

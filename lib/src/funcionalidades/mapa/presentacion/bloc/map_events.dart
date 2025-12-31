@@ -112,3 +112,20 @@ class AddRoutePointEvent extends MapEvent {
 class UpdateRecordingElapsedTimeEvent extends MapEvent {
   const UpdateRecordingElapsedTimeEvent();
 }
+
+class ShowRouteToStationEvent extends MapEvent {
+  final StationDetails station;
+  //final LatLng? userLocation;
+
+  const ShowRouteToStationEvent({
+    required this.station,
+    //this.userLocation,
+  });
+
+  @override
+  List<Object?> get props => [station /*, userLocation*/];
+}
+
+class CancelNavigationEvent extends MapEvent {
+  const CancelNavigationEvent();
+}

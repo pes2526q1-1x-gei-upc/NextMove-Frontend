@@ -158,4 +158,51 @@ class StationRepository {
       throw UnknownFailure();
     }
   }
+
+  Future<Either<Failure, void>> setStationFavoriteStatus(String stationId, StationType stationType, bool isFavorite) async {
+    try {
+      await stationRemoteDataProvider.setStationFavoriteStatus(stationId, stationType, isFavorite);
+      return Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in setStationFavoriteStatus: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
+  Future<Either<Failure, List<String>>> getFavCarStationIds() async {
+    try {
+      final ids = await stationRemoteDataProvider.getFavCarStationIds();
+      return Right(ids);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getFavCarStationIds: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
+
+  Future<Either<Failure, List<String>>> getFavBikeStationIds() async {
+    try {
+      final ids = await stationRemoteDataProvider.getFavBikeStationIds();
+      return Right(ids);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getFavBikeStationIds: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
 }

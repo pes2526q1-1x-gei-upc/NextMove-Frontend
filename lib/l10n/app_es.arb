@@ -118,8 +118,8 @@
     "waitAMoment": "Espera un momento por favor",
     "hi": "Hola, ",
     "ops": "¡Vaya!",
-    "account" : "Cuenta",
-    "accountDetails" : "Detalles de la cuenta",
+    "account": "Cuenta",
+    "accountDetails": "Detalles de la cuenta",
     "bloquedUsers": "Usuarios bloqueados",
     "noBloquedUsers": "No tienes usuarios bloqueados.",
     "unblock": "Desbloquear",
@@ -168,7 +168,6 @@
             }
         }
     },
-
     "deleteFriend": "Eliminar amistad",
     "blockUser": "Bloquear usuario",
     "blockUserConfirmation": "¿Estás seguro de que quieres bloquear a {nickname}? No podrás ver su perfil ni interactuar con él.",
@@ -181,10 +180,11 @@
         }
     },
     "block": "Bloquear",
-    "minCharsSearchHint" : "Por favor, introduce al menos 3 caracteres para buscar.",
-    "anyStationsFound" : "No se han encontrado resultados para tu búsqueda.",
+    "minCharsSearchHint": "Por favor, introduce al menos 3 caracteres para buscar.",
+    "anyStationsFound": "No se han encontrado resultados para tu búsqueda.",
     "errorSavingRoute": "Error al guardar la ruta",
     "notEnoughPointsToRecordTrack": "No se han registrado suficientes puntos para guardar la ruta grabada.",
+    "howToGetThere": "Cómo llegar",
     "routeHistory": "Historial de recorridos grabados",
     "noRoutesFound": "No se han encontrado rutas grabadas.",
     "distance": "Distancia",
@@ -241,6 +241,61 @@
     "errorDeletingAccount": "Error al eliminar la cuenta.",
     "accountDeletedSuccessfully": "La cuenta se ha eliminado correctamente.",
     "userMismatch": "El usuario no coincide con el usuario actual.",
+    "start": "Iniciar",
+    "estTime": "Tiempo estimado",
+    "uLoc": "Tu ubicación",
+    "social": "Social",
+    "ranking": "Ránquing",
+    "numberOfRoutes": "Número de rutas",
+    "challengesParticipated": "Retos participados",
+    "challengesCompleted": "Retos completados",
+    "noStatisticsAvailable": "No hay estadísticas disponibles para este usuario.",
+    "accountSuspendedMessage": "Tu cuenta ha sido suspendida.",
+    "accountSuspended": "Cuenta suspendida",
+    "suspensionReason": "Motivo de la suspensión",
+    "communityGuidelinesViolation": "Violación de las normas de la comunidad",
+    "needHelp": "¿Necesitas ayuda?",
+    "contactSupport": "Contacta con soporte",
+    "reviewCommunityGuidelines": "Revisa nuestras normas de comunidad para evitar futuras suspensiones.",
+    "description": "Descripción",
+    "days": "días",
+    "hours": "horas",
+    "minutes": "minutos",
+    "permanent": "Permanente",
+    "challenges": "Retos",
+    "competition": "Competición",
+    "noChallengesAvailable": "No hay retos disponibles.",
+    "points": "{count, plural, =1{{count} punto} other{{count} puntos}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "dates": "Fechas",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de finalización",
+    "company": "Empresa",
+    "enroll": "Inscribirse",
+    "enrolled": "Inscrito",
+    "share": "Compartir",
+    "routeRecordedOn": "Estadísticas de la ruta grabada el día {date} a las {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    },
+    "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad."
+    ,"errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario.",
     "social": "Social",
 
     "chats": "Chats",

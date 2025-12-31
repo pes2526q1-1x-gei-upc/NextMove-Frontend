@@ -23,8 +23,8 @@ class UserRemoteDataProvider {
     final currentUser = firebaseAuth.currentUser;
     if (kDebugMode) {
       print(
-      "UserRemoteDataProvider: getUserProfile for $identifier. CurrentUser UID: ${currentUser?.uid}",
-    );
+        "UserRemoteDataProvider: getUserProfile for $identifier. CurrentUser UID: ${currentUser?.uid}",
+      );
     }
 
     // Cargar el perfil del usuario logeado
@@ -32,39 +32,61 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print("UserRemoteDataProvider: Fetching MY profile");
       }
-      return _fetchMyProfile(currentUser.email!);
+
+      return _fetchMyProfile();
     }
     // Cargar el perfil de otro usuario por su nickname
     else {
       if (kDebugMode) {
         print(
-        "UserRemoteDataProvider: Fetching profile by nickname: $identifier",
-      );
+          "UserRemoteDataProvider: Fetching profile by nickname: $identifier",
+        );
       }
       return _fetchUserProfileByNickname(identifier);
     }
   }
 
-  Future<UserEntity> _fetchMyProfile(String email) async {
-    const String getUserQuery = r'''
-      query User($email: String!) {
-        User(email: $email) {
-          email
-          name
-          nickname
-          photo
-          phoneNumber
-          bioDescription
-          preferredMode
-          preferredLanguage
-          birthDate
-          createdAt
-        }
-      }
-    ''';
+  Future<UserEntity> getUserProfileByEmail(String email) async {
+    return _fetchProfile(email);
+  }
 
+  Future<UserEntity> _fetchMyProfile() async {
     final QueryOptions options = QueryOptions(
-      document: gql(getUserQuery),
+      document: gql(GraphQLQueries.getMeQuery),
+      fetchPolicy: FetchPolicy.noCache,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print('Error GraphQL Raw: ${result.exception.toString()}');
+      }
+      throw custom_exceptions.ServerException(
+        'Error al obtener perfil: ${result.exception}',
+      );
+    }
+
+    final data = result.data?['me'];
+    if (data == null) {
+      if (kDebugMode) {
+        print('No se encontró el usuario actual');
+      }
+      throw custom_exceptions.ServerException('No se encontró el usuario');
+    }
+
+    final statsData = await _fetchStatistics(data['email']);
+
+    if (statsData != null) {
+      data['statistics'] = statsData;
+    }
+
+    return UserEntity.fromRawData(data);
+  }
+
+  Future<UserEntity> _fetchProfile(String email) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getUserQuery),
       variables: {'email': email},
       fetchPolicy: FetchPolicy.noCache,
     );
@@ -88,7 +110,44 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
+    final statsData = await _fetchStatistics(email);
+
+    if (statsData != null) {
+      data['statistics'] = statsData;
+    }
+
     return UserEntity.fromRawData(data);
+  }
+
+  Future<dynamic> _fetchStatistics(String email) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getUserStats),
+      variables: {'email': email},
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print('Error GraphQL Raw (stats): ${result.exception.toString()}');
+      }
+      throw custom_exceptions.ServerException(
+        'Error al obtener estadísticas: ${result.exception}',
+      );
+    }
+
+    final statsData = result.data?['userStats'];
+    if (statsData == null) {
+      if (kDebugMode) {
+        print(
+          'No se encontraron estadísticas para el usuario con email: $email',
+        );
+      }
+      return;
+    }
+
+    return statsData;
   }
 
   Future<UserEntity> _fetchUserProfileByNickname(String nickname) async {
@@ -122,8 +181,8 @@ class UserRemoteDataProvider {
     }
     if (kDebugMode) {
       print(
-      "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
-    );
+        "UserRemoteDataProvider: Search results for '$nickname': ${data.map((u) => u['nickname']).toList()}",
+      );
     }
 
     // Buscar coincidencia exacta
@@ -134,8 +193,8 @@ class UserRemoteDataProvider {
       orElse: () {
         if (kDebugMode) {
           print(
-          "UserRemoteDataProvider: Exact match for '$nickname' not found in results.",
-        );
+            "UserRemoteDataProvider: Exact match for '$nickname' not found in results.",
+          );
         }
         return null;
       },
@@ -147,8 +206,14 @@ class UserRemoteDataProvider {
 
     if (kDebugMode) {
       print(
-      "UserRemoteDataProvider: Found user: ${exactMatch['nickname']} (Email: ${exactMatch['email']})",
-    );
+        "UserRemoteDataProvider: Found user: ${exactMatch['nickname']} (Email: ${exactMatch['email']})",
+      );
+    }
+
+    final statsData = await _fetchStatistics(exactMatch['email']);
+
+    if (statsData != null) {
+      exactMatch['statistics'] = statsData;
     }
 
     return UserEntity.fromRawData(exactMatch);

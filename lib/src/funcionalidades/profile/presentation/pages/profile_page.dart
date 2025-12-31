@@ -199,6 +199,7 @@ class ProfilePage extends StatelessWidget {
                     const DeleteAccountButton(),
                     
                     const SizedBox(height: 30),
+
                     // --- FOOTER ---
                     const AppFooter(),
 

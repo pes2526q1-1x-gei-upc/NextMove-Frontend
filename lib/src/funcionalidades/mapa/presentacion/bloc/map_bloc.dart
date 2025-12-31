@@ -1,15 +1,23 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/station_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
+import 'package:nextmove_app/src/shared/domain/route_input.dart';
+import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -24,6 +32,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final TrackRepository trackRepository;
   final RecordedRoutesRepository recordedRoutesRepository;
   final SearchHistoryService searchHistoryService;
+  final NavigationRouteRepository navigationRouteRepository;
+  final StationsCache stationsCache;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -35,13 +45,29 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   // Posición central por defecto (Barcelona)
   static const LatLng _bcnCenter = LatLng(41.3851, 2.1734);
 
+  final StationType? _initialMode;
+
+
+  static const Size bikeIconSize = Size(60, 60);  
+  static const Size evIconSize = Size(20, 20);     
+
+  BitmapDescriptor? evLowIcon;
+  BitmapDescriptor? evMidIcon;
+  BitmapDescriptor? evHighIcon;
+  BitmapDescriptor? evSuperIcon;
+  BitmapDescriptor? bikeIcon;
+
   MapBloc({
     required this.stationRepository,
     required this.trackRepository,
     required this.recordedRoutesRepository,
+    required this.navigationRouteRepository,
     required this.searchHistoryService,
+    required this.stationsCache,
     required this.onMarkerTapped,
-  }) : super(const MapInitialState()) {
+    StationType? initialMode,
+  }) : _initialMode = initialMode,
+       super(const MapInitialState()) {
     // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
@@ -55,6 +81,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<StopRouteRecordingEvent>(_onStopRouteRecording);
     on<AddRoutePointEvent>(_onAddRoutePoint);
     on<UpdateRecordingElapsedTimeEvent>(_onUpdateRecordingElapsedTime);
+    on<ShowRouteToStationEvent>(_onShowRouteToStation);
+    on<CancelNavigationEvent>(_onCancelNavigation);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -84,17 +112,42 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         (stations) => stations as List<EVStationDetails>? ?? [],
       );
 
-      // Construir marcadores iniciales para bicicletas
+      // Crear ClusterManagerIds
+      final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
+      final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+
+      // Crear ClusterManagers
+      final bikeClusterManager = ClusterManager(
+        clusterManagerId: bikeClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🔵 Cluster de bicicletas tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
+      final evClusterManager = ClusterManager(
+        clusterManagerId: evClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟢 Cluster de EV tapped: ${cluster.count} estaciones');
+          }
+        },
+      );
+
+      bikeIcon = await _getBikeCustomIcon();
+      await _loadEvCustomIcons();
+
       final bikeMarkers = _buildMarkersForStations(
         bikeStations,
         null,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        bikeClusterManagerId,
       );
 
       final carMarkers = _buildMarkersForStations(
         null,
         evStations,
-        BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        evClusterManagerId,
       );
 
       // Cargar búsquedas recientes guardadas
@@ -111,13 +164,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evStations,
       );
 
+      // Determinar el modo inicial: usar el modo preferido del usuario o bici por defecto
+      final initialMode = _initialMode ?? StationType.bicycle;
+
       // Emitir estado cargado
       emit(
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
           userLocation: null,
-          currentMode: StationType.bicycle,
+          currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
@@ -127,9 +183,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           isSearching: false,
           routePolyline: defaultPolyline,
           recentBikeSearches: recentBikeSearches,  
-          recentEvSearches: recentEvSearches,      
+          recentEvSearches: recentEvSearches,     
+          decodedPolyline: null,
+          bikeClusterManager: bikeClusterManager,
+          evClusterManager: evClusterManager,
         ),
       );
+
+      // Update cache
+      stationsCache.updateStations([...bikeStations, ...evStations]);
 
       // Iniciar solicitud de permisos de ubicación
       add(const RequestLocationPermissionEvent());
@@ -446,11 +508,81 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  /// Construir marcadores para una lista de estaciones
+ 
+  Future<BitmapDescriptor> _getBikeCustomIcon() async {
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
+    final ByteData data = await rootBundle.load('assets/bikePin_custom.png');
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: targetSize.width.toInt(),
+      targetHeight: targetSize.height.toInt(),
+    );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.bytes(resizedBytes);
+  }
+
+  Future<void> _loadEvCustomIcons() async {
+    final targetSize = Platform.isIOS ? const Size(75, 75) : const Size(75, 75);
+    final targetWidth = targetSize.width.toInt();
+    final targetHeight = targetSize.height.toInt();
+    
+    evLowIcon = await _loadEvIcon('assets/evLow_icon.png', targetWidth, targetHeight);
+    evMidIcon = await _loadEvIcon('assets/evMid_icon.png', targetWidth, targetHeight);
+    evHighIcon = await _loadEvIcon('assets/evHigh_icon.png', targetWidth, targetHeight);
+    evSuperIcon = await _loadEvIcon('assets/evSuper_icon.png', targetWidth, targetHeight);
+  }
+
+  Future<BitmapDescriptor> _loadEvIcon(String assetPath, int width, int height) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    final Uint8List bytes = data.buffer.asUint8List();
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: width,
+      targetHeight: height,
+    );
+    final ui.FrameInfo frameInfo = await codec.getNextFrame();
+    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+    return BitmapDescriptor.bytes(resizedBytes);
+  }
+
+  double _getMaxPowerKw(List<Connector>? connectors) {
+    if (connectors == null || connectors.isEmpty) {
+      return 0.0;
+    }
+    double maxPower = 0.0;
+    for (var connector in connectors) {
+      if (connector.powerKw != null && connector.powerKw! > maxPower) {
+        maxPower = connector.powerKw!;
+      }
+    }
+    return maxPower;
+  }
+
+  BitmapDescriptor _getCarIconByPower(double powerKw, bool isSuperFast) {
+    if (isSuperFast) {
+      return evSuperIcon!;
+    }
+    
+    if (powerKw <= 11) {
+      return evLowIcon!;
+    } else if (powerKw <= 22) {
+      return evMidIcon!;
+    } else if (powerKw <= 50) {
+      return evHighIcon!;
+    } else {
+      return evSuperIcon!;
+    }
+  }
+
+  
   Set<Marker> _buildMarkersForStations(
     List<BicycleStationDetails>? bikeStations,
     List<EVStationDetails>? evStations,
-    BitmapDescriptor icon,
+    ClusterManagerId clusterManagerId,
   ) {
     if (bikeStations == null && evStations != null) {
       return evStations
@@ -458,10 +590,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             (station) => station.latitude != null && station.longitude != null,
           )
           .map((station) {
+            final power = _getMaxPowerKw(station.connectors);
+            final icon = _getCarIconByPower(power, station.isSuperFast == true);
+            
             return Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
               icon: icon,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })
@@ -475,7 +611,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             return Marker(
               markerId: MarkerId(station.id),
               position: LatLng(station.latitude!, station.longitude!),
-              icon: icon,
+              icon: bikeIcon!,
+              clusterManagerId: clusterManagerId,
               onTap: () => onMarkerTapped(station, state as MapLoadedState),
             );
           })
@@ -646,6 +783,98 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
       emit(currentState.copyWith(
         recordingElapsedTime: newElapsedTime,
+      ));
+    }
+  }
+
+  void _onShowRouteToStation (
+    ShowRouteToStationEvent event,
+    Emitter<MapState> emit,
+  ) async{
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      
+      emit(currentState.copyWith(
+        isNavigationMode: true,
+        selectedStation: event.station,
+        searchQuery: null,
+        searchResults: [],
+      ));
+
+      final routeInput = RouteInput(
+        origin: currentState.userLocation!, 
+        destination: LatLng(event.station.latitude!, event.station.longitude!),  
+        mode: currentState.currentMode == StationType.bicycle ? TravelModeEnum.BICYCLE : TravelModeEnum.DRIVE, 
+        routingPreference: RoutingPreferenceEnum.TRAFFIC_AWARE,
+      );
+
+      try{
+          final result = await navigationRouteRepository.fetchNavigationRoute(routeInput);
+
+          if(emit.isDone){
+            debugPrint('Bloc closed, aborting navigation route fetch.');
+            return;
+          }
+          result.fold(
+            (failure) {
+              if (kDebugMode) {
+                print('Error fetching navigation route: ${failure.message}');
+              }
+            },
+            (navigationRoute) {
+              if (kDebugMode) {
+                print('Navigation route fetched successfully.');
+              }
+              final List<PointLatLng> decodedPoints = PolylinePoints.decodePolyline(navigationRoute.polyline);
+
+              final List<LatLng> polylinePointsCoordinates = decodedPoints
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+
+              // 3. Crear el objeto Polyline
+              final Polyline navigationPolyline = Polyline(
+                polylineId: const PolylineId('navigation_route'),
+                points: polylinePointsCoordinates,
+                color:  currentState.currentMode == StationType.bicycle ? Colors.blue : Colors.green,
+                width: 5,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              );
+
+              emit(currentState.copyWith(
+                navigationRoute: navigationRoute,
+                decodedPolyline: navigationPolyline,
+                routeViewport: navigationRoute.viewport,
+                isNavigationMode: true,
+                selectedStation: event.station,
+                searchQuery: null,
+                searchResults: [],
+              ));
+            },
+          );
+          } catch (e) {
+            if (kDebugMode) {
+              print('Error fetching navigation route: $e');
+            }
+          }
+
+    }
+
+    
+  }
+
+  void _onCancelNavigation(
+    CancelNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(
+        isNavigationMode: false,
+        selectedStation: null,
+        navigationRoute: null,
+        decodedPolyline: Polyline(polylineId: PolylineId('no_route')),
+        routeViewport: null,
       ));
     }
   }

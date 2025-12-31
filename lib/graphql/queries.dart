@@ -1,6 +1,6 @@
 class GraphQLQueries {
   // === Perfil ===
-  static const String getUserProfileQuery = r'''
+  static const String getMeQuery = r'''
   query Me {
     me {
       email
@@ -13,9 +13,33 @@ class GraphQLQueries {
       phoneNumber
       preferredLanguage
       createdAt
+      isBanned
+      banInfo {
+        bannedUntil
+        description
+        reason
+        isPermanent
+      }
     }
   }
   ''';
+
+  static const String getUserQuery = r'''
+      query User($email: String!) {
+        User(email: $email) {
+          email
+          name
+          nickname
+          photo
+          phoneNumber
+          bioDescription
+          preferredMode
+          preferredLanguage
+          birthDate
+          createdAt
+        }
+      }
+    ''';
 
   static const String existsUserQuery = r'''
     query ExistsUser ($email: String!) {
@@ -62,7 +86,8 @@ class GraphQLQueries {
         anclajesDisponibles,
         estado,
         bicisMecanicasDisponibles,
-        bicisElectricasDisponibles
+        bicisElectricasDisponibles,
+        isFavoriteStation
       }
     }''';
 
@@ -85,7 +110,7 @@ class GraphQLQueries {
         latitude
         longitude
       }
-      
+      isFavoriteStation
       distanciaKm
     }
   }''';
@@ -152,6 +177,7 @@ class GraphQLQueries {
           isSuperFast
           lastUpdated
           distance
+          isFavoriteStation
         }
       }
     }''';
@@ -174,6 +200,7 @@ class GraphQLQueries {
         status
       }
       isSuperFast
+      isFavoriteStation
     }
   }''';
 
@@ -286,8 +313,185 @@ class GraphQLQueries {
       checkAssessed(station_id: $station_id)
     } 
   ''';
-}
 
+    static const String getNavigationRouteQuery = r'''
+      query ComputeRoute(
+        $origin: CoordinatesInput!
+        $destination: CoordinatesInput!
+        $travelMode: TravelMode!
+        $routingPreference: RoutingPreference!
+      ) {
+          computeRoute(
+            input: {
+              origin: $origin
+              destination: $destination
+              travelMode: $travelMode
+              routingPreference: $routingPreference
+            }
+          ) {
+            recommendedRoute {
+              distance
+              distanceMeters
+              duration
+              durationSeconds
+              polyline
+              isEcoFriendly
+              routeLabels
+              startLocation {
+                latitude
+                longitude
+              }
+              endLocation {
+                latitude
+                longitude
+              }
+              viewport {
+                low {
+                  latitude
+                  longitude
+                }
+                high {
+                  latitude
+                  longitude
+                }
+              }
+              travelAdvisory {
+                hasTollRoads
+                estimatedTollPrice
+                fuelConsumption
+              }
+              steps {
+                instruction
+                distance
+                distanceMeters
+                duration
+                durationSeconds
+                startLocation {
+                  latitude
+                  longitude
+                }
+                endLocation {
+                  latitude
+                  longitude
+                }
+                polyline
+              }
+            }
+          }
+        }''';
+  static const String addFavStation = r'''
+    mutation addFavStation($stationId: String!, $stationType: String!) {
+      addFavStation(station_id: $stationId, type: $stationType)
+    }
+  ''';
+
+  static const String deleteFavStation = r'''
+    mutation deleteFavStation($stationId: String!, $stationType: String!) {
+      deleteFavStation(stationId: $stationId, type: $stationType)
+    }
+  ''';
+
+  // === Ranking ===
+
+  static const String getRanking = r'''
+  query getRanking($metric: String!) {
+    ranking(metric: $metric) {
+      email
+      num_rutas
+      km_recorridos
+      elevacion_positiva
+      co2_ahorrado
+      calorias_quemadas
+      num_retos_participados
+      num_retos_completados
+    }
+  }''';
+
+  static const String getGlobalStats = r'''
+  query global {
+    globalStats {
+      total_usuarios
+      usuarios_activos
+      usuarios_inactivos
+      km_recorridos_totales
+      km_promedio
+      km_recorridos_maximo
+      rutas_totales
+      elevacion_positiva_total
+      calorias_quemadas_total
+      co2_total_ahorrado
+    }
+  }''';
+
+  static const String getUserStats = r'''
+  query userStats($email: String!) {
+    userStats(email: $email) {
+      email
+      num_rutas
+      km_recorridos
+      co2_ahorrado
+      calorias_quemadas
+      elevacion_positiva
+      num_retos_participados
+      num_retos_completados
+      num_rutas
+    }
+  }''';
+
+  static const String getTopUsers = r'''
+  query top($limit: Int!, $metric: String!) {
+    topUsers(limit: $limit, metric: $metric) {
+      email
+    }
+  }''';
+
+  // === Retos ===
+
+  static const String getAllChallenges = r'''
+  query getAllChallenges {
+    getAllChallenges {
+      id
+      description
+      distance
+      name
+      points
+      starting_date
+      ending_date
+      photo
+      company {
+        name
+        photo
+      }
+    }
+  }''';
+
+  static const String getEnrolledChallengesNames = r'''
+  query getEnrolledChallenges {
+    getEnrolledChallenges {
+      name
+    }
+  }''';
+
+  static const String enrollInChallenge = r'''
+  mutation enrollInChallenge($challengeId: String!) {
+    enrollChallenge(challenge_id: $challengeId)
+  }''';
+
+  static const String getFavCarStations = r'''
+  query GetFavCarStations {
+    getFavCarStations {
+      station_id
+    }
+  }
+  ''';
+
+  static const String getFavBikeStations = r'''
+  query GetFavBikeStations {
+    getFavBikeStations {
+      station_id
+    }
+  }'''; 
+}
 const String getOrCreateDirectChatQuery = r'''
   query GetOrCreateDirectChat($userEmail: String!) {
     getOrCreateDirectChat(userEmail: $userEmail) {

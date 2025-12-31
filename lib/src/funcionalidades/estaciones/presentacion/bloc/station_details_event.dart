@@ -10,8 +10,8 @@ class LoadStationDetailsEvent extends StationDetailsEvent {
   LoadStationDetailsEvent(this.stationId, this.stationType, [this.stationDetails]);
 }
 
-class ToggleFavoriteStatusEvent extends StationDetailsEvent {
+class ToggleFavoriteEvent extends StationDetailsEvent {
   final String stationId;
 
-  ToggleFavoriteStatusEvent(this.stationId);
+  ToggleFavoriteEvent(this.stationId);
 }

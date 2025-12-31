@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 class UserEntity extends Equatable {
   final String email;
@@ -12,6 +13,7 @@ class UserEntity extends Equatable {
   final String descripcion;
   final String modoPreferido;
   final bool? regWithGoogle;
+  final UserStatistics? statistics;
 
   const UserEntity({
     required this.email,
@@ -25,10 +27,14 @@ class UserEntity extends Equatable {
     required this.descripcion,
     required this.modoPreferido,
     this.regWithGoogle,
+    this.statistics,
   });
 
   // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
   factory UserEntity.fromRawData(Map<String, dynamic> data) {
+    if (kDebugMode) {
+      print('UserEntity.fromRawData: $data');
+    }
     return UserEntity(
       email: data['email'],
       apodo: data['nickname'] ?? 'Usuario',
@@ -47,6 +53,21 @@ class UserEntity extends Equatable {
       modoPreferido: mapPreferredModeFromAPI(data['preferredMode']),
       photo: data['photo'] ?? '',
       regWithGoogle: data['regWithGoogle'] ?? false,
+      statistics: data['statistics'] != null
+          ? UserStatistics(
+              totalRoutes: data['statistics']['num_rutas'] ?? 0,
+              distance: (data['statistics']['km_recorridos'] ?? 0).toDouble(),
+              elevationGain: (data['statistics']['elevacion_positiva'] ?? 0)
+                  .toDouble(),
+              caloriesBurned: (data['statistics']['calorias_quemadas'] ?? 0)
+                  .toDouble(),
+              co2Saved: (data['statistics']['co2_ahorrado'] ?? 0).toDouble(),
+              challengesParticipated:
+                  (data['statistics']['num_retos_participados'] ?? 0).toDouble(),
+              challengesCompleted:
+                  (data['statistics']['num_retos_completados'] ?? 0).toDouble(),
+            )
+          : null,
     );
   }
 
@@ -165,4 +186,24 @@ class UserEntity extends Equatable {
     photo,
     regWithGoogle,
   ];
+}
+
+class UserStatistics {
+  final int totalRoutes;
+  final double distance;
+  final double co2Saved;
+  final double caloriesBurned;
+  final double elevationGain;
+  final double challengesParticipated;
+  final double challengesCompleted;
+
+  UserStatistics({
+    required this.totalRoutes,
+    required this.distance,
+    required this.elevationGain,
+    required this.caloriesBurned,
+    required this.co2Saved,
+    required this.challengesParticipated,
+    required this.challengesCompleted,
+  });
 }
