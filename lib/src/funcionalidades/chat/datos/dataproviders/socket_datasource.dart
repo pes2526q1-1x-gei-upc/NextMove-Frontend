@@ -29,6 +29,10 @@ class SocketDataSource {
       StreamController<Map<String, dynamic>>.broadcast();
   final StreamController<Map<String, dynamic>> _groupDeletedController =
       StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _friendshipDeletedController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _directChatCreatedController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   bool _listenersConfigured = false;
   SocketDataSource();
@@ -56,6 +60,10 @@ class SocketDataSource {
       _groupParticipantKickedController.stream;
   Stream<Map<String, dynamic>> get groupDeletedStream =>
       _groupDeletedController.stream;
+  Stream<Map<String, dynamic>> get friendshipDeletedStream =>
+      _friendshipDeletedController.stream;
+  Stream<Map<String, dynamic>> get directChatCreatedStream =>
+      _directChatCreatedController.stream;
 
   /// Configurar listeners de Socket.IO
   void setupSocketListeners() {
@@ -168,6 +176,18 @@ class SocketDataSource {
     socket.on('group:deleted', (data) {
       debugPrint('[SocketDataSource] 🗑️ Grupo eliminado: $data');
       _groupDeletedController.add(data as Map<String, dynamic>);
+    });
+
+    // Amistad eliminada (chat directo eliminado)
+    socket.on('friendship:deleted', (data) {
+      debugPrint('[SocketDataSource] 🗑️ Amistad eliminada (chat eliminado): $data');
+      _friendshipDeletedController.add(data as Map<String, dynamic>);
+    });
+
+    // Chat directo creado
+    socket.on('direct:chat:created', (data) {
+      debugPrint('[SocketDataSource] ➕ Chat directo creado: $data');
+      _directChatCreatedController.add(data as Map<String, dynamic>);
     });
 
     _listenersConfigured = true;
@@ -303,6 +323,8 @@ class SocketDataSource {
     _userKickedController.close();
     _groupUserAddedController.close();
     _groupParticipantKickedController.close();
+    _friendshipDeletedController.close();
+    _directChatCreatedController.close();
   }
 
   /// Forzar reconfiguración de listeners tras una reconexión de socket
@@ -327,6 +349,8 @@ class SocketDataSource {
       socket.off('group:user:added');
       socket.off('group:participant:kicked');
       socket.off('group:deleted');
+      socket.off('friendship:deleted');
+      socket.off('direct:chat:created');
     }
 
     _listenersConfigured = false;

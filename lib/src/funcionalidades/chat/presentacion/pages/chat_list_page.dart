@@ -14,6 +14,7 @@ import '../../../../../graphql/queries.dart';
 import '../widgets/chat_list_widgets.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'create_group_page.dart';
+import 'package:nextmove_app/config/socket_config.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -38,11 +39,18 @@ class _ChatListPageState extends State<ChatListPage> {
   Future<List<dynamic>>? _friendsForFilterFuture;
   Timer? _autoRefreshTimer;
   Set<String> _lastKnownGroupIds = {}; // IDs de grupos conocidos para detectar cambios
+  StreamSubscription<Map<String, dynamic>>? _directChatCreatedSubscription;
 
   @override
   void dispose() {
     _searchController.dispose();
     _autoRefreshTimer?.cancel();
+    _directChatCreatedSubscription?.cancel();
+    // Eliminar listener del socket
+    final socket = SocketConfig.socket;
+    if (socket != null) {
+      socket.off('direct:chat:created');
+    }
     super.dispose();
   }
 
@@ -53,7 +61,35 @@ class _ChatListPageState extends State<ChatListPage> {
       _initializeChat();
       _loadFriendsForFilter();
       _startAutoRefresh();
+      _setupDirectChatCreatedListener();
     });
+  }
+
+  void _setupDirectChatCreatedListener() {
+    try {
+      final socket = SocketConfig.socket;
+      if (socket != null && socket.connected) {
+        // Eliminar listener previo si existe para evitar duplicados
+        socket.off('direct:chat:created');
+        socket.on('direct:chat:created', (data) {
+          debugPrint('[ChatListPage] ➕ Chat directo creado recibido: $data');
+          if (mounted) {
+            refreshChatList();
+          }
+        });
+        debugPrint('[ChatListPage] ✅ Listener de direct:chat:created configurado');
+      } else {
+        debugPrint('[ChatListPage] ⚠️ Socket no disponible, reintentando en 1 segundo...');
+        // Reintentar después de 1 segundo
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            _setupDirectChatCreatedListener();
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('[ChatListPage] Error configurando listener de chat directo creado: $e');
+    }
   }
 
   void _startAutoRefresh() {
@@ -555,6 +591,7 @@ class _ChatListPageState extends State<ChatListPage> {
           'chatId': chat['id'] as String,
           'email': otherParticipant?['userEmail'] as String?,
           'type': 'direct',
+          'lastMessage': chat['lastMessage'] as Map<String, dynamic>?,
         };
       } else {
         // --- CAMBIO AQUÍ: Mapeamos la foto del grupo ---
@@ -565,6 +602,7 @@ class _ChatListPageState extends State<ChatListPage> {
           'email': null,
           'type': 'group',
           'description': chat['description'] as String?,
+          'lastMessage': chat['lastMessage'] as Map<String, dynamic>?,
         };
       }
     }).toList();
@@ -583,6 +621,7 @@ class _ChatListPageState extends State<ChatListPage> {
             'chatId': null,
             'email': friend['email'] as String?,
             'type': 'direct',
+            'lastMessage': null, // No hay chat aún, no hay último mensaje
           });
         }
       }
@@ -684,7 +723,29 @@ class _ChatListPageState extends State<ChatListPage> {
           final groupName = group['name'] as String? ?? 'Grupo';
           final groupId = group['chatId'] as String;
           final description = group['description'] as String?;
-          final groupPhoto = group['photo'] as String?; 
+          final groupPhoto = group['photo'] as String?;
+          final lastMessage = group['lastMessage'] as Map<String, dynamic>?;
+
+          // Determinar qué mostrar en el subtitle
+          String? subtitleText;
+          if (lastMessage != null && lastMessage['content'] != null) {
+            final sender = lastMessage['sender'] as String?;
+            final content = lastMessage['content'] as String? ?? '';
+            if (content.isNotEmpty) {
+              if (sender != null && sender.isNotEmpty) {
+                subtitleText = '$sender: $content';
+              } else {
+                subtitleText = content;
+              }
+            }
+          }
+          
+          // Si no hay último mensaje, mostrar la descripción del grupo
+          if (subtitleText == null || subtitleText.isEmpty) {
+            if (description != null && description.isNotEmpty) {
+              subtitleText = description;
+            }
+          }
 
           return ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
@@ -701,8 +762,15 @@ class _ChatListPageState extends State<ChatListPage> {
               groupName,
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
             ),
-            subtitle: description != null && description.isNotEmpty
-                ? Text(description, maxLines: 1, overflow: TextOverflow.ellipsis)
+            subtitle: subtitleText != null
+                ? Text(
+                    subtitleText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  )
                 : const Text('Grupo', style: TextStyle(fontStyle: FontStyle.italic)),
             onTap: () => _navigateToRoom(
               groupId, 

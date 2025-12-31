@@ -61,15 +61,43 @@ class _FriendChatItemState extends State<FriendChatItem> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      subtitle: Text(
+      subtitle: _buildSubtitle(theme, l10n),
+      onTap: widget.onTap,
+    );
+  }
+
+  Widget _buildSubtitle(ThemeData theme, AppLocalizations l10n) {
+    final lastMessage = widget.friend['lastMessage'] as Map<String, dynamic>?;
+    
+    // Si hay último mensaje y tiene contenido, mostrarlo
+    if (lastMessage != null && lastMessage['content'] != null) {
+      final content = lastMessage['content'] as String? ?? '';
+      if (content.isNotEmpty) {
+        return Text(
+          content,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        );
+      }
+    }
+    
+    // Si no hay último mensaje, mostrar "toca para chatear" solo si no hay chatId (amigo sin chat)
+    final chatId = widget.friend['chatId'] as String?;
+    if (chatId == null) {
+      return Text(
         l10n.tapToChat,
         style: theme.textTheme.bodySmall?.copyWith(
           fontStyle: FontStyle.italic,
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
-      ),
-      onTap: widget.onTap,
-    );
+      );
+    }
+    
+    // Si hay chatId pero no hay mensajes, mostrar mensaje vacío o texto por defecto
+    return const SizedBox.shrink();
   }
 }
 

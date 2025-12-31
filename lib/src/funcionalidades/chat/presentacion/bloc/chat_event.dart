@@ -305,3 +305,17 @@ class GroupDeleted extends ChatEvent {
   @override
   List<Object?> get props => [chatId, chatName];
 }
+
+/// Amistad eliminada (chat directo eliminado)
+class FriendshipDeleted extends ChatEvent {
+  final String chatId;
+  final String deletedBy;
+  final String deletedByNickname;
+  const FriendshipDeleted({
+    required this.chatId,
+    required this.deletedBy,
+    required this.deletedByNickname,
+  });
+  @override
+  List<Object?> get props => [chatId, deletedBy, deletedByNickname];
+}

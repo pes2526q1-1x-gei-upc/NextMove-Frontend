@@ -57,6 +57,14 @@ class ChatRepository {
   Stream<Map<String, dynamic>> get groupDeletedStream =>
       _socketDataSource.groupDeletedStream;
 
+  /// Stream de amistad eliminada (chat directo eliminado)
+  Stream<Map<String, dynamic>> get friendshipDeletedStream =>
+      _socketDataSource.friendshipDeletedStream;
+
+  /// Stream de chat directo creado
+  Stream<Map<String, dynamic>> get directChatCreatedStream =>
+      _socketDataSource.directChatCreatedStream;
+
   /// Unirse a una sala de chat
   Future<void> joinRoom(String roomId) async {
     return await _socketDataSource.joinRoom(roomId);

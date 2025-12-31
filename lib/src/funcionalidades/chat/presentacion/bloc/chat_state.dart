@@ -168,3 +168,17 @@ class GroupDeletedState extends ChatState {
   @override
   List<Object?> get props => [chatId, chatName];
 }
+
+/// Amistad eliminada (chat directo eliminado)
+class FriendshipDeletedState extends ChatState {
+  final String chatId;
+  final String deletedBy;
+  final String deletedByNickname;
+  const FriendshipDeletedState({
+    required this.chatId,
+    required this.deletedBy,
+    required this.deletedByNickname,
+  });
+  @override
+  List<Object?> get props => [chatId, deletedBy, deletedByNickname];
+}

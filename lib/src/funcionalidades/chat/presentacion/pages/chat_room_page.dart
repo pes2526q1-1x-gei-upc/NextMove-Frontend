@@ -507,17 +507,39 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
           if (state is ChatRoomActive) {
             Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
           }
-          // Si el usuario fue expulsado del grupo o el grupo fue eliminado, cerrar la pantalla
-          if ((state is ChatDisconnected || state is GroupDeletedState) && !_isNavigatingAway) {
+          // Si el usuario fue expulsado del grupo, el grupo fue eliminado, o la amistad fue eliminada, cerrar la pantalla
+          if ((state is ChatDisconnected || state is GroupDeletedState || state is FriendshipDeletedState) && !_isNavigatingAway) {
             _isNavigatingAway = true;
             String message;
             bool isGroupDeleted = state is GroupDeletedState;
-            if (isGroupDeleted) {
+            bool isFriendshipDeleted = state is FriendshipDeletedState;
+            
+            // Verificar primero si es una amistad eliminada (para chats individuales)
+            if (isFriendshipDeleted) {
+              final friendshipState = state as FriendshipDeletedState;
+              // Verificar que el chat eliminado corresponde al chat actual
+              if (friendshipState.chatId == widget.roomId && !widget.isGroup) {
+                message = 'La amistad ha sido eliminada';
+                debugPrint('[ChatRoomPage] 🗑️ Amistad eliminada, cerrando pantalla del chat ${widget.roomId}...');
+              } else {
+                // El chat eliminado no es el actual o es un grupo, no hacer nada
+                debugPrint('[ChatRoomPage] ⚠️ Amistad eliminada pero no es el chat actual (${friendshipState.chatId} != ${widget.roomId}) o es grupo (${widget.isGroup})');
+                _isNavigatingAway = false;
+                return;
+              }
+            } else if (isGroupDeleted) {
               message = 'El grupo ha sido eliminado';
               debugPrint('[ChatRoomPage] 🗑️ Grupo eliminado, cerrando pantalla...');
             } else {
-              message = 'Has sido expulsado del grupo';
-              debugPrint('[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...');
+              // Solo mostrar mensaje de expulsión si es un grupo (no un chat individual)
+              if (widget.isGroup) {
+                message = 'Has sido expulsado del grupo';
+                debugPrint('[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...');
+              } else {
+                // Si no es grupo y llegamos aquí, probablemente es una desconexión normal
+                _isNavigatingAway = false;
+                return;
+              }
             }
             // Mostrar mensaje y navegar inmediatamente
             ScaffoldMessenger.of(context).showSnackBar(
@@ -531,7 +553,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             Future.microtask(() {
               if (mounted && _isNavigatingAway) {
                 debugPrint('[ChatRoomPage] ✅ Navegando de vuelta a la lista de chats...');
-                Navigator.of(context).pop({'groupDeleted': isGroupDeleted, 'leftGroup': false});
+                Navigator.of(context).pop({
+                  'groupDeleted': isGroupDeleted,
+                  'friendshipDeleted': isFriendshipDeleted,
+                  'leftGroup': false
+                });
               } else {
                 debugPrint('[ChatRoomPage] ⚠️ No se puede navegar: mounted=$mounted, _isNavigatingAway=$_isNavigatingAway');
               }
@@ -561,8 +587,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
               ),
             );
           }
-          // Si el usuario fue expulsado o el grupo fue eliminado, mostrar loading mientras se navega
-          if (state is ChatDisconnected || state is GroupDeletedState) {
+          // Si el usuario fue expulsado, el grupo fue eliminado, o la amistad fue eliminada, mostrar loading mientras se navega
+          if (state is ChatDisconnected || state is GroupDeletedState || state is FriendshipDeletedState) {
             return Scaffold(
               backgroundColor: theme.colorScheme.surface,
               body: const Center(child: CircularProgressIndicator()),

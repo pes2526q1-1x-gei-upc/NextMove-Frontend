@@ -21,6 +21,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<Map<String, dynamic>>? _userKickedSubscription;
   StreamSubscription<Map<String, dynamic>>? _groupUserAddedSubscription;
   StreamSubscription<Map<String, dynamic>>? _groupParticipantKickedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _friendshipDeletedSubscription;
 
   // Estado local
   String? _currentRoomId;
@@ -53,6 +54,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<GroupUserAdded>(_onGroupUserAdded);
     on<GroupParticipantKicked>(_onGroupParticipantKicked);
     on<GroupDeleted>(_onGroupDeleted);
+    on<FriendshipDeleted>(_onFriendshipDeleted);
   }
 
   /// Inicializar conexión de chat
@@ -266,7 +268,27 @@ Future<void> _onInitializeChat(
       },
     );
 
-    debugPrint('[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted, messageEdited, userKicked, groupUserAdded y groupParticipantKicked)');
+    // Escuchar amistad eliminada (chat directo eliminado)
+    _friendshipDeletedSubscription = _chatRepository.friendshipDeletedStream.listen(
+      (data) {
+        debugPrint('[ChatBloc] 🗑️ Amistad eliminada (chat eliminado): $data');
+        final chatId = data['chatId'] as String?;
+        final deletedBy = data['deletedBy'] as String? ?? '';
+        final deletedByNickname = data['deletedByNickname'] as String? ?? '';
+        if (chatId != null) {
+          add(FriendshipDeleted(
+            chatId: chatId,
+            deletedBy: deletedBy,
+            deletedByNickname: deletedByNickname,
+          ));
+        }
+      },
+      onError: (error) {
+        debugPrint('[ChatBloc] ❌ Error en friendshipDeleted stream: $error');
+      },
+    );
+
+    debugPrint('[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted, messageEdited, userKicked, groupUserAdded, groupParticipantKicked y friendshipDeleted)');
   }
 
   /// Unirse a una sala de chat
@@ -777,6 +799,32 @@ Future<void> _onInitializeChat(
     emit(GroupDeletedState(chatId: event.chatId, chatName: event.chatName));
   }
 
+  /// Amistad eliminada (chat directo eliminado)
+  void _onFriendshipDeleted(
+    FriendshipDeleted event,
+    Emitter<ChatState> emit,
+  ) {
+    debugPrint('[ChatBloc] 🗑️ Amistad eliminada, chat ${event.chatId} eliminado por ${event.deletedByNickname}');
+    debugPrint('[ChatBloc] 📍 Sala actual: $_currentRoomId, Chat eliminado: ${event.chatId}');
+    
+    // Si el usuario está en la sala del chat eliminado, salir y limpiar estado
+    if (_currentRoomId == event.chatId) {
+      debugPrint('[ChatBloc] ✅ Usuario está en la sala eliminada, limpiando estado...');
+      _chatRepository.leaveRoom(event.chatId);
+      _currentRoomId = null;
+      _messages.clear();
+      _usersTyping.clear();
+    }
+    
+    // Siempre emitir FriendshipDeletedState para que la UI pueda reaccionar
+    // incluso si el usuario no está actualmente en esa sala
+    emit(FriendshipDeletedState(
+      chatId: event.chatId,
+      deletedBy: event.deletedBy,
+      deletedByNickname: event.deletedByNickname,
+    ));
+  }
+
   @override
   Future<void> close() {
     _messageSubscription?.cancel();
@@ -787,6 +835,7 @@ Future<void> _onInitializeChat(
     _messageEditedSubscription?.cancel();
     _userKickedSubscription?.cancel();
     _groupUserAddedSubscription?.cancel();
+    _friendshipDeletedSubscription?.cancel();
     return super.close();
   }
 }
