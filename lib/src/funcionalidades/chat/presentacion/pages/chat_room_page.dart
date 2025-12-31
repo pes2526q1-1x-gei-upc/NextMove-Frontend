@@ -344,6 +344,115 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             }
           }
           
+          // Solo permitir swipe to delete para mensajes propios que no estén eliminados
+          if (isMe && !message.deleted) {
+            return Builder(
+              builder: (builderContext) {
+                final builderTheme = Theme.of(builderContext);
+                final chatBloc = context.read<ChatBloc>();
+                
+                return Dismissible(
+                  key: Key('message_${message.id}'),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    decoration: BoxDecoration(
+                      color: builderTheme.colorScheme.error,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  confirmDismiss: (direction) async {
+                    // Mostrar diálogo de confirmación
+                    final l10n = AppLocalizations.of(builderContext)!;
+                    
+                    return await showDialog<bool>(
+                      context: builderContext,
+                      builder: (dialogContext) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        title: Row(
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              color: builderTheme.colorScheme.error,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text('Eliminar mensaje'),
+                          ],
+                        ),
+                        content: const Text(
+                          '¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext, false),
+                            child: Text(
+                              l10n.cancel,
+                              style: TextStyle(
+                                color: builderTheme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext, true),
+                            style: TextButton.styleFrom(
+                              foregroundColor: builderTheme.colorScheme.error,
+                            ),
+                            child: const Text(
+                              'Eliminar',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ) ?? false;
+                  },
+                  onDismissed: (direction) {
+                    chatBloc.add(DeleteMessage(
+                      messageId: message.id,
+                      roomId: message.roomId,
+                    ));
+                    
+                    // Mostrar SnackBar con confirmación
+                    ScaffoldMessenger.of(builderContext).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text('Mensaje eliminado'),
+                          ],
+                        ),
+                        backgroundColor: builderTheme.colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: MessageBubble(
+                    message: message,
+                    isMe: isMe,
+                    isGroup: widget.isGroup,
+                    participantsMap: participantsMap,
+                    showAvatar: showAvatar,
+                    showSenderName: showSenderName,
+                  ),
+                );
+              },
+            );
+          }
+          
           return MessageBubble(
             message: message,
             isMe: isMe,

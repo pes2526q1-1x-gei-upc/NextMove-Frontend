@@ -29,15 +29,38 @@ class MessageBubble extends StatelessWidget {
   });
 
   void _showDeleteConfirmation(BuildContext context, ChatBloc chatBloc) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar mensaje'),
-        content: const Text('¿Estás seguro de que quieres eliminar este mensaje?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.delete_outline,
+              color: theme.colorScheme.error,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            const Text('Eliminar mensaje'),
+          ],
+        ),
+        content: const Text(
+          '¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -46,11 +69,33 @@ class MessageBubble extends StatelessWidget {
                 roomId: message.roomId,
               ));
               Navigator.pop(dialogContext);
+              
+              // Mostrar SnackBar con confirmación
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text('Mensaje eliminado'),
+                    ],
+                  ),
+                  backgroundColor: theme.colorScheme.error,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
             },
             style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: theme.colorScheme.error,
             ),
-            child: const Text('Eliminar'),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -105,33 +150,60 @@ class MessageBubble extends StatelessWidget {
 
   void _showMessageOptions(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     // Obtener el ChatBloc antes de mostrar el BottomSheet
     final chatBloc = context.read<ChatBloc>();
     
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (bottomSheetContext) => BlocProvider.value(
         value: chatBloc,
         child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: Text(l10n.delete),
-                onTap: () {
-                  Navigator.pop(bottomSheetContext);
-                  _showDeleteConfirmation(context, chatBloc);
-                },
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
               ListTile(
-                leading: const Icon(Icons.edit_outlined),
+                leading: Icon(
+                  Icons.edit_outlined,
+                  color: theme.colorScheme.primary,
+                ),
                 title: const Text('Editar'),
                 onTap: () {
                   Navigator.pop(bottomSheetContext);
                   _showEditDialog(context, chatBloc);
                 },
               ),
+              ListTile(
+                leading: Icon(
+                  Icons.delete_outline,
+                  color: theme.colorScheme.error,
+                ),
+                title: Text(
+                  l10n.delete,
+                  style: TextStyle(
+                    color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(bottomSheetContext);
+                  _showDeleteConfirmation(context, chatBloc);
+                },
+              ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
