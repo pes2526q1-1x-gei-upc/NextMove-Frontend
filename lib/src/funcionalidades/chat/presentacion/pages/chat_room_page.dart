@@ -354,17 +354,26 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                 return Dismissible(
                   key: Key('message_${message.id}'),
                   direction: DismissDirection.endToStart,
-                  background: Container(
+                  dismissThresholds: const {
+                    DismissDirection.endToStart: 0.15, // Activar con solo 15% de desplazamiento (más cerca del icono)
+                  },
+                  movementDuration: const Duration(milliseconds: 200),
+                  resizeDuration: const Duration(milliseconds: 200),
+                  background: Align(
                     alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
-                    decoration: BoxDecoration(
-                      color: builderTheme.colorScheme.error,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.white,
-                      size: 28,
+                    child: Container(
+                      width: 56, // Ancho para círculo perfecto
+                      height: 56, // Alto igual al ancho para círculo perfecto
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: builderTheme.colorScheme.error,
+                        shape: BoxShape.circle, // Círculo perfecto
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
                   ),
                   confirmDismiss: (direction) async {
