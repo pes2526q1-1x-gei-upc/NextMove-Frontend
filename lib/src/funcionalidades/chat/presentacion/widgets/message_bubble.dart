@@ -15,6 +15,7 @@ class MessageBubble extends StatelessWidget {
   final Map<String, String>? participantsMap; // Mapa de email -> nickname
   final bool showAvatar; // Mostrar avatar (último mensaje del grupo)
   final bool showSenderName; // Mostrar nombre (primer mensaje del grupo)
+  final Function(Message)? onEditMessage;
 
   const MessageBubble({
     super.key,
@@ -26,6 +27,7 @@ class MessageBubble extends StatelessWidget {
     this.participantsMap,
     this.showAvatar = true, // Por defecto mostrar avatar
     this.showSenderName = true, // Por defecto mostrar nombre
+    this.onEditMessage,
   });
 
   void _showDeleteConfirmation(BuildContext context, ChatBloc chatBloc) {
@@ -102,52 +104,6 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, ChatBloc chatBloc) {
-    final TextEditingController editController = TextEditingController(text: message.content);
-    
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Editar mensaje'),
-        content: TextField(
-          controller: editController,
-          autofocus: true,
-          maxLines: null,
-          decoration: const InputDecoration(
-            hintText: 'Escribe tu mensaje...',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              final newContent = editController.text.trim();
-              if (newContent.isNotEmpty && newContent != message.content) {
-                chatBloc.add(EditMessage(
-                  messageId: message.id,
-                  roomId: message.roomId,
-                  newContent: newContent,
-                ));
-                Navigator.pop(dialogContext);
-              } else if (newContent.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('El mensaje no puede estar vacío')),
-                );
-              } else {
-                Navigator.pop(dialogContext);
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showMessageOptions(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -183,7 +139,7 @@ class MessageBubble extends StatelessWidget {
                 title: const Text('Editar'),
                 onTap: () {
                   Navigator.pop(bottomSheetContext);
-                  _showEditDialog(context, chatBloc);
+                  onEditMessage?.call(message);
                 },
               ),
               ListTile(

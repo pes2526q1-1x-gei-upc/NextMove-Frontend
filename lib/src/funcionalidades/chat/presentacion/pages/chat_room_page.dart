@@ -57,6 +57,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   String? _currentRoomName;
   String? _currentGroupPhoto;
   bool _isNavigatingAway = false; // Flag para evitar múltiples navegaciones
+  Message? _editingMessage;
+
+  bool get _isEditing => _editingMessage != null;
 
   @override
   void initState() {
@@ -183,12 +186,40 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       _isTyping = false;
       context.read<ChatBloc>().add(StopTyping(widget.roomId));
     }
-    context.read<ChatBloc>().add(SendMessage(
-      roomId: widget.roomId,
-      content: content,
-    ));
-    _messageController.clear();
+    if (_editingMessage != null) {
+      // Editar mensaje
+      context.read<ChatBloc>().add(EditMessage(
+        messageId: _editingMessage!.id,
+        roomId: _editingMessage!.roomId,
+        newContent: content,
+      ));
+      setState(() {
+        _editingMessage = null;
+      });
+      _messageController.clear();
+    } else {
+      // Enviar nuevo mensaje
+      context.read<ChatBloc>().add(SendMessage(
+        roomId: widget.roomId,
+        content: content,
+      ));
+      _messageController.clear();
+    }
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+  }
+
+  void _startEditingMessage(Message message) {
+    setState(() {
+      _editingMessage = message;
+      _messageController.text = message.content;
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      _editingMessage = null;
+      _messageController.clear();
+    });
   }
 
   String _getTypingText(
@@ -456,6 +487,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                     participantsMap: participantsMap,
                     showAvatar: showAvatar,
                     showSenderName: showSenderName,
+                    onEditMessage: _startEditingMessage,
                   ),
                 );
               },
@@ -469,6 +501,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             participantsMap: participantsMap,
             showAvatar: showAvatar,
             showSenderName: showSenderName,
+            onEditMessage: _startEditingMessage,
           );
         }
         
@@ -784,7 +817,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             controller: _messageController,
                             onChanged: _handleTyping,
                             decoration: InputDecoration(
-                              hintText: l10n.writeAMessage,
+                              hintText: _isEditing ? 'Editando mensaje...' : l10n.writeAMessage,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(24),
                                 borderSide: BorderSide.none,
@@ -797,12 +830,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             onSubmitted: (_) => _sendMessage(),
                           ),
                         ),
+                        if (_isEditing) ...[
+                          const SizedBox(width: 8),
+                          Material(
+                            color: theme.colorScheme.error,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              icon: Icon(Icons.close, color: theme.colorScheme.onError),
+                              onPressed: _cancelEdit,
+                            ),
+                          ),
+                        ],
                         const SizedBox(width: 8),
                         Material(
                           color: theme.colorScheme.primary,
                           shape: const CircleBorder(),
                           child: IconButton(
-                            icon: Icon(Icons.send, color: theme.colorScheme.onPrimary),
+                            icon: Icon(_isEditing ? Icons.check : Icons.send, color: theme.colorScheme.onPrimary),
                             onPressed: _sendMessage,
                           ),
                         ),
