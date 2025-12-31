@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
-class TurnInstructionWidget extends StatelessWidget {
+class TurnInstructionWidget extends StatefulWidget {
   final RouteStep currentStep;
   final int distanceToNextStepMeters;
   final VoidCallback onCancel;
@@ -14,12 +14,27 @@ class TurnInstructionWidget extends StatelessWidget {
     required this.onCancel,
   });
 
+  @override
+  State<TurnInstructionWidget> createState() => _TurnInstructionWidgetState();
+}
+
+class _TurnInstructionWidgetState extends State<TurnInstructionWidget> {
   String _formatDistance(int meters) {
     if (meters < 1000) {
       return '$meters m';
     } else {
       final km = (meters / 1000).toStringAsFixed(1);
       return '$km km';
+    }
+  }
+
+  @override
+  void didUpdateWidget(TurnInstructionWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Forzar reconstrucción cuando cambian las propiedades
+    if (oldWidget.currentStep != widget.currentStep ||
+        oldWidget.distanceToNextStepMeters != widget.distanceToNextStepMeters) {
+      // El widget se reconstruirá automáticamente
     }
   }
 
@@ -62,7 +77,7 @@ class TurnInstructionWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '${l10n.enxmet} ${_formatDistance(distanceToNextStepMeters)}',
+                    '${l10n.enxmet} ${_formatDistance(widget.distanceToNextStepMeters)}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -72,7 +87,7 @@ class TurnInstructionWidget extends StatelessWidget {
                   const Spacer(),
                   // Cancel button
                   IconButton(
-                    onPressed: onCancel,
+                    onPressed: widget.onCancel,
                     icon: const Icon(Icons.close_rounded),
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     tooltip: l10n.cancel,
@@ -84,7 +99,7 @@ class TurnInstructionWidget extends StatelessWidget {
               
               // Instruction text
               Text(
-                currentStep.instruction,
+                widget.currentStep.instruction,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
