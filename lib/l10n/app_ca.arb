@@ -424,5 +424,6 @@
     "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
     "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
     "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir",
-    "trophies": "Trofeus"
+    "trophies": "Trofeus",
+    "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0"
 }

@@ -437,5 +437,6 @@
     "noFriendsToAdd": "You don't have friends to add to the group",
     "couldNotFindUserEmail": "Could not find user's email",
     "deleteMessageConfirmation": "Are you sure you want to delete this message? This action cannot be undone.",
-    "trophies": "Trophies"
+    "trophies": "Trophies",
+    "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0"
 }
