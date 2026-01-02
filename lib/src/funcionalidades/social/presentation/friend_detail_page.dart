@@ -60,7 +60,8 @@ class FriendDetailsPage extends StatelessWidget {
       if (myNickname != null) {
         context.read<SocialBloc>().add(BlockUserEvent(myNickname, userToBlock));
 
-        Navigator.pop(context); // Cerramos la página de detalles
+        // Devolver true para indicar que se bloqueó el usuario
+        Navigator.pop(context, true);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -259,7 +260,8 @@ class _DeleteFriendButton extends StatelessWidget {
           DeleteFriendEvent(myNickname, friendNickname),
         );
 
-        Navigator.pop(context);
+        // Devolver true para indicar que se eliminó la amistad
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.deletedFriend(friendNickname)),

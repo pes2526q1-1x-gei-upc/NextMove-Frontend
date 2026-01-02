@@ -54,7 +54,7 @@ class ProfileHeaderWidget extends StatelessWidget {
           child: CircleAvatar(
             radius: 35,
             backgroundColor: Colors.grey[200],
-            backgroundImage: backgroundImage, 
+            backgroundImage: backgroundImage,
             child: avatarChild,
           ),
         ),
@@ -66,17 +66,17 @@ class ProfileHeaderWidget extends StatelessWidget {
               Text(
                 title,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 14,
-                      color: theme.colorScheme.outline,
-                    ),
+                  fontSize: 14,
+                  color: theme.colorScheme.outline,
+                ),
               ),
             ],
           ),
@@ -115,8 +115,11 @@ class ProfileMenuOption extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 
-                        Theme.of(context).brightness == Brightness.dark ? 0.35 : 1,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest
+                      .withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark
+                            ? 0.35
+                            : 1,
                       ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -131,9 +134,9 @@ class ProfileMenuOption extends StatelessWidget {
                 child: Text(
                   text,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               if (trailing != null)
@@ -141,7 +144,9 @@ class ProfileMenuOption extends StatelessWidget {
               else
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).iconTheme.color?.withValues(alpha: 0.6),
                 ),
             ],
           ),

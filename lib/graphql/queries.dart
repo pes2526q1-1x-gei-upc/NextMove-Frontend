@@ -13,13 +13,6 @@ class GraphQLQueries {
       phoneNumber
       preferredLanguage
       createdAt
-      isBanned
-      banInfo {
-        bannedUntil
-        description
-        reason
-        isPermanent
-      }
     }
   }
   ''';
@@ -232,6 +225,7 @@ class GraphQLQueries {
     ListFriends(){
       name
       photo
+      email
     }
   }''';
 
@@ -491,5 +485,78 @@ static const String getNavigationRouteQuery = r'''
     getFavBikeStations {
       station_id
     }
-  }'''; 
+  }''';
+  static const String getOrCreateDirectChatQuery = r'''
+    query GetOrCreateDirectChat($userEmail: String!) {
+      getOrCreateDirectChat(userEmail: $userEmail) {
+        id
+        type
+        name
+      }
+    }
+  ''';
+
+  static const String myChatsQuery = r'''
+    query MyChats {
+      myChats {
+        id
+        type
+        name
+        description
+        photo
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+          isAdmin
+        }
+        lastMessage {
+          content
+          sender
+          timestamp
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static const String chatMessagesQuery = r'''
+    query ChatMessages($chatId: ID!, $limit: Int, $offset: Int) {
+      chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
+        id
+        chatId
+        senderEmail
+        senderNickname
+        senderPhoto
+        content
+        type
+        createdAt
+        deleted
+        deletedAt
+        edited
+        editedAt
+      }
+    }
+  ''';
+
+  static const String getChatDetailsQuery = r'''
+    query GetChatDetails($chatId: ID!) {
+      myChats {
+        id
+        type
+        name
+        description
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
 }
