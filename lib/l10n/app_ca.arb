@@ -285,6 +285,141 @@
             }
         }
     },
-    "shareRouteStatisticsMessage": "He enregistrat una ruta amb bicicleta utilitzant NextMove! Mira les meves estadístiques i descarrega l'aplicació per competir amb mi i la resta de la comunitat."
-    ,"errorAddingToCalendar": "S'ha produït un error en afegir el repte al calendari."
+    "shareRouteStatisticsMessage": "He enregistrat una ruta amb bicicleta utilitzant NextMove! Mira les meves estadístiques i descarrega l'aplicació per competir amb mi i la resta de la comunitat.",
+    "errorAddingToCalendar": "S'ha produït un error en afegir el repte al calendari.",
+    "social": "Social",
+    "chats": "Xats",
+    "connectingToServer": "Connectant al servidor...",
+    "connectionError": "Error de connexió",
+    "retry": "Tornar-ho a provar",
+    "errorLoadingFriends": "Error carregant amics",
+    "noFriendsYet": "Encara no tens amics",
+    "addFriendsToStartChatting": "Afegeix amics per començar a xatejar",
+    "noFriendsFound": "No s'han trobat amics",
+    "tryAnotherSearchTerm": "Prova amb un altre terme de cerca",
+    "results": "Resultats",
+    "groupResults": "Resultats de grups",
+    "tapToChat": "Toca per xatejar",
+    "searchChats": "Cercar xats...",
+    "searchGroups": "Cercar grups...",
+    "noGroupsAvailable": "No t'has unit a cap grup encara",
+    "groupsComingSoon": "Busca grups per unir-te a un",
+    "noMessagesYet": "No hi ha missatges encara.\nSigues el primer a enviar-ne!",
+    "typing": "escrivint...",
+    "back": "Enrere",
+    "loadingRoom": "Carregant sala...",
+    "writeAMessage": "Escriu un missatge...",
+    "today": "Avui",
+    "yesterday": "Ahir",
+    "groupDetails": "Detalls del grup",
+    "participants": "Participants",
+    "addParticipants": "Afegir participants",
+    "userWithoutValidEmail": "Aquest usuari no té un email vàlid",
+    "errorAddingParticipant": "Error afegint {email}: {error}",
+    "@errorAddingParticipant": {
+        "placeholders": {
+            "email": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "couldNotAddParticipants": "No s'ha pogut afegir cap participant",
+    "editGroup": "Editar Grup",
+    "groupUpdatedSuccessfully": "Grup actualitzat correctament",
+    "youHaveBeenKickedFrom": "Has estat expulsat de {groupName}",
+    "@youHaveBeenKickedFrom": {
+        "placeholders": {
+            "groupName": {
+                "type": "String"
+            }
+        }
+    },
+    "youLeftTheGroup": "Has sortit del grup",
+    "errorLeavingGroup": "Error sortint del grup: {error}",
+    "@errorLeavingGroup": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "user": "Usuari",
+    "admin": "Admin",
+    "you": "Tu",
+    "adminRoleRemoved": "S'ha tret el rol d'admin a {nickname}",
+    "@adminRoleRemoved": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "adminRoleGranted": "S'ha atorgat el rol d'admin a {nickname}",
+    "@adminRoleGranted": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "removeAdmin": "Treure admin",
+    "makeAdmin": "Fer admin",
+    "participantKicked": "S'ha expulsat a {nickname} del grup",
+    "@participantKicked": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "kick": "Expulsar",
+    "kickParticipant": "Expulsar participant",
+    "areYouSureKickParticipant": "Estàs segur que vols expulsar a {nickname} del grup?",
+    "@areYouSureKickParticipant": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "add": "Afegir",
+    "leaveGroup": "Sortir del grup",
+    "areYouSureLeaveGroup": "Estàs segur que vols sortir del grup?",
+    "leave": "Sortir",
+    "groupDeleted": "Grup eliminat",
+    "createGroup": "Crear Grup",
+    "createAGroupToStart": "Crea un grup per començar",
+    "deleteMessage": "Eliminar missatge",
+    "messageDeleted": "Missatge eliminat",
+    "friendshipDeleted": "L'amistat ha estat eliminada",
+    "groupHasBeenDeleted": "El grup ha estat eliminat",
+    "youHaveBeenKickedFromGroup": "Has estat expulsat del grup",
+    "editingMessage": "Editant missatge...",
+    "groupNameRequired": "El nom del grup és obligatori",
+    "selectAtLeastOneFriend": "Selecciona almenys un amic",
+    "groupCreatedSuccessfully": "Grup creat correctament",
+    "errorLoadingFriendsList": "Error carregant amics",
+    "noFriendsFoundSearch": "No s'han trobat amics",
+    "groupNotFound": "Grup no trobat",
+    "editGroupTooltip": "Editar grup",
+    "edit": "Editar",
+    "areYouSureDeleteMessage": "Estàs segur que vols eliminar aquest missatge? Aquesta acció no es pot desfer.",
+    "confirmDeleteMessage": "Missatge eliminat",
+    "noGroupsYet": "No tienes grupos",
+    "group": "Grup",
+    "member": "Membre",
+    "members": "Membres",
+    "deleteGroup": "Eliminar grup",
+    "areYouSureDeleteGroup": "Estàs segur que vols eliminar aquest grup? Aquesta acció no es pot desfer.",
+    "confirmDeleteGroup": "Grup eliminat",
+    "isWriting": "està escribint...",
+    "areWriting": "estan escribint...",
+    "and": "i",
+    "more": "más",
+    "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
+    "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
+    "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir"
 }
