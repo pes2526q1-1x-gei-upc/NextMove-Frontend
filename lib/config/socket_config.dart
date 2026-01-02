@@ -1,12 +1,12 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SocketConfig {
-  static IO.Socket? _socket;
+  static io.Socket? _socket;
   static String? _currentUserId;
 
-  static IO.Socket? get socket => _socket;
+  static io.Socket? get socket => _socket;
   static bool get isConnected => _socket?.connected ?? false;
 
   /// Inicializar conexión Socket.IO
@@ -15,10 +15,14 @@ class SocketConfig {
     // Si ya hay una conexión pero con un usuario diferente, desconectar primero
     if (_socket != null && _socket!.connected) {
       if (_currentUserId != userId) {
-        debugPrint('[SocketIO] Usuario cambió de $_currentUserId a $userId, desconectando socket anterior...');
+        debugPrint(
+          '[SocketIO] Usuario cambió de $_currentUserId a $userId, desconectando socket anterior...',
+        );
         disconnect();
       } else {
-        debugPrint('[SocketIO] Ya existe una conexión activa para el mismo usuario');
+        debugPrint(
+          '[SocketIO] Ya existe una conexión activa para el mismo usuario',
+        );
         return;
       }
     }
@@ -29,18 +33,18 @@ class SocketConfig {
     debugPrint('[SocketIO] Conectando a: $serverUrl');
     debugPrint('[SocketIO] User ID: $userId');
 
-    _socket = IO.io(
+    _socket = io.io(
       serverUrl,
-      IO.OptionBuilder()
-        .setTransports(['websocket', 'polling'])
-        .enableAutoConnect()
-        .enableReconnection()
-        .setReconnectionDelay(1000)
-        .setReconnectionDelayMax(5000)
-        .setReconnectionAttempts(999) // Intentos ilimitados
-        .setTimeout(20000)
-        .setAuth({'token': firebaseToken})
-        .build(),
+      io.OptionBuilder()
+          .setTransports(['websocket', 'polling'])
+          .enableAutoConnect()
+          .enableReconnection()
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(5000)
+          .setReconnectionAttempts(999) // Intentos ilimitados
+          .setTimeout(20000)
+          .setAuth({'token': firebaseToken})
+          .build(),
     );
 
     _setupEventHandlers();
@@ -103,11 +107,11 @@ class SocketConfig {
   }
 
   /// Enviar evento de ping personalizado (NO es el ping del heartbeat nativo)
-  /// 
+  ///
   /// NOTA: Este método ya no se usa. Socket.IO maneja automáticamente el heartbeat
   /// mediante ping/pong nativo según la configuración del servidor (pingInterval/pingTimeout).
   /// El heartbeat nativo es transparente y no requiere código adicional.
-  /// 
+  ///
   /// Si necesitas enviar un evento 'ping' personalizado por alguna razón específica,
   /// puedes usar este método, pero no ayuda al mantenimiento de la conexión.
   @Deprecated('Socket.IO maneja el heartbeat automáticamente. No es necesario.')

@@ -38,7 +38,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
-  
+
   final Set<String> _selectedFriends = {};
   String _searchQuery = '';
   bool _isCreating = false;
@@ -66,7 +66,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
   Future<void> _createGroup(BuildContext context) async {
     final name = _nameController.text.trim();
-    
+
     // Validaciones previas
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,9 +84,14 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
     setState(() => _isCreating = true);
 
+    final remoteProvider = UserRemoteDataProvider();
+    final client = GraphQLProvider.of(context).value;
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final theme = Theme.of(context);
+
     try {
       String? photoUrl;
-      final remoteProvider = UserRemoteDataProvider();
 
       // 1. SUBIR FOTO (Solo si el usuario seleccionó una)
       // Usamos el método genérico que creamos para no actualizar tu perfil
@@ -95,7 +100,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       }
 
       // 2. EJECUTAR MUTACIÓN
-      final client = GraphQLProvider.of(context).value;
       final result = await client.mutate(
         MutationOptions(
           document: gql(createGroupChatMutation),
@@ -112,18 +116,16 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         throw Exception(result.exception.toString());
       }
 
-      if (mounted) {
-        Navigator.of(context).pop(true); // Retorna true para refrescar la lista
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Grupo creado exitosamente')),
-        );
-      }
+      navigator.pop(true); // Retorna true para refrescar la lista
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Grupo creado exitosamente')),
+      );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -146,7 +148,8 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             const Padding(
               padding: EdgeInsets.all(16.0),
               child: SizedBox(
-                width: 24, height: 24,
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             )
@@ -182,7 +185,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                               ? FileImage(_selectedImage!)
                               : null,
                           child: _selectedImage == null
-                              ? Icon(Icons.group, size: 60, color: theme.colorScheme.onPrimaryContainer)
+                              ? Icon(
+                                  Icons.group,
+                                  size: 60,
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                )
                               : null,
                         ),
                         Positioned(
@@ -191,7 +198,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                           child: CircleAvatar(
                             radius: 18,
                             backgroundColor: theme.colorScheme.primary,
-                            child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                            child: const Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                         if (_isCreating && _selectedImage != null)
@@ -202,7 +213,9 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
-                                child: CircularProgressIndicator(color: Colors.white),
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -234,7 +247,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               ],
             ),
           ),
-          
+
           // BARRA DE SELECCIONADOS
           if (_selectedFriends.isNotEmpty)
             Container(
@@ -243,7 +256,10 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               color: theme.colorScheme.primaryContainer,
               child: Row(
                 children: [
-                  Icon(Icons.people, color: theme.colorScheme.onPrimaryContainer),
+                  Icon(
+                    Icons.people,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     '${_selectedFriends.length} amigos seleccionados',
@@ -287,16 +303,25 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                 fetchPolicy: FetchPolicy.networkOnly,
               ),
               builder: (result, {fetchMore, refetch}) {
-                if (result.isLoading) return const Center(child: CircularProgressIndicator());
-                if (result.hasException) return const Center(child: Text('Error al cargar amigos'));
+                if (result.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (result.hasException) {
+                  return const Center(child: Text('Error al cargar amigos'));
+                }
 
-                final friends = result.data?['ListFriends'] as List<dynamic>? ?? [];
+                final friends =
+                    result.data?['ListFriends'] as List<dynamic>? ?? [];
                 final filteredFriends = friends.where((f) {
                   final name = f['name'] as String? ?? '';
-                  return name.toLowerCase().contains(_searchQuery.toLowerCase());
+                  return name.toLowerCase().contains(
+                    _searchQuery.toLowerCase(),
+                  );
                 }).toList();
 
-                if (filteredFriends.isEmpty) return const Center(child: Text('No se encontraron amigos'));
+                if (filteredFriends.isEmpty) {
+                  return const Center(child: Text('No se encontraron amigos'));
+                }
 
                 return ListView.builder(
                   itemCount: filteredFriends.length,
@@ -309,13 +334,20 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       value: isSelected,
                       onChanged: (selected) {
                         setState(() {
-                          if (selected == true) _selectedFriends.add(email);
-                          else _selectedFriends.remove(email);
+                          if (selected == true) {
+                            _selectedFriends.add(email);
+                          } else {
+                            _selectedFriends.remove(email);
+                          }
                         });
                       },
                       secondary: CircleAvatar(
-                        backgroundImage: friend['photo'] != null ? NetworkImage(friend['photo']) : null,
-                        child: friend['photo'] == null ? Text(friend['name'][0]) : null,
+                        backgroundImage: friend['photo'] != null
+                            ? NetworkImage(friend['photo'])
+                            : null,
+                        child: friend['photo'] == null
+                            ? Text(friend['name'][0])
+                            : null,
                       ),
                       title: Text(friend['name'] ?? 'Usuario'),
                       subtitle: Text(email),

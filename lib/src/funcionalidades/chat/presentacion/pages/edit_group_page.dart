@@ -37,7 +37,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
-  
+
   File? _selectedImageFile;
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
@@ -46,7 +46,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.currentName);
-    _descriptionController = TextEditingController(text: widget.currentDescription ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.currentDescription ?? '',
+    );
   }
 
   @override
@@ -78,13 +80,15 @@ class _EditGroupPageState extends State<EditGroupPage> {
       if (_selectedImageFile != null) {
         debugPrint('[EditGroupPage] Subiendo imagen...');
         final remoteProvider = UserRemoteDataProvider();
-        finalPhotoUrl = await remoteProvider.uploadProfilePhoto(_selectedImageFile!);
+        finalPhotoUrl = await remoteProvider.uploadProfilePhoto(
+          _selectedImageFile!,
+        );
         debugPrint('[EditGroupPage] Imagen subida: $finalPhotoUrl');
       }
 
       // 2. Ejecutar mutación GraphQL
       debugPrint('[EditGroupPage] Ejecutando mutación...');
-      final result = runMutation({
+      runMutation({
         'chatId': widget.chatId,
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
@@ -92,7 +96,6 @@ class _EditGroupPageState extends State<EditGroupPage> {
       });
 
       debugPrint('[EditGroupPage] Mutación ejecutada');
-      
     } catch (e) {
       debugPrint('[EditGroupPage] Error: $e');
       if (mounted) {
@@ -112,9 +115,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Editar Grupo'),
-      ),
+      appBar: AppBar(title: const Text('Editar Grupo')),
       body: Mutation(
         options: MutationOptions(
           document: gql(updateGroupChatMutation),
@@ -129,7 +130,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
                 'photo': data?['updateGroupChat']?['photo'],
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Grupo actualizado correctamente')),
+                const SnackBar(
+                  content: Text('Grupo actualizado correctamente'),
+                ),
               );
             }
           },
@@ -139,7 +142,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
               setState(() => _isUploading = false);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}'),
+                  content: Text(
+                    'Error: ${error?.graphqlErrors.first.message ?? "Error desconocido"}',
+                  ),
                   backgroundColor: theme.colorScheme.error,
                 ),
               );
@@ -167,10 +172,19 @@ class _EditGroupPageState extends State<EditGroupPage> {
                             backgroundImage: _selectedImageFile != null
                                 ? FileImage(_selectedImageFile!)
                                 : (widget.currentPhotoUrl != null
-                                    ? NetworkImage(widget.currentPhotoUrl!)
-                                    : null) as ImageProvider?,
-                            child: (_selectedImageFile == null && widget.currentPhotoUrl == null)
-                                ? Icon(Icons.group, size: 60, color: theme.colorScheme.onPrimaryContainer)
+                                          ? NetworkImage(
+                                              widget.currentPhotoUrl!,
+                                            )
+                                          : null)
+                                      as ImageProvider?,
+                            child:
+                                (_selectedImageFile == null &&
+                                    widget.currentPhotoUrl == null)
+                                ? Icon(
+                                    Icons.group,
+                                    size: 60,
+                                    color: theme.colorScheme.onPrimaryContainer,
+                                  )
                                 : null,
                           ),
                           Positioned(
@@ -179,7 +193,11 @@ class _EditGroupPageState extends State<EditGroupPage> {
                             child: CircleAvatar(
                               radius: 18,
                               backgroundColor: theme.colorScheme.primary,
-                              child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                              child: const Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           if (isLoading)
@@ -190,7 +208,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Center(
-                                  child: CircularProgressIndicator(color: Colors.white),
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -209,8 +229,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.group),
                     ),
-                    validator: (value) =>
-                        (value == null || value.isEmpty) ? 'El nombre es obligatorio' : null,
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'El nombre es obligatorio'
+                        : null,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -230,7 +251,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
-                      onPressed: isLoading ? null : () => _handleSave(runMutation),
+                      onPressed: isLoading
+                          ? null
+                          : () => _handleSave(runMutation),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -249,7 +272,10 @@ class _EditGroupPageState extends State<EditGroupPage> {
                             )
                           : const Text(
                               'Guardar cambios',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     ),
                   ),

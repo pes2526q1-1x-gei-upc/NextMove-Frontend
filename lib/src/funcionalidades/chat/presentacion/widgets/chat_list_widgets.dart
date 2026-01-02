@@ -1,5 +1,4 @@
 // lib/src/funcionalidades/chat/presentacion/widgets/chat_list_widgets.dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
@@ -8,11 +7,7 @@ class FriendChatItem extends StatefulWidget {
   final Map<String, dynamic> friend;
   final VoidCallback onTap;
 
-  const FriendChatItem({
-    super.key,
-    required this.friend,
-    required this.onTap,
-  });
+  const FriendChatItem({super.key, required this.friend, required this.onTap});
 
   @override
   State<FriendChatItem> createState() => _FriendChatItemState();
@@ -28,18 +23,23 @@ class _FriendChatItemState extends State<FriendChatItem> {
     final friendName = widget.friend['name'] as String;
     final friendPhoto = widget.friend['photo'] as String?;
 
-    final hasPhoto = friendPhoto != null && friendPhoto.isNotEmpty && !_imageError;
+    final hasPhoto =
+        friendPhoto != null && friendPhoto.isNotEmpty && !_imageError;
     final photoUrl = friendPhoto;
-    
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       leading: CircleAvatar(
         radius: 24,
-        backgroundImage: hasPhoto && photoUrl != null ? NetworkImage(photoUrl) : null,
+        backgroundImage: hasPhoto && photoUrl != null
+            ? NetworkImage(photoUrl)
+            : null,
         backgroundColor: theme.colorScheme.surfaceContainerHighest,
         onBackgroundImageError: hasPhoto && photoUrl != null
             ? (exception, stackTrace) {
-                debugPrint('Error cargando foto de amigo en lista de chats: $exception');
+                debugPrint(
+                  'Error cargando foto de amigo en lista de chats: $exception',
+                );
                 if (mounted) {
                   setState(() {
                     _imageError = true;
@@ -68,7 +68,7 @@ class _FriendChatItemState extends State<FriendChatItem> {
 
   Widget _buildSubtitle(ThemeData theme, AppLocalizations l10n) {
     final lastMessage = widget.friend['lastMessage'] as Map<String, dynamic>?;
-    
+
     // Si hay último mensaje y tiene contenido, mostrarlo
     if (lastMessage != null && lastMessage['content'] != null) {
       final content = lastMessage['content'] as String? ?? '';
@@ -83,7 +83,7 @@ class _FriendChatItemState extends State<FriendChatItem> {
         );
       }
     }
-    
+
     // Si no hay último mensaje, mostrar "toca para chatear" solo si no hay chatId (amigo sin chat)
     final chatId = widget.friend['chatId'] as String?;
     if (chatId == null) {
@@ -95,7 +95,7 @@ class _FriendChatItemState extends State<FriendChatItem> {
         ),
       );
     }
-    
+
     // Si hay chatId pero no hay mensajes, mostrar mensaje vacío o texto por defecto
     return const SizedBox.shrink();
   }
@@ -147,10 +147,7 @@ class FriendsList extends StatelessWidget {
 class GroupsList extends StatelessWidget {
   final ThemeData theme;
 
-  const GroupsList({
-    super.key,
-    required this.theme,
-  });
+  const GroupsList({super.key, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -160,26 +157,16 @@ class GroupsList extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.group_off,
-            size: 64,
-            color: Colors.grey,
-          ),
+          const Icon(Icons.group_off, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           Text(
             l10n.noGroupsAvailable,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 8),
           Text(
             l10n.groupsComingSoon,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
@@ -235,7 +222,9 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 controller: widget.controller,
                 onChanged: widget.onSearchChanged,
                 decoration: InputDecoration(
-                          hintText: widget.showFriends ? l10n.searchChats : l10n.searchGroups,
+                  hintText: widget.showFriends
+                      ? l10n.searchChats
+                      : l10n.searchGroups,
                   hintStyle: TextStyle(color: Colors.grey[400]),
                   prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
                   border: InputBorder.none,
@@ -287,10 +276,7 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                 fillColor: Theme.of(context).colorScheme.primary,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 borderWidth: 0,
-                constraints: const BoxConstraints(
-                  minWidth: 48,
-                  minHeight: 48,
-                ),
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 children: const [
                   Icon(Icons.person, size: 20),
                   Icon(Icons.group, size: 20),

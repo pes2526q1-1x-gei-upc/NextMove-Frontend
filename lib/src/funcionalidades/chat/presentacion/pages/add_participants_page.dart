@@ -79,13 +79,19 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
       if (_selectedUserEmails.contains(user.email)) {
         _selectedUserEmails.remove(user.email);
         _selectedUsers.remove(user.email);
-        debugPrint('[AddParticipants] Deseleccionado: ${user.apodo} (${user.email})');
+        debugPrint(
+          '[AddParticipants] Deseleccionado: ${user.apodo} (${user.email})',
+        );
       } else {
         _selectedUserEmails.add(user.email);
         _selectedUsers[user.email] = user;
-        debugPrint('[AddParticipants] Seleccionado: ${user.apodo} (${user.email})');
+        debugPrint(
+          '[AddParticipants] Seleccionado: ${user.apodo} (${user.email})',
+        );
       }
-      debugPrint('[AddParticipants] Total seleccionados: ${_selectedUserEmails.length}');
+      debugPrint(
+        '[AddParticipants] Total seleccionados: ${_selectedUserEmails.length}',
+      );
     });
   }
 
@@ -95,9 +101,11 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
 
   bool _isCurrentUser(UserEntity user) {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final currentUserEmail = userProvider.email ??
+    final currentUserEmail =
+        userProvider.email ??
         userProvider.user?['email'] as String? ??
-        FirebaseAuth.instance.currentUser?.email ?? '';
+        FirebaseAuth.instance.currentUser?.email ??
+        '';
     return user.email == currentUserEmail;
   }
 
@@ -107,10 +115,14 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
     ThemeData theme,
   ) async {
     final client = GraphQLProvider.of(context).value;
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     bool allSuccess = true;
     int successCount = 0;
 
-    debugPrint('[AddParticipants] Iniciando adición de ${emails.length} participantes');
+    debugPrint(
+      '[AddParticipants] Iniciando adición de ${emails.length} participantes',
+    );
     debugPrint('[AddParticipants] Emails a añadir: $emails');
 
     for (final email in emails) {
@@ -125,24 +137,21 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
         final result = await client.mutate(
           MutationOptions(
             document: gql(GraphQLMutations.addParticipantToGroupMutation),
-            variables: {
-              'chatId': widget.chatId,
-              'userEmail': email,
-            },
+            variables: {'chatId': widget.chatId, 'userEmail': email},
           ),
         );
 
         if (result.hasException) {
           allSuccess = false;
           debugPrint('[AddParticipants] Error GraphQL: ${result.exception}');
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error al añadir $email: ${result.exception.toString()}'),
-                backgroundColor: theme.colorScheme.error,
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error al añadir $email: ${result.exception.toString()}',
               ),
-            );
-          }
+              backgroundColor: theme.colorScheme.error,
+            ),
+          );
         } else {
           successCount++;
           debugPrint('[AddParticipants] ✅ Añadido: $email');
@@ -150,42 +159,42 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
       } catch (e) {
         allSuccess = false;
         debugPrint('[AddParticipants] Exception: $e');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al añadir $email: $e'),
-              backgroundColor: theme.colorScheme.error,
-            ),
-          );
-        }
-      }
-    }
-
-    if (mounted) {
-      if (allSuccess && successCount > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('$successCount participante(s) añadido(s) correctamente'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context, true);
-      } else if (successCount > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$successCount participante(s) añadido(s), pero algunos fallaron'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-        Navigator.pop(context, true);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('No se pudo añadir ningún participante'),
+            content: Text('Error al añadir $email: $e'),
             backgroundColor: theme.colorScheme.error,
           ),
         );
       }
+    }
+
+    if (allSuccess && successCount > 0) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '$successCount participante(s) añadido(s) correctamente',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      navigator.pop(true);
+    } else if (successCount > 0) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '$successCount participante(s) añadido(s), pero algunos fallaron',
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      navigator.pop(true);
+    } else {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: const Text('No se pudo añadir ningún participante'),
+          backgroundColor: theme.colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -203,7 +212,9 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
             TextButton(
               onPressed: () {
                 final emails = _selectedUserEmails.toList();
-                debugPrint('[AddParticipants] Botón presionado con emails: $emails');
+                debugPrint(
+                  '[AddParticipants] Botón presionado con emails: $emails',
+                );
                 _addParticipantsSequentially(context, emails, theme);
               },
               child: Text(
@@ -245,7 +256,10 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                   decoration: InputDecoration(
                     hintText: l10n.searchByNickname,
                     hintStyle: TextStyle(color: theme.colorScheme.outline),
-                    prefixIcon: Icon(Icons.search, color: theme.colorScheme.outline),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: theme.colorScheme.outline,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -253,11 +267,16 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.close, color: theme.colorScheme.outline),
+                            icon: Icon(
+                              Icons.close,
+                              color: theme.colorScheme.outline,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               _debounce?.cancel();
-                              context.read<SocialBloc>().add(ClearSearchEvent());
+                              context.read<SocialBloc>().add(
+                                ClearSearchEvent(),
+                              );
                               setState(() {});
                             },
                           )
@@ -282,12 +301,17 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                       child: Chip(
                         avatar: CircleAvatar(
                           radius: 14,
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                          backgroundColor:
+                              theme.colorScheme.surfaceContainerHighest,
                           backgroundImage: user.photo.isNotEmpty
                               ? NetworkImage(user.photo)
                               : null,
                           child: user.photo.isEmpty
-                              ? Icon(Icons.person, size: 16, color: theme.colorScheme.onSurface)
+                              ? Icon(
+                                  Icons.person,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurface,
+                                )
                               : null,
                         ),
                         label: Text(
@@ -326,20 +350,22 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                   final filteredUsers = usersToShow.where((user) {
                     // Verificar que tenga email
                     if (user.email.isEmpty) {
-                      debugPrint('[AddParticipants] Usuario sin email: ${user.apodo}');
+                      debugPrint(
+                        '[AddParticipants] Usuario sin email: ${user.apodo}',
+                      );
                       return false;
                     }
-                    
+
                     // No mostrar si ya es participante
                     if (_isUserAlreadyParticipant(user)) {
                       return false;
                     }
-                    
+
                     // No mostrar si es el usuario actual
                     if (_isCurrentUser(user)) {
                       return false;
                     }
-                    
+
                     return true;
                   }).toList();
 
@@ -353,7 +379,9 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                 ? Icons.person_off_outlined
                                 : Icons.people_outline,
                             size: 64,
-                            color: theme.colorScheme.outline.withOpacity(0.5),
+                            color: theme.colorScheme.outline.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -372,11 +400,16 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
 
                   return ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
                     itemCount: filteredUsers.length,
                     itemBuilder: (context, index) {
                       final user = filteredUsers[index];
-                      final isSelected = _selectedUserEmails.contains(user.email);
+                      final isSelected = _selectedUserEmails.contains(
+                        user.email,
+                      );
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
@@ -388,12 +421,17 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                 onTap: () => _toggleUserSelection(user),
                                 borderRadius: BorderRadius.circular(16),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 16,
+                                  ),
                                   child: Row(
                                     children: [
                                       CircleAvatar(
                                         radius: 28,
-                                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                        backgroundColor: theme
+                                            .colorScheme
+                                            .surfaceContainerHighest,
                                         backgroundImage: user.photo.isNotEmpty
                                             ? NetworkImage(user.photo)
                                             : null,
@@ -401,29 +439,39 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                             ? Icon(
                                                 Icons.person,
                                                 size: 28,
-                                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.6),
                                               )
                                             : null,
                                       ),
                                       const SizedBox(width: 16),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               user.apodo,
-                                              style: theme.textTheme.bodyLarge?.copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              style: theme.textTheme.bodyLarge
+                                                  ?.copyWith(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                             ),
-                                            if (user.nombreCompleto.isNotEmpty) ...[
+                                            if (user
+                                                .nombreCompleto
+                                                .isNotEmpty) ...[
                                               const SizedBox(height: 4),
                                               Text(
                                                 user.nombreCompleto,
-                                                style: theme.textTheme.bodySmall?.copyWith(
-                                                  color: theme.colorScheme.outline,
-                                                ),
+                                                style: theme.textTheme.bodySmall
+                                                    ?.copyWith(
+                                                      color: theme
+                                                          .colorScheme
+                                                          .outline,
+                                                    ),
                                               ),
                                             ],
                                           ],
@@ -431,7 +479,8 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
                                       ),
                                       Checkbox(
                                         value: isSelected,
-                                        onChanged: (value) => _toggleUserSelection(user),
+                                        onChanged: (value) =>
+                                            _toggleUserSelection(user),
                                         activeColor: theme.colorScheme.primary,
                                       ),
                                     ],

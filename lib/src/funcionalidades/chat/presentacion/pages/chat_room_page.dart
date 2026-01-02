@@ -48,7 +48,8 @@ class ChatRoomPage extends StatefulWidget {
   State<ChatRoomPage> createState() => _ChatRoomPageState();
 }
 
-class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver {
+class _ChatRoomPageState extends State<ChatRoomPage>
+    with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   bool _isTyping = false;
@@ -82,10 +83,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       debugPrint('[ChatRoomPage] App vuelve al foreground...');
-      
+
       final isConnected = SocketConfig.isConnected;
       debugPrint('[ChatRoomPage] Socket conectado: $isConnected');
-      
+
       if (!isConnected) {
         debugPrint('[ChatRoomPage] Socket desconectado, reconectando...');
         _reconnectSocket();
@@ -113,11 +114,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
 
       await SocketConfig.connect(firebaseToken, firebaseUserId);
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       _chatBloc.add(const SocketReconnected());
       _chatBloc.add(JoinChatRoom(widget.roomId));
       _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
-      
+
       debugPrint('[ChatRoomPage] ✅ Socket reconectado exitosamente');
     } catch (error) {
       debugPrint('[ChatRoomPage] ❌ Error reconectando socket: $error');
@@ -169,12 +170,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       context.read<ChatBloc>().add(StartTyping(widget.roomId));
     }
     _lastTypingTime = now;
+    final chatBloc = context.read<ChatBloc>();
     Future.delayed(const Duration(seconds: 3), () {
       if (_lastTypingTime != null &&
           DateTime.now().difference(_lastTypingTime!).inSeconds >= 3 &&
           _isTyping) {
         _isTyping = false;
-        context.read<ChatBloc>().add(StopTyping(widget.roomId));
+        chatBloc.add(StopTyping(widget.roomId));
       }
     });
   }
@@ -188,21 +190,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     }
     if (_editingMessage != null) {
       // Editar mensaje
-      context.read<ChatBloc>().add(EditMessage(
-        messageId: _editingMessage!.id,
-        roomId: _editingMessage!.roomId,
-        newContent: content,
-      ));
+      context.read<ChatBloc>().add(
+        EditMessage(
+          messageId: _editingMessage!.id,
+          roomId: _editingMessage!.roomId,
+          newContent: content,
+        ),
+      );
       setState(() {
         _editingMessage = null;
       });
       _messageController.clear();
     } else {
       // Enviar nuevo mensaje
-      context.read<ChatBloc>().add(SendMessage(
-        roomId: widget.roomId,
-        content: content,
-      ));
+      context.read<ChatBloc>().add(
+        SendMessage(roomId: widget.roomId, content: content),
+      );
       _messageController.clear();
     }
     Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
@@ -223,7 +226,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   }
 
   String _getTypingText(
-    Map<String, String> usersTyping, 
+    Map<String, String> usersTyping,
     List<Message> messages,
     Map<String, String>? participantsMap,
     String? currentUserEmail,
@@ -231,12 +234,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     if (usersTyping.isEmpty) {
       return '';
     }
-    
+
     // Filtrar el usuario actual de la lista de usuarios escribiendo
     final filteredTypingUsers = usersTyping.entries.where((entry) {
       final userId = entry.key;
       final userName = entry.value;
-      
+
       // Excluir si userId o userName coinciden con el email del usuario actual
       if (currentUserEmail != null) {
         if (userId == currentUserEmail || userName == currentUserEmail) {
@@ -245,20 +248,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       }
       return true;
     }).toList();
-    
+
     // Convertir userName a nickname (el backend ahora envía el nickname directamente en userName)
     final typingNicknames = filteredTypingUsers.map((entry) {
-      final userName = entry.value; // userName del evento (ahora debería ser el nickname del backend)
-      
+      final userName = entry
+          .value; // userName del evento (ahora debería ser el nickname del backend)
+
       // Si userName es un email (fallback del backend si no tiene nickname), buscar en participantsMap
-      if (userName.contains('@') && participantsMap != null && participantsMap.containsKey(userName)) {
+      if (userName.contains('@') &&
+          participantsMap != null &&
+          participantsMap.containsKey(userName)) {
         return participantsMap[userName]!;
       }
-      
+
       // Si no es un email, ya es el nickname del backend, usarlo directamente
       return userName;
     }).toList();
-    
+
     if (typingNicknames.length == 1) {
       return '${typingNicknames.first} está escribiendo...';
     } else if (typingNicknames.length == 2) {
@@ -268,7 +274,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     }
   }
 
-  String? _getOtherUserNickname(List<Message> messages, String currentUserEmail) {
+  String? _getOtherUserNickname(
+    List<Message> messages,
+    String currentUserEmail,
+  ) {
     if (messages.isEmpty) {
       return widget.roomName.isNotEmpty ? widget.roomName : null;
     }
@@ -326,14 +335,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     Map<String, String>? participantsMap,
   ) {
     final groupedItems = _groupMessagesByDay(messages);
-    
+
     // Función auxiliar para obtener el mensaje en el índice visual dado
-    Message? _getMessageAtVisualIndex(List<_ChatItem> items, int visualIndex) {
+    Message? getMessageAtVisualIndex(List<_ChatItem> items, int visualIndex) {
       final actualIndex = items.length - 1 - visualIndex;
       if (actualIndex < 0 || actualIndex >= items.length) return null;
       return items[actualIndex].message;
     }
-    
+
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -342,51 +351,61 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       itemCount: groupedItems.length,
       itemBuilder: (context, index) {
         final item = groupedItems[groupedItems.length - 1 - index];
-        
+
         if (item.isDateSeparator && item.date != null) {
           return DateSeparator(date: item.date!);
         } else if (item.message != null) {
           final message = item.message!;
           final isMe = message.isSentByMe(currentUserEmail);
-          
+
           // Determinar si mostrar avatar y nombre basándose en mensajes consecutivos
           bool showAvatar = true;
           bool showSenderName = true;
-          
+
           if (widget.isGroup && !isMe) {
             // En el ListView con reverse: true:
             // - index 0 muestra el mensaje más reciente (arriba)
             // - index n muestra el mensaje más antiguo (abajo)
             // Para obtener el mensaje más reciente (arriba), usamos index - 1
             // Para obtener el mensaje más antiguo (abajo), usamos index + 1
-            
+
             // Avatar: mostrar solo en el último mensaje del grupo consecutivo
             // El último mensaje es el más reciente, así que buscamos si hay uno más reciente del mismo usuario
-            final moreRecentMessage = index > 0 ? _getMessageAtVisualIndex(groupedItems, index - 1) : null;
-            if (moreRecentMessage != null && moreRecentMessage.senderId == message.senderId) {
-              showAvatar = false; // Hay un mensaje más reciente del mismo usuario
+            final moreRecentMessage = index > 0
+                ? getMessageAtVisualIndex(groupedItems, index - 1)
+                : null;
+            if (moreRecentMessage != null &&
+                moreRecentMessage.senderId == message.senderId) {
+              showAvatar =
+                  false; // Hay un mensaje más reciente del mismo usuario
             }
-            
+
             // Nombre: mostrar solo en el primer mensaje del grupo consecutivo
             // El primer mensaje es el más antiguo, así que buscamos si hay uno más antiguo del mismo usuario
-            final moreAncientMessage = _getMessageAtVisualIndex(groupedItems, index + 1);
-            if (moreAncientMessage != null && moreAncientMessage.senderId == message.senderId) {
-              showSenderName = false; // Hay un mensaje más antiguo del mismo usuario
+            final moreAncientMessage = getMessageAtVisualIndex(
+              groupedItems,
+              index + 1,
+            );
+            if (moreAncientMessage != null &&
+                moreAncientMessage.senderId == message.senderId) {
+              showSenderName =
+                  false; // Hay un mensaje más antiguo del mismo usuario
             }
           }
-          
+
           // Solo permitir swipe to delete para mensajes propios que no estén eliminados
           if (isMe && !message.deleted) {
             return Builder(
               builder: (builderContext) {
                 final builderTheme = Theme.of(builderContext);
                 final chatBloc = context.read<ChatBloc>();
-                
+
                 return Dismissible(
                   key: Key('message_${message.id}'),
                   direction: DismissDirection.endToStart,
                   dismissThresholds: const {
-                    DismissDirection.endToStart: 0.15, // Activar con solo 15% de desplazamiento (más cerca del icono)
+                    DismissDirection.endToStart:
+                        0.15, // Activar con solo 15% de desplazamiento (más cerca del icono)
                   },
                   movementDuration: const Duration(milliseconds: 200),
                   resizeDuration: const Duration(milliseconds: 200),
@@ -410,63 +429,74 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                   confirmDismiss: (direction) async {
                     // Mostrar diálogo de confirmación
                     final l10n = AppLocalizations.of(builderContext)!;
-                    
+
                     return await showDialog<bool>(
-                      context: builderContext,
-                      builder: (dialogContext) => AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        title: Row(
-                          children: [
-                            Icon(
-                              Icons.delete_outline,
-                              color: builderTheme.colorScheme.error,
-                              size: 24,
+                          context: builderContext,
+                          builder: (dialogContext) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 12),
-                            const Text('Eliminar mensaje'),
-                          ],
-                        ),
-                        content: const Text(
-                          '¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext, false),
-                            child: Text(
-                              l10n.cancel,
-                              style: TextStyle(
-                                color: builderTheme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            title: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_outline,
+                                  color: builderTheme.colorScheme.error,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                const Text('Eliminar mensaje'),
+                              ],
+                            ),
+                            content: const Text(
+                              '¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, false),
+                                child: Text(
+                                  l10n.cancel,
+                                  style: TextStyle(
+                                    color: builderTheme.colorScheme.onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                ),
                               ),
-                            ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, true),
+                                style: TextButton.styleFrom(
+                                  foregroundColor:
+                                      builderTheme.colorScheme.error,
+                                ),
+                                child: const Text(
+                                  'Eliminar',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
                           ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext, true),
-                            style: TextButton.styleFrom(
-                              foregroundColor: builderTheme.colorScheme.error,
-                            ),
-                            child: const Text(
-                              'Eliminar',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ) ?? false;
+                        ) ??
+                        false;
                   },
                   onDismissed: (direction) {
-                    chatBloc.add(DeleteMessage(
-                      messageId: message.id,
-                      roomId: message.roomId,
-                    ));
-                    
+                    chatBloc.add(
+                      DeleteMessage(
+                        messageId: message.id,
+                        roomId: message.roomId,
+                      ),
+                    );
+
                     // Mostrar SnackBar con confirmación
                     ScaffoldMessenger.of(builderContext).showSnackBar(
                       SnackBar(
                         content: const Row(
                           children: [
-                            Icon(Icons.check_circle, color: Colors.white, size: 20),
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
                             Text('Mensaje eliminado'),
                           ],
@@ -493,7 +523,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
               },
             );
           }
-          
+
           return MessageBubble(
             message: message,
             isMe: isMe,
@@ -504,7 +534,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             onEditMessage: _startEditingMessage,
           );
         }
-        
+
         return const SizedBox.shrink();
       },
     );
@@ -514,7 +544,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     if (nickname.isEmpty) return;
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUserNickname = userProvider.user?['nickname'] as String?;
-    
+
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) {
@@ -530,7 +560,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
               BlocProvider<SocialBloc>(
                 create: (context) {
                   final socialBloc = SocialBloc();
-                  if (currentUserNickname != null && currentUserNickname.isNotEmpty) {
+                  if (currentUserNickname != null &&
+                      currentUserNickname.isNotEmpty) {
                     socialBloc.add(LoadFriendsEvent(currentUserNickname));
                   }
                   return socialBloc;
@@ -542,19 +573,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
         },
       ),
     );
-    
+
     if (result != null && mounted) {
-      final bool shouldPop = result == true || 
-          (result is Map<String, dynamic> && 
-           ((result as Map<String, dynamic>)['leftGroup'] == true || 
-            (result as Map<String, dynamic>)['groupDeleted'] == true));
+      final bool shouldPop =
+          result == true ||
+          (result is Map<String, dynamic> &&
+              ((result as Map<String, dynamic>)['leftGroup'] == true ||
+                  (result as Map<String, dynamic>)['groupDeleted'] == true));
       if (shouldPop) {
         _chatBloc.add(LeaveChatRoom(widget.roomId));
         final Map<String, dynamic> popResult = {
-          'leftGroup': result is Map<String, dynamic> && 
-                       (result as Map<String, dynamic>)['leftGroup'] == true,
-          'groupDeleted': result is Map<String, dynamic> && 
-                          (result as Map<String, dynamic>)['groupDeleted'] == true,
+          'leftGroup':
+              result is Map<String, dynamic> &&
+              (result as Map<String, dynamic>)['leftGroup'] == true,
+          'groupDeleted':
+              result is Map<String, dynamic> &&
+              (result as Map<String, dynamic>)['groupDeleted'] == true,
         };
         Navigator.of(context).pop(popResult);
       }
@@ -566,9 +600,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
     final theme = Theme.of(context);
     // Usar directamente FirebaseAuth para obtener el email actual, ya que es más confiable
     // cuando el usuario cambia sin reiniciar la app
-    final currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? 
-                            Provider.of<UserProvider>(context, listen: false).email ?? 
-                            Provider.of<UserProvider>(context, listen: false).user?['email'] as String? ?? '';
+    final currentUserEmail =
+        FirebaseAuth.instance.currentUser?.email ??
+        Provider.of<UserProvider>(context, listen: false).email ??
+        Provider.of<UserProvider>(context, listen: false).user?['email']
+            as String? ??
+        '';
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -576,73 +613,93 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
       appBar: AppBar(
         automaticallyImplyLeading: true,
         titleSpacing: 0,
-        title: widget.isGroup 
-          ? Query(
-              options: QueryOptions(
-                document: gql(myChatsQuery),
-                fetchPolicy: FetchPolicy.cacheAndNetwork,
-              ),
-              builder: (result, {fetchMore, refetch}) {
-                // Crear mapa de participantes: email -> nickname
-                Map<String, String>? participantsMap;
-                if (result.data != null) {
-                  final chats = result.data?['myChats'] as List<dynamic>? ?? [];
-                  final chat = chats.firstWhere(
-                    (c) => c['id'] == widget.roomId,
-                    orElse: () => null,
-                  );
-                  if (chat != null) {
-                    final participants = chat['participants'] as List<dynamic>? ?? [];
-                    final tempMap = <String, String>{};
-                    for (var p in participants) {
-                      final email = p['userEmail'] as String? ?? '';
-                      final nickname = p['nickname'] as String?;
-                      if (email.isNotEmpty) {
-                        tempMap[email] = nickname ?? email.split('@').first;
-                      }
-                    }
-                    participantsMap = tempMap;
-                  }
-                }
-                
-                return BlocBuilder<ChatBloc, ChatState>(
-                  builder: (context, state) {
-                    final messages = state is ChatRoomActive ? state.messages : <Message>[];
-                    final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
-                    final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
-                    final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
-                    
-                    return _buildAppBarTitle(
-                      context,
-                      state,
-                      messages,
-                      otherUserNickname,
-                      otherUserPhoto,
-                      participantsMap,
-                      currentUserEmail,
+        title: widget.isGroup
+            ? Query(
+                options: QueryOptions(
+                  document: gql(myChatsQuery),
+                  fetchPolicy: FetchPolicy.cacheAndNetwork,
+                ),
+                builder: (result, {fetchMore, refetch}) {
+                  // Crear mapa de participantes: email -> nickname
+                  Map<String, String>? participantsMap;
+                  if (result.data != null) {
+                    final chats =
+                        result.data?['myChats'] as List<dynamic>? ?? [];
+                    final chat = chats.firstWhere(
+                      (c) => c['id'] == widget.roomId,
+                      orElse: () => null,
                     );
-                  },
-                );
-              },
-            )
-          : BlocBuilder<ChatBloc, ChatState>(
-              builder: (context, state) {
-                final messages = state is ChatRoomActive ? state.messages : <Message>[];
-                final otherUserNickname = _getOtherUserNickname(messages, currentUserEmail);
-                final photoFromMessages = _getOtherUserPhoto(messages, currentUserEmail);
-                final otherUserPhoto = photoFromMessages ?? widget.otherUserPhoto;
-                
-                return _buildAppBarTitle(
-                  context,
-                  state,
-                  messages,
-                  otherUserNickname,
-                  otherUserPhoto,
-                  null,
-                  currentUserEmail,
-                );
-              },
-            ),
+                    if (chat != null) {
+                      final participants =
+                          chat['participants'] as List<dynamic>? ?? [];
+                      final tempMap = <String, String>{};
+                      for (var p in participants) {
+                        final email = p['userEmail'] as String? ?? '';
+                        final nickname = p['nickname'] as String?;
+                        if (email.isNotEmpty) {
+                          tempMap[email] = nickname ?? email.split('@').first;
+                        }
+                      }
+                      participantsMap = tempMap;
+                    }
+                  }
+
+                  return BlocBuilder<ChatBloc, ChatState>(
+                    builder: (context, state) {
+                      final messages = state is ChatRoomActive
+                          ? state.messages
+                          : <Message>[];
+                      final otherUserNickname = _getOtherUserNickname(
+                        messages,
+                        currentUserEmail,
+                      );
+                      final photoFromMessages = _getOtherUserPhoto(
+                        messages,
+                        currentUserEmail,
+                      );
+                      final otherUserPhoto =
+                          photoFromMessages ?? widget.otherUserPhoto;
+
+                      return _buildAppBarTitle(
+                        context,
+                        state,
+                        messages,
+                        otherUserNickname,
+                        otherUserPhoto,
+                        participantsMap,
+                        currentUserEmail,
+                      );
+                    },
+                  );
+                },
+              )
+            : BlocBuilder<ChatBloc, ChatState>(
+                builder: (context, state) {
+                  final messages = state is ChatRoomActive
+                      ? state.messages
+                      : <Message>[];
+                  final otherUserNickname = _getOtherUserNickname(
+                    messages,
+                    currentUserEmail,
+                  );
+                  final photoFromMessages = _getOtherUserPhoto(
+                    messages,
+                    currentUserEmail,
+                  );
+                  final otherUserPhoto =
+                      photoFromMessages ?? widget.otherUserPhoto;
+
+                  return _buildAppBarTitle(
+                    context,
+                    state,
+                    messages,
+                    otherUserNickname,
+                    otherUserPhoto,
+                    null,
+                    currentUserEmail,
+                  );
+                },
+              ),
         elevation: 1,
       ),
       body: BlocConsumer<ChatBloc, ChatState>(
@@ -659,33 +716,42 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
           }
           // Si el usuario fue expulsado del grupo, el grupo fue eliminado, o la amistad fue eliminada, cerrar la pantalla
-          if ((state is ChatDisconnected || state is GroupDeletedState || state is FriendshipDeletedState) && !_isNavigatingAway) {
+          if ((state is ChatDisconnected ||
+                  state is GroupDeletedState ||
+                  state is FriendshipDeletedState) &&
+              !_isNavigatingAway) {
             _isNavigatingAway = true;
             String message;
             bool isGroupDeleted = state is GroupDeletedState;
-            bool isFriendshipDeleted = state is FriendshipDeletedState;
-            
+
             // Verificar primero si es una amistad eliminada (para chats individuales)
-            if (isFriendshipDeleted) {
-              final friendshipState = state as FriendshipDeletedState;
+            if (state is FriendshipDeletedState) {
               // Verificar que el chat eliminado corresponde al chat actual
-              if (friendshipState.chatId == widget.roomId && !widget.isGroup) {
+              if (state.chatId == widget.roomId && !widget.isGroup) {
                 message = 'La amistad ha sido eliminada';
-                debugPrint('[ChatRoomPage] 🗑️ Amistad eliminada, cerrando pantalla del chat ${widget.roomId}...');
+                debugPrint(
+                  '[ChatRoomPage] 🗑️ Amistad eliminada, cerrando pantalla del chat ${widget.roomId}...',
+                );
               } else {
                 // El chat eliminado no es el actual o es un grupo, no hacer nada
-                debugPrint('[ChatRoomPage] ⚠️ Amistad eliminada pero no es el chat actual (${friendshipState.chatId} != ${widget.roomId}) o es grupo (${widget.isGroup})');
+                debugPrint(
+                  '[ChatRoomPage] ⚠️ Amistad eliminada pero no es el chat actual (${state.chatId} != ${widget.roomId}) o es grupo (${widget.isGroup})',
+                );
                 _isNavigatingAway = false;
                 return;
               }
             } else if (isGroupDeleted) {
               message = 'El grupo ha sido eliminado';
-              debugPrint('[ChatRoomPage] 🗑️ Grupo eliminado, cerrando pantalla...');
+              debugPrint(
+                '[ChatRoomPage] 🗑️ Grupo eliminado, cerrando pantalla...',
+              );
             } else {
               // Solo mostrar mensaje de expulsión si es un grupo (no un chat individual)
               if (widget.isGroup) {
                 message = 'Has sido expulsado del grupo';
-                debugPrint('[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...');
+                debugPrint(
+                  '[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...',
+                );
               } else {
                 // Si no es grupo y llegamos aquí, probablemente es una desconexión normal
                 _isNavigatingAway = false;
@@ -701,16 +767,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
               ),
             );
             // Navegar inmediatamente usando Future.microtask para asegurar que se ejecute
+            final navigator = Navigator.of(context);
             Future.microtask(() {
               if (mounted && _isNavigatingAway) {
-                debugPrint('[ChatRoomPage] ✅ Navegando de vuelta a la lista de chats...');
-                Navigator.of(context).pop({
+                debugPrint(
+                  '[ChatRoomPage] ✅ Navegando de vuelta a la lista de chats...',
+                );
+                navigator.pop({
                   'groupDeleted': isGroupDeleted,
-                  'friendshipDeleted': isFriendshipDeleted,
-                  'leftGroup': false
+                  'friendshipDeleted': state is FriendshipDeletedState,
+                  'leftGroup': false,
                 });
               } else {
-                debugPrint('[ChatRoomPage] ⚠️ No se puede navegar: mounted=$mounted, _isNavigatingAway=$_isNavigatingAway');
+                debugPrint(
+                  '[ChatRoomPage] ⚠️ No se puede navegar: mounted=$mounted, _isNavigatingAway=$_isNavigatingAway',
+                );
               }
             });
           }
@@ -724,7 +795,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: theme.colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(l10n.connectionError, style: theme.textTheme.titleLarge),
                   const SizedBox(height: 8),
@@ -739,7 +814,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             );
           }
           // Si el usuario fue expulsado, el grupo fue eliminado, o la amistad fue eliminada, mostrar loading mientras se navega
-          if (state is ChatDisconnected || state is GroupDeletedState || state is FriendshipDeletedState) {
+          if (state is ChatDisconnected ||
+              state is GroupDeletedState ||
+              state is FriendshipDeletedState) {
             return Scaffold(
               backgroundColor: theme.colorScheme.surface,
               body: const Center(child: CircularProgressIndicator()),
@@ -749,7 +826,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
             return Center(child: Text(l10n.loadingRoom));
           }
           final messages = state.messages;
-          
+
           return Column(
             children: [
               Expanded(
@@ -763,53 +840,69 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             l10n.noMessagesYet,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                         )
                       : widget.isGroup
-                          ? Query(
-                              options: QueryOptions(
-                                document: gql(myChatsQuery),
-                                fetchPolicy: FetchPolicy.cacheAndNetwork,
-                              ),
-                              builder: (result, {fetchMore, refetch}) {
-                                // Crear mapa de participantes: email -> nickname
-                                Map<String, String>? participantsMap;
-                                if (result.data != null) {
-                                  final chats = result.data?['myChats'] as List<dynamic>? ?? [];
-                                  final chat = chats.firstWhere(
-                                    (c) => c['id'] == widget.roomId,
-                                    orElse: () => null,
-                                  );
-                                  if (chat != null) {
-                                    final participants = chat['participants'] as List<dynamic>? ?? [];
-                                    final tempMap = <String, String>{};
-                                    for (var p in participants) {
-                                      final email = p['userEmail'] as String? ?? '';
-                                      final nickname = p['nickname'] as String?;
-                                      if (email.isNotEmpty) {
-                                        tempMap[email] = nickname ?? email.split('@').first;
-                                      }
-                                    }
-                                    participantsMap = tempMap;
+                      ? Query(
+                          options: QueryOptions(
+                            document: gql(myChatsQuery),
+                            fetchPolicy: FetchPolicy.cacheAndNetwork,
+                          ),
+                          builder: (result, {fetchMore, refetch}) {
+                            // Crear mapa de participantes: email -> nickname
+                            Map<String, String>? participantsMap;
+                            if (result.data != null) {
+                              final chats =
+                                  result.data?['myChats'] as List<dynamic>? ??
+                                  [];
+                              final chat = chats.firstWhere(
+                                (c) => c['id'] == widget.roomId,
+                                orElse: () => null,
+                              );
+                              if (chat != null) {
+                                final participants =
+                                    chat['participants'] as List<dynamic>? ??
+                                    [];
+                                final tempMap = <String, String>{};
+                                for (var p in participants) {
+                                  final email = p['userEmail'] as String? ?? '';
+                                  final nickname = p['nickname'] as String?;
+                                  if (email.isNotEmpty) {
+                                    tempMap[email] =
+                                        nickname ?? email.split('@').first;
                                   }
                                 }
-                                
-                                return _buildMessagesList(messages, currentUserEmail, participantsMap);
-                              },
-                            )
-                          : _buildMessagesList(messages, currentUserEmail, null),
+                                participantsMap = tempMap;
+                              }
+                            }
+
+                            return _buildMessagesList(
+                              messages,
+                              currentUserEmail,
+                              participantsMap,
+                            );
+                          },
+                        )
+                      : _buildMessagesList(messages, currentUserEmail, null),
                 ),
               ),
-              
+
               Container(
-                color: theme.colorScheme.surface, 
+                color: theme.colorScheme.surface,
                 child: SafeArea(
                   top: false,
                   bottom: true,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(
+                      left: 12,
+                      right: 12,
+                      top: 8,
+                      bottom: 8,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
@@ -817,14 +910,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             controller: _messageController,
                             onChanged: _handleTyping,
                             decoration: InputDecoration(
-                              hintText: _isEditing ? 'Editando mensaje...' : l10n.writeAMessage,
+                              hintText: _isEditing
+                                  ? 'Editando mensaje...'
+                                  : l10n.writeAMessage,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(24),
                                 borderSide: BorderSide.none,
                               ),
                               filled: true,
-                              fillColor: theme.colorScheme.surfaceVariant,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              fillColor:
+                                  theme.colorScheme.surfaceContainerHighest,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 10,
+                              ),
                             ),
                             textInputAction: TextInputAction.send,
                             onSubmitted: (_) => _sendMessage(),
@@ -836,7 +935,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                             color: theme.colorScheme.error,
                             shape: const CircleBorder(),
                             child: IconButton(
-                              icon: Icon(Icons.close, color: theme.colorScheme.onError),
+                              icon: Icon(
+                                Icons.close,
+                                color: theme.colorScheme.onError,
+                              ),
                               onPressed: _cancelEdit,
                             ),
                           ),
@@ -846,7 +948,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
                           color: theme.colorScheme.primary,
                           shape: const CircleBorder(),
                           child: IconButton(
-                            icon: Icon(_isEditing ? Icons.check : Icons.send, color: theme.colorScheme.onPrimary),
+                            icon: Icon(
+                              _isEditing ? Icons.check : Icons.send,
+                              color: theme.colorScheme.onPrimary,
+                            ),
                             onPressed: _sendMessage,
                           ),
                         ),
@@ -873,93 +978,118 @@ class _ChatRoomPageState extends State<ChatRoomPage> with WidgetsBindingObserver
   ) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     return GestureDetector(
-              onTap: () async {
-                if (widget.isGroup) {
-                  final result = await Navigator.of(context).push<Map<String, dynamic>?>(
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider.value(
-                        value: _chatBloc,
-                        child: ChatRoomDetailsPage(
-                          chatId: widget.roomId,
-                          chatName: _currentRoomName ?? widget.roomName,
-                          chatDescription: null,
-                        ),
-                      ),
+      onTap: () async {
+        if (widget.isGroup) {
+          final result = await Navigator.of(context)
+              .push<Map<String, dynamic>?>(
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: _chatBloc,
+                    child: ChatRoomDetailsPage(
+                      chatId: widget.roomId,
+                      chatName: _currentRoomName ?? widget.roomName,
+                      chatDescription: null,
                     ),
-                  );
-                  
-                  if (result is Map<String, dynamic> && mounted) {
-                    final resultMap = result;
-                    if (resultMap['leftGroup'] == true || resultMap['groupDeleted'] == true) {
-                      // Cerrar inmediatamente y volver a la lista de chats
-                      // Usar WidgetsBinding para asegurar que se ejecute después del frame actual
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          Navigator.of(context).pop({
-                            'leftGroup': resultMap['leftGroup'] == true,
-                            'groupDeleted': resultMap['groupDeleted'] == true,
-                          });
-                        }
-                      });
-                      return;
-                    }
-                    
-                    setState(() {
-                      if (result['name'] != null) {
-                        _currentRoomName = result['name'] as String;
-                      }
-                      if (result['photo'] != null) {
-                        _currentGroupPhoto = result['photo'] as String;
-                      }
-                    });
-                  }
-                } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
-                  _navigateToFriendDetail(otherUserNickname);
+                  ),
+                ),
+              );
+
+          if (result is Map<String, dynamic> && mounted) {
+            final resultMap = result;
+            if (resultMap['leftGroup'] == true ||
+                resultMap['groupDeleted'] == true) {
+              // Cerrar inmediatamente y volver a la lista de chats
+              // Usar WidgetsBinding para asegurar que se ejecute después del frame actual
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  Navigator.of(context).pop({
+                    'leftGroup': resultMap['leftGroup'] == true,
+                    'groupDeleted': resultMap['groupDeleted'] == true,
+                  });
                 }
-              },
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: widget.isGroup
-                        ? theme.colorScheme.primaryContainer
-                        : theme.colorScheme.surfaceContainerHighest,
-                    backgroundImage: (widget.isGroup && _currentGroupPhoto != null && _currentGroupPhoto!.isNotEmpty)
-                        ? NetworkImage(_currentGroupPhoto!)
-                        : (!widget.isGroup && otherUserPhoto != null && otherUserPhoto.isNotEmpty
-                            ? NetworkImage(otherUserPhoto)
-                            : null),
-                    child: (widget.isGroup && (_currentGroupPhoto == null || _currentGroupPhoto!.isEmpty))
-                        ? Icon(Icons.group, size: 20, color: theme.colorScheme.onPrimaryContainer)
-                        : (!widget.isGroup && (otherUserPhoto == null || otherUserPhoto.isEmpty)
-                            ? Icon(Icons.person, size: 20, color: theme.iconTheme.color?.withOpacity(0.8))
-                            : null),
+              });
+              return;
+            }
+
+            setState(() {
+              if (result['name'] != null) {
+                _currentRoomName = result['name'] as String;
+              }
+              if (result['photo'] != null) {
+                _currentGroupPhoto = result['photo'] as String;
+              }
+            });
+          }
+        } else if (otherUserNickname != null && otherUserNickname.isNotEmpty) {
+          _navigateToFriendDetail(otherUserNickname);
+        }
+      },
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: widget.isGroup
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.surfaceContainerHighest,
+            backgroundImage:
+                (widget.isGroup &&
+                    _currentGroupPhoto != null &&
+                    _currentGroupPhoto!.isNotEmpty)
+                ? NetworkImage(_currentGroupPhoto!)
+                : (!widget.isGroup &&
+                          otherUserPhoto != null &&
+                          otherUserPhoto.isNotEmpty
+                      ? NetworkImage(otherUserPhoto)
+                      : null),
+            child:
+                (widget.isGroup &&
+                    (_currentGroupPhoto == null || _currentGroupPhoto!.isEmpty))
+                ? Icon(
+                    Icons.group,
+                    size: 20,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  )
+                : (!widget.isGroup &&
+                          (otherUserPhoto == null || otherUserPhoto.isEmpty)
+                      ? Icon(
+                          Icons.person,
+                          size: 20,
+                          color: theme.iconTheme.color?.withValues(alpha: 0.8),
+                        )
+                      : null),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _currentRoomName ?? widget.roomName,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _currentRoomName ?? widget.roomName,
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        if (state is ChatRoomActive && state.usersTyping.isNotEmpty)
-                          Text(
-                            widget.isGroup 
-                              ? _getTypingText(state.usersTyping, state.messages, participantsMap, currentUserEmail)
-                              : l10n.typing,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                      ],
+                ),
+                if (state is ChatRoomActive && state.usersTyping.isNotEmpty)
+                  Text(
+                    widget.isGroup
+                        ? _getTypingText(
+                            state.usersTyping,
+                            state.messages,
+                            participantsMap,
+                            currentUserEmail,
+                          )
+                        : l10n.typing,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
                     ),
                   ),
-                ],
-              ),
-            );
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
