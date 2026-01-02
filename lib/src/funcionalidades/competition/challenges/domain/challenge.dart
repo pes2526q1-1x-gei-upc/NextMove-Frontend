@@ -43,6 +43,7 @@ class Challenge {
         int.parse(json['ending_date'] as String),
       ),
       isEnrolled: enrolledChallengesNames.contains(json['name'] as String),
+      photo: json['photo'] as String?,
     );
   }
 
