@@ -12,6 +12,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigati
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/saved_track_statistics_page.dart';
+
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -237,6 +239,20 @@ class _MapPageState extends State<MapPage> {
                 ),
               );
             }
+            if (state is MapLoadedState && state.shouldShowStatistics) {
+              final mapBloc = context.read<MapBloc>();
+              mapBloc.add(const ResetStatisticsNavigationEvent());
+              
+              // Pestaña de estadísticas
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider<MapBloc>.value(
+                    value: mapBloc,
+                    child: const SavedTrackStatisticsPage(),
+                  ),
+                ),
+              );
+            }            
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
             }

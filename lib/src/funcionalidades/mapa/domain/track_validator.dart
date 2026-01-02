@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
 import 'dart:math' as math;
 
@@ -15,21 +16,25 @@ class TrackValidationResult {
 class TrackValidator {
   static const double _maxRealisticSpeedKmH = 55.0; 
   static const double _maxDistanceBetweenPointsMeters = 500.0;
-  static const int _minPointsRequired = 4;
+  static const int _minPointsRequired = 4; 
   static const double _minTotalDistanceMeters = 10.0;
+
+  final AppLocalizations l10n;
+
+  TrackValidator(this.l10n); // Constructor que recibe las traducciones
 
   TrackValidationResult validate(RecordedTrack track) {
     if (track.points.length < _minPointsRequired) {
       return TrackValidationResult(
         isValid: false,
-        reason: 'La ruta debe tener al menos $_minPointsRequired puntos',
+        reason: l10n.validationMinPoints(_minPointsRequired),
       );
     }
 
     if (track.totalDistanceMeters < _minTotalDistanceMeters) {
       return TrackValidationResult(
         isValid: false,
-        reason: 'La ruta no muestra movimiento significativo',
+        reason: l10n.validationNoMovement,
       );
     }
 
@@ -37,7 +42,7 @@ class TrackValidator {
       if (track.points[i].timestamp.isBefore(track.points[i - 1].timestamp)) {
         return TrackValidationResult(
           isValid: false,
-          reason: 'Datos temporales inconsistentes',
+          reason: l10n.validationInconsistentTime,
         );
       }
     }
@@ -63,7 +68,7 @@ class TrackValidator {
       if (current.speed > _maxRealisticSpeedKmH) {
         return TrackValidationResult(
           isValid: false,
-          reason: 'Velocidad imposible detectada: ${current.speed.toStringAsFixed(1)} km/h',
+          reason: l10n.validationImpossibleSpeed(current.speed.toStringAsFixed(1)),
         );
       }
     }
@@ -72,21 +77,21 @@ class TrackValidator {
     if (identicalRatio > 0.6) {
       return TrackValidationResult(
         isValid: false,
-        reason: 'Patrón de GPS sospechoso detectado',
+        reason: l10n.validationSuspiciousGPS,
       );
     }
 
     if (suspiciousJumps > track.points.length * 0.1) {
       return TrackValidationResult(
         isValid: false,
-        reason: 'Movimientos imposibles detectados',
+        reason: l10n.validationImpossibleMovements,
       );
     }
 
     if (track.maxSpeedKmH > _maxRealisticSpeedKmH) {
       return TrackValidationResult(
         isValid: false,
-        reason: 'Velocidad máxima imposible',
+        reason: l10n.validationMaxSpeedImpossible,
       );
     }
 

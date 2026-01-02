@@ -434,5 +434,32 @@
     "descriptionOptional": "Description (optional)",
     "noFriendsToAdd": "You don't have friends to add to the group",
     "couldNotFindUserEmail": "Could not find user's email",
-    "deleteMessageConfirmation": "Are you sure you want to delete this message? This action cannot be undone."
+    "deleteMessageConfirmation": "Are you sure you want to delete this message? This action cannot be undone.",
+
+    "routeSavedSuccessfully": "Route saved successfully",
+    "backToMap": "Back to map",
+    "noRouteDataAvailable": "No route data available",
+
+    "validationMinPoints": "The route must have at least {count} points",
+    "@validationMinPoints": {
+        "placeholders": {
+        "count": {
+            "type": "int"
+        }
+        }
+    },
+    "validationNoMovement": "The route shows no significant movement",
+    "validationInconsistentTime": "Inconsistent time data",
+    "validationImpossibleSpeed": "Impossible speed detected: {speed} km/h",
+    "@validationImpossibleSpeed": {
+        "placeholders": {
+        "speed": {
+            "type": "String"
+        }
+        }
+    },
+    "validationSuspiciousGPS": "Suspicious GPS pattern detected",
+    "validationImpossibleMovements": "Impossible movements detected",
+    "validationMaxSpeedImpossible": "Maximum speed impossible"
+
 }
