@@ -28,6 +28,7 @@ class RankingUserList extends StatelessWidget {
       itemBuilder: (context, index) {
         final entry = rankingData[index];
         return RankingUserTile(
+          key: ValueKey(entry.email),
           entry: entry,
           selectedMetric: selectedMetric,
           position: index + 1,
@@ -90,9 +91,9 @@ class _RankingUserTileState extends State<RankingUserTile> {
     final currentUserEmail = userProvider.email;
     final isCurrentUser = widget.entry.email == currentUserEmail;
 
-    final displayName = widget.entry.email;
+    final String displayName = widget.entry.nickname;
 
-    final hasPhoto = _userData?.photo.isNotEmpty == true;
+    final bool hasPhoto = _userData?.photo.isNotEmpty == true;
 
     return ListTile(
       onTap: () {

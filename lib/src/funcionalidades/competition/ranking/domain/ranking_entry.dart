@@ -1,6 +1,6 @@
 class RankingEntry {
   final String email;
-  final String? nickname;
+  final String nickname;
   final int? numberOfRoutes;
   final double? distance;
   final double? elevationGain;
@@ -13,7 +13,7 @@ class RankingEntry {
 
   RankingEntry({
     required this.email,
-    this.nickname,
+    required this.nickname,
     // this.score,
     this.numberOfRoutes,
     this.distance,
@@ -27,7 +27,7 @@ class RankingEntry {
   factory RankingEntry.fromJson(Map<String, dynamic> json) {
     return RankingEntry(
       email: json['email'] as String,
-      nickname: json['nickname'] as String?,
+      nickname: json['nickname'] as String,
       numberOfRoutes: json['num_rutas'] as int?,
       distance: (json['km_recorridos'] as num?)?.toDouble(),
       elevationGain: (json['elevacion_positiva'] as num?)?.toDouble(),
