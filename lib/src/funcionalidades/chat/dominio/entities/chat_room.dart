@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Entidad de dominio para una sala de chat
 class ChatRoom extends Equatable {
   final String id;
   final String name;
@@ -22,7 +21,7 @@ class ChatRoom extends Equatable {
     required this.createdAt,
   });
 
-  /// Verificar si es un chat directo (1 a 1)
+  /// Verificar si es un chat directo 
   bool get isDirect => type == 'direct';
 
   /// Verificar si es un chat grupal

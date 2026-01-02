@@ -90,8 +90,6 @@ class SocketConfig {
       debugPrint('[SocketIO] ⚠️ Error del servidor: $data');
     });
 
-    // Nota: Este listener escucha un evento 'pong' personalizado, no el pong nativo del heartbeat
-    // El heartbeat nativo de Socket.IO se maneja automáticamente y no emite eventos visibles
     _socket?.on('pong', (data) {
       debugPrint('[SocketIO] 🏓 Pong recibido (evento personalizado): $data');
     });
@@ -104,21 +102,6 @@ class SocketConfig {
     _socket?.dispose();
     _socket = null;
     _currentUserId = null;
-  }
-
-  /// Enviar evento de ping personalizado (NO es el ping del heartbeat nativo)
-  ///
-  /// NOTA: Este método ya no se usa. Socket.IO maneja automáticamente el heartbeat
-  /// mediante ping/pong nativo según la configuración del servidor (pingInterval/pingTimeout).
-  /// El heartbeat nativo es transparente y no requiere código adicional.
-  ///
-  /// Si necesitas enviar un evento 'ping' personalizado por alguna razón específica,
-  /// puedes usar este método, pero no ayuda al mantenimiento de la conexión.
-  @Deprecated('Socket.IO maneja el heartbeat automáticamente. No es necesario.')
-  static void ping() {
-    if (_socket?.connected ?? false) {
-      _socket?.emit('ping');
-    }
   }
 
   /// Obtener el ID del usuario actual

@@ -20,16 +20,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<Message>? _messageEditedSubscription;
   StreamSubscription<Map<String, dynamic>>? _userKickedSubscription;
   StreamSubscription<Map<String, dynamic>>? _groupUserAddedSubscription;
-
   StreamSubscription<Map<String, dynamic>>? _friendshipDeletedSubscription;
 
   // Estado local
   String? _currentRoomId;
   final List<Message> _messages = [];
-  final Map<String, String> _usersTyping = {}; // userId -> userName
+  final Map<String, String> _usersTyping = {}; 
 
   ChatBloc(this._chatRepository) : super(const ChatInitial()) {
-    // Registrar handlers de eventos
     on<InitializeChat>(_onInitializeChat);
     on<JoinChatRoom>(_onJoinChatRoom);
     on<LeaveChatRoom>(_onLeaveChatRoom);
@@ -84,13 +82,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         add(const SocketReconnected());
       });
 
-      // Socket.IO maneja el heartbeat automáticamente con ping/pong nativo
-      // No es necesario un keep-alive personalizado
-
       emit(ChatConnected(event.userId));
-      debugPrint('[ChatBloc] ✅ Chat inicializado correctamente');
+      debugPrint('[ChatBloc] Chat inicializado correctamente');
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error inicializando chat: $e');
+      debugPrint('[ChatBloc] Error inicializando chat: $e');
       emit(ChatConnectionError(e.toString()));
     }
   }
@@ -179,23 +174,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .messageDeletedStream
         .listen(
           (data) {
-            debugPrint('[ChatBloc] 📨 Evento message:deleted recibido: $data');
+            debugPrint('[ChatBloc] Evento message:deleted recibido: $data');
             final messageId = data['messageId'] as String?;
             final roomId = data['roomId'] as String?;
 
             if (messageId != null && roomId != null) {
               debugPrint(
-                '[ChatBloc] 🗑️ Procesando eliminación de mensaje $messageId en sala $roomId',
+                '[ChatBloc] Procesando eliminación de mensaje $messageId en sala $roomId',
               );
               add(MessageDeleted(messageId: messageId, roomId: roomId));
             } else {
               debugPrint(
-                '[ChatBloc] ⚠️ Datos incompletos en message:deleted: messageId=$messageId, roomId=$roomId',
+                '[ChatBloc] Datos incompletos en message:deleted: messageId=$messageId, roomId=$roomId',
               );
             }
           },
           onError: (error) {
-            debugPrint('[ChatBloc] ❌ Error en messageDeleted stream: $error');
+            debugPrint('[ChatBloc]  Error en messageDeleted stream: $error');
           },
         );
 
@@ -206,19 +201,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .listen(
           (messageModel) {
             debugPrint(
-              '[ChatBloc] 📨 Evento message:edited recibido: ${messageModel.id}',
+              '[ChatBloc] Evento message:edited recibido: ${messageModel.id}',
             );
             add(MessageEdited(messageModel.toEntity()));
           },
           onError: (error) {
-            debugPrint('[ChatBloc] ❌ Error en messageEdited stream: $error');
+            debugPrint('[ChatBloc]  Error en messageEdited stream: $error');
           },
         );
 
     // Escuchar usuario expulsado de grupo
     _userKickedSubscription = _chatRepository.userKickedStream.listen(
       (data) {
-        debugPrint('[ChatBloc] 🚫 Usuario expulsado del grupo: $data');
+        debugPrint('[ChatBloc]  Usuario expulsado del grupo: $data');
         final chatId = data['chatId'] as String?;
         final chatName = data['chatName'] as String? ?? 'Grupo';
         if (chatId != null) {
@@ -226,14 +221,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       },
       onError: (error) {
-        debugPrint('[ChatBloc] ❌ Error en userKicked stream: $error');
+        debugPrint('[ChatBloc]  Error en userKicked stream: $error');
       },
     );
 
     // Escuchar usuario añadido a grupo
     _groupUserAddedSubscription = _chatRepository.groupUserAddedStream.listen(
       (data) {
-        debugPrint('[ChatBloc] ➕ Usuario añadido a grupo: $data');
+        debugPrint('[ChatBloc] Usuario añadido a grupo: $data');
         final chatId = data['chatId'] as String?;
         final chatName = data['chatName'] as String? ?? 'Grupo';
         if (chatId != null) {
@@ -241,14 +236,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       },
       onError: (error) {
-        debugPrint('[ChatBloc] ❌ Error en groupUserAdded stream: $error');
+        debugPrint('[ChatBloc]  Error en groupUserAdded stream: $error');
       },
     );
 
     // Escuchar grupo eliminado
     _chatRepository.groupDeletedStream.listen(
       (data) {
-        debugPrint('[ChatBloc] 🗑️ Grupo eliminado: $data');
+        debugPrint('[ChatBloc] Grupo eliminado: $data');
         final chatId = data['chatId'] as String?;
         final chatName = data['chatName'] as String? ?? 'Grupo Eliminado';
         if (chatId != null) {
@@ -256,7 +251,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       },
       onError: (error) {
-        debugPrint('[ChatBloc] ❌ Error en groupDeleted stream: $error');
+        debugPrint('[ChatBloc]  Error en groupDeleted stream: $error');
       },
     );
 
@@ -265,7 +260,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         .listen(
           (data) {
             debugPrint(
-              '[ChatBloc] 🗑️ Amistad eliminada (chat eliminado): $data',
+              '[ChatBloc] Amistad eliminada (chat eliminado): $data',
             );
             final chatId = data['chatId'] as String?;
             final deletedBy = data['deletedBy'] as String? ?? '';
@@ -283,13 +278,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           },
           onError: (error) {
             debugPrint(
-              '[ChatBloc] ❌ Error en friendshipDeleted stream: $error',
+              '[ChatBloc] Error en friendshipDeleted stream: $error',
             );
           },
         );
 
     debugPrint(
-      '[ChatBloc] ✅ Stream listeners configurados (incluyendo messageDeleted, messageEdited, userKicked, groupUserAdded, groupParticipantKicked y friendshipDeleted)',
+      '[ChatBloc] Stream listeners configurados (incluyendo messageDeleted, messageEdited, userKicked, groupUserAdded, groupParticipantKicked y friendshipDeleted)',
     );
   }
 
@@ -321,9 +316,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
       );
 
-      debugPrint('[ChatBloc] ✅ Unido a sala: ${event.roomId}');
+      debugPrint('[ChatBloc]  Unido a sala: ${event.roomId}');
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error uniéndose a sala: $e');
+      debugPrint('[ChatBloc]  Error uniéndose a sala: $e');
       emit(ChatRoomError(roomId: event.roomId, message: e.toString()));
     }
   }
@@ -354,7 +349,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     try {
-      debugPrint('[ChatBloc] 💬 Enviando mensaje a ${event.roomId}');
+      debugPrint('[ChatBloc]  Enviando mensaje a ${event.roomId}');
 
       await _chatRepository.sendMessage(
         roomId: event.roomId,
@@ -364,7 +359,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       // El mensaje se agregará cuando llegue via messageStream
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error enviando mensaje: $e');
+      debugPrint('[ChatBloc]  Error enviando mensaje: $e');
       emit(ChatRoomError(roomId: event.roomId, message: e.toString()));
     }
   }
@@ -382,7 +377,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _messages.add(message);
     _messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    debugPrint('[ChatBloc] ✅ Mensaje agregado: ${message.content}');
+    debugPrint('[ChatBloc]  Mensaje agregado: ${message.content}');
 
     if (state is ChatRoomActive) {
       final currentState = state as ChatRoomActive;
@@ -430,7 +425,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _onUserJoinedRoom(UserJoinedRoom event, Emitter<ChatState> emit) {
     if (event.roomId != _currentRoomId) return;
 
-    debugPrint('[ChatBloc] 👤 ${event.userName} se unió');
+    debugPrint('[ChatBloc]  ${event.userName} se unió');
 
     if (state is ChatRoomActive) {
       final currentState = state as ChatRoomActive;
@@ -442,7 +437,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _onUserLeftRoom(UserLeftRoom event, Emitter<ChatState> emit) {
     if (event.roomId != _currentRoomId) return;
 
-    debugPrint('[ChatBloc] 👋 ${event.userName} salió');
+    debugPrint('[ChatBloc] ${event.userName} salió');
 
     _usersTyping.remove(event.userId);
 
@@ -505,7 +500,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       if (newCount > 0) {
         debugPrint(
-          '[ChatBloc] 📥 Agregando $newCount mensajes nuevos del historial',
+          '[ChatBloc] Agregando $newCount mensajes nuevos del historial',
         );
       }
 
@@ -523,10 +518,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       }
 
       debugPrint(
-        '[ChatBloc] ✅ Historial cargado: ${messages.length} mensajes totales, ${_messages.length} en lista',
+        '[ChatBloc] Historial cargado: ${messages.length} mensajes totales, ${_messages.length} en lista',
       );
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error cargando historial: $e');
+      debugPrint('[ChatBloc]  Error cargando historial: $e');
       if (state is ChatRoomActive) {
         final currentState = state as ChatRoomActive;
         emit(currentState.copyWith(isLoadingHistory: false));
@@ -545,7 +540,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// Manejar error
   void _onChatError(ChatError event, Emitter<ChatState> emit) {
-    debugPrint('[ChatBloc] ⚠️ Error: ${event.message}');
+    debugPrint('[ChatBloc] Error: ${event.message}');
     if (_currentRoomId != null) {
       emit(ChatRoomError(roomId: _currentRoomId!, message: event.message));
     }
@@ -557,7 +552,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     try {
-      debugPrint('[ChatBloc] 🔄 Manejando reconexión del socket...');
+      debugPrint('[ChatBloc]  Manejando reconexión del socket...');
 
       // Reconfigurar listeners de Socket.IO y streams
       _chatRepository.resetSocketListeners();
@@ -575,9 +570,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }
       }
 
-      debugPrint('[ChatBloc] ✅ Reconexión manejada correctamente');
+      debugPrint('[ChatBloc]  Reconexión manejada correctamente');
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error manejando reconexión: $e');
+      debugPrint('[ChatBloc]  Error manejando reconexión: $e');
     }
   }
 
@@ -588,7 +583,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     int? messageIndex;
     try {
-      debugPrint('[ChatBloc] 🗑️ Eliminando mensaje ${event.messageId}');
+      debugPrint('[ChatBloc] Eliminando mensaje ${event.messageId}');
 
       // Actualizar estado local inmediatamente para feedback visual rápido
       messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
@@ -600,7 +595,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         final currentState = state as ChatRoomActive;
         emit(currentState.copyWith(messages: List.from(_messages)));
-        debugPrint('[ChatBloc] ✅ Estado local actualizado inmediatamente');
+        debugPrint('[ChatBloc]  Estado local actualizado inmediatamente');
       }
 
       await _chatRepository.deleteMessage(
@@ -609,9 +604,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
 
       // El mensaje también se actualizará cuando llegue el evento message:deleted via socket
-      // (esto asegura sincronización con otros usuarios)
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error eliminando mensaje: $e');
+      debugPrint('[ChatBloc]  Error eliminando mensaje: $e');
       // Revertir cambio local si falla
       if (messageIndex != null &&
           messageIndex != -1 &&
@@ -631,12 +625,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   /// Mensaje eliminado (recibido desde Socket.IO)
   void _onMessageDeleted(MessageDeleted event, Emitter<ChatState> emit) {
     debugPrint(
-      '[ChatBloc] 🔄 Handler _onMessageDeleted llamado: messageId=${event.messageId}, roomId=${event.roomId}, currentRoomId=$_currentRoomId',
+      '[ChatBloc] Handler _onMessageDeleted llamado: messageId=${event.messageId}, roomId=${event.roomId}, currentRoomId=$_currentRoomId',
     );
 
     if (event.roomId != _currentRoomId) {
       debugPrint(
-        '[ChatBloc] ⚠️ Mensaje eliminado de otra sala ignorado (${event.roomId} != $_currentRoomId)',
+        '[ChatBloc] Mensaje eliminado de otra sala ignorado (${event.roomId} != $_currentRoomId)',
       );
       return;
     }
@@ -644,7 +638,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     // Buscar el mensaje en la lista y marcarlo como eliminado
     final messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
     debugPrint(
-      '[ChatBloc] 📋 Buscando mensaje ${event.messageId} en lista de ${_messages.length} mensajes. Índice encontrado: $messageIndex',
+      '[ChatBloc] Buscando mensaje ${event.messageId} en lista de ${_messages.length} mensajes. Índice encontrado: $messageIndex',
     );
 
     if (messageIndex != -1) {
@@ -655,24 +649,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
 
       debugPrint(
-        '[ChatBloc] ✅ Mensaje marcado como eliminado: ${event.messageId}. Estado actual: ${state.runtimeType}',
+        '[ChatBloc] Mensaje marcado como eliminado: ${event.messageId}. Estado actual: ${state.runtimeType}',
       );
 
       if (state is ChatRoomActive) {
         final currentState = state as ChatRoomActive;
         emit(currentState.copyWith(messages: List.from(_messages)));
-        debugPrint('[ChatBloc] ✅ Estado actualizado con mensaje eliminado');
+        debugPrint('[ChatBloc]  Estado actualizado con mensaje eliminado');
       } else {
         debugPrint(
-          '[ChatBloc] ⚠️ Estado no es ChatRoomActive, no se puede actualizar',
+          '[ChatBloc] Estado no es ChatRoomActive, no se puede actualizar',
         );
       }
     } else {
       debugPrint(
-        '[ChatBloc] ⚠️ Mensaje a eliminar no encontrado en la lista: ${event.messageId}',
+        '[ChatBloc] Mensaje a eliminar no encontrado en la lista: ${event.messageId}',
       );
       debugPrint(
-        '[ChatBloc] 📋 IDs de mensajes en lista: ${_messages.map((m) => m.id).toList()}',
+        '[ChatBloc] IDs de mensajes en lista: ${_messages.map((m) => m.id).toList()}',
       );
     }
   }
@@ -684,7 +678,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     int? messageIndex;
     try {
-      debugPrint('[ChatBloc] ✏️ Editando mensaje ${event.messageId}');
+      debugPrint('[ChatBloc] Editando mensaje ${event.messageId}');
 
       // Actualizar estado local inmediatamente para feedback visual rápido
       messageIndex = _messages.indexWhere((m) => m.id == event.messageId);
@@ -697,7 +691,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         final currentState = state as ChatRoomActive;
         emit(currentState.copyWith(messages: List.from(_messages)));
-        debugPrint('[ChatBloc] ✅ Estado local actualizado inmediatamente');
+        debugPrint('[ChatBloc]  Estado local actualizado inmediatamente');
       }
 
       await _chatRepository.editMessage(
@@ -707,9 +701,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
 
       // El mensaje también se actualizará cuando llegue el evento message:edited via socket
-      // (esto asegura sincronización con otros usuarios)
     } catch (e) {
-      debugPrint('[ChatBloc] ❌ Error editando mensaje: $e');
+      debugPrint('[ChatBloc]  Error editando mensaje: $e');
       // Revertir cambio local si falla
       if (messageIndex != null &&
           messageIndex != -1 &&
@@ -732,7 +725,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final editedMessage = event.message;
 
     if (editedMessage.roomId != _currentRoomId) {
-      debugPrint('[ChatBloc] ⚠️ Mensaje editado de otra sala ignorado');
+      debugPrint('[ChatBloc] Mensaje editado de otra sala ignorado');
       return;
     }
 
@@ -741,7 +734,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     if (messageIndex != -1) {
       _messages[messageIndex] = editedMessage;
-      debugPrint('[ChatBloc] ✅ Mensaje actualizado: ${editedMessage.id}');
+      debugPrint('[ChatBloc]  Mensaje actualizado: ${editedMessage.id}');
 
       if (state is ChatRoomActive) {
         final currentState = state as ChatRoomActive;
@@ -749,7 +742,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       }
     } else {
       debugPrint(
-        '[ChatBloc] ⚠️ Mensaje editado no encontrado en la lista: ${editedMessage.id}',
+        '[ChatBloc] Mensaje editado no encontrado en la lista: ${editedMessage.id}',
       );
     }
   }
@@ -759,8 +752,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     UserKickedFromGroup event,
     Emitter<ChatState> emit,
   ) {
-    debugPrint('[ChatBloc] 🚫 Usuario expulsado del grupo ${event.chatId}');
-    debugPrint('[ChatBloc] 📍 Sala actual: $_currentRoomId');
+    debugPrint('[ChatBloc] Usuario expulsado del grupo ${event.chatId}');
+    debugPrint('[ChatBloc] Sala actual: $_currentRoomId');
 
     // Emitir estado para que la UI pueda reaccionar (actualizar lista de chats)
     emit(
@@ -770,7 +763,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     // Si el usuario está en la sala del grupo del que fue expulsado, salir
     if (_currentRoomId == event.chatId) {
       debugPrint(
-        '[ChatBloc] ✅ Usuario está en la sala expulsada, cerrando chat...',
+        '[ChatBloc] Usuario está en la sala expulsada, cerrando chat...',
       );
       _chatRepository.leaveRoom(event.chatId);
       _currentRoomId = null;
@@ -779,14 +772,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(const ChatDisconnected());
     } else {
       debugPrint(
-        '[ChatBloc] ⚠️ Usuario no está en la sala expulsada actualmente',
+        '[ChatBloc] Usuario no está en la sala expulsada actualmente',
       );
     }
   }
 
   /// Usuario añadido a grupo
   void _onGroupUserAdded(GroupUserAdded event, Emitter<ChatState> emit) {
-    debugPrint('[ChatBloc] ➕ Usuario añadido al grupo ${event.chatId}');
+    debugPrint('[ChatBloc] Usuario añadido al grupo ${event.chatId}');
     // Emitir un estado específico para que la UI pueda reaccionar
     emit(GroupUserAddedState(chatId: event.chatId, chatName: event.chatName));
   }
@@ -797,7 +790,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) {
     debugPrint(
-      '[ChatBloc] 🚫 Participante expulsado del grupo ${event.chatId}',
+      '[ChatBloc] Participante expulsado del grupo ${event.chatId}',
     );
     // Emitir un estado específico para que la UI pueda reaccionar
     emit(
@@ -810,7 +803,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   /// Grupo eliminado
   void _onGroupDeleted(GroupDeleted event, Emitter<ChatState> emit) {
-    debugPrint('[ChatBloc] 🗑️ Grupo ${event.chatId} eliminado');
+    debugPrint('[ChatBloc] Grupo ${event.chatId} eliminado');
     // Si el usuario está en la sala del grupo eliminado, salir
     if (_currentRoomId == event.chatId) {
       _chatRepository.leaveRoom(event.chatId);
@@ -825,16 +818,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   /// Amistad eliminada (chat directo eliminado)
   void _onFriendshipDeleted(FriendshipDeleted event, Emitter<ChatState> emit) {
     debugPrint(
-      '[ChatBloc] 🗑️ Amistad eliminada, chat ${event.chatId} eliminado por ${event.deletedByNickname}',
+      '[ChatBloc] Amistad eliminada, chat ${event.chatId} eliminado por ${event.deletedByNickname}',
     );
     debugPrint(
-      '[ChatBloc] 📍 Sala actual: $_currentRoomId, Chat eliminado: ${event.chatId}',
+      '[ChatBloc] Sala actual: $_currentRoomId, Chat eliminado: ${event.chatId}',
     );
 
     // Si el usuario está en la sala del chat eliminado, salir y limpiar estado
     if (_currentRoomId == event.chatId) {
       debugPrint(
-        '[ChatBloc] ✅ Usuario está en la sala eliminada, limpiando estado...',
+        '[ChatBloc] Usuario está en la sala eliminada, limpiando estado...',
       );
       _chatRepository.leaveRoom(event.chatId);
       _currentRoomId = null;

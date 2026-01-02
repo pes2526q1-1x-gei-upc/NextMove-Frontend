@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
 
 // Mutación corregida para incluir photo y participantEmails
@@ -70,14 +71,18 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     // Validaciones previas
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El nombre del grupo es obligatorio')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.groupNameRequired),
+        ),
       );
       return;
     }
 
     if (_selectedFriends.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona al menos un amigo')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.selectAtLeastOneFriend),
+        ),
       );
       return;
     }
@@ -94,7 +99,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       String? photoUrl;
 
       // 1. SUBIR FOTO (Solo si el usuario seleccionó una)
-      // Usamos el método genérico que creamos para no actualizar tu perfil
       if (_selectedImage != null) {
         photoUrl = await remoteProvider.uploadPhoto(_selectedImage!);
       }
@@ -117,14 +121,16 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       }
 
       navigator.pop(true); // Retorna true para refrescar la lista
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Grupo creado exitosamente')),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.groupCreatedSuccessfully),
+        ),
       );
     } catch (e) {
       if (mounted) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${AppLocalizations.of(context)!.error}: $e'),
             backgroundColor: theme.colorScheme.error,
           ),
         );
@@ -142,7 +148,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Grupo'),
+        title: Text(AppLocalizations.of(context)!.createGroup),
         actions: [
           if (_isCreating)
             const Padding(
@@ -307,7 +313,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (result.hasException) {
-                  return const Center(child: Text('Error al cargar amigos'));
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.errorLoadingFriendsList,
+                    ),
+                  );
                 }
 
                 final friends =
@@ -320,7 +330,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                 }).toList();
 
                 if (filteredFriends.isEmpty) {
-                  return const Center(child: Text('No se encontraron amigos'));
+                  return Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.noFriendsFoundSearch,
+                    ),
+                  );
                 }
 
                 return ListView.builder(

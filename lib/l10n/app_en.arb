@@ -296,7 +296,6 @@
     "shareRouteStatisticsMessage": "I have recorded a route by bicycle using NextMove! Check out my statistics and download the app to compete with me and the rest of the community.",
     "errorAddingToCalendar": "An error occurred while adding the challenge to the calendar.",
     "social": "Social",
-
     "chats": "Chats",
     "connectingToServer": "Connecting to server...",
     "connectionError": "Connection error",
@@ -321,5 +320,111 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "groupDetails": "Group details",
-    "participants": "Participants"
+    "participants": "Participants",
+    "addParticipants": "Add participants",
+    "userWithoutValidEmail": "This user doesn't have a valid email",
+    "errorAddingParticipant": "Error adding {email}: {error}",
+    "@errorAddingParticipant": {
+        "placeholders": {
+            "email": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "couldNotAddParticipants": "Could not add any participants",
+    "editGroup": "Edit Group",
+    "groupUpdatedSuccessfully": "Group updated successfully",
+    "youHaveBeenKickedFrom": "You have been kicked from {groupName}",
+    "@youHaveBeenKickedFrom": {
+        "placeholders": {
+            "groupName": {
+                "type": "String"
+            }
+        }
+    },
+    "youLeftTheGroup": "You left the group",
+    "errorLeavingGroup": "Error leaving group: {error}",
+    "@errorLeavingGroup": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "user": "User",
+    "admin": "Admin",
+    "you": "You",
+    "adminRoleRemoved": "Admin role removed from {nickname}",
+    "@adminRoleRemoved": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "adminRoleGranted": "Admin role granted to {nickname}",
+    "@adminRoleGranted": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "removeAdmin": "Remove admin",
+    "makeAdmin": "Make admin",
+    "participantKicked": "{nickname} was kicked from the group",
+    "@participantKicked": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "kick": "Kick",
+    "kickParticipant": "Kick participant",
+    "areYouSureKickParticipant": "Are you sure you want to kick {nickname} from the group?",
+    "@areYouSureKickParticipant": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "add": "Add",
+    "leaveGroup": "Leave group",
+    "areYouSureLeaveGroup": "Are you sure you want to leave the group?",
+    "leave": "Leave",
+    "groupDeleted": "Group deleted",
+    "createGroup": "Create Group",
+    "createAGroupToStart": "Create a group to start",
+    "deleteMessage": "Delete message",
+    "messageDeleted": "Message deleted",
+    "friendshipDeleted": "Friendship has been deleted",
+    "groupHasBeenDeleted": "The group has been deleted",
+    "youHaveBeenKickedFromGroup": "You have been kicked from the group",
+    "editingMessage": "Editing message...",
+    "groupNameRequired": "Group name is required",
+    "selectAtLeastOneFriend": "Select at least one friend",
+    "groupCreatedSuccessfully": "Group created successfully",
+    "errorLoadingFriendsList": "Error loading friends",
+    "noFriendsFoundSearch": "No friends found",
+    "groupNotFound": "Group not found",
+    "editGroupTooltip": "Edit group",
+    "edit": "Edit",
+    "areYouSureDeleteMessage": "Are you sure you want to delete this message? This action cannot be undone.",
+    "confirmDeleteMessage": "Message deleted",
+    "noGroupsYet": "No groups yet",
+    "group": "Group",
+    "member": "Member",
+    "members": "Members",
+    "deleteGroup": "Delete group",
+    "areYouSureDeleteGroup": "Are you sure you want to delete this group? This action cannot be undone.",
+    "confirmDeleteGroup": "Group deleted",
+    "isWriting": "is writing...",
+    "areWriting": "are writing...",
+    "and": "and",
+    "more": "more"
 }

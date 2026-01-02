@@ -66,12 +66,12 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
   }
 
   void _toggleUserSelection(UserEntity user) {
-    // ✅ VALIDAR EMAIL
+    final l10n = AppLocalizations.of(context)!;
     if (user.email.isEmpty) {
       debugPrint('[AddParticipants] ERROR: Usuario ${user.apodo} sin email');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Este usuario no tiene email válido')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.userWithoutValidEmail)));
       return;
     }
 
@@ -114,6 +114,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
     List<String> emails,
     ThemeData theme,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final client = GraphQLProvider.of(context).value;
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
@@ -154,14 +155,14 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
           );
         } else {
           successCount++;
-          debugPrint('[AddParticipants] ✅ Añadido: $email');
+          debugPrint('[AddParticipants]  Añadido: $email');
         }
       } catch (e) {
         allSuccess = false;
         debugPrint('[AddParticipants] Exception: $e');
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Error al añadir $email: $e'),
+            content: Text(l10n.errorAddingParticipant(email, e.toString())),
             backgroundColor: theme.colorScheme.error,
           ),
         );
@@ -191,7 +192,7 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
     } else {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: const Text('No se pudo añadir ningún participante'),
+          content: Text(l10n.couldNotAddParticipants),
           backgroundColor: theme.colorScheme.error,
         ),
       );
@@ -200,13 +201,13 @@ class _AddParticipantsPageState extends State<AddParticipantsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const Text('Añadir participantes'),
+        title: Text(l10n.addParticipants),
         actions: [
           if (_selectedUserEmails.isNotEmpty)
             TextButton(

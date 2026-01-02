@@ -57,9 +57,10 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
             state.chatId == widget.chatId &&
             !_isNavigatingAway) {
           _isNavigatingAway = true;
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Has sido expulsado de ${state.chatName}'),
+              content: Text(l10n.youHaveBeenKickedFrom(state.chatName)),
               backgroundColor: Theme.of(context).colorScheme.error,
               duration: const Duration(seconds: 2),
             ),
@@ -138,7 +139,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
             Navigator.pop(context, updatedGroupData);
           },
         ),
-        title: const Text('Detalles del grupo'),
+        title: Text(l10n.groupDetails),
         actions: [
           // Botón de editar grupo (solo visible si es admin)
           Query(
@@ -174,7 +175,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
 
               return IconButton(
                 icon: const Icon(Icons.edit),
-                tooltip: 'Editar grupo',
+                tooltip: l10n.editGroupTooltip,
                 onPressed: () async {
                   final editResult = await Navigator.of(context)
                       .push<Map<String, dynamic>?>(
@@ -253,7 +254,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Grupo no encontrado',
+                    l10n.groupNotFound,
                     style: theme.textTheme.titleLarge,
                   ),
                 ],
@@ -275,9 +276,9 @@ class _ChatRoomDetailsContent extends StatelessWidget {
               document: gql(GraphQLMutations.leaveGroupMutation),
               onCompleted: (data) {
                 // Mostrar mensaje
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Has salido del grupo')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.youLeftTheGroup)));
                 // Cerrar ChatRoomDetailsPage y luego ChatRoomPage
                 // Usar popUntil para volver directamente a la lista de chats
                 Navigator.of(context).pop({'leftGroup': true});
@@ -417,7 +418,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                           children: [
                             ProfileSectionLabel(
                               text:
-                                  '${participants.length} ${participants.length == 1 ? 'miembro' : 'miembros'}',
+                                  '${participants.length} ${participants.length == 1 ? l10n.member : l10n.members}',
                             ),
                             const SizedBox(height: 8),
                             ProfileStyledCard(
@@ -617,7 +618,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                     ),
                                                     if (isCurrentUser)
                                                       Text(
-                                                        'Tú',
+                                                        l10n.you,
                                                         style: theme
                                                             .textTheme
                                                             .bodySmall
@@ -649,8 +650,8 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                         SnackBar(
                                                           content: Text(
                                                             isAdmin
-                                                                ? 'Se quitó el rol de admin a $participantNickname'
-                                                                : '$participantNickname ahora es admin',
+                                                                ? l10n.adminRoleGranted(participantNickname)
+                                                                : l10n.adminRoleRemoved(participantNickname),
                                                           ),
                                                         ),
                                                       );
@@ -726,7 +727,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                       ).showSnackBar(
                                                         SnackBar(
                                                           content: Text(
-                                                            '$participantNickname expulsado del grupo',
+                                                            l10n.participantKicked(participantNickname),
                                                           ),
                                                         ),
                                                       );
@@ -756,7 +757,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                             .error,
                                                         size: 20,
                                                       ),
-                                                      tooltip: 'Expulsar',
+                                                      tooltip: l10n.kick,
                                                       onPressed:
                                                           kickResult
                                                                   ?.isLoading ==
@@ -773,11 +774,11 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                                           16,
                                                                         ),
                                                                   ),
-                                                                  title: const Text(
-                                                                    'Expulsar participante',
+                                                                  title: Text(
+                                                                    l10n.kickParticipant,
                                                                   ),
                                                                   content: Text(
-                                                                    '¿Estás seguro de que quieres expulsar a $participantNickname del grupo?',
+                                                                    l10n.areYouSureKickParticipant(participantNickname),
                                                                   ),
                                                                   actions: [
                                                                     TextButton(
@@ -785,8 +786,8 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                                           Navigator.pop(
                                                                             context,
                                                                           ),
-                                                                      child: const Text(
-                                                                        'Cancelar',
+                                                                      child: Text(
+                                                                        l10n.cancel,
                                                                         style: TextStyle(
                                                                           color:
                                                                               Colors.grey,
@@ -805,8 +806,8 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                                               participantEmail,
                                                                         });
                                                                       },
-                                                                      child: const Text(
-                                                                        'Expulsar',
+                                                                      child: Text(
+                                                                        l10n.kick,
                                                                         style: TextStyle(
                                                                           color:
                                                                               Colors.red,
@@ -903,7 +904,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                   }
                                 },
                                 icon: const Icon(Icons.person_add, size: 20),
-                                label: const Text('Añadir'),
+                                label: Text(l10n.add),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: theme.colorScheme.primary,
                                   foregroundColor: theme.colorScheme.onPrimary,
@@ -930,11 +931,11 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(16),
                                             ),
-                                            title: const Text(
-                                              'Salir del grupo',
+                                            title: Text(
+                                              l10n.leaveGroup,
                                             ),
-                                            content: const Text(
-                                              '¿Estás seguro de que quieres salir de este grupo?',
+                                            content: Text(
+                                              l10n.areYouSureLeaveGroup,
                                             ),
                                             actions: [
                                               TextButton(
@@ -954,9 +955,9 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                     'chatId': chatId,
                                                   });
                                                 },
-                                                child: const Text(
-                                                  'Salir',
-                                                  style: TextStyle(
+                                                child: Text(
+                                                  l10n.leave,
+                                                  style: const TextStyle(
                                                     color: Colors.red,
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -975,7 +976,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                         ),
                                       )
                                     : const Icon(Icons.exit_to_app, size: 20),
-                                label: const Text('Salir'),
+                                label: Text(l10n.leave),
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
@@ -1005,9 +1006,7 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                               ),
                               onCompleted: (data) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Grupo eliminado'),
-                                  ),
+                                  SnackBar(content: Text(l10n.groupDeleted)),
                                 );
                                 Navigator.of(
                                   context,
@@ -1047,9 +1046,9 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                     size: 28,
                                                   ),
                                                   const SizedBox(width: 12),
-                                                  const Expanded(
+                                                  Expanded(
                                                     child: Text(
-                                                      'Eliminar grupo',
+                                                      l10n.deleteGroup,
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -1058,8 +1057,8 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                   ),
                                                 ],
                                               ),
-                                              content: const Text(
-                                                '¿Estás seguro de que quieres eliminar este grupo? Esta acción no se puede deshacer y todos los participantes serán removidos.',
+                                              content: Text(
+                                                l10n.areYouSureDeleteGroup,
                                               ),
                                               actions: [
                                                 TextButton(
@@ -1086,9 +1085,9 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                                         foregroundColor:
                                                             Colors.white,
                                                       ),
-                                                  child: const Text(
-                                                    'Eliminar',
-                                                    style: TextStyle(
+                                                  child: Text(
+                                                    l10n.delete,
+                                                    style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
@@ -1111,9 +1110,9 @@ class _ChatRoomDetailsContent extends StatelessWidget {
                                           Icons.delete_forever,
                                           size: 20,
                                         ),
-                                  label: const Text(
-                                    'Eliminar grupo',
-                                    style: TextStyle(
+                                  label: Text(
+                                    l10n.deleteGroup,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

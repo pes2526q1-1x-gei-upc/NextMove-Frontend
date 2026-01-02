@@ -82,24 +82,24 @@ class SocketDataSource {
     debugPrint('[SocketDataSource] 🔧 Configurando listeners...');
 
     socket.on('message:new', (data) {
-      debugPrint('[SocketDataSource] 💬 RAW DATA: $data');
+      debugPrint('[SocketDataSource]  RAW DATA: $data');
       try {
         final message = MessageModel.fromJson(data as Map<String, dynamic>);
         _messageController.add(message);
-        debugPrint('[SocketDataSource] ✅ Mensaje procesado');
+        debugPrint('[SocketDataSource]  Mensaje procesado');
       } catch (e) {
-        debugPrint('[SocketDataSource] ❌ Error procesando mensaje: $e');
+        debugPrint('[SocketDataSource]  Error procesando mensaje: $e');
       }
     });
 
     // Escuchar usuarios escribiendo
     socket.on('typing:user', (data) {
-      debugPrint('[SocketDataSource] ⌨️ Usuario escribiendo: $data');
+      debugPrint('[SocketDataSource] Usuario escribiendo: $data');
       _typingController.add(data as Map<String, dynamic>);
     });
 
     socket.on('typing:stop', (data) {
-      debugPrint('[SocketDataSource] ⌨️ Usuario dejó de escribir: $data');
+      debugPrint('[SocketDataSource] Usuario dejó de escribir: $data');
       _typingController.add({
         ...data as Map<String, dynamic>,
         'stopped': true,
@@ -108,85 +108,85 @@ class SocketDataSource {
 
     // Escuchar usuarios uniéndose/saliendo
     socket.on('user:joined', (data) {
-      debugPrint('[SocketDataSource] 👤 Usuario se unió: $data');
+      debugPrint('[SocketDataSource] Usuario se unió: $data');
       _userJoinedController.add(data as Map<String, dynamic>);
     });
 
     socket.on('user:left', (data) {
-      debugPrint('[SocketDataSource] 👋 Usuario salió: $data');
+      debugPrint('[SocketDataSource] Usuario salió: $data');
       _userLeftController.add(data as Map<String, dynamic>);
     });
 
     socket.on('user:disconnected', (data) {
-      debugPrint('[SocketDataSource] 🔌 Usuario desconectado: $data');
+      debugPrint('[SocketDataSource] Usuario desconectado: $data');
       _userLeftController.add(data as Map<String, dynamic>);
     });
 
     // Confirmación de unirse a sala
     socket.on('room:joined', (data) {
-      debugPrint('[SocketDataSource] ✅ Te uniste a sala: $data');
+      debugPrint('[SocketDataSource] Te uniste a sala: $data');
       _roomJoinedController.add(data as Map<String, dynamic>);
     });
 
     socket.on('room:left', (data) {
-      debugPrint('[SocketDataSource] 👋 Saliste de sala: $data');
+      debugPrint('[SocketDataSource] Saliste de sala: $data');
     });
 
     // Mensaje leído
     socket.on('message:read:confirmed', (data) {
-      debugPrint('[SocketDataSource] ✓ Mensaje leído: $data');
+      debugPrint('[SocketDataSource] Mensaje leído: $data');
     });
 
     // Mensaje eliminado
     socket.on('message:deleted', (data) {
-      debugPrint('[SocketDataSource] 🗑️ Mensaje eliminado: $data');
+      debugPrint('[SocketDataSource] Mensaje eliminado: $data');
       _messageDeletedController.add(data as Map<String, dynamic>);
     });
 
     // Mensaje editado
     socket.on('message:edited', (data) {
-      debugPrint('[SocketDataSource] ✏️ Mensaje editado: $data');
+      debugPrint('[SocketDataSource] Mensaje editado: $data');
       try {
         final message = MessageModel.fromJson(data as Map<String, dynamic>);
         _messageEditedController.add(message);
       } catch (e) {
-        debugPrint('[SocketDataSource] ❌ Error procesando mensaje editado: $e');
+        debugPrint('[SocketDataSource]  Error procesando mensaje editado: $e');
       }
     });
 
     // Usuario expulsado de grupo
     socket.on('user:kicked:from:group', (data) {
-      debugPrint('[SocketDataSource] 🚫 Usuario expulsado del grupo: $data');
+      debugPrint('[SocketDataSource] Usuario expulsado del grupo: $data');
       _userKickedController.add(data as Map<String, dynamic>);
     });
 
     // Usuario añadido a grupo (para actualizar lista de chats)
     socket.on('group:user:added', (data) {
-      debugPrint('[SocketDataSource] ➕ Usuario añadido a grupo: $data');
+      debugPrint('[SocketDataSource] Usuario añadido a grupo: $data');
       _groupUserAddedController.add(data as Map<String, dynamic>);
     });
 
     // Participante expulsado de grupo (para actualizar lista de miembros)
     socket.on('group:participant:kicked', (data) {
-      debugPrint('[SocketDataSource] 🚫 Participante expulsado del grupo: $data');
+      debugPrint('[SocketDataSource] Participante expulsado del grupo: $data');
       _groupParticipantKickedController.add(data as Map<String, dynamic>);
     });
 
     // Grupo eliminado
     socket.on('group:deleted', (data) {
-      debugPrint('[SocketDataSource] 🗑️ Grupo eliminado: $data');
+      debugPrint('[SocketDataSource] Grupo eliminado: $data');
       _groupDeletedController.add(data as Map<String, dynamic>);
     });
 
     // Amistad eliminada (chat directo eliminado)
     socket.on('friendship:deleted', (data) {
-      debugPrint('[SocketDataSource] 🗑️ Amistad eliminada (chat eliminado): $data');
+      debugPrint('[SocketDataSource] Amistad eliminada (chat eliminado): $data');
       _friendshipDeletedController.add(data as Map<String, dynamic>);
     });
 
     // Chat directo creado
     socket.on('direct:chat:created', (data) {
-      debugPrint('[SocketDataSource] ➕ Chat directo creado: $data');
+      debugPrint('[SocketDataSource] Chat directo creado: $data');
       _directChatCreatedController.add(data as Map<String, dynamic>);
     });
 
@@ -201,7 +201,7 @@ class SocketDataSource {
       throw Exception('Socket no conectado');
     }
 
-    debugPrint('[SocketDataSource] 📥 Uniéndose a sala: $roomId');
+    debugPrint('[SocketDataSource] Uniéndose a sala: $roomId');
     socket.emit('join:room', {'roomId': roomId});
   }
 
@@ -212,7 +212,7 @@ class SocketDataSource {
       throw Exception('Socket no conectado');
     }
 
-    debugPrint('[SocketDataSource] 📤 Saliendo de sala: $roomId');
+    debugPrint('[SocketDataSource] Saliendo de sala: $roomId');
     socket.emit('leave:room', {'roomId': roomId});
   }
 
@@ -227,7 +227,7 @@ class SocketDataSource {
       throw Exception('Socket no conectado');
     }
 
-    debugPrint('[SocketDataSource] 💬 Enviando mensaje a sala $roomId');
+    debugPrint('[SocketDataSource]  Enviando mensaje a sala $roomId');
     socket.emit('message:send', {
       'roomId': roomId,
       'content': content,
@@ -285,7 +285,7 @@ class SocketDataSource {
       throw Exception('Socket no conectado');
     }
 
-    debugPrint('[SocketDataSource] 🗑️ Eliminando mensaje $messageId');
+    debugPrint('[SocketDataSource] Eliminando mensaje $messageId');
     socket.emit('message:delete', {
       'messageId': messageId,
       'roomId': roomId,
@@ -303,7 +303,7 @@ class SocketDataSource {
       throw Exception('Socket no conectado');
     }
 
-    debugPrint('[SocketDataSource] ✏️ Editando mensaje $messageId');
+    debugPrint('[SocketDataSource] Editando mensaje $messageId');
     socket.emit('message:edit', {
       'messageId': messageId,
       'roomId': roomId,
@@ -329,7 +329,7 @@ class SocketDataSource {
 
   /// Forzar reconfiguración de listeners tras una reconexión de socket
   void resetSocketListeners() {
-    debugPrint('[SocketDataSource] 🔄 Reseteando listeners de socket');
+    debugPrint('[SocketDataSource]  Reseteando listeners de socket');
 
     final socket = SocketConfig.socket;
     if (socket != null) {

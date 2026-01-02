@@ -119,9 +119,9 @@ class _ChatRoomPageState extends State<ChatRoomPage>
       _chatBloc.add(JoinChatRoom(widget.roomId));
       _chatBloc.add(LoadMessageHistory(roomId: widget.roomId));
 
-      debugPrint('[ChatRoomPage] ✅ Socket reconectado exitosamente');
+      debugPrint('[ChatRoomPage]  Socket reconectado exitosamente');
     } catch (error) {
-      debugPrint('[ChatRoomPage] ❌ Error reconectando socket: $error');
+      debugPrint('[ChatRoomPage]  Error reconectando socket: $error');
     }
   }
 
@@ -265,12 +265,13 @@ class _ChatRoomPageState extends State<ChatRoomPage>
       return userName;
     }).toList();
 
+    final l10n = AppLocalizations.of(context);
     if (typingNicknames.length == 1) {
-      return '${typingNicknames.first} está escribiendo...';
+      return '${typingNicknames.first} ${l10n?.isWriting}';
     } else if (typingNicknames.length == 2) {
-      return '${typingNicknames[0]} y ${typingNicknames[1]} están escribiendo...';
+      return '${typingNicknames[0]} ${l10n?.and} ${typingNicknames[1]} ${l10n?.areWriting}';
     } else {
-      return '${typingNicknames[0]} y ${typingNicknames.length - 1} más están escribiendo...';
+      return '${typingNicknames[0]} ${l10n?.and} ${typingNicknames.length - 1} ${l10n?.more} ${l10n?.areWriting}';
     }
   }
 
@@ -336,7 +337,6 @@ class _ChatRoomPageState extends State<ChatRoomPage>
   ) {
     final groupedItems = _groupMessagesByDay(messages);
 
-    // Función auxiliar para obtener el mensaje en el índice visual dado
     Message? getMessageAtVisualIndex(List<_ChatItem> items, int visualIndex) {
       final actualIndex = items.length - 1 - visualIndex;
       if (actualIndex < 0 || actualIndex >= items.length) return null;
@@ -427,9 +427,9 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                     ),
                   ),
                   confirmDismiss: (direction) async {
-                    // Mostrar diálogo de confirmación
+                    final builderContext = context;
+                    final builderTheme = Theme.of(builderContext);
                     final l10n = AppLocalizations.of(builderContext)!;
-
                     return await showDialog<bool>(
                           context: builderContext,
                           builder: (dialogContext) => AlertDialog(
@@ -444,7 +444,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                                   size: 24,
                                 ),
                                 const SizedBox(width: 12),
-                                const Text('Eliminar mensaje'),
+                                Text(l10n.deleteMessage),
                               ],
                             ),
                             content: const Text(
@@ -469,8 +469,8 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                                   foregroundColor:
                                       builderTheme.colorScheme.error,
                                 ),
-                                child: const Text(
-                                  'Eliminar',
+                                child: Text(
+                                  l10n.delete,
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
@@ -480,6 +480,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                         false;
                   },
                   onDismissed: (direction) {
+                    final l10n = AppLocalizations.of(context)!;
                     chatBloc.add(
                       DeleteMessage(
                         messageId: message.id,
@@ -490,7 +491,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                     // Mostrar SnackBar con confirmación
                     ScaffoldMessenger.of(builderContext).showSnackBar(
                       SnackBar(
-                        content: const Row(
+                        content: Row(
                           children: [
                             Icon(
                               Icons.check_circle,
@@ -498,7 +499,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                               size: 20,
                             ),
                             SizedBox(width: 8),
-                            Text('Mensaje eliminado'),
+                            Text(l10n.messageDeleted),
                           ],
                         ),
                         backgroundColor: builderTheme.colorScheme.error,
@@ -728,7 +729,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
             if (state is FriendshipDeletedState) {
               // Verificar que el chat eliminado corresponde al chat actual
               if (state.chatId == widget.roomId && !widget.isGroup) {
-                message = 'La amistad ha sido eliminada';
+                message = l10n.friendshipDeleted;
                 debugPrint(
                   '[ChatRoomPage] 🗑️ Amistad eliminada, cerrando pantalla del chat ${widget.roomId}...',
                 );
@@ -741,14 +742,14 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                 return;
               }
             } else if (isGroupDeleted) {
-              message = 'El grupo ha sido eliminado';
+              message = l10n.groupHasBeenDeleted;
               debugPrint(
                 '[ChatRoomPage] 🗑️ Grupo eliminado, cerrando pantalla...',
               );
             } else {
               // Solo mostrar mensaje de expulsión si es un grupo (no un chat individual)
               if (widget.isGroup) {
-                message = 'Has sido expulsado del grupo';
+                message = l10n.youHaveBeenKickedFromGroup;
                 debugPrint(
                   '[ChatRoomPage] 🚫 Usuario expulsado, cerrando pantalla...',
                 );
@@ -911,7 +912,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                             onChanged: _handleTyping,
                             decoration: InputDecoration(
                               hintText: _isEditing
-                                  ? 'Editando mensaje...'
+                                  ? l10n.editingMessage
                                   : l10n.writeAMessage,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(24),

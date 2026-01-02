@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../entities/message.dart';
 
-/// Modelo de datos para Message con serialización JSON
 class MessageModel extends Message {
   const MessageModel({
     required super.id,
@@ -41,7 +40,7 @@ class MessageModel extends Message {
           return DateTime.fromMillisecondsSinceEpoch(timestamp);
         } catch (e2) {
           if (kDebugMode) {
-            debugPrint('[MessageModel] ⚠️ No se pudo parsear fecha: $value');
+            debugPrint('[MessageModel] No se pudo parsear fecha: $value');
           }
           return DateTime.now();
         }
@@ -51,7 +50,7 @@ class MessageModel extends Message {
     return DateTime.now();
   }
 
-  /// Crear desde JSON (recibido de Socket.IO o GraphQL)
+  /// Crear desde JSON 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     final senderPhoto = json['senderPhoto'] as String? ?? json['sender_photo'] as String?;
     if (kDebugMode) {
@@ -100,7 +99,7 @@ class MessageModel extends Message {
     );
   }
 
-  /// Convertir a JSON (para enviar)
+  /// Convertir a JSON 
   Map<String, dynamic> toJson() {
     return {
       'id': id,

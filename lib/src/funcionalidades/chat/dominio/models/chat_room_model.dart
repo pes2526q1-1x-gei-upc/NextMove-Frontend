@@ -1,6 +1,5 @@
 import '../entities/chat_room.dart';
 
-/// Modelo de datos para ChatRoom con serialización JSON
 class ChatRoomModel extends ChatRoom {
   const ChatRoomModel({
     required super.id,

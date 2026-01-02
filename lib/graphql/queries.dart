@@ -13,13 +13,6 @@ class GraphQLQueries {
       phoneNumber
       preferredLanguage
       createdAt
-      isBanned
-      banInfo {
-        bannedUntil
-        description
-        reason
-        isPermanent
-      }
     }
   }
   ''';
@@ -314,7 +307,7 @@ class GraphQLQueries {
     } 
   ''';
 
-    static const String getNavigationRouteQuery = r'''
+  static const String getNavigationRouteQuery = r'''
       query ComputeRoute(
         $origin: CoordinatesInput!
         $destination: CoordinatesInput!
@@ -490,8 +483,9 @@ class GraphQLQueries {
     getFavBikeStations {
       station_id
     }
-  }'''; 
+  }''';
 }
+
 const String getOrCreateDirectChatQuery = r'''
   query GetOrCreateDirectChat($userEmail: String!) {
     getOrCreateDirectChat(userEmail: $userEmail) {

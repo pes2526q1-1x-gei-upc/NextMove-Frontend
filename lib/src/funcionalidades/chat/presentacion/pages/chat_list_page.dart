@@ -1,4 +1,3 @@
-// lib/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,17 +72,17 @@ class _ChatListPageState extends State<ChatListPage> {
         // Eliminar listener previo si existe para evitar duplicados
         socket.off('direct:chat:created');
         socket.on('direct:chat:created', (data) {
-          debugPrint('[ChatListPage] ➕ Chat directo creado recibido: $data');
+          debugPrint('[ChatListPage] Chat directo creado recibido: $data');
           if (mounted) {
             refreshChatList();
           }
         });
         debugPrint(
-          '[ChatListPage] ✅ Listener de direct:chat:created configurado',
+          '[ChatListPage] Listener de direct:chat:created configurado',
         );
       } else {
         debugPrint(
-          '[ChatListPage] ⚠️ Socket no disponible, reintentando en 1 segundo...',
+          '[ChatListPage] Socket no disponible, reintentando en 1 segundo...',
         );
         // Reintentar después de 1 segundo
         Future.delayed(const Duration(seconds: 1), () {
@@ -135,7 +134,7 @@ class _ChatListPageState extends State<ChatListPage> {
             !_lastKnownGroupIds.containsAll(currentGroupIds)) {
           // Hay cambios, refrescar la lista
           debugPrint(
-            '[ChatListPage] 🔄 Detectados cambios en grupos, refrescando lista...',
+            '[ChatListPage] Detectados cambios en grupos, refrescando lista...',
           );
           _lastKnownGroupIds = currentGroupIds;
           refreshChatList();
@@ -192,13 +191,26 @@ class _ChatListPageState extends State<ChatListPage> {
   }
 
   Future<void> _initializeChat() async {
+    debugPrint('[ChatListPage] 🔧 Iniciando _initializeChat...');
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final firebaseToken = userProvider.firebaseToken;
     final userId = userProvider.firebaseUserId;
 
+    debugPrint(
+      '[ChatListPage] 🔧 firebaseToken: ${firebaseToken != null ? "✅ Disponible" : "❌ NULL"}',
+    );
+    debugPrint(
+      '[ChatListPage] 🔧 userId: ${userId != null ? "✅ Disponible ($userId)" : "❌ NULL"}',
+    );
+
     if (firebaseToken != null && userId != null) {
+      debugPrint('[ChatListPage] 🔧 Disparando InitializeChat event...');
       context.read<ChatBloc>().add(
         InitializeChat(firebaseToken: firebaseToken, userId: userId),
+      );
+    } else {
+      debugPrint(
+        '[ChatListPage] ⚠️ No se puede inicializar chat: token o userId son null',
       );
     }
   }
@@ -337,7 +349,7 @@ class _ChatListPageState extends State<ChatListPage> {
             state is UserKickedFromGroupState) {
           // Refrescar lista de chats cuando se añade un usuario a un grupo, se elimina un grupo, o se expulsa un usuario
           debugPrint(
-            '[ChatListPage] 🔄 Refrescando lista de chats debido a: ${state.runtimeType}',
+            '[ChatListPage] Refrescando lista de chats debido a: ${state.runtimeType}',
           );
           refreshChatList();
         }
@@ -393,7 +405,7 @@ class _ChatListPageState extends State<ChatListPage> {
                   }
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Crear Grupo'),
+                label: Text(l10n.createGroup),
               )
             : null,
       ),
@@ -644,11 +656,9 @@ class _ChatListPageState extends State<ChatListPage> {
           'lastMessage': chat['lastMessage'] as Map<String, dynamic>?,
         };
       } else {
-        // --- CAMBIO AQUÍ: Mapeamos la foto del grupo ---
         return {
           'name': chat['name'] as String? ?? 'Grupo',
-          'photo':
-              chat['photo'] as String?, // <--- Usar el campo photo del backend
+          'photo': chat['photo'] as String?,
           'chatId': chat['id'] as String,
           'email': null,
           'type': 'group',
@@ -678,7 +688,7 @@ class _ChatListPageState extends State<ChatListPage> {
             'chatId': null,
             'email': friend['email'] as String?,
             'type': 'direct',
-            'lastMessage': null, // No hay chat aún, no hay último mensaje
+            'lastMessage': null,
           });
         }
       }
@@ -692,6 +702,7 @@ class _ChatListPageState extends State<ChatListPage> {
           }).toList();
 
     if (filteredItems.isEmpty && _searchQuery.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       if (_showFriends) {
         return Center(
           child: Column(
@@ -720,12 +731,12 @@ class _ChatListPageState extends State<ChatListPage> {
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'No tienes grupos',
+              Text(
+                l10n.noGroupsYet,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              const Text('Crea un grupo para empezar'),
+              Text(l10n.createAGroupToStart),
             ],
           ),
         );
@@ -756,7 +767,7 @@ class _ChatListPageState extends State<ChatListPage> {
                   onRefresh: refetch,
                   onFriendTap: (friend) {
                     final chatId = friend['chatId'] as String?;
-                    final friendName = friend['name'] as String? ?? 'Usuario';
+                    final friendName = friend['name'] as String? ?? l10n.user;
                     final friendPhoto = friend['photo'] as String?;
 
                     if (chatId != null) {
@@ -786,6 +797,7 @@ class _ChatListPageState extends State<ChatListPage> {
     List<Map<String, dynamic>> groups,
     VoidCallback onRefresh,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return RefreshIndicator(
       onRefresh: () async => onRefresh(),
       child: ListView.separated(
@@ -801,7 +813,7 @@ class _ChatListPageState extends State<ChatListPage> {
         ),
         itemBuilder: (context, index) {
           final group = groups[index];
-          final groupName = group['name'] as String? ?? 'Grupo';
+          final groupName = group['name'] as String? ?? l10n.group;
           final groupId = group['chatId'] as String;
           final description = group['description'] as String?;
           final groupPhoto = group['photo'] as String?;

@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Entidad de dominio para un mensaje de chat
 class Message extends Equatable {
   final String id;
   final String roomId;

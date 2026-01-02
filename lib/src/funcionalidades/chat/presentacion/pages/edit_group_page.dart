@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
 
 const String updateGroupChatMutation = r'''
@@ -102,7 +103,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
         setState(() => _isUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${AppLocalizations.of(context)!.error}: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -115,7 +116,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Grupo')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.editGroup)),
       body: Mutation(
         options: MutationOptions(
           document: gql(updateGroupChatMutation),
@@ -130,8 +131,10 @@ class _EditGroupPageState extends State<EditGroupPage> {
                 'photo': data?['updateGroupChat']?['photo'],
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Grupo actualizado correctamente'),
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)!.groupUpdatedSuccessfully,
+                  ),
                 ),
               );
             }

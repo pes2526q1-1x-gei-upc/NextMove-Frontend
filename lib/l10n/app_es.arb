@@ -226,7 +226,6 @@
     "bad": "Mala",
     "thankYouForYourReview": "¡Gracias por tu valoración!",
     "errorLoadingReviews": "Error al cargar las valoraciones",
-    "retry": "Reintentar",
     "firstToReview": "¡Sé el primero en valorar esta estación!",
     "editReview": "Editar valoración",
     "sureActionConfirmation": "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?",
@@ -244,7 +243,6 @@
     "start": "Iniciar",
     "estTime": "Tiempo estimado",
     "uLoc": "Tu ubicación",
-    "social": "Social",
     "ranking": "Ránquing",
     "numberOfRoutes": "Número de rutas",
     "challengesParticipated": "Retos participados",
@@ -294,10 +292,9 @@
             }
         }
     },
-    "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad."
-    ,"errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario.",
+    "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad.",
+    "errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario.",
     "social": "Social",
-
     "chats": "Chats",
     "connectingToServer": "Conectando al servidor...",
     "connectionError": "Error de conexión",
@@ -322,5 +319,111 @@
     "today": "Hoy",
     "yesterday": "Ayer",
     "groupDetails": "Detalles del grupo",
-    "participants": "Participantes"
+    "participants": "Participantes",
+    "addParticipants": "Añadir participantes",
+    "userWithoutValidEmail": "Este usuario no tiene email válido",
+    "errorAddingParticipant": "Error al añadir {email}: {error}",
+    "@errorAddingParticipant": {
+        "placeholders": {
+            "email": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "couldNotAddParticipants": "No se pudo añadir ningún participante",
+    "editGroup": "Editar Grupo",
+    "groupUpdatedSuccessfully": "Grupo actualizado correctamente",
+    "youHaveBeenKickedFrom": "Has sido expulsado de {groupName}",
+    "@youHaveBeenKickedFrom": {
+        "placeholders": {
+            "groupName": {
+                "type": "String"
+            }
+        }
+    },
+    "youLeftTheGroup": "Has salido del grupo",
+    "errorLeavingGroup": "Error al salir del grupo: {error}",
+    "@errorLeavingGroup": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "user": "Usuario",
+    "admin": "Admin",
+    "you": "Tú",
+    "adminRoleRemoved": "Se quitó el rol de admin a {nickname}",
+    "@adminRoleRemoved": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "adminRoleGranted": "Se otorgó el rol de admin a {nickname}",
+    "@adminRoleGranted": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "removeAdmin": "Quitar admin",
+    "makeAdmin": "Hacer admin",
+    "participantKicked": "Se expulsó a {nickname} del grupo",
+    "@participantKicked": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "kick": "Expulsar",
+    "kickParticipant": "Expulsar participante",
+    "areYouSureKickParticipant": "¿Estás seguro de que quieres expulsar a {nickname} del grupo?",
+    "@areYouSureKickParticipant": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "add": "Añadir",
+    "leaveGroup": "Salir del grupo",
+    "areYouSureLeaveGroup": "¿Estás seguro de que quieres salir del grupo?",
+    "leave": "Salir",
+    "groupDeleted": "Grupo eliminado",
+    "createGroup": "Crear Grupo",
+    "createAGroupToStart": "Crea un grupo para empezar",
+    "deleteMessage": "Eliminar mensaje",
+    "messageDeleted": "Mensaje eliminado",
+    "friendshipDeleted": "La amistad ha sido eliminada",
+    "groupHasBeenDeleted": "El grupo ha sido eliminado",
+    "youHaveBeenKickedFromGroup": "Has sido expulsado del grupo",
+    "editingMessage": "Editando mensaje...",
+    "groupNameRequired": "El nombre del grupo es obligatorio",
+    "selectAtLeastOneFriend": "Selecciona al menos un amigo",
+    "groupCreatedSuccessfully": "Grupo creado exitosamente",
+    "errorLoadingFriendsList": "Error al cargar amigos",
+    "noFriendsFoundSearch": "No se encontraron amigos",
+    "groupNotFound": "Grupo no encontrado",
+    "editGroupTooltip": "Editar grupo",
+    "edit": "Editar",
+    "areYouSureDeleteMessage": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.",
+    "confirmDeleteMessage": "Mensaje eliminado",
+    "noGroupsYet": "No tienes grupos",
+    "group": "Grupo",
+    "member": "Miembro",
+    "members": "Miembros",
+    "deleteGroup": "Eliminar grupo",
+    "areYouSureDeleteGroup": "Estas seguro de que quieres eliminar el grupo? Esta acción no se puede deshacer",
+    "confirmDeleteGroup": "Grupo eliminado",
+    "isWriting": "está escribiendo...",
+    "areWriting": "están escribiendo...",
+    "and": "y",
+    "more": "más"
 }

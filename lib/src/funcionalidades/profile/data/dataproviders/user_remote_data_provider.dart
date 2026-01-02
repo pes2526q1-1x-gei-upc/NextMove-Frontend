@@ -75,10 +75,16 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
-    final statsData = await _fetchStatistics(data['email']);
-
-    if (statsData != null) {
-      data['statistics'] = statsData;
+    // _fetchStatistics is now optional to prevent blocking profile load
+    try {
+      final statsData = await _fetchStatistics(data['email']);
+      if (statsData != null) {
+        data['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(data);
@@ -110,10 +116,15 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
-    final statsData = await _fetchStatistics(email);
-
-    if (statsData != null) {
-      data['statistics'] = statsData;
+    try {
+      final statsData = await _fetchStatistics(email);
+      if (statsData != null) {
+        data['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(data);
@@ -132,9 +143,8 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw (stats): ${result.exception.toString()}');
       }
-      throw custom_exceptions.ServerException(
-        'Error al obtener estadísticas: ${result.exception}',
-      );
+      // Return null instead of throwing to allow partial data loading
+      return null;
     }
 
     final statsData = result.data?['userStats'];
@@ -144,7 +154,7 @@ class UserRemoteDataProvider {
           'No se encontraron estadísticas para el usuario con email: $email',
         );
       }
-      return;
+      return null;
     }
 
     return statsData;
@@ -210,10 +220,15 @@ class UserRemoteDataProvider {
       );
     }
 
-    final statsData = await _fetchStatistics(exactMatch['email']);
-
-    if (statsData != null) {
-      exactMatch['statistics'] = statsData;
+    try {
+      final statsData = await _fetchStatistics(exactMatch['email']);
+      if (statsData != null) {
+        exactMatch['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(exactMatch);
@@ -527,7 +542,6 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException(
         'Error de conexión al subir foto',
       );
-      
     }
   }
 }
