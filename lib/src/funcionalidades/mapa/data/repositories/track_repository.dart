@@ -4,13 +4,23 @@ import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/dataproviders/track_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/track_validator.dart';
 
 class TrackRepository {
   final TrackDataProvider trackDataProvider;
+  final TrackValidator _validator = TrackValidator();
+
   TrackRepository() : trackDataProvider = TrackDataProvider();
   
   Future<Either<Failure, void>> saveRecordedTrack(RecordedTrack track) async {
     try {
+      final validationResult = _validator.validate(track);
+      
+      if (!validationResult.isValid) {
+        // Retornar error de validación
+        return Left(ValidationFailure(message: validationResult.reason!));
+      }
+      
       await trackDataProvider.saveRecordedTrack(track);
       return Right(null);
     } on ServerException catch (e) {
