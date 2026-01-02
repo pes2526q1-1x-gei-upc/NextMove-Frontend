@@ -72,8 +72,7 @@ class _RankingUserTileState extends State<RankingUserTile> {
   Future<void> _loadUserData() async {
     _userBloc = UserBloc();
     _userBloc!.add(LoadUserProfileByEmail(widget.entry.email));
-    
-    // Listen to the bloc state changes
+
     _userBloc!.stream.listen((state) {
       if (state is UserLoaded) {
         if (mounted) {
@@ -92,7 +91,7 @@ class _RankingUserTileState extends State<RankingUserTile> {
     final isCurrentUser = widget.entry.email == currentUserEmail;
 
     final displayName = widget.entry.email;
-    
+
     final hasPhoto = _userData?.photo.isNotEmpty == true;
 
     return ListTile(
@@ -110,9 +109,7 @@ class _RankingUserTileState extends State<RankingUserTile> {
                       return bloc;
                     },
                   ),
-                  BlocProvider<SocialBloc>(
-                    create: (context) => SocialBloc(),
-                  ),
+                  BlocProvider<SocialBloc>(create: (context) => SocialBloc()),
                 ],
                 child: const FriendDetailsPage(showSocialButtons: false),
               );
@@ -121,7 +118,9 @@ class _RankingUserTileState extends State<RankingUserTile> {
         );
       },
       tileColor: isCurrentUser
-          ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+          ? Theme.of(
+              context,
+            ).colorScheme.primaryContainer.withValues(alpha: 0.3)
           : null,
       shape: isCurrentUser
           ? RoundedRectangleBorder(
@@ -137,7 +136,6 @@ class _RankingUserTileState extends State<RankingUserTile> {
         height: 40,
         child: Stack(
           children: [
-            // Profile picture or default user icon
             Positioned(
               top: 2,
               left: 2,
@@ -165,7 +163,9 @@ class _RankingUserTileState extends State<RankingUserTile> {
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.person,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               size: 16,
                             );
                           },
@@ -178,7 +178,6 @@ class _RankingUserTileState extends State<RankingUserTile> {
                       ),
               ),
             ),
-            // Position number overlay
             Positioned(
               bottom: -2,
               right: -2,
@@ -213,20 +212,20 @@ class _RankingUserTileState extends State<RankingUserTile> {
       ),
       subtitle: Text(
         widget.selectedMetric == 'calorias_quemadas'
-            ? '${widget.entry.caloriesBurned ?? 0} kcal'
+            ? '${(widget.entry.caloriesBurned ?? 0.0).toStringAsFixed(2)} kcal'
             : widget.selectedMetric == 'km_recorridos'
-            ? '${widget.entry.distance ?? 0} km'
+            ? '${(widget.entry.distance ?? 0.0).toStringAsFixed(2)} km'
             : widget.selectedMetric == 'num_rutas'
             ? '${widget.entry.numberOfRoutes ?? 0}'
             : widget.selectedMetric == 'elevacion_positiva'
-            ? '${widget.entry.elevationGain ?? 0} m'
+            ? '${(widget.entry.elevationGain ?? 0.0).toStringAsFixed(2)} m'
             : widget.selectedMetric == 'co2_ahorrado'
-            ? '${widget.entry.co2Saved ?? 0} kg'
+            ? '${(widget.entry.co2Saved ?? 0.0).toStringAsFixed(2)} kg'
             : widget.selectedMetric == 'num_retos_participados'
             ? '${widget.entry.challengesParticipated ?? 0}'
             : widget.selectedMetric == 'num_retos_completados'
             ? '${widget.entry.challengesCompleted ?? 0}'
-            : '${widget.entry.elevationGain ?? 0} m',
+            : '${(widget.entry.elevationGain ?? 0.0).toStringAsFixed(2)} m',
         style: TextStyle(
           fontWeight: isCurrentUser ? FontWeight.w500 : FontWeight.normal,
         ),
