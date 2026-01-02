@@ -140,11 +140,12 @@ class GraphQLMutations {
   ''';
 
   static const String updateGroupChatMutation = r'''
-    mutation UpdateGroupChat($chatId: ID!, $name: String, $description: String) {
-      updateGroupChat(chatId: $chatId, name: $name, description: $description) {
+    mutation UpdateGroupChat($chatId: ID!, $name: String, $description: String, $photo: String) {
+      updateGroupChat(chatId: $chatId, name: $name, description: $description, photo: $photo) {
         id
         name
         description
+        photo
         type
       }
     }
@@ -162,9 +163,32 @@ class GraphQLMutations {
     }
   ''';
 
+  static const String kickParticipantFromGroupMutation = r'''
+    mutation Kick($chatId: ID!, $userEmail: String!) {
+      kickParticipantFromGroup(chatId: $chatId, userEmail: $userEmail)
+    }
+  ''';
+
   static const String deleteGroupMutation = r'''
     mutation DeleteGroup($chatId: ID!) {
       deleteGroup(chatId: $chatId)
+    }
+  ''';
+
+  static const String createGroupChatMutation = r'''
+    mutation CreateGroupChat($name: String!, $description: String, $participantEmails: [String!]!, $photo: String) {
+      createGroupChat(name: $name, description: $description, participantEmails: $participantEmails, photo: $photo) {
+        id
+        name
+        description
+        photo
+        type
+        participants {
+          userEmail
+          nickname
+          photoUrl
+        }
+      }
     }
   ''';
 }

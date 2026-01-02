@@ -61,25 +61,25 @@ class SocketConfig {
   /// Configurar listeners básicos de conexión
   static void _setupEventHandlers() {
     _socket?.onConnect((_) {
-      debugPrint('[SocketIO] ✅ Conectado exitosamente');
+      debugPrint('[SocketIO] Conectado exitosamente');
       debugPrint('[SocketIO] Socket ID: ${_socket?.id}');
     });
 
     _socket?.on('connection:success', (data) {
-      debugPrint('[SocketIO] 🎉 Autenticación exitosa');
+      debugPrint('[SocketIO] Autenticación exitosa');
       debugPrint('[SocketIO] Data: $data');
     });
 
     _socket?.onConnectError((error) {
-      debugPrint('[SocketIO] ❌ Error de conexión: $error');
+      debugPrint('[SocketIO] Error de conexión: $error');
     });
 
     _socket?.onDisconnect((reason) {
-      debugPrint('[SocketIO] 🔌 Desconectado: $reason');
+      debugPrint('[SocketIO] Desconectado: $reason');
     });
 
     _socket?.onReconnect((attempt) {
-      debugPrint('[SocketIO] 🔄 Reconectado exitosamente (intento $attempt)');
+      debugPrint('[SocketIO] Reconectado exitosamente (intento $attempt)');
       // Notificar reconexión
       if (_onReconnectCallback != null) {
         _onReconnectCallback!();
@@ -87,11 +87,11 @@ class SocketConfig {
     });
 
     _socket?.on('error', (data) {
-      debugPrint('[SocketIO] ⚠️ Error del servidor: $data');
+      debugPrint('[SocketIO] Error del servidor: $data');
     });
 
     _socket?.on('pong', (data) {
-      debugPrint('[SocketIO] 🏓 Pong recibido (evento personalizado): $data');
+      debugPrint('[SocketIO] Pong recibido (evento personalizado): $data');
     });
   }
 

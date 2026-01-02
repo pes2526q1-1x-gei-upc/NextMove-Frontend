@@ -54,7 +54,7 @@ class MessageModel extends Message {
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     final senderPhoto = json['senderPhoto'] as String? ?? json['sender_photo'] as String?;
     if (kDebugMode) {
-      debugPrint('[MessageModel] 📨 Parsing message from JSON');
+      debugPrint('[MessageModel] Parsing message from JSON');
       debugPrint('[MessageModel]   - senderId: ${json['senderId'] ?? json['sender_email']}');
       debugPrint('[MessageModel]   - senderName: ${json['senderName'] ?? json['sender_nickname']}');
       debugPrint('[MessageModel]   - senderPhoto: $senderPhoto');

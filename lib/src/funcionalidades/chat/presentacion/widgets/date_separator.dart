@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
-/// Widget que muestra un separador de fecha para agrupar mensajes por día
 class DateSeparator extends StatelessWidget {
   final DateTime date;
 
@@ -11,8 +10,6 @@ class DateSeparator extends StatelessWidget {
     required this.date,
   });
 
-  /// Formatea la fecha para mostrar en el separador
-  /// Retorna "Hoy", "Ayer" o la fecha formateada según corresponda
   static String formatDateHeader(DateTime date, BuildContext context) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);

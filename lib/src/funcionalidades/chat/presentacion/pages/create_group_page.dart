@@ -4,29 +4,15 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
-
-// Mutación corregida para incluir photo y participantEmails
-const String createGroupChatMutation = r'''
-  mutation CreateGroupChat($name: String!, $description: String, $participantEmails: [String!]!, $photo: String) {
-    createGroupChat(name: $name, description: $description, participantEmails: $participantEmails, photo: $photo) {
-      id
-      name
-      description
-      photo
-      type
-    }
-  }
-''';
-
-const String getFriendsQuery = r'''
-  query ListFriends {
-    ListFriends {
-      name
-      email
-      photo
-    }
-  }
-''';
+import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
+import 'package:nextmove_app/graphql/queries.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/chat_remote_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/group_photo_selector.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/group_name_description_fields.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/add_participant_search_bar.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/selected_users_chips.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/user_selection_card.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/widgets/empty_user_list_placeholder.dart';
 
 class CreateGroupPage extends StatefulWidget {
   const CreateGroupPage({super.key});
@@ -40,7 +26,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
-  final Set<String> _selectedFriends = {};
+  final Map<String, UserEntity> _selectedFriends = {};
   String _searchQuery = '';
   bool _isCreating = false;
 
@@ -65,72 +51,66 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     }
   }
 
+  void _toggleFriendSelection(UserEntity user) {
+    setState(() {
+      if (_selectedFriends.containsKey(user.email)) {
+        _selectedFriends.remove(user.email);
+      } else {
+        _selectedFriends[user.email] = user;
+      }
+    });
+  }
+
   Future<void> _createGroup(BuildContext context) async {
     final name = _nameController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
 
-    // Validaciones previas
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.groupNameRequired),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.groupNameRequired)));
       return;
     }
 
     if (_selectedFriends.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.selectAtLeastOneFriend),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.selectAtLeastOneFriend)));
       return;
     }
 
     setState(() => _isCreating = true);
 
     final remoteProvider = UserRemoteDataProvider();
-    final client = GraphQLProvider.of(context).value;
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final theme = Theme.of(context);
 
     try {
       String? photoUrl;
-
-      // 1. SUBIR FOTO (Solo si el usuario seleccionó una)
       if (_selectedImage != null) {
         photoUrl = await remoteProvider.uploadPhoto(_selectedImage!);
       }
 
-      // 2. EJECUTAR MUTACIÓN
-      final result = await client.mutate(
-        MutationOptions(
-          document: gql(createGroupChatMutation),
-          variables: {
-            'name': name,
-            'description': _descriptionController.text.trim(),
-            'participantEmails': _selectedFriends.toList(),
-            'photo': photoUrl, // La URL de S3 que recibimos arriba
-          },
-        ),
+      // 2. Ejecutar mutación GraphQL mediante el DataProvider
+      debugPrint('[CreateGroupPage] Ejecutando mutación...');
+      final chatProvider = ChatRemoteDataProvider();
+      await chatProvider.createGroupChat(
+        name: name,
+        description: _descriptionController.text.trim(),
+        participantEmails: _selectedFriends.keys.toList(),
+        photo: photoUrl,
       );
 
-      if (result.hasException) {
-        throw Exception(result.exception.toString());
-      }
-
-      navigator.pop(true); // Retorna true para refrescar la lista
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.groupCreatedSuccessfully),
-        ),
+      navigator.pop(true);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text(l10n.groupCreatedSuccessfully)),
       );
     } catch (e) {
       if (mounted) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('${AppLocalizations.of(context)!.error}: $e'),
+            content: Text('${l10n.error}: $e'),
             backgroundColor: theme.colorScheme.error,
           ),
         );
@@ -145,10 +125,11 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.createGroup),
+        title: Text(l10n.createGroup),
         actions: [
           if (_isCreating)
             const Padding(
@@ -163,7 +144,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             TextButton(
               onPressed: () => _createGroup(context),
               child: Text(
-                'Crear',
+                l10n.create,
                 style: TextStyle(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -174,138 +155,41 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       ),
       body: Column(
         children: [
-          // SECCIÓN SUPERIOR: Foto + Nombre + Desc
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                Center(
-                  child: GestureDetector(
-                    onTap: _isCreating ? null : _pickImage,
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: theme.colorScheme.primaryContainer,
-                          backgroundImage: _selectedImage != null
-                              ? FileImage(_selectedImage!)
-                              : null,
-                          child: _selectedImage == null
-                              ? Icon(
-                                  Icons.group,
-                                  size: 60,
-                                  color: theme.colorScheme.onPrimaryContainer,
-                                )
-                              : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: theme.colorScheme.primary,
-                            child: const Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        if (_isCreating && _selectedImage != null)
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black26,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                GroupPhotoSelector(
+                  selectedImage: _selectedImage,
+                  onPickImage: _pickImage,
+                  isLoading: _isCreating,
                 ),
                 const SizedBox(height: 24),
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre del grupo',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.group),
-                  ),
-                  maxLength: 50,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Descripción (opcional)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.description),
-                  ),
-                  maxLines: 2,
-                  maxLength: 200,
+                GroupNameDescriptionFields(
+                  nameController: _nameController,
+                  descriptionController: _descriptionController,
+                  nameLabel: l10n.groupName,
+                  descriptionLabel: l10n.descriptionOptional,
                 ),
               ],
             ),
           ),
-
-          // BARRA DE SELECCIONADOS
-          if (_selectedFriends.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: theme.colorScheme.primaryContainer,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.people,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${_selectedFriends.length} amigos seleccionados',
-                    style: TextStyle(
-                      color: theme.colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          // BUSCADOR
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _searchQuery = value),
-              decoration: InputDecoration(
-                hintText: 'Buscar amigos...',
-                prefixIcon: const Icon(Icons.search),
-                border: const OutlineInputBorder(),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-              ),
-            ),
+          SelectedUsersChips(
+            selectedUsers: _selectedFriends,
+            onUserDeleted: _toggleFriendSelection,
           ),
-
-          // LISTA DE AMIGOS
+          AddParticipantSearchBar(
+            controller: _searchController,
+            onChanged: (value) => setState(() => _searchQuery = value),
+            onClear: () {
+              _searchController.clear();
+              setState(() => _searchQuery = '');
+            },
+          ),
           Expanded(
             child: Query(
               options: QueryOptions(
-                document: gql(getFriendsQuery),
+                document: gql(GraphQLQueries.getFriends),
                 fetchPolicy: FetchPolicy.networkOnly,
               ),
               builder: (result, {fetchMore, refetch}) {
@@ -313,58 +197,54 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (result.hasException) {
-                  return Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.errorLoadingFriendsList,
-                    ),
-                  );
+                  return Center(child: Text(l10n.errorLoadingFriendsList));
                 }
 
-                final friends =
+                final friendsData =
                     result.data?['ListFriends'] as List<dynamic>? ?? [];
+
+                final List<UserEntity> friends = friendsData.map((f) {
+                  // Mapear los campos del GraphQL a los que espera fromRawData
+                  final map = {
+                    'email': f['email'],
+                    'nickname':
+                        f['name'], // Usamos 'name' como nickname para la entidad
+                    'name': f['name'],
+                    'photo': f['photo'],
+                  };
+                  return UserEntity.fromRawData(map);
+                }).toList();
+
                 final filteredFriends = friends.where((f) {
-                  final name = f['name'] as String? ?? '';
-                  return name.toLowerCase().contains(
-                    _searchQuery.toLowerCase(),
-                  );
+                  return f.apodo.toLowerCase().contains(
+                        _searchQuery.toLowerCase(),
+                      ) ||
+                      f.email.toLowerCase().contains(
+                        _searchQuery.toLowerCase(),
+                      );
                 }).toList();
 
                 if (filteredFriends.isEmpty) {
-                  return Center(
-                    child: Text(
-                      AppLocalizations.of(context)!.noFriendsFoundSearch,
-                    ),
+                  return EmptyUserListPlaceholder(
+                    isSearching: _searchQuery.isNotEmpty,
+                    message: _searchQuery.isNotEmpty
+                        ? l10n.noFriendsFoundSearch
+                        : l10n.noFriendsToAdd,
                   );
                 }
 
                 return ListView.builder(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
                   itemCount: filteredFriends.length,
                   itemBuilder: (context, index) {
                     final friend = filteredFriends[index];
-                    final email = friend['email'] as String;
-                    final isSelected = _selectedFriends.contains(email);
-
-                    return CheckboxListTile(
-                      value: isSelected,
-                      onChanged: (selected) {
-                        setState(() {
-                          if (selected == true) {
-                            _selectedFriends.add(email);
-                          } else {
-                            _selectedFriends.remove(email);
-                          }
-                        });
-                      },
-                      secondary: CircleAvatar(
-                        backgroundImage: friend['photo'] != null
-                            ? NetworkImage(friend['photo'])
-                            : null,
-                        child: friend['photo'] == null
-                            ? Text(friend['name'][0])
-                            : null,
-                      ),
-                      title: Text(friend['name'] ?? 'Usuario'),
-                      subtitle: Text(email),
+                    return UserSelectionCard(
+                      user: friend,
+                      isSelected: _selectedFriends.containsKey(friend.email),
+                      onTap: () => _toggleFriendSelection(friend),
                     );
                   },
                 );

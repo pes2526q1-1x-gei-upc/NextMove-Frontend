@@ -33,13 +33,11 @@ class MessageBubble extends StatelessWidget {
   void _showDeleteConfirmation(BuildContext context, ChatBloc chatBloc) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(
@@ -48,12 +46,10 @@ class MessageBubble extends StatelessWidget {
               size: 24,
             ),
             const SizedBox(width: 12),
-            const Text('Eliminar mensaje'),
+            Text(l10n.deleteMessage),
           ],
         ),
-        content: const Text(
-          '¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.',
-        ),
+        content: Text(l10n.areYouSureDeleteMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -66,20 +62,23 @@ class MessageBubble extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              chatBloc.add(DeleteMessage(
-                messageId: message.id,
-                roomId: message.roomId,
-              ));
+              chatBloc.add(
+                DeleteMessage(messageId: message.id, roomId: message.roomId),
+              );
               Navigator.pop(dialogContext);
-              
+
               // Mostrar SnackBar con confirmación
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Row(
+                  content: Row(
                     children: [
-                      Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text('Mensaje eliminado'),
+                      const Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(l10n.messageDeleted),
                     ],
                   ),
                   backgroundColor: theme.colorScheme.error,
@@ -94,9 +93,9 @@ class MessageBubble extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.error,
             ),
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -109,7 +108,7 @@ class MessageBubble extends StatelessWidget {
     final theme = Theme.of(context);
     // Obtener el ChatBloc antes de mostrar el BottomSheet
     final chatBloc = context.read<ChatBloc>();
-    
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -136,7 +135,7 @@ class MessageBubble extends StatelessWidget {
                   Icons.edit_outlined,
                   color: theme.colorScheme.primary,
                 ),
-                title: const Text('Editar'),
+                title: Text(l10n.edit),
                 onTap: () {
                   Navigator.pop(bottomSheetContext);
                   onEditMessage?.call(message);
@@ -167,49 +166,49 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  /// Obtener el nickname del remitente, convirtiendo email a nickname si es necesario
   String _getSenderDisplayName() {
     String displayName = message.senderName;
-    
-    // Si senderName parece ser un email (contiene @), intentar obtener el nickname
+
+
     if (displayName.contains('@')) {
-      // Primero intentar buscar en el mapa de participantes usando el senderName (email)
-      if (participantsMap != null && participantsMap!.containsKey(displayName)) {
+      if (participantsMap != null &&
+          participantsMap!.containsKey(displayName)) {
         return participantsMap![displayName]!;
       }
-      
-      // También intentar buscar usando senderId (que debería ser el email)
-      if (participantsMap != null && message.senderId.contains('@') && participantsMap!.containsKey(message.senderId)) {
+
+      if (participantsMap != null &&
+          message.senderId.contains('@') &&
+          participantsMap!.containsKey(message.senderId)) {
         return participantsMap![message.senderId]!;
       }
-      
-      // Si no se encuentra, extraer la parte antes del @ como fallback
+
       return displayName.split('@').first;
     }
-    
-    // Si senderName no es un email pero senderId sí lo es, intentar buscar en participantsMap
-    if (message.senderId.contains('@') && participantsMap != null && participantsMap!.containsKey(message.senderId)) {
+    if (message.senderId.contains('@') &&
+        participantsMap != null &&
+        participantsMap!.containsKey(message.senderId)) {
       return participantsMap![message.senderId]!;
     }
-    
-    // Si no es un email, usar el senderName directamente (debería ser el nickname)
+
     return displayName;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final timeFormat = DateFormat('HH:mm');
     final senderDisplayName = _getSenderDisplayName();
-    
+
     // Mostrar avatar solo en grupos, cuando el mensaje no es del usuario actual, y cuando showAvatar es true
     final shouldShowAvatar = isGroup && !isMe && showAvatar;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Avatar del remitente (solo en grupos y para mensajes de otros)
@@ -222,21 +221,30 @@ class MessageBubble extends StatelessWidget {
                       onTap: onAvatarTap,
                       child: CircleAvatar(
                         radius: 16,
-                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                        backgroundImage: message.senderPhoto != null && message.senderPhoto!.isNotEmpty
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        backgroundImage:
+                            message.senderPhoto != null &&
+                                message.senderPhoto!.isNotEmpty
                             ? NetworkImage(message.senderPhoto!)
                             : null,
-                        child: message.senderPhoto == null || message.senderPhoto!.isEmpty
+                        child:
+                            message.senderPhoto == null ||
+                                message.senderPhoto!.isEmpty
                             ? Icon(
                                 Icons.person,
                                 size: 16,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
                               )
                             : null,
                       ),
                     ),
                   )
-                : const SizedBox(width: 40), // 32px (avatar width) + 8px (padding right)
+                : const SizedBox(
+                    width: 40,
+                  ), 
           Flexible(
             child: GestureDetector(
               onLongPress: isMe && !message.deleted
@@ -289,12 +297,16 @@ class MessageBubble extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '(editado)',
+                                l10n.editedLabel,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 9,
                                   color: isMe
-                                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.6)
-                                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      ? theme.colorScheme.onPrimary.withValues(
+                                          alpha: 0.6,
+                                        )
+                                      : theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.5,
+                                        ),
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
@@ -304,8 +316,12 @@ class MessageBubble extends StatelessWidget {
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 11,
                                   color: isMe
-                                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                      ? theme.colorScheme.onPrimary.withValues(
+                                          alpha: 0.7,
+                                        )
+                                      : theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.6,
+                                        ),
                                 ),
                               ),
                             ],
@@ -336,7 +352,7 @@ class MessageBubble extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   message.deleted
-                                      ? 'Mensaje eliminado'
+                                      ? l10n.messageDeleted
                                       : message.content,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: isMe
@@ -354,8 +370,12 @@ class MessageBubble extends StatelessWidget {
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 11,
                                   color: isMe
-                                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                      ? theme.colorScheme.onPrimary.withValues(
+                                          alpha: 0.7,
+                                        )
+                                      : theme.colorScheme.onSurface.withValues(
+                                          alpha: 0.6,
+                                        ),
                                 ),
                               ),
                             ],

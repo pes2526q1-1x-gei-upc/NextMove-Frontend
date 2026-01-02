@@ -418,5 +418,8 @@
     "isWriting": "està escribint...",
     "areWriting": "estan escribint...",
     "and": "i",
-    "more": "más"
+    "more": "más",
+    "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
+    "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
+    "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir"
 }

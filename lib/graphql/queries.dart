@@ -484,94 +484,77 @@ class GraphQLQueries {
       station_id
     }
   }''';
-}
-
-const String getOrCreateDirectChatQuery = r'''
-  query GetOrCreateDirectChat($userEmail: String!) {
-    getOrCreateDirectChat(userEmail: $userEmail) {
-      id
-      type
-      name
-    }
-  }
-''';
-
-const String myChatsQuery = r'''
-  query MyChats {
-    myChats {
-      id
-      type
-      name
-      description
-      photo
-      participants {
-        userEmail
-        nickname
-        photoUrl
-        joinedAt
-        isAdmin
+  static const String getOrCreateDirectChatQuery = r'''
+    query GetOrCreateDirectChat($userEmail: String!) {
+      getOrCreateDirectChat(userEmail: $userEmail) {
+        id
+        type
+        name
       }
-      lastMessage {
+    }
+  ''';
+
+  static const String myChatsQuery = r'''
+    query MyChats {
+      myChats {
+        id
+        type
+        name
+        description
+        photo
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+          isAdmin
+        }
+        lastMessage {
+          content
+          sender
+          timestamp
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static const String chatMessagesQuery = r'''
+    query ChatMessages($chatId: ID!, $limit: Int, $offset: Int) {
+      chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
+        id
+        chatId
+        senderEmail
+        senderNickname
+        senderPhoto
         content
-        sender
-        timestamp
-      }
-      createdAt
-      updatedAt
-    }
-  }
-''';
-
-const String chatMessagesQuery = r'''
-  query ChatMessages($chatId: ID!, $limit: Int, $offset: Int) {
-    chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
-      id
-      chatId
-      senderEmail
-      senderNickname
-      senderPhoto
-      content
-      type
-      createdAt
-      deleted
-      deletedAt
-      edited
-      editedAt
-    }
-  }
-''';
-
-const String getChatDetailsQuery = r'''
-  query GetChatDetails($chatId: ID!) {
-    myChats {
-      id
-      type
-      name
-      description
-      participants {
-        userEmail
-        nickname
-        photoUrl
-        joinedAt
-      }
-      createdAt
-      updatedAt
-    }
-  }
-''';
-
-const String createGroupChatMutation = r'''
-  mutation CreateGroupChat($name: String!, $description: String, $participantEmails: [String!]!) {
-    createGroupChat(name: $name, description: $description, participantEmails: $participantEmails) {
-      id
-      name
-      description
-      type
-      participants {
-        userEmail
-        nickname
-        photoUrl
+        type
+        createdAt
+        deleted
+        deletedAt
+        edited
+        editedAt
       }
     }
-  }
-''';
+  ''';
+
+  static const String getChatDetailsQuery = r'''
+    query GetChatDetails($chatId: ID!) {
+      myChats {
+        id
+        type
+        name
+        description
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+}

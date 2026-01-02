@@ -18,28 +18,21 @@ class _FriendChatItemState extends State<FriendChatItem> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final friendName = widget.friend['name'] as String;
     final friendPhoto = widget.friend['photo'] as String?;
 
     final hasPhoto =
         friendPhoto != null && friendPhoto.isNotEmpty && !_imageError;
-    final photoUrl = friendPhoto;
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       leading: CircleAvatar(
         radius: 24,
-        backgroundImage: hasPhoto && photoUrl != null
-            ? NetworkImage(photoUrl)
-            : null,
+        backgroundImage: hasPhoto ? NetworkImage(friendPhoto) : null,
         backgroundColor: theme.colorScheme.surfaceContainerHighest,
-        onBackgroundImageError: hasPhoto && photoUrl != null
+        onBackgroundImageError: hasPhoto
             ? (exception, stackTrace) {
-                debugPrint(
-                  'Error cargando foto de amigo en lista de chats: $exception',
-                );
                 if (mounted) {
                   setState(() {
                     _imageError = true;
@@ -61,15 +54,15 @@ class _FriendChatItemState extends State<FriendChatItem> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      subtitle: _buildSubtitle(theme, l10n),
+      subtitle: _buildSubtitle(theme),
       onTap: widget.onTap,
     );
   }
 
-  Widget _buildSubtitle(ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSubtitle(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     final lastMessage = widget.friend['lastMessage'] as Map<String, dynamic>?;
 
-    // Si hay último mensaje y tiene contenido, mostrarlo
     if (lastMessage != null && lastMessage['content'] != null) {
       final content = lastMessage['content'] as String? ?? '';
       if (content.isNotEmpty) {
@@ -84,7 +77,6 @@ class _FriendChatItemState extends State<FriendChatItem> {
       }
     }
 
-    // Si no hay último mensaje, mostrar "toca para chatear" solo si no hay chatId (amigo sin chat)
     final chatId = widget.friend['chatId'] as String?;
     if (chatId == null) {
       return Text(
@@ -96,7 +88,6 @@ class _FriendChatItemState extends State<FriendChatItem> {
       );
     }
 
-    // Si hay chatId pero no hay mensajes, mostrar mensaje vacío o texto por defecto
     return const SizedBox.shrink();
   }
 }
@@ -143,39 +134,110 @@ class FriendsList extends StatelessWidget {
   }
 }
 
-/// Widget para mostrar la lista de grupos (vacía por ahora)
-class GroupsList extends StatelessWidget {
-  final ThemeData theme;
+/// Widget para mostrar un elemento de chat de grupo
+class GroupChatItem extends StatelessWidget {
+  final Map<String, dynamic> group;
+  final VoidCallback onTap;
 
-  const GroupsList({super.key, required this.theme});
+  const GroupChatItem({super.key, required this.group, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    // TODO: Este método debería recibir filteredGroups como parámetro cuando se implemente búsqueda de grupos
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.group_off, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          Text(
-            l10n.noGroupsAvailable,
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.groupsComingSoon,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
+    final groupName = group['name'] as String? ?? l10n.group;
+    final description = group['description'] as String?;
+    final groupPhoto = group['photo'] as String?;
+    final lastMessage = group['lastMessage'] as Map<String, dynamic>?;
+
+    String? subtitleText;
+    if (lastMessage != null && lastMessage['content'] != null) {
+      final sender = lastMessage['sender'] as String?;
+      final content = lastMessage['content'] as String? ?? '';
+      if (content.isNotEmpty) {
+        subtitleText = (sender != null && sender.isNotEmpty)
+            ? '$sender: $content'
+            : content;
+      }
+    }
+
+    if (subtitleText == null || subtitleText.isEmpty) {
+      if (description != null && description.isNotEmpty) {
+        subtitleText = description;
+      }
+    }
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+      leading: CircleAvatar(
+        radius: 24,
+        backgroundColor: theme.colorScheme.primaryContainer,
+        backgroundImage: groupPhoto != null ? NetworkImage(groupPhoto) : null,
+        child: groupPhoto == null
+            ? Icon(Icons.group, color: theme.colorScheme.onPrimaryContainer)
+            : null,
+      ),
+      title: Text(
+        groupName,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: Text(
+        subtitleText ?? l10n.group,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          fontStyle: subtitleText == null ? FontStyle.italic : null,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+/// Widget para mostrar la lista de grupos
+class GroupsList extends StatelessWidget {
+  final ThemeData theme;
+  final List<dynamic> groups;
+  final VoidCallback onRefresh;
+  final Function(Map<String, dynamic>) onGroupTap;
+
+  const GroupsList({
+    super.key,
+    required this.theme,
+    required this.groups,
+    required this.onRefresh,
+    required this.onGroupTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async => onRefresh(),
+      child: ListView.separated(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8),
+        itemCount: groups.length,
+        separatorBuilder: (context, index) => Divider(
+          height: 1,
+          thickness: 0.5,
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          indent: 72,
+          endIndent: 16,
+        ),
+        itemBuilder: (context, index) {
+          final group = groups[index];
+          return GroupChatItem(group: group, onTap: () => onGroupTap(group));
+        },
       ),
     );
   }
 }
 
 /// Widget para la barra de búsqueda y toggle
-class ChatSearchBar extends StatefulWidget {
+class ChatSearchBar extends StatelessWidget {
   final TextEditingController controller;
   final bool showFriends;
   final ValueChanged<bool> onToggleChanged;
@@ -190,71 +252,19 @@ class ChatSearchBar extends StatefulWidget {
   });
 
   @override
-  State<ChatSearchBar> createState() => _ChatSearchBarState();
-}
-
-class _ChatSearchBarState extends State<ChatSearchBar> {
-  late AppLocalizations l10n;
-  @override
   Widget build(BuildContext context) {
-    l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Row(
       children: [
         Expanded(
-          child: SizedBox(
-            height: 48,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: Theme.of(context).brightness == Brightness.dark
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-              ),
-              child: TextField(
-                controller: widget.controller,
-                onChanged: widget.onSearchChanged,
-                decoration: InputDecoration(
-                  hintText: widget.showFriends
-                      ? l10n.searchChats
-                      : l10n.searchGroups,
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  suffixIcon: widget.controller.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            widget.controller.clear();
-                            widget.onSearchChanged('');
-                          },
-                        )
-                      : null,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        SizedBox(
-          height: 48,
-          width: 96,
           child: Container(
+            height: 48,
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: Theme.of(context).brightness == Brightness.dark
+              boxShadow: theme.brightness == Brightness.dark
                   ? null
                   : [
                       BoxShadow(
@@ -264,28 +274,84 @@ class _ChatSearchBarState extends State<ChatSearchBar> {
                       ),
                     ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: ToggleButtons(
-                isSelected: [widget.showFriends, !widget.showFriends],
-                onPressed: (index) {
-                  widget.onToggleChanged(index == 0);
-                },
-                borderRadius: BorderRadius.zero,
-                selectedColor: Theme.of(context).colorScheme.onPrimary,
-                fillColor: Theme.of(context).colorScheme.primary,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                borderWidth: 0,
-                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                children: const [
-                  Icon(Icons.person, size: 20),
-                  Icon(Icons.group, size: 20),
-                ],
+            child: TextField(
+              controller: controller,
+              onChanged: onSearchChanged,
+              decoration: InputDecoration(
+                hintText: showFriends ? l10n.searchChats : l10n.searchGroups,
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                suffixIcon: controller.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          controller.clear();
+                          onSearchChanged('');
+                        },
+                      )
+                    : null,
               ),
             ),
           ),
         ),
+        const SizedBox(width: 12),
+        Container(
+          height: 48,
+          width: 96,
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: theme.brightness == Brightness.dark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: ToggleButtons(
+              isSelected: [showFriends, !showFriends],
+              onPressed: (index) => onToggleChanged(index == 0),
+              selectedColor: theme.colorScheme.onPrimary,
+              fillColor: theme.colorScheme.primary,
+              color: theme.colorScheme.onSurfaceVariant,
+              borderWidth: 0,
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              children: const [
+                Icon(Icons.person, size: 20),
+                Icon(Icons.group, size: 20),
+              ],
+            ),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+/// Floating Action Button para crear un grupo
+class ChatListFab extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const ChatListFab({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return FloatingActionButton.extended(
+      onPressed: onPressed,
+      icon: const Icon(Icons.add),
+      label: Text(l10n.createGroup),
     );
   }
 }

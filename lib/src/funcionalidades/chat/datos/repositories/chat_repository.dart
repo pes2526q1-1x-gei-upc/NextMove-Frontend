@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import '../../dominio/entities/message.dart';
-import '../../dominio/entities/chat_room.dart';
 import '../../dominio/models/message_model.dart';
 import '../dataproviders/socket_datasource.dart';
 
@@ -138,16 +137,12 @@ class ChatRepository {
     );
   }
 
-  /// Obtener lista de salas de chat del usuario
-  /// TODO: Implementar cuando tengas el endpoint GraphQL
-  Future<List<ChatRoom>> getUserChatRooms() async {
-    // TODO: Implementar cuando tengas el endpoint GraphQL
-    // Por ahora retornar lista vacía o salas mock
-    return [];
-  }
-
   /// Obtener historial de mensajes de una sala
-  Future<List<Message>> getRoomMessages(String roomId, {int limit = 50, int offset = 0}) async {
+  Future<List<Message>> getRoomMessages(
+    String roomId, {
+    int limit = 50,
+    int offset = 0,
+  }) async {
     try {
       final fireBaseUser = FirebaseAuth.instance.currentUser;
       if (fireBaseUser == null) {
@@ -160,12 +155,8 @@ class ChatRepository {
       final GraphQLClient client = GraphQLConfig.client.value;
 
       final QueryOptions options = QueryOptions(
-        document: gql(chatMessagesQuery),
-        variables: {
-          'chatId': roomId,
-          'limit': limit,
-          'offset': offset,
-        },
+        document: gql(GraphQLQueries.chatMessagesQuery),
+        variables: {'chatId': roomId, 'limit': limit, 'offset': offset},
         fetchPolicy: FetchPolicy.networkOnly,
         context: Context().withEntry(
           HttpLinkHeaders(headers: {'Authorization': authHeader}),
@@ -173,23 +164,26 @@ class ChatRepository {
       );
 
       if (kDebugMode) {
-        debugPrint('[ChatRepository] 📥 Cargando mensajes históricos para chat: $roomId');
+        debugPrint(
+          '[ChatRepository] Cargando mensajes históricos para chat: $roomId',
+        );
       }
 
       final QueryResult result = await client.query(options);
 
       if (result.hasException) {
         if (kDebugMode) {
-          debugPrint('[ChatRepository] ❌ Error en query: ${result.exception}');
+          debugPrint('[ChatRepository] Error en query: ${result.exception}');
         }
         throw Exception('Error al cargar mensajes: ${result.exception}');
       }
 
-      final List<dynamic>? messagesData = result.data?['chatMessages'] as List<dynamic>?;
+      final List<dynamic>? messagesData =
+          result.data?['chatMessages'] as List<dynamic>?;
 
       if (messagesData == null || messagesData.isEmpty) {
         if (kDebugMode) {
-          debugPrint('[ChatRepository] ✅ No hay mensajes históricos');
+          debugPrint('[ChatRepository] No hay mensajes históricos');
         }
         return [];
       }
@@ -223,7 +217,9 @@ class ChatRepository {
       }).toList();
 
       if (kDebugMode) {
-        debugPrint('[ChatRepository] ✅ Cargados ${messages.length} mensajes históricos');
+        debugPrint(
+          '[ChatRepository] Cargados ${messages.length} mensajes históricos',
+        );
       }
 
       // Ordenar mensajes por timestamp (más antiguos primero)
@@ -232,7 +228,7 @@ class ChatRepository {
       return messages;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[ChatRepository] ❌ Error cargando mensajes: $e');
+        debugPrint('[ChatRepository] Error cargando mensajes: $e');
       }
       rethrow;
     }

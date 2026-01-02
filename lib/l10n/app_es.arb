@@ -425,5 +425,16 @@
     "isWriting": "está escribiendo...",
     "areWriting": "están escribiendo...",
     "and": "y",
-    "more": "más"
+    "more": "más",
+    "participantsAddedCorrectly": "Participante(s) añadido(s) correctamente",
+    "someParticipantsFailed": "Algunos participantes no se pudieron añadir",
+    "noUsersAvailableToAdd": "No hay usuarios disponibles para añadir",
+    "groupName": "Nombre del grupo",
+    "nameIsRequired": "El nombre es obligatorio",
+    "editedLabel": "(editado)",
+    "create": "Crear",
+    "descriptionOptional": "Descripción (opcional)",
+    "noFriendsToAdd": "No tienes amigos para añadir al grupo",
+    "couldNotFindUserEmail": "No se pudo encontrar el correo del usuario",
+    "deleteMessageConfirmation": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer."
 }
