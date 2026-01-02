@@ -292,6 +292,8 @@
             }
         }
     },
+    "arrival": "Llegada",
+    "enxmet": "En",
     "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad.",
     "errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario.",
     "social": "Social",

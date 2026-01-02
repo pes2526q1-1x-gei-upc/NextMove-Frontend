@@ -12,6 +12,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigati
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/turn_instruction_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_progress_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -185,6 +187,44 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  int _calculateRemainingSeconds(NavigationRoute route, int currentStepIndex, int distanceToNextStepMeters) {
+    int remainingSeconds = 0;
+    
+    // Remaining time of current step
+    if (currentStepIndex < route.steps.length) {
+      final currentStep = route.steps[currentStepIndex];
+      if (currentStep.distanceMeters > 0) {
+        final progress = distanceToNextStepMeters / currentStep.distanceMeters;
+        // Clamp progress to 0.0 - 1.0 just in case
+        final safeProgress = progress.clamp(0.0, 1.0);
+        remainingSeconds += (currentStep.durationSeconds * safeProgress).round();
+      } else {
+        remainingSeconds += currentStep.durationSeconds;
+      }
+    }
+    
+    // Time of subsequent steps
+    for (int i = currentStepIndex + 1; i < route.steps.length; i++) {
+        remainingSeconds += route.steps[i].durationSeconds;
+    }
+    
+    return remainingSeconds;
+  }
+
+  int _calculateRemainingDistance(NavigationRoute route, int currentStepIndex, int distanceToNextStepMeters) {
+    int remainingDistance = 0;
+    
+    // Remaining distance of current step
+    remainingDistance += distanceToNextStepMeters;
+    
+    // Distance of subsequent steps
+    for (int i = currentStepIndex + 1; i < route.steps.length; i++) {
+        remainingDistance += route.steps[i].distanceMeters;
+    }
+    
+    return remainingDistance;
+  }
+
   // -----------------------------------------------------------------------
   // Build
   // -----------------------------------------------------------------------
@@ -240,6 +280,27 @@ class _MapPageState extends State<MapPage> {
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
             }
+            
+            // Auto-follow camera during turn-by-turn navigation
+            if (state is MapLoadedState && 
+                state.isTurnByTurnActive && 
+                state.userLocation != null && 
+                _mapController != null) {
+              // Usar el heading del GPS si está disponible, sino 0
+              final bearing = state.userHeading ?? 0.0;
+              
+              _mapController!.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    target: state.userLocation!,
+                    zoom: 17.0, // Closer zoom for navigation
+                    bearing: bearing, // Rotar el mapa según la orientación (2D)
+                    tilt: 0.0, // Sin inclinación 3D, vista plana
+                  ),
+                ),
+              );
+            }
+            
             // Centrar la cámara en la ubicación del usuario la primera vez que se obtiene
             if (state is MapLoadedState && 
                 state.userLocation != null && 
@@ -323,60 +384,92 @@ class _MapPageState extends State<MapPage> {
                     ),
 
                     if (state.isNavigationMode)...[
-                      Positioned(
-                        top:60,
-                        left:0,
-                        right:0,
-                        child: RouteInfoWidget(
-                          origin: state.userLocation!,
-                          destination: state.selectedStation!,
-                        )
-                      ),
-                      if(state.navigationRoute != null)
-                      Positioned.fill(
-                        bottom: 0,
-                        child: DraggableScrollableSheet(
-                          initialChildSize: 0.28,
-                          minChildSize: 0.22,
-                          maxChildSize: 0.28,
-                          builder: (context, scrollController) {
-                            return NotificationListener<DraggableScrollableNotification>(
-                              onNotification: (notification) {
-                                // Cuando el usuario suelta el drag y está en el mínimo
-                                if (notification.extent <= notification.minExtent + 0.01) {
-                                  Future.delayed(const Duration(milliseconds: 150), () {
-                                    if (context.mounted) {
-                                      context.read<MapBloc>().add(CancelNavigationEvent());
-                                    }
-                                  });
-                                }
-                                return true;
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(24),
-                                  ),
-                                ),
-                                child: SingleChildScrollView(
-                                  controller: scrollController,
-                                  child: RoutePreviewWidget(
-                                    route: state.navigationRoute!,
-                                    onStartPressed: () {
-                                      debugPrint("Iniciar navegación presionado");
-                                    },
-                                    onCancelPressed: () {
-                                      context.read<MapBloc>().add(CancelNavigationEvent());
-                                    },
-                                  ),
-                                ),
-                              ),
-                            );
+                      // Show turn-by-turn navigation widgets when active
+                      if (state.isTurnByTurnActive && 
+                          state.navigationRoute != null && 
+                          state.currentStepIndex != null) ...[
+                        NavigationProgressWidget(
+                          remainingSeconds: _calculateRemainingSeconds(
+                            state.navigationRoute!,
+                            state.currentStepIndex!,
+                            state.distanceToNextStepMeters ?? 0,
+                          ),
+                          remainingDistance: _calculateRemainingDistance(
+                            state.navigationRoute!,
+                            state.currentStepIndex!,
+                            state.distanceToNextStepMeters ?? 0,
+                          ),
+                        ),
+                        TurnInstructionWidget(
+                          currentStep: state.navigationRoute!.steps[state.currentStepIndex!],
+                          distanceToNextStepMeters: state.distanceToNextStepMeters ?? 0,
+                          onCancel: () {
+                            context.read<MapBloc>().add(const StopTurnByTurnNavigationEvent());
                           },
                         ),
-                      ),
+                      ] else ...[
+                        // Show route preview when not in turn-by-turn mode
+                        Positioned(
+                          top:60,
+                          left:0,
+                          right:0,
+                          child: RouteInfoWidget(
+                            origin: state.userLocation!,
+                            destination: state.selectedStation!,
+                          )
+                        ),
+                        if(state.navigationRoute != null)
+                        Positioned.fill(
+                          bottom: 0,
+                          child: DraggableScrollableSheet(
+                            initialChildSize: 0.28,
+                            minChildSize: 0.22,
+                            maxChildSize: 0.28,
+                            builder: (context, scrollController) {
+                              return NotificationListener<DraggableScrollableNotification>(
+                                onNotification: (notification) {
+                                  // Cuando el usuario suelta el drag y está en el mínimo
+                                  if (notification.extent <= notification.minExtent + 0.01) {
+                                    Future.delayed(const Duration(milliseconds: 150), () {
+                                      if (context.mounted) {
+                                        context.read<MapBloc>().add(CancelNavigationEvent());
+                                      }
+                                    });
+                                  }
+                                  return true;
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(24),
+                                    ),
+                                  ),
+                                  child: SingleChildScrollView(
+                                    controller: scrollController,
+                                    child: RoutePreviewWidget(
+                                      route: state.navigationRoute!,
+                                      onStartPressed: () {
+                                        context.read<MapBloc>().add(const StartTurnByTurnNavigationEvent());
+                                      },
+                                      onCancelPressed: () {
+                                        context.read<MapBloc>().add(CancelNavigationEvent());
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ],
+                    if(state.isTurnByTurnActive || !state.isNavigationMode)
+                      MapControlsColumnWidget(
+                        userLocation: state.userLocation,
+                        mapController: _mapController,
+                        currentMapType: state.currentMapType,
+                      ),
                     
 
                     // Barra de búsqueda
@@ -412,13 +505,6 @@ class _MapPageState extends State<MapPage> {
                       ),
                    
 
-                    // Columna de controles del mapa (botones combinados)
-                    MapControlsColumnWidget(
-                      userLocation: state.userLocation,
-                      mapController: _mapController,
-                      currentMapType: state.currentMapType,
-                    ),
-
                     // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
@@ -430,7 +516,7 @@ class _MapPageState extends State<MapPage> {
                         isSearchBarFocused: _isSearchBarFocused,
                       ),
                     ),
-                    ],
+                  ],
                   ],
                 );
                   },

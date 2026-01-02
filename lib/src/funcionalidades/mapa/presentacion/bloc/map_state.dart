@@ -49,6 +49,12 @@ class MapLoadedState extends MapState {
   final RouteViewport? routeViewport;
   final ClusterManager? bikeClusterManager;
   final ClusterManager? evClusterManager;
+  
+  // Turn-by-turn navigation fields
+  final bool isTurnByTurnActive;
+  final int? currentStepIndex;
+  final int? distanceToNextStepMeters;
+  final double? userHeading; // Orientación del usuario para rotar el mapa (0-360)
 
   const MapLoadedState({
     required this.bikeStations,
@@ -76,6 +82,10 @@ class MapLoadedState extends MapState {
     this.routeViewport,
     this.bikeClusterManager,
     this.evClusterManager,
+    this.isTurnByTurnActive = false,
+    this.currentStepIndex,
+    this.distanceToNextStepMeters,
+    this.userHeading,
   });
 
   @override
@@ -105,6 +115,10 @@ class MapLoadedState extends MapState {
         routeViewport,
         bikeClusterManager,
         evClusterManager,
+        isTurnByTurnActive,
+        currentStepIndex,
+        distanceToNextStepMeters,
+        userHeading,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -136,6 +150,10 @@ class MapLoadedState extends MapState {
     RouteViewport? routeViewport,
     ClusterManager? bikeClusterManager,
     ClusterManager? evClusterManager,
+    bool? isTurnByTurnActive,
+    int? currentStepIndex,
+    int? distanceToNextStepMeters,
+    double? userHeading,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -163,6 +181,10 @@ class MapLoadedState extends MapState {
       routeViewport: routeViewport ?? this.routeViewport,
       bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
       evClusterManager: evClusterManager ?? this.evClusterManager,
+      isTurnByTurnActive: isTurnByTurnActive ?? this.isTurnByTurnActive,
+      currentStepIndex: currentStepIndex ?? this.currentStepIndex,
+      distanceToNextStepMeters: distanceToNextStepMeters ?? this.distanceToNextStepMeters,
+      userHeading: userHeading ?? this.userHeading,
     );
   }
 
