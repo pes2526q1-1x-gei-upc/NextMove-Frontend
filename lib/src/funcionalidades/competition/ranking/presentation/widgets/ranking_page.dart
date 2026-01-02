@@ -62,9 +62,14 @@ class _RankingPageState extends State<RankingPage> {
                     const Center(child: CircularProgressIndicator())
                   else if (state is RankingLoaded)
                     Expanded(
-                      child: RankingUserList(
-                        selectedMetric: selectedMetric,
-                        rankingData: state.rankingData,
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          _refreshRanking();
+                        },
+                        child: RankingUserList(
+                          selectedMetric: selectedMetric,
+                          rankingData: state.rankingData,
+                        ),
                       ),
                     )
                   else if (state is RankingError)
@@ -76,5 +81,9 @@ class _RankingPageState extends State<RankingPage> {
         ),
       ),
     );
+  }
+
+  void _refreshRanking() {
+    _rankingBloc.add(LoadRankingEvent(selectedMetric!));
   }
 }
