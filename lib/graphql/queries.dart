@@ -392,6 +392,7 @@ static const String getNavigationRouteQuery = r'''
   query getRanking($metric: String!) {
     ranking(metric: $metric) {
       email
+      nickname
       num_rutas
       km_recorridos
       elevacion_positiva
