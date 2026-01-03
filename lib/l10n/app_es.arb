@@ -439,6 +439,30 @@
     "noFriendsToAdd": "No tienes amigos para añadir al grupo",
     "couldNotFindUserEmail": "No se pudo encontrar el correo del usuario",
     "deleteMessageConfirmation": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.",
+    "routeSavedSuccessfully": "Ruta guardada correctamente",
+    "backToMap": "Volver al mapa",
+    "noRouteDataAvailable": "No hay datos de ruta disponibles",
+    "validationMinPoints": "La ruta debe tener al menos {count} puntos",
+    "@validationMinPoints": {
+        "placeholders": {
+        "count": {
+            "type": "int"
+        }
+        }
+    },
+    "validationNoMovement": "La ruta no muestra movimiento significativo",
+    "validationInconsistentTime": "Datos temporales inconsistentes",
+    "validationImpossibleSpeed": "Velocidad imposible detectada: {speed} km/h",
+    "@validationImpossibleSpeed": {
+        "placeholders": {
+        "speed": {
+            "type": "String"
+        }
+        }
+    },
+    "validationSuspiciousGPS": "Patrón de GPS sospechoso detectado",
+    "validationImpossibleMovements": "Movimientos imposibles detectados",
+    "validationMaxSpeedImpossible": "Velocidad máxima imposible",
     "trophies": "Trofeos",
     "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0"
 }

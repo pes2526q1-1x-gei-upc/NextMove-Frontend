@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 /// Clase base abstracta para todos los eventos del mapa
 abstract class MapEvent extends Equatable {
@@ -97,7 +98,11 @@ class StartRouteRecordingEvent extends MapEvent {
 
 /// Evento: detener grabación de ruta
 class StopRouteRecordingEvent extends MapEvent {
-  const StopRouteRecordingEvent();
+  final AppLocalizations l10n;
+  const StopRouteRecordingEvent(this.l10n);
+  
+  @override
+  List<Object?> get props => [l10n];
 }
 
 /// Evento: agregar punto a la ruta actual
@@ -132,6 +137,9 @@ class CancelNavigationEvent extends MapEvent {
   const CancelNavigationEvent();
 }
 
+class ResetStatisticsNavigationEvent extends MapEvent {
+  const ResetStatisticsNavigationEvent();
+}
 /// Evento: iniciar navegación turn-by-turn
 class StartTurnByTurnNavigationEvent extends MapEvent {
   const StartTurnByTurnNavigationEvent();
