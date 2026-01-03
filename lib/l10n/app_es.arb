@@ -438,5 +438,7 @@
     "descriptionOptional": "Descripción (opcional)",
     "noFriendsToAdd": "No tienes amigos para añadir al grupo",
     "couldNotFindUserEmail": "No se pudo encontrar el correo del usuario",
-    "deleteMessageConfirmation": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer."
+    "deleteMessageConfirmation": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.",
+    "trophies": "Trofeos",
+    "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0"
 }

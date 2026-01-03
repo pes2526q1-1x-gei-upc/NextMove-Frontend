@@ -97,6 +97,7 @@ flutter:
   assets:
     - assets/
     - assets/icon/
+    - assets/trophies/
     - .env
   #   - images/a_dot_ham.jpeg
 

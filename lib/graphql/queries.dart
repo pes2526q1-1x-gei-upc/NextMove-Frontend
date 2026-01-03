@@ -476,6 +476,13 @@ static const String getNavigationRouteQuery = r'''
     enrollChallenge(challenge_id: $challengeId)
   }''';
 
+  static const String getCompletedChallenges = r'''
+  query getCompletedChallenges {
+    getTrophies {
+      name
+    }
+  }''';
+
   static const String getFavCarStations = r'''
   query GetFavCarStations {
     getFavCarStations {
