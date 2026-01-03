@@ -68,6 +68,7 @@ dependencies:
   mocktail: ^1.0.4
   widgets_to_image: ^2.0.1
   share_plus: ^12.0.1
+  url_launcher: ^6.3.2
   eventide: ^2.0.0
 dev_dependencies:
   flutter_test:

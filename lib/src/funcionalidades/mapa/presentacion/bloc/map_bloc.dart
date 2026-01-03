@@ -39,6 +39,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final StationsCache stationsCache;
   final PromotedCompaniesRepository promotedCompaniesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
+  final Function(Company, MapLoadedState) onCompanyMarkerTapped;
 
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -70,6 +71,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.stationsCache,
     required this.promotedCompaniesRepository,
     required this.onMarkerTapped,
+    required this.onCompanyMarkerTapped,
     StationType? initialMode,
   }) : _initialMode = initialMode,
        super(const MapInitialState()) {
@@ -722,12 +724,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             position: company.location!,
             icon: companyIcons[company.name] ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
             clusterManagerId: clusterManagerId,
-            onTap: () {
-              // TODO: Handle company marker tap - maybe show company info
-              if (kDebugMode) {
-                print('Company tapped: ${company.name}');
-              }
-            },
+            onTap: () => onCompanyMarkerTapped(company, state as MapLoadedState),
           );
         })
         .toSet();
