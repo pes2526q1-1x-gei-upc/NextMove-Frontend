@@ -372,9 +372,10 @@ class _MapPageState extends State<MapPage> {
                             zoom: 12,
                           ),
                           markers: markersToShow,
-                          clusterManagers: clusterManagerToShow != null 
-                              ? {clusterManagerToShow} 
-                              : {},
+                          clusterManagers: {
+                            if (clusterManagerToShow != null) clusterManagerToShow,
+                            state.companyClusterManager,
+                          }.whereType<ClusterManager>().toSet(),
                           onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,

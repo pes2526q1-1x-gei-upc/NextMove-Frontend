@@ -128,6 +128,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       // Crear ClusterManagerIds
       final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
       final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+      final companyClusterManagerId = ClusterManagerId('company_cluster_manager');
 
       // Crear ClusterManagers
       final bikeClusterManager = ClusterManager(
@@ -148,6 +149,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       );
 
+      final companyClusterManager = ClusterManager(
+        clusterManagerId: companyClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟠 Cluster de empresas tapped: ${cluster.count} empresas');
+          }
+        },
+      );
+
       bikeIcon = await _getBikeCustomIcon();
       await _loadEvCustomIcons();
 
@@ -163,7 +173,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evClusterManagerId,
       );
 
-      final companyMarkers = _buildMarkersForCompanies(promotedCompanies);
+      final companyMarkers = _buildMarkersForCompanies(promotedCompanies, companyClusterManagerId);
 
       // Cargar búsquedas recientes guardadas
       final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
@@ -204,6 +214,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           decodedPolyline: null,
           bikeClusterManager: bikeClusterManager,
           evClusterManager: evClusterManager,
+          companyClusterManager: companyClusterManager,
         ),
       );
 
@@ -699,8 +710,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return {};
   }
 
-  Set<Marker> _buildMarkersForCompanies(List<Company> companies) {
-    print('Building markers for ${companies.length} companies, with data: $companies');
+  Set<Marker> _buildMarkersForCompanies(List<Company> companies, ClusterManagerId clusterManagerId) {
     return companies
         .where((company) => company.location != null)
         .map((company) {
@@ -708,6 +718,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             markerId: MarkerId('company_${company.name}'),
             position: company.location!,
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            clusterManagerId: clusterManagerId,
             onTap: () {
               // TODO: Handle company marker tap - maybe show company info
               if (kDebugMode) {

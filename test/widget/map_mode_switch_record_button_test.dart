@@ -55,6 +55,7 @@ void main() {
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: false,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));
@@ -77,6 +78,7 @@ void main() {
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: false,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));
@@ -99,6 +101,7 @@ void main() {
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: true,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));
