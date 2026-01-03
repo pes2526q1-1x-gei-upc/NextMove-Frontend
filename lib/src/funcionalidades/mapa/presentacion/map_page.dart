@@ -9,6 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/s
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
@@ -56,6 +57,7 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+  PromotedCompaniesRepository promotedCompaniesRepository = PromotedCompaniesRepository();
 
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
@@ -241,6 +243,7 @@ class _MapPageState extends State<MapPage> {
         searchHistoryService: searchHistoryService,
         navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
+        promotedCompaniesRepository: promotedCompaniesRepository,
         onMarkerTapped: _showStationBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
@@ -333,13 +336,19 @@ class _MapPageState extends State<MapPage> {
                       ? state.bikeMarkers
                       : state.carMarkers;
                       
-                   sourceMarkers = tempMarkers.where(
-                      (m) => m.markerId.value == state.selectedStation!.id
-                   ).toSet();
+                   sourceMarkers = {
+                     ...tempMarkers.where(
+                        (m) => m.markerId.value == state.selectedStation!.id
+                     ),
+                     ...state.companyMarkers,
+                   };
                 } else {
-                   sourceMarkers = state.currentMode == StationType.bicycle
-                      ? state.bikeMarkers
-                      : state.carMarkers;
+                   sourceMarkers = {
+                     ...state.currentMode == StationType.bicycle
+                        ? state.bikeMarkers
+                        : state.carMarkers,
+                     ...state.companyMarkers,
+                   };
                 }
 
                 final clusterManagerToShow = state.currentMode == StationType.bicycle

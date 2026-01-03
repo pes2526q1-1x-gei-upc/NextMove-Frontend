@@ -25,7 +25,7 @@ class PromotedCompaniesProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
-    final data = result.data?['getPromotedCompanies'];
+    final data = result.data?['getFirms'];
 
     if (kDebugMode) {
       print('Promoted companies data: $data');

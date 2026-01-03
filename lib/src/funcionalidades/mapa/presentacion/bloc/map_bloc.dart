@@ -18,6 +18,8 @@ import 'package:nextmove_app/src/shared/domain/route_input.dart';
 import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -34,6 +36,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final SearchHistoryService searchHistoryService;
   final NavigationRouteRepository navigationRouteRepository;
   final StationsCache stationsCache;
+  final PromotedCompaniesRepository promotedCompaniesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
 
   // Stream de ubicación
@@ -64,6 +67,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.navigationRouteRepository,
     required this.searchHistoryService,
     required this.stationsCache,
+    required this.promotedCompaniesRepository,
     required this.onMarkerTapped,
     StationType? initialMode,
   }) : _initialMode = initialMode,
@@ -95,10 +99,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(const MapLoadingState());
 
     try {
-      // Cargar estaciones en paralelo
+      // Cargar estaciones y empresas promocionadas en paralelo
       final results = await Future.wait([
         stationRepository.getAllBicycleStationDetails(),
         stationRepository.getAllEVStationDetails(),
+        promotedCompaniesRepository.getPromotedCompanies(),
       ]);
 
       final bikeStations = results[0].fold(
@@ -112,6 +117,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           'Error cargando estaciones de coches: ${failure.message}',
         ),
         (stations) => stations as List<EVStationDetails>? ?? [],
+      );
+      final promotedCompanies = results[2].fold(
+        (failure) => throw Exception(
+          'Error cargando empresas promocionadas: ${failure.message}',
+        ),
+        (companies) => companies as List<Company>? ?? [],
       );
 
       // Crear ClusterManagerIds
@@ -152,6 +163,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evClusterManagerId,
       );
 
+      final companyMarkers = _buildMarkersForCompanies(promotedCompanies);
+
       // Cargar búsquedas recientes guardadas
       final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
       final savedEvSearchIds = await searchHistoryService.getEvSearches();
@@ -174,11 +187,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
+          promotedCompanies: promotedCompanies,
           userLocation: null,
           currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
+          companyMarkers: companyMarkers,
           centerPosition: _bcnCenter,
           searchQuery: null,
           searchResults: [],
@@ -682,6 +697,26 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
 
     return {};
+  }
+
+  Set<Marker> _buildMarkersForCompanies(List<Company> companies) {
+    print('Building markers for ${companies.length} companies, with data: $companies');
+    return companies
+        .where((company) => company.location != null)
+        .map((company) {
+          return Marker(
+            markerId: MarkerId('company_${company.name}'),
+            position: company.location!,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            onTap: () {
+              // TODO: Handle company marker tap - maybe show company info
+              if (kDebugMode) {
+                print('Company tapped: ${company.name}');
+              }
+            },
+          );
+        })
+        .toSet();
   }
 
   /// Handler: Iniciar grabación de ruta

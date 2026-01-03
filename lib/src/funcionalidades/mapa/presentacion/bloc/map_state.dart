@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -26,11 +27,13 @@ class MapLoadingState extends MapState {
 class MapLoadedState extends MapState {
   final List<StationDetails> bikeStations;
   final List<StationDetails> evStations;
+  final List<Company> promotedCompanies;
   final LatLng? userLocation;
   final StationType currentMode;
   final MapType currentMapType;
   final Set<Marker> bikeMarkers;
   final Set<Marker> carMarkers;
+  final Set<Marker> companyMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
   final List<StationDetails> searchResults;
@@ -59,11 +62,13 @@ class MapLoadedState extends MapState {
   const MapLoadedState({
     required this.bikeStations,
     required this.evStations,
+    required this.promotedCompanies,
     this.userLocation,
     required this.currentMode,
     required this.currentMapType,
     required this.bikeMarkers,
     required this.carMarkers,
+    required this.companyMarkers,
     required this.centerPosition,
     this.searchQuery,
     this.searchResults = const [],
@@ -92,11 +97,13 @@ class MapLoadedState extends MapState {
   List<Object?> get props => [
         bikeStations,
         evStations,
+        promotedCompanies,
         userLocation,
         currentMode,
         currentMapType,
         bikeMarkers,
         carMarkers,
+        companyMarkers,
         centerPosition,
         searchQuery,
         searchResults,
@@ -125,11 +132,13 @@ class MapLoadedState extends MapState {
   MapLoadedState copyWith({
     List<StationDetails>? bikeStations,
     List<StationDetails>? evStations,
+    List<Company>? promotedCompanies,
     LatLng? userLocation,
     StationType? currentMode,
     MapType? currentMapType,
     Set<Marker>? bikeMarkers,
     Set<Marker>? carMarkers,
+    Set<Marker>? companyMarkers,
     LatLng? centerPosition,
     String? searchQuery,
     bool clearSearchQuery = false,
@@ -158,11 +167,13 @@ class MapLoadedState extends MapState {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
       evStations: evStations ?? this.evStations,
+      promotedCompanies: promotedCompanies ?? this.promotedCompanies,
       userLocation: userLocation ?? this.userLocation,
       currentMode: currentMode ?? this.currentMode,
       currentMapType: currentMapType ?? this.currentMapType,
       bikeMarkers: bikeMarkers ?? this.bikeMarkers,
       carMarkers: carMarkers ?? this.carMarkers,
+      companyMarkers: companyMarkers ?? this.companyMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: clearSearchQuery ? null : (searchQuery ?? this.searchQuery),
       searchResults: searchResults ?? this.searchResults,
