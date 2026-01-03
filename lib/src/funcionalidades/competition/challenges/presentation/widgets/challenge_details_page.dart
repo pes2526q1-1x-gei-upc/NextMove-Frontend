@@ -5,6 +5,7 @@ import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/c
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:eventide/eventide.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class ChallengeDetailsPage extends StatelessWidget {
@@ -247,9 +248,25 @@ class ChallengeDetailsPage extends StatelessWidget {
                 children: [
                   Icon(Icons.email, size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    challenge.company.email!,
-                    style: theme.textTheme.bodyMedium,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final Uri emailUri = Uri(
+                          scheme: 'mailto',
+                          path: challenge.company.email!,
+                        );
+                        if (await canLaunchUrl(emailUri)) {
+                          await launchUrl(emailUri);
+                        }
+                      },
+                      child: Text(
+                        challenge.company.email!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -260,9 +277,22 @@ class ChallengeDetailsPage extends StatelessWidget {
                 children: [
                   Icon(Icons.link, size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    challenge.company.url!,
-                    style: theme.textTheme.bodyMedium,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final Uri url = Uri.parse(challenge.company.url!);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        }
+                      },
+                      child: Text(
+                        challenge.company.url!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

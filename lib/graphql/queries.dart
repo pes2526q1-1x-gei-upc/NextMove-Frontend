@@ -457,6 +457,9 @@ static const String getNavigationRouteQuery = r'''
       company {
         name
         logo_url
+        email
+        url
+        description
       }
     }
   }''';

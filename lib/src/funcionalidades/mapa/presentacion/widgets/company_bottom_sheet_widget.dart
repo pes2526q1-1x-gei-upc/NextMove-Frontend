@@ -17,7 +17,6 @@ class CompanyBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.colorScheme.onSurface;
-    final mutedColor = theme.colorScheme.onSurfaceVariant;
 
     return Container(
       decoration: BoxDecoration(
@@ -86,14 +85,26 @@ class CompanyBottomSheet extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (company.email != null)
-                        Text(
-                          company.email!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
-                            color: mutedColor,
+                        InkWell(
+                          onTap: () async {
+                            final Uri emailUri = Uri(
+                              scheme: 'mailto',
+                              path: company.email!,
+                            );
+                            if (await canLaunchUrl(emailUri)) {
+                              await launchUrl(emailUri);
+                            }
+                          },
+                          child: Text(
+                            company.email!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              color: theme.colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                     ],
                   ),
