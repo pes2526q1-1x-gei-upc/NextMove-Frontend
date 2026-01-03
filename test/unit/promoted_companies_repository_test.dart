@@ -32,16 +32,20 @@ void main() {
       () async {
         final mockData = [
           {
-            'ubicacion': {'latitude': 41.3851, 'longitude': 2.1734},
-            'nombre': 'Company A',
-            'descripcion': 'Desc A',
-            'id': 1,
+            'location': {'latitude': 41.3851, 'longitude': 2.1734},
+            'name': 'Company A',
+            'description': 'Desc A',
+            'email': 'companya@test.com',
+            'url': 'https://companya.com',
+            'logo_url': 'https://companya.com/logo.png',
           },
           {
-            'ubicacion': {'latitude': 40.4168, 'longitude': -3.7038},
-            'nombre': 'Company B',
-            'descripcion': 'Desc B',
-            'id': 2,
+            'location': {'latitude': 40.4168, 'longitude': -3.7038},
+            'name': 'Company B',
+            'description': 'Desc B',
+            'email': 'companyb@test.com',
+            'url': 'https://companyb.com',
+            'logo_url': 'https://companyb.com/logo.png',
           },
         ];
         when(
@@ -144,10 +148,12 @@ void main() {
     test('should handle extra fields', () async {
       final mockData = [
         {
-          'ubicacion': {'latitude': 41.3851, 'longitude': 2.1734},
-          'nombre': 'Company A',
-          'descripcion': 'Desc A',
-          'id': 1,
+          'location': {'latitude': 41.3851, 'longitude': 2.1734},
+          'name': 'Company A',
+          'description': 'Desc A',
+          'email': 'companya@test.com',
+          'url': 'https://companya.com',
+          'logo_url': 'https://companya.com/logo.png',
           'extra': 'value',
         },
       ];

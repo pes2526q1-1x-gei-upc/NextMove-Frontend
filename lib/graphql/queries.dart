@@ -456,7 +456,7 @@ static const String getNavigationRouteQuery = r'''
       photo
       company {
         name
-        photo
+        logo_url
       }
     }
   }''';
@@ -565,15 +565,15 @@ static const String getNavigationRouteQuery = r'''
 
   static const String getPromotedCompanies = r'''
   query getPromotedCompanies {
-    getFirms {
-      ubicacion {
+    getPromotedCompanies {
+      location {
         latitude
         longitude
       }
       url
-      nombre
+      name
       email
-      descripcion
+      description
       logo_url
     }
   }''';

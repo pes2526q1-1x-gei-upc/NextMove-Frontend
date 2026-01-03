@@ -14,18 +14,7 @@ class PromotedCompaniesRepository {
       final companiesData = await promotedCompaniesProvider
           .getPromotedCompanies();
       final companies = companiesData != null
-          ? companiesData.map((company) {
-              final translatedJson = {
-                ...company,
-                'location': company['ubicacion'],
-                'name': company['nombre'],
-                'description': company['descripcion'],
-              };
-              translatedJson.remove('ubicacion');
-              translatedJson.remove('nombre');
-              translatedJson.remove('descripcion');
-              return Company.fromJson(translatedJson);
-            }).toList()
+          ? companiesData.map((company) => Company.fromJson(company)).toList()
           : <Company>[];
       return Right(companies);
     } on ServerException catch (e) {
