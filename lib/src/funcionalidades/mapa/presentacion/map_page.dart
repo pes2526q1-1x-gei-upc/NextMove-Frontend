@@ -9,6 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/datos/repositories/s
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
@@ -25,9 +26,11 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.da
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/favorite_stations_button_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/company_bottom_sheet_widget.dart';
 
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/favorite_stations_button_widget.dart';
 
 import 'widgets/google_map_widget.dart';
 import 'widgets/toggle_map_mode_widget.dart';
@@ -56,6 +59,7 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+  PromotedCompaniesRepository promotedCompaniesRepository = PromotedCompaniesRepository();
 
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
@@ -241,7 +245,9 @@ class _MapPageState extends State<MapPage> {
         searchHistoryService: searchHistoryService,
         navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
+        promotedCompaniesRepository: promotedCompaniesRepository,
         onMarkerTapped: _showStationBottomSheet,
+        onCompanyMarkerTapped: _showCompanyBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
       child: Builder(  // ← AÑADE ESTE Builder
@@ -333,13 +339,19 @@ class _MapPageState extends State<MapPage> {
                       ? state.bikeMarkers
                       : state.carMarkers;
                       
-                   sourceMarkers = tempMarkers.where(
-                      (m) => m.markerId.value == state.selectedStation!.id
-                   ).toSet();
+                   sourceMarkers = {
+                     ...tempMarkers.where(
+                        (m) => m.markerId.value == state.selectedStation!.id
+                     ),
+                     ...state.companyMarkers,
+                   };
                 } else {
-                   sourceMarkers = state.currentMode == StationType.bicycle
-                      ? state.bikeMarkers
-                      : state.carMarkers;
+                   sourceMarkers = {
+                     ...state.currentMode == StationType.bicycle
+                        ? state.bikeMarkers
+                        : state.carMarkers,
+                     ...state.companyMarkers,
+                   };
                 }
 
                 final clusterManagerToShow = state.currentMode == StationType.bicycle
@@ -363,9 +375,10 @@ class _MapPageState extends State<MapPage> {
                             zoom: 12,
                           ),
                           markers: markersToShow,
-                          clusterManagers: clusterManagerToShow != null 
-                              ? {clusterManagerToShow} 
-                              : {},
+                          clusterManagers: {
+                            if (clusterManagerToShow != null) clusterManagerToShow,
+                            state.companyClusterManager,
+                          }.whereType<ClusterManager>().toSet(),
                           onCameraMove: _onCameraMoveThrottled, 
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
@@ -566,13 +579,43 @@ class _MapPageState extends State<MapPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => BlocProvider<MapBloc>.value(
-      value: mapBloc,
-      child: StationBottomSheet(
-        context: context,
-        stationId: station.id,
-        state: state
+        value: mapBloc,
+        child: StationBottomSheet(
+          context: context,
+          stationId: station.id,
+          state: state
+        ),
       ),
-    ),
+    );
+  }
+
+  void _showCompanyBottomSheet(Company company, MapLoadedState state) {
+    final mapBloc = _blocContext!.read<MapBloc>();
+
+    if (company.location != null) {
+      _mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: company.location!,
+            zoom: 16,
+          ),
+        ),
+      );
+    }
+
+    showModalBottomSheet(
+      context: _blocContext!,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => BlocProvider<MapBloc>.value(
+        value: mapBloc,
+        child: CompanyBottomSheet(
+          company: company,
+          state: state,
+        ),
+      ),
     );
   }
 }

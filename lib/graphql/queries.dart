@@ -456,7 +456,10 @@ static const String getNavigationRouteQuery = r'''
       photo
       company {
         name
-        photo
+        logo_url
+        email
+        url
+        description
       }
     }
   }''';
@@ -560,4 +563,21 @@ static const String getNavigationRouteQuery = r'''
       }
     }
   ''';
+
+  // === Compañías ===
+
+  static const String getPromotedCompanies = r'''
+  query getPromotedCompanies {
+    getPromotedCompanies {
+      location {
+        latitude
+        longitude
+      }
+      url
+      name
+      email
+      description
+      logo_url
+    }
+  }''';
 }

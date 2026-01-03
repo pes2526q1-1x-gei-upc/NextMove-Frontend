@@ -20,12 +20,13 @@ void main() {
     test('should return list of challenges when data provider succeeds', () async {
       final mockData = [
         {
+          'id': '1',
           'company': {
             'name': 'Company 1',
             'email': 'company1@test.com',
             'url': 'https://company1.com',
             'description': 'First test company',
-            'logo': 'https://company1.com/logo.png',
+            'logo_url': 'https://company1.com/logo.png',
           },
           'description': 'Test challenge 1',
           'distance': 10.0,
@@ -35,12 +36,13 @@ void main() {
           'starting_date': '1738368000000',
         },
         {
+          'id': '2',
           'company': {
             'name': 'Company 2',
             'email': 'company2@test.com',
             'url': 'https://company2.com',
             'description': 'Second test company',
-            'logo': null,
+            'logo_url': null,
           },
           'description': 'Test challenge 2',
           'distance': 5.0,

@@ -163,9 +163,9 @@ class CompanyNameAndLogoRow extends StatelessWidget {
     final double companyLogoSize = 24;
     return Row(
       children: [
-        challenge.company.logo != null
+        challenge.company.logoUrl != null
             ? Image.network(
-                challenge.company.logo!,
+                challenge.company.logoUrl!,
                 width: companyLogoSize,
                 height: companyLogoSize,
                 errorBuilder: (context, error, stackTrace) {
