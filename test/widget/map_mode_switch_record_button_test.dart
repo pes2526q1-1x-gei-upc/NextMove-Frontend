@@ -45,14 +45,17 @@ void main() {
     final state = MapLoadedState(
       bikeStations: [],
       evStations: [],
+      promotedCompanies: [],
       currentMode: StationType.bicycle,
       currentMapType: MapType.normal,
       bikeMarkers: {},
       carMarkers: {},
+      companyMarkers: {},
       centerPosition: const LatLng(41.3851, 2.1734),
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: false,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));
@@ -65,14 +68,17 @@ void main() {
     final state = MapLoadedState(
       bikeStations: [],
       evStations: [],
+      promotedCompanies: [],
       currentMode: StationType.electricVehicle,
       currentMapType: MapType.normal,
       bikeMarkers: {},
       carMarkers: {},
+      companyMarkers: {},
       centerPosition: const LatLng(41.3851, 2.1734),
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: false,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));
@@ -85,14 +91,17 @@ void main() {
     final state = MapLoadedState(
       bikeStations: [],
       evStations: [],
+      promotedCompanies: [],
       currentMode: StationType.bicycle,
       currentMapType: MapType.normal,
       bikeMarkers: {},
       carMarkers: {},
+      companyMarkers: {},
       centerPosition: const LatLng(41.3851, 2.1734),
       isSearching: false,
       routePolyline: const Polyline(polylineId: PolylineId(''), points: []),
       isRecordingRoute: true,
+      companyClusterManager: null,
     );
 
     await tester.pumpWidget(buildWidget(state));

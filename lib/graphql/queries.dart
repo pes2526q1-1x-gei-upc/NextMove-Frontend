@@ -307,71 +307,73 @@ class GraphQLQueries {
     } 
   ''';
 
-  static const String getNavigationRouteQuery = r'''
-      query ComputeRoute(
-        $origin: CoordinatesInput!
-        $destination: CoordinatesInput!
-        $travelMode: TravelMode!
-        $routingPreference: RoutingPreference!
+static const String getNavigationRouteQuery = r'''
+  query ComputeRoute(
+    $origin: CoordinatesInput!
+    $destination: CoordinatesInput!
+    $travelMode: TravelMode!
+    $routingPreference: RoutingPreference!
+    $languageCode: String!
+  ) {
+      computeRoute(
+        input: {
+          origin: $origin
+          destination: $destination
+          travelMode: $travelMode
+          routingPreference: $routingPreference
+          languageCode: $languageCode
+        }
       ) {
-          computeRoute(
-            input: {
-              origin: $origin
-              destination: $destination
-              travelMode: $travelMode
-              routingPreference: $routingPreference
+        recommendedRoute {
+          distance
+          distanceMeters
+          duration
+          durationSeconds
+          polyline
+          isEcoFriendly
+          routeLabels
+          startLocation {
+            latitude
+            longitude
+          }
+          endLocation {
+            latitude
+            longitude
+          }
+          viewport {
+            low {
+              latitude
+              longitude
             }
-          ) {
-            recommendedRoute {
-              distance
-              distanceMeters
-              duration
-              durationSeconds
-              polyline
-              isEcoFriendly
-              routeLabels
-              startLocation {
-                latitude
-                longitude
-              }
-              endLocation {
-                latitude
-                longitude
-              }
-              viewport {
-                low {
-                  latitude
-                  longitude
-                }
-                high {
-                  latitude
-                  longitude
-                }
-              }
-              travelAdvisory {
-                hasTollRoads
-                estimatedTollPrice
-                fuelConsumption
-              }
-              steps {
-                instruction
-                distance
-                distanceMeters
-                duration
-                durationSeconds
-                startLocation {
-                  latitude
-                  longitude
-                }
-                endLocation {
-                  latitude
-                  longitude
-                }
-                polyline
-              }
+            high {
+              latitude
+              longitude
             }
           }
-        }''';
+          travelAdvisory {
+            hasTollRoads
+            estimatedTollPrice
+            fuelConsumption
+          }
+          steps {
+            instruction
+            distance
+            distanceMeters
+            duration
+            durationSeconds
+            startLocation {
+              latitude
+              longitude
+            }
+            endLocation {
+              latitude
+              longitude
+            }
+            polyline
+          }
+        }
+      }
+    }''';
   static const String addFavStation = r'''
     mutation addFavStation($stationId: String!, $stationType: String!) {
       addFavStation(station_id: $stationId, type: $stationType)
@@ -390,6 +392,7 @@ class GraphQLQueries {
   query getRanking($metric: String!) {
     ranking(metric: $metric) {
       email
+      nickname
       num_rutas
       km_recorridos
       elevacion_positiva
@@ -453,7 +456,10 @@ class GraphQLQueries {
       photo
       company {
         name
-        photo
+        logo_url
+        email
+        url
+        description
       }
     }
   }''';
@@ -468,6 +474,13 @@ class GraphQLQueries {
   static const String enrollInChallenge = r'''
   mutation enrollInChallenge($challengeId: String!) {
     enrollChallenge(challenge_id: $challengeId)
+  }''';
+
+  static const String getCompletedChallenges = r'''
+  query getCompletedChallenges {
+    getTrophies {
+      name
+    }
   }''';
 
   static const String getFavCarStations = r'''
@@ -557,4 +570,21 @@ class GraphQLQueries {
       }
     }
   ''';
+
+  // === Compañías ===
+
+  static const String getPromotedCompanies = r'''
+  query getPromotedCompanies {
+    getPromotedCompanies {
+      location {
+        latitude
+        longitude
+      }
+      url
+      name
+      email
+      description
+      logo_url
+    }
+  }''';
 }

@@ -1,4 +1,5 @@
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/trophy.dart';
 
 class Challenge {
   final String id;
@@ -12,6 +13,8 @@ class Challenge {
   final bool isEnrolled;
   final String? photo;
 
+  final Trophy trophy;
+
   Challenge({
     required this.id,
     required this.name,
@@ -23,7 +26,7 @@ class Challenge {
     required this.endingDate,
     required this.isEnrolled,
     this.photo,
-  });
+  }) : trophy = Trophy.fromChallengeName(name);
 
   factory Challenge.fromJson(
     Map<String, dynamic> json,
@@ -43,6 +46,7 @@ class Challenge {
         int.parse(json['ending_date'] as String),
       ),
       isEnrolled: enrolledChallengesNames.contains(json['name'] as String),
+      photo: json['photo'] as String?,
     );
   }
 

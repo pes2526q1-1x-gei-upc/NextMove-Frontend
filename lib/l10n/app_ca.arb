@@ -285,6 +285,8 @@
             }
         }
     },
+    "arrival": "Arribada",
+    "enxmet": "En",
     "shareRouteStatisticsMessage": "He enregistrat una ruta amb bicicleta utilitzant NextMove! Mira les meves estadístiques i descarrega l'aplicació per competir amb mi i la resta de la comunitat.",
     "errorAddingToCalendar": "S'ha produït un error en afegir el repte al calendari.",
     "social": "Social",
@@ -422,11 +424,9 @@
     "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
     "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
     "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir",
-    
     "routeSavedSuccessfully": "Ruta desada correctament",
     "backToMap": "Tornar al mapa",
     "noRouteDataAvailable": "No hi ha dades de ruta disponibles",
-    
     "validationMinPoints": "La ruta ha de tenir almenys {count} punts",
     "@validationMinPoints": {
         "placeholders": {
@@ -447,7 +447,7 @@
     },
     "validationSuspiciousGPS": "Patró de GPS sospitós detectat",
     "validationImpossibleMovements": "Moviments impossibles detectats",
-    "validationMaxSpeedImpossible": "Velocitat màxima impossible"
-
-
+    "validationMaxSpeedImpossible": "Velocitat màxima impossible",
+    "trophies": "Trofeus",
+    "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0"
 }

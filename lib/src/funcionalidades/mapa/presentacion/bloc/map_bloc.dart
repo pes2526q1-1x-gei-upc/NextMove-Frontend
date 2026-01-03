@@ -18,6 +18,9 @@ import 'package:nextmove_app/src/shared/domain/route_input.dart';
 import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:http/http.dart' as http;
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -34,7 +37,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final SearchHistoryService searchHistoryService;
   final NavigationRouteRepository navigationRouteRepository;
   final StationsCache stationsCache;
+  final PromotedCompaniesRepository promotedCompaniesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
+  final Function(Company, MapLoadedState) onCompanyMarkerTapped;
 
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -64,7 +69,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.navigationRouteRepository,
     required this.searchHistoryService,
     required this.stationsCache,
+    required this.promotedCompaniesRepository,
     required this.onMarkerTapped,
+    required this.onCompanyMarkerTapped,
     StationType? initialMode,
   }) : _initialMode = initialMode,
        super(const MapInitialState()) {
@@ -84,7 +91,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ShowRouteToStationEvent>(_onShowRouteToStation);
     on<CancelNavigationEvent>(_onCancelNavigation);
     on<ResetStatisticsNavigationEvent>(_onResetStatisticsNavigation);
-
+    on<StartTurnByTurnNavigationEvent>(_onStartTurnByTurnNavigation);
+    on<StopTurnByTurnNavigationEvent>(_onStopTurnByTurnNavigation);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -95,10 +103,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(const MapLoadingState());
 
     try {
-      // Cargar estaciones en paralelo
+      // Cargar estaciones y empresas promocionadas en paralelo
       final results = await Future.wait([
         stationRepository.getAllBicycleStationDetails(),
         stationRepository.getAllEVStationDetails(),
+        promotedCompaniesRepository.getPromotedCompanies(),
       ]);
 
       final bikeStations = results[0].fold(
@@ -113,10 +122,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         ),
         (stations) => stations as List<EVStationDetails>? ?? [],
       );
+      final promotedCompanies = results[2].fold(
+        (failure) => throw Exception(
+          'Error cargando empresas promocionadas: ${failure.message}',
+        ),
+        (companies) => companies as List<Company>? ?? [],
+      );
+
+      final companyIcons = await _loadCompanyIcons(promotedCompanies);
 
       // Crear ClusterManagerIds
       final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
       final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+      final companyClusterManagerId = ClusterManagerId('company_cluster_manager');
 
       // Crear ClusterManagers
       final bikeClusterManager = ClusterManager(
@@ -137,6 +155,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       );
 
+      final companyClusterManager = ClusterManager(
+        clusterManagerId: companyClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟠 Cluster de empresas tapped: ${cluster.count} empresas');
+          }
+        },
+      );
+
       bikeIcon = await _getBikeCustomIcon();
       await _loadEvCustomIcons();
 
@@ -151,6 +178,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evStations,
         evClusterManagerId,
       );
+
+      final companyMarkers = _buildMarkersForCompanies(promotedCompanies, companyClusterManagerId, companyIcons);
 
       // Cargar búsquedas recientes guardadas
       final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
@@ -174,11 +203,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
+          promotedCompanies: promotedCompanies,
           userLocation: null,
           currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
+          companyMarkers: companyMarkers,
           centerPosition: _bcnCenter,
           searchQuery: null,
           searchResults: [],
@@ -189,6 +220,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           decodedPolyline: null,
           bikeClusterManager: bikeClusterManager,
           evClusterManager: evClusterManager,
+          companyClusterManager: companyClusterManager,
         ),
       );
 
@@ -341,6 +373,64 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         );
       }
 
+      // Turn-by-turn navigation logic
+      if (currentState.isTurnByTurnActive && 
+          currentState.navigationRoute != null && 
+          currentState.currentStepIndex != null) {
+        final route = currentState.navigationRoute!;
+        final currentStepIndex = currentState.currentStepIndex!;
+        
+        if (currentStepIndex < route.steps.length) {
+          final currentStep = route.steps[currentStepIndex];
+          
+          // Calculate distance to end of current step
+          if (currentStep.endLocation != null) {
+            final distanceToStepEnd = Geolocator.distanceBetween(
+              newLocation.latitude,
+              newLocation.longitude,
+              currentStep.endLocation!.latitude,
+              currentStep.endLocation!.longitude,
+            ).round();
+            
+            // Check if we should advance to next step (within 30 meters)
+            if (distanceToStepEnd < 30 && currentStepIndex < route.steps.length - 1) {
+              // Advance to next step
+              if (kDebugMode) {
+                print('Advancing to step ${currentStepIndex + 1}');
+              }
+              emit(currentState.copyWith(
+                userLocation: newLocation,
+                currentStepIndex: currentStepIndex + 1,
+                distanceToNextStepMeters: 0,
+                userHeading: event.heading >= 0 ? event.heading : null,
+              ));
+              return;
+            } else if (distanceToStepEnd < 20 && currentStepIndex == route.steps.length - 1) {
+              // Arrived at destination
+              if (kDebugMode) {
+                print('Arrived at destination!');
+              }
+              emit(currentState.copyWith(
+                userLocation: newLocation,
+                isTurnByTurnActive: false,
+                currentStepIndex: null,
+                distanceToNextStepMeters: null,
+                userHeading: null,
+              ));
+              return;
+            }
+            
+            // Update distance to next step and heading
+            emit(currentState.copyWith(
+              userLocation: newLocation,
+              distanceToNextStepMeters: distanceToStepEnd,
+              userHeading: event.heading >= 0 ? event.heading : null,
+            ));
+            return;
+          }
+        }
+      }
+
       emit(currentState.copyWith(userLocation: newLocation));
     }
   }
@@ -476,6 +566,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                   latitude: pos.latitude,
                   longitude: pos.longitude,
                   altitude: pos.altitude,
+                  heading: pos.heading,
                 ),
               );
             }
@@ -501,6 +592,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           latitude: currentPosition.latitude,
           longitude: currentPosition.longitude,
           altitude: currentPosition.altitude,
+          heading: currentPosition.heading,
         ),
       );
     } catch (e) {
@@ -622,6 +714,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
 
     return {};
+  }
+
+  Set<Marker> _buildMarkersForCompanies(List<Company> companies, ClusterManagerId clusterManagerId, Map<String, BitmapDescriptor> companyIcons) {
+    return companies
+        .where((company) => company.location != null)
+        .map((company) {
+          return Marker(
+            markerId: MarkerId('company_${company.name}'),
+            position: company.location!,
+            icon: companyIcons[company.name] ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            clusterManagerId: clusterManagerId,
+            onTap: () => onCompanyMarkerTapped(company, state as MapLoadedState),
+          );
+        })
+        .toSet();
   }
 
   /// Handler: Iniciar grabación de ruta
@@ -810,6 +917,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         destination: LatLng(event.station.latitude!, event.station.longitude!),  
         mode: currentState.currentMode == StationType.bicycle ? TravelModeEnum.BICYCLE : TravelModeEnum.DRIVE, 
         routingPreference: RoutingPreferenceEnum.TRAFFIC_AWARE,
+        languageCode: event.languageCode,
       );
 
       try{
@@ -879,8 +987,89 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         navigationRoute: null,
         decodedPolyline: Polyline(polylineId: PolylineId('no_route')),
         routeViewport: null,
+        isTurnByTurnActive: false,
+        currentStepIndex: null,
+        distanceToNextStepMeters: null,
       ));
     }
+  }
+
+  /// Handler: Iniciar navegación turn-by-turn
+  void _onStartTurnByTurnNavigation(
+    StartTurnByTurnNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState && 
+        currentState.navigationRoute != null &&
+        currentState.navigationRoute!.steps.isNotEmpty) {
+      if (kDebugMode) {
+        print('Starting turn-by-turn navigation with ${currentState.navigationRoute!.steps.length} steps');
+      }
+      
+      // Calculate initial distance to first step
+      int? initialDistance;
+      if (currentState.userLocation != null && 
+          currentState.navigationRoute!.steps[0].endLocation != null) {
+        initialDistance = Geolocator.distanceBetween(
+          currentState.userLocation!.latitude,
+          currentState.userLocation!.longitude,
+          currentState.navigationRoute!.steps[0].endLocation!.latitude,
+          currentState.navigationRoute!.steps[0].endLocation!.longitude,
+        ).round();
+      }
+      
+      emit(currentState.copyWith(
+        isTurnByTurnActive: true,
+        currentStepIndex: 0,
+        distanceToNextStepMeters: initialDistance ?? 0,
+      ));
+    }
+  }
+
+  /// Handler: Detener navegación turn-by-turn
+  void _onStopTurnByTurnNavigation(
+    StopTurnByTurnNavigationEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      if (kDebugMode) {
+        print('Stopping turn-by-turn navigation');
+      }
+      
+      emit(currentState.copyWith(
+        isTurnByTurnActive: false,
+        currentStepIndex: null,
+        distanceToNextStepMeters: null,
+      ));
+    }
+  }
+
+  Future<Map<String, BitmapDescriptor>> _loadCompanyIcons(List<Company> companies) async {
+    final icons = <String, BitmapDescriptor>{};
+    for (final company in companies) {
+      if (company.logoUrl != null && company.logoUrl!.isNotEmpty) {
+        try {
+          final response = await http.get(Uri.parse(company.logoUrl!));
+          if (response.statusCode == 200) {
+            final bytes = response.bodyBytes;
+            final codec = await ui.instantiateImageCodec(bytes, targetWidth: 40, targetHeight: 40);
+            final frame = await codec.getNextFrame();
+            final byteData = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+            if (byteData != null) {
+              final resizedBytes = byteData.buffer.asUint8List();
+              icons[company.name] = BitmapDescriptor.bytes(resizedBytes);
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error loading logo for ${company.name}: $e');
+          }
+        }
+      }
+    }
+    return icons;
   }
 
   @override
@@ -899,3 +1088,4 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 }
+
