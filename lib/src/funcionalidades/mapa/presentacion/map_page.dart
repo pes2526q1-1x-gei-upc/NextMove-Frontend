@@ -63,7 +63,7 @@ class _MapPageState extends State<MapPage> {
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
-  bool _wasTurnByTurnActive = false;
+  bool _wasRecordingRoute = false;
   bool _hasShownCompletionScreen = false;
 
   
@@ -284,13 +284,15 @@ class _MapPageState extends State<MapPage> {
               _setZoomToViewport(state.routeViewport!); 
             }
             
-            // Detectar cuando la navegación termina
+            // Detectar cuando se guarda exitosamente una ruta grabada
             if (state is MapLoadedState) {
-              // Si la navegación estaba activa y ahora no lo está, mostrar pantalla de finalización
-              if (_wasTurnByTurnActive && 
-                  !state.isTurnByTurnActive && 
+              // Si estaba grabando y ahora no está grabando, y no hay errores, y tiene suficientes puntos
+              if (_wasRecordingRoute && 
+                  !state.isRecordingRoute && 
                   !_hasShownCompletionScreen &&
-                  state.isNavigationMode) {
+                  state.snackbarError == null &&
+                  state.recordedTrack != null &&
+                  state.recordedTrack!.points.length >= 2) {
                 _hasShownCompletionScreen = true;
                 // Esperar un momento antes de mostrar la pantalla para que la transición sea suave
                 Future.delayed(const Duration(milliseconds: 500), () {
@@ -302,8 +304,6 @@ class _MapPageState extends State<MapPage> {
                       builder: (dialogContext) => NavigationCompletedScreen(
                         onClose: () {
                           Navigator.of(dialogContext).pop();
-                          // Cancelar la navegación después de cerrar
-                          context.read<MapBloc>().add(CancelNavigationEvent());
                           _hasShownCompletionScreen = false;
                         },
                         currentMode: state.currentMode,
@@ -313,13 +313,12 @@ class _MapPageState extends State<MapPage> {
                 });
               }
               
-              // Actualizar el estado de navegación
-              _wasTurnByTurnActive = state.isTurnByTurnActive;
+              // Actualizar el estado de grabación
+              _wasRecordingRoute = state.isRecordingRoute;
               
-              // Resetear el flag cuando se cancela la navegación manualmente
-              if (!state.isNavigationMode) {
+              // Resetear el flag cuando se inicia una nueva grabación
+              if (state.isRecordingRoute) {
                 _hasShownCompletionScreen = false;
-                _wasTurnByTurnActive = false;
               }
             }
             

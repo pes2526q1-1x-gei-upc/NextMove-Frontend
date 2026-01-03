@@ -449,5 +449,7 @@
     "bikePhotoRejected": "No se detectó una bicicleta válida en la imagen. Por favor, intenta de nuevo.",
     "bikeDetectionError": "Error al validar la imagen. Por favor, intenta de nuevo.",
     "valid": "Válida",
-    "invalid": "Inválida"
+    "invalid": "Inválida",
+    "recordCompleted": "Grabación de ruta finalizada",
+    "recordCompletedMessage": "Grabación de ruta finalizada con éxito"
 }

@@ -447,5 +447,7 @@
     "bikePhotoRejected": "No valid bike detected in the image. Please try again.",
     "bikeDetectionError": "Error validating image. Please try again.",
     "valid": "Valid",
-    "invalid": "Invalid"
+    "invalid": "Invalid",
+    "recordCompleted": "Route recording completed",
+    "recordCompletedMessage": "Route recording successfully completed"
 }

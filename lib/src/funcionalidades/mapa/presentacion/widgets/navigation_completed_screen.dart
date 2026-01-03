@@ -158,7 +158,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                     
                     // Título
                     Text(
-                      l10n.routeCompleted ?? 'Recorrido finalizado',
+                      l10n.recordCompleted!,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -172,7 +172,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                     
                     // Mensaje descriptivo
                     Text(
-                      l10n.routeCompletedMessage ?? 'Has llegado a tu destino',
+                      l10n.recordCompletedMessage!,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
