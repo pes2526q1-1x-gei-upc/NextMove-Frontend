@@ -39,7 +39,7 @@ class BikeDetectionData {
   factory BikeDetectionData.fromJson(Map<String, dynamic> json) {
     return BikeDetectionData(
       hasBike: json['hasBike'] ?? false,
-      confidence: (json['confidence'] ?? 0).toDouble(),
+      confidence: (json['confidence'] ?? 0) as double,
       count: json['count'] ?? 0,
       items: json['items'] != null
           ? (json['items'] as List)
@@ -54,7 +54,7 @@ class DetectedItem {
   final int classValue;
   final String className;
   final double confidence;
-  final List<int> bbox;
+  final List<double> bbox;
 
   DetectedItem({
     required this.classValue,
@@ -69,7 +69,7 @@ class DetectedItem {
       className: json['class_name'] ?? '',
       confidence: (json['confidence'] ?? 0).toDouble(),
       bbox: json['bbox'] != null
-          ? List<int>.from(json['bbox'])
+          ? List<double>.from(json['bbox'])
           : [],
     );
   }

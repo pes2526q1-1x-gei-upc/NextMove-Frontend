@@ -83,7 +83,7 @@ class BikeDetectionProvider {
         }
 
         // Validar: confidence > 75% y hasBike = true
-        return hasBike && confidence > 75.0;
+        return hasBike && confidence > 0.75;
       } else {
         final errorBody = response.body;
         if (kDebugMode) {
