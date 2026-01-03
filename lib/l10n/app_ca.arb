@@ -423,5 +423,8 @@
     "more": "más",
     "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
     "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
-    "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir"
+    "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir",
+    "routeCompleted": "Recorregut finalitzat",
+    "routeCompletedMessage": "Has arribat al teu destí",
+    "close": "Tancar"
 }

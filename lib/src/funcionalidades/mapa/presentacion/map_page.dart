@@ -14,6 +14,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/turn_instruction_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_progress_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_completed_screen.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -62,6 +63,8 @@ class _MapPageState extends State<MapPage> {
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
+  bool _wasTurnByTurnActive = false;
+  bool _hasShownCompletionScreen = false;
 
   
   StreamSubscription<Position>? _positionStream;
@@ -279,6 +282,44 @@ class _MapPageState extends State<MapPage> {
             }
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
+            }
+            
+            // Detectar cuando la navegación termina
+            if (state is MapLoadedState) {
+              // Si la navegación estaba activa y ahora no lo está, mostrar pantalla de finalización
+              if (_wasTurnByTurnActive && 
+                  !state.isTurnByTurnActive && 
+                  !_hasShownCompletionScreen &&
+                  state.isNavigationMode) {
+                _hasShownCompletionScreen = true;
+                // Esperar un momento antes de mostrar la pantalla para que la transición sea suave
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  if (mounted && context.mounted) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierColor: Colors.black.withValues(alpha: 0.7),
+                      builder: (dialogContext) => NavigationCompletedScreen(
+                        onClose: () {
+                          Navigator.of(dialogContext).pop();
+                          // Cancelar la navegación después de cerrar
+                          context.read<MapBloc>().add(CancelNavigationEvent());
+                          _hasShownCompletionScreen = false;
+                        },
+                      ),
+                    );
+                  }
+                });
+              }
+              
+              // Actualizar el estado de navegación
+              _wasTurnByTurnActive = state.isTurnByTurnActive;
+              
+              // Resetear el flag cuando se cancela la navegación manualmente
+              if (!state.isNavigationMode) {
+                _hasShownCompletionScreen = false;
+                _wasTurnByTurnActive = false;
+              }
             }
             
             // Auto-follow camera during turn-by-turn navigation
