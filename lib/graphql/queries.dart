@@ -560,4 +560,20 @@ static const String getNavigationRouteQuery = r'''
       }
     }
   ''';
+
+  // === Compañías ===
+
+  static const String getPromotedCompanies = r'''
+  query getPromotedCompanies {
+    getFirms {
+      ubicacion {
+        latitude
+        longitude
+      }
+      url
+      nombre
+      email
+      descripcion
+    }
+  }''';
 }
