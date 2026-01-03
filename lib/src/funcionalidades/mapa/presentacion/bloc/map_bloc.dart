@@ -20,6 +20,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:http/http.dart' as http;
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -125,6 +126,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         (companies) => companies as List<Company>? ?? [],
       );
 
+      final companyIcons = await _loadCompanyIcons(promotedCompanies);
+
       // Crear ClusterManagerIds
       final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
       final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
@@ -173,7 +176,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evClusterManagerId,
       );
 
-      final companyMarkers = _buildMarkersForCompanies(promotedCompanies, companyClusterManagerId);
+      final companyMarkers = _buildMarkersForCompanies(promotedCompanies, companyClusterManagerId, companyIcons);
 
       // Cargar búsquedas recientes guardadas
       final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
@@ -710,14 +713,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return {};
   }
 
-  Set<Marker> _buildMarkersForCompanies(List<Company> companies, ClusterManagerId clusterManagerId) {
+  Set<Marker> _buildMarkersForCompanies(List<Company> companies, ClusterManagerId clusterManagerId, Map<String, BitmapDescriptor> companyIcons) {
     return companies
         .where((company) => company.location != null)
         .map((company) {
           return Marker(
             markerId: MarkerId('company_${company.name}'),
             position: company.location!,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            icon: companyIcons[company.name] ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
             clusterManagerId: clusterManagerId,
             onTap: () {
               // TODO: Handle company marker tap - maybe show company info
@@ -1041,6 +1044,32 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         distanceToNextStepMeters: null,
       ));
     }
+  }
+
+  Future<Map<String, BitmapDescriptor>> _loadCompanyIcons(List<Company> companies) async {
+    final icons = <String, BitmapDescriptor>{};
+    for (final company in companies) {
+      if (company.logoUrl != null && company.logoUrl!.isNotEmpty) {
+        try {
+          final response = await http.get(Uri.parse(company.logoUrl!));
+          if (response.statusCode == 200) {
+            final bytes = response.bodyBytes;
+            final codec = await ui.instantiateImageCodec(bytes, targetWidth: 40, targetHeight: 40);
+            final frame = await codec.getNextFrame();
+            final byteData = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+            if (byteData != null) {
+              final resizedBytes = byteData.buffer.asUint8List();
+              icons[company.name] = BitmapDescriptor.bytes(resizedBytes);
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error loading logo for ${company.name}: $e');
+          }
+        }
+      }
+    }
+    return icons;
   }
 
   @override

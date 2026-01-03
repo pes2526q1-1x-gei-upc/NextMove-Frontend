@@ -5,7 +5,7 @@ class Company {
   final String? email;
   final String? url;
   final String? description;
-  final String? logo;
+  final String? logoUrl;
   final LatLng? location;
 
   Company({
@@ -13,7 +13,7 @@ class Company {
     required this.email,
     required this.url,
     this.description,
-    this.logo,
+    this.logoUrl,
     this.location,
   });
 
@@ -23,7 +23,7 @@ class Company {
       email: json['email'] as String?,
       url: json['url'] as String?,
       description: json['description'] as String?,
-      logo: json['logo'] as String?,
+      logoUrl: json['logo_url'] as String?,
       location: json['location'] != null
           ? LatLng(
               json['location']['latitude'] as double,

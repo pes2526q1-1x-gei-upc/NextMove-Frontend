@@ -574,6 +574,7 @@ static const String getNavigationRouteQuery = r'''
       nombre
       email
       descripcion
+      logo_url
     }
   }''';
 }

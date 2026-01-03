@@ -205,10 +205,10 @@ class ChallengeDetailsPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                if (challenge.company.logo != null)
+                if (challenge.company.logoUrl != null)
                   CircleAvatar(
                     radius: 24,
-                    backgroundImage: NetworkImage(challenge.company.logo!),
+                    backgroundImage: NetworkImage(challenge.company.logoUrl!),
                     onBackgroundImageError: (_, __) =>
                         const Icon(Icons.business),
                   )
