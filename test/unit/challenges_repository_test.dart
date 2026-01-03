@@ -29,7 +29,7 @@ void main() {
             'logo_url': 'https://company1.com/logo.png',
           },
           'description': 'Test challenge 1',
-          'distance': 10.0,
+          'distance': 10000.0,
           'ending_date': '1740009600000',
           'name': 'Challenge 1',
           'points': 100,
@@ -45,16 +45,14 @@ void main() {
             'logo_url': null,
           },
           'description': 'Test challenge 2',
-          'distance': 5.0,
+          'distance': 5000.0,
           'ending_date': '1740009600000',
           'name': 'Challenge 2',
           'points': 50,
           'starting_date': '1738368000000',
         },
       ];
-      final mockEnrolledNames = ['Challenge 1'];
       when(() => mockDataProvider.getAllChallenges()).thenAnswer((_) async => mockData);
-      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => mockEnrolledNames);
 
       final result = await repository.getallChallenges();
 
@@ -65,18 +63,14 @@ void main() {
           expect(challenges, isNotNull);
           expect(challenges!.length, 2);
           expect(challenges[0].name, 'Challenge 1');
-          expect(challenges[0].isEnrolled, true);
           expect(challenges[1].name, 'Challenge 2');
-          expect(challenges[1].isEnrolled, false);
         },
       );
       verify(() => mockDataProvider.getAllChallenges()).called(1);
-      verify(() => mockDataProvider.getEnrolledChallengesNames()).called(1);
     });
 
     test('should return ServerFailure when ServerException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ServerException('Server error'));
-      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       final result = await repository.getallChallenges();
 
@@ -89,7 +83,6 @@ void main() {
 
     test('should return ConnectionFailure when ConnectionException is thrown', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(ConnectionException());
-      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       final result = await repository.getallChallenges();
 
@@ -102,9 +95,71 @@ void main() {
 
     test('should throw UnknownFailure for other exceptions', () async {
       when(() => mockDataProvider.getAllChallenges()).thenThrow(Exception('Unknown error'));
-      when(() => mockDataProvider.getEnrolledChallengesNames()).thenAnswer((_) async => []);
 
       expect(() => repository.getallChallenges(), throwsA(isA<UnknownFailure>()));
+    });
+
+    test('should return list of enrolled challenges when data provider succeeds', () async {
+      final mockEnrolledData = [
+        {
+          'id': '1',
+          'name': 'Challenge 1',
+          'company': {
+            'name': 'Company 1',
+            'logo_url': 'https://company1.com/logo.png',
+          },
+          'description': 'Test challenge 1',
+          'distance': 10000.0,
+          'points': 100,
+          'starting_date': '1738368000000',
+          'ending_date': '1740009600000',
+          'photo': null,
+          'completed': 0,
+          'total_distance': 10000.0,
+          'current_distance': 5000.0,
+        },
+      ];
+      when(() => mockDataProvider.getEnrolledChallenge()).thenAnswer((_) async => mockEnrolledData);
+
+      final result = await repository.getEnrolledChallenge();
+
+      expect(result.isRight(), true);
+      result.fold(
+        (failure) => fail('Expected Right, got Left'),
+        (enrolledChallenge) {
+          expect(enrolledChallenge, isNotNull);
+          expect(enrolledChallenge!.name, 'Challenge 1');
+          expect(enrolledChallenge.completed, 0);
+          expect(enrolledChallenge.currentDistance, 5.0); // 5000.0 meters converted to kilometers
+          expect(enrolledChallenge.totalDistance, 10.0); // 10000.0 meters converted to kilometers
+        },
+      );
+      verify(() => mockDataProvider.getEnrolledChallenge()).called(1);
+    });
+
+    test('should return null when data provider returns empty list', () async {
+      when(() => mockDataProvider.getEnrolledChallenge()).thenAnswer((_) async => []);
+
+      final result = await repository.getEnrolledChallenge();
+
+      expect(result.isRight(), true);
+      result.fold(
+        (failure) => fail('Expected Right, got Left'),
+        (enrolledChallenge) => expect(enrolledChallenge, isNull),
+      );
+      verify(() => mockDataProvider.getEnrolledChallenge()).called(1);
+    });
+
+    test('should return ServerFailure when getEnrolledChallenges throws ServerException', () async {
+      when(() => mockDataProvider.getEnrolledChallenge()).thenThrow(ServerException('Server error'));
+
+      final result = await repository.getEnrolledChallenge();
+
+      expect(result.isLeft(), true);
+      result.fold(
+        (failure) => expect(failure, isA<ServerFailure>()),
+        (enrolledChallenges) => fail('Expected Left, got Right'),
+      );
     });
   });
 }

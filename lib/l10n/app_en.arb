@@ -262,6 +262,7 @@
     "minutes": "minutes",
     "permanent": "Permanent",
     "challenges": "Challenges",
+    "progress": "Progress",
     "competition": "Competition",
     "noChallengesAvailable": "No challenges available.",
     "points": "{count, plural, =1{{count} point} other{{count} points}}",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
@@ -15,6 +16,10 @@ class ChallengeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final challengesBloc = context.read<ChallengesBloc>();
+    final currentState = challengesBloc.state as ChallengesLoaded;
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
 
     Text startDate = Text(
       formatDate(challenge.startingDate),
@@ -73,6 +78,13 @@ class ChallengeCard extends StatelessWidget {
                   challenge: challenge,
                   theme: theme,
                 ),
+                if (isThisChallengeEnrolled &&
+                    currentState.enrolledChallenge != null)
+                  ChallengeProgressIndicator(
+                    enrolledChallenge: currentState.enrolledChallenge!,
+                    theme: theme,
+                    l10n: l10n,
+                  ),
                 const SizedBox(height: 12),
                 StartAndFinishDates(
                   theme: theme,
@@ -105,8 +117,11 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
 
-    final bool isEnrolledToAChallenge =
-        (challengesBloc.state as ChallengesLoaded).isEnrolled;
+    final currentState = challengesBloc.state as ChallengesLoaded;
+    final bool isEnrolledToAChallenge = currentState.hasEnrolledChallenge;
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
+
     return Row(
       children: [
         Expanded(
@@ -122,22 +137,22 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+            ((isEnrolledToAChallenge && isThisChallengeEnrolled)))
           ElevatedButton(
-            onPressed: (challenge.isEnrolled)
+            onPressed: (isThisChallengeEnrolled)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: challenge.isEnrolled
+              backgroundColor: isThisChallengeEnrolled
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
             child: Text(
-              challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+              isThisChallengeEnrolled ? l10n.enrolled : l10n.enroll,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: challenge.isEnrolled
+                color: isThisChallengeEnrolled
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),
@@ -266,7 +281,7 @@ class PointsAndDistanceRow extends StatelessWidget {
         Icon(Icons.route, size: 20),
         const SizedBox(width: 8),
         Text(
-          "${challenge.distance.toInt()} km",
+          "${challenge.distance.toStringAsFixed(1)} km",
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -311,6 +326,43 @@ class Photo extends StatelessWidget {
                 ),
               ),
       ),
+    );
+  }
+}
+
+class ChallengeProgressIndicator extends StatelessWidget {
+  const ChallengeProgressIndicator({
+    super.key,
+    required this.enrolledChallenge,
+    required this.theme,
+    required this.l10n,
+  });
+
+  final EnrolledChallenge enrolledChallenge;
+  final ThemeData theme;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final progressPercentage = enrolledChallenge.completed;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        LinearProgressIndicator(
+          value: progressPercentage / 100,
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '${enrolledChallenge.currentDistance.toStringAsFixed(1)} / ${enrolledChallenge.totalDistance.toStringAsFixed(1)} km ($progressPercentage%)',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
     );
   }
 }

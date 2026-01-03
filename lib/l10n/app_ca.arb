@@ -254,6 +254,7 @@
     "minutes": "minuts",
     "permanent": "Permanent",
     "challenges": "Reptes",
+    "progress": "Progrés",
     "competition": "Competició",
     "noChallengesAvailable": "No hi ha reptes disponibles.",
     "points": "{count, plural, =1{{count} punt} other{{count} punts}}",

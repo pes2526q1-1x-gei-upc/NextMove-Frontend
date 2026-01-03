@@ -4,6 +4,7 @@ import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/data/dataproviders/challenges_remote_data_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
 
 class ChallengesRepository {
   final ChallengesRemoteDataProvider challengesRemoteDataProvider;
@@ -15,10 +16,8 @@ class ChallengesRepository {
     try {
       final challengesData = await challengesRemoteDataProvider
           .getAllChallenges();
-      final enrolledChallengesNames =
-          await challengesRemoteDataProvider.getEnrolledChallengesNames() ?? [];
       final List<Challenge>? challengeEntries = challengesData
-          ?.map((entry) => Challenge.fromJson(entry, enrolledChallengesNames))
+          ?.map((entry) => Challenge.fromJson(entry))
           .toList();
       return Right(challengeEntries);
     } on ServerException catch (e) {
@@ -28,6 +27,31 @@ class ChallengesRepository {
     } catch (e) {
       if (kDebugMode) {
         print('UnknownFailure in getChallengesData: $e');
+      }
+      throw UnknownFailure();
+    }
+  }
+
+  Future<Either<Failure, EnrolledChallenge?>> getEnrolledChallenge() async {
+    try {
+      final enrolledChallengeData = await challengesRemoteDataProvider
+          .getEnrolledChallenge();
+      if (enrolledChallengeData == null || enrolledChallengeData.isEmpty) {
+        return const Right(null);
+      }
+      final EnrolledChallenge enrolledChallengeEntry =
+          EnrolledChallenge.fromJson(enrolledChallengeData.first);
+      return Right(enrolledChallengeEntry);
+    } on ServerException catch (e) {
+      if (kDebugMode) {
+        print('ServerException in getEnrolledChallenge: ${e.message}');
+      }
+      return Left(ServerFailure(message: e.message));
+    } on ConnectionException {
+      return Left(ConnectionFailure());
+    } catch (e) {
+      if (kDebugMode) {
+        print('UnknownFailure in getEnrolledChallenges: $e');
       }
       throw UnknownFailure();
     }

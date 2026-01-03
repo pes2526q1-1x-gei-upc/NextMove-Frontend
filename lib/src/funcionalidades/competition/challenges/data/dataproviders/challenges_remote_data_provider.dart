@@ -34,11 +34,11 @@ class ChallengesRemoteDataProvider {
     return data != null ? List<Map<String, dynamic>>.from(data) : null;
   }
 
-  Future<List<String>?> getEnrolledChallengesNames() async {
+  Future<List<Map<String, dynamic>>?> getEnrolledChallenge() async {
     final authHeader = await AuthRemoteDataProvider().authHeader;
 
     final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getEnrolledChallengesNames),
+      document: gql(GraphQLQueries.getEnrolledChallenge),
       context: Context().withEntry(
         HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
       ),
@@ -54,10 +54,10 @@ class ChallengesRemoteDataProvider {
     final List<dynamic>? data = result.data?['getEnrolledChallenges'];
 
     if (kDebugMode) {
-      print('Enrolled Challenges data: $data');
+      print('Enrolled Challenge full data: $data');
     }
 
-    return data?.map((challenge) => challenge['name'] as String).toList();
+    return data != null ? List<Map<String, dynamic>>.from(data) : null;
   }
 
   Future<void> enrollInChallenge(String challengeId) async {
