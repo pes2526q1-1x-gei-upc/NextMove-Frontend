@@ -426,5 +426,13 @@
     "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir",
     "routeCompleted": "Recorregut finalitzat",
     "routeCompletedMessage": "Has arribat al teu destí",
-    "close": "Tancar"
+    "close": "Tancar",
+    "uploadBikePhotoPoints": "Puja una foto de la teva bici i guanya 50 punts extres",
+    "tapToTakePhoto": "Toca per fer una foto",
+    "validatingPhoto": "Validant foto...",
+    "bikePhotoAccepted": "Foto acceptada! Has guanyat 50 punts extres",
+    "bikePhotoRejected": "No s'ha detectat una bicicleta vàlida a la imatge. Si us plau, torna-ho a intentar.",
+    "bikeDetectionError": "Error en validar la imatge. Si us plau, torna-ho a intentar.",
+    "valid": "Vàlida",
+    "invalid": "Invàlida"
 }

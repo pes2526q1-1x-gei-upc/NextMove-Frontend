@@ -439,5 +439,13 @@
     "deleteMessageConfirmation": "Are you sure you want to delete this message? This action cannot be undone.",
     "routeCompleted": "Route completed",
     "routeCompletedMessage": "You have arrived at your destination",
-    "close": "Close"
+    "close": "Close",
+    "uploadBikePhotoPoints": "Upload a photo of your bike and earn 50 extra points",
+    "tapToTakePhoto": "Tap to take a photo",
+    "validatingPhoto": "Validating photo...",
+    "bikePhotoAccepted": "Photo accepted! You have earned 50 extra points",
+    "bikePhotoRejected": "No valid bike detected in the image. Please try again.",
+    "bikeDetectionError": "Error validating image. Please try again.",
+    "valid": "Valid",
+    "invalid": "Invalid"
 }

@@ -306,6 +306,7 @@ class _MapPageState extends State<MapPage> {
                           context.read<MapBloc>().add(CancelNavigationEvent());
                           _hasShownCompletionScreen = false;
                         },
+                        currentMode: state.currentMode,
                       ),
                     );
                   }
