@@ -56,13 +56,13 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+  final GlobalKey _mapKey = GlobalKey();
 
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
   final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
-
   
   StreamSubscription<Position>? _positionStream;
 
@@ -206,9 +206,9 @@ class _MapPageState extends State<MapPage> {
         onMarkerTapped: _showStationBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
-      child: Builder(  // ← AÑADE ESTE Builder
+      child: Builder( 
         builder: (blocContext) {
-          _blocContext = blocContext;  // ← GUARDA el context
+          _blocContext = blocContext;  
           return _buildUI(blocContext);
         },
       ),    
@@ -313,6 +313,7 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         // Widget del mapa 
                         MapWidget(
+                          key: _mapKey,
                           initialCameraPosition: CameraPosition(
                             target: _bcnCenter,
                             zoom: 12,
