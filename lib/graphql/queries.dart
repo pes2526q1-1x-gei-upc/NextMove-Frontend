@@ -456,7 +456,10 @@ static const String getNavigationRouteQuery = r'''
       photo
       company {
         name
-        photo
+        logo_url
+        email
+        url
+        description
       }
     }
   }''';
@@ -471,6 +474,13 @@ static const String getNavigationRouteQuery = r'''
   static const String enrollInChallenge = r'''
   mutation enrollInChallenge($challengeId: String!) {
     enrollChallenge(challenge_id: $challengeId)
+  }''';
+
+  static const String getCompletedChallenges = r'''
+  query getCompletedChallenges {
+    getTrophies {
+      name
+    }
   }''';
 
   static const String getFavCarStations = r'''
@@ -560,4 +570,21 @@ static const String getNavigationRouteQuery = r'''
       }
     }
   ''';
+
+  // === Compañías ===
+
+  static const String getPromotedCompanies = r'''
+  query getPromotedCompanies {
+    getPromotedCompanies {
+      location {
+        latitude
+        longitude
+      }
+      url
+      name
+      email
+      description
+      logo_url
+    }
+  }''';
 }

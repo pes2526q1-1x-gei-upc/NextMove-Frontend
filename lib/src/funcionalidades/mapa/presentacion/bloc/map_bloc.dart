@@ -18,6 +18,9 @@ import 'package:nextmove_app/src/shared/domain/route_input.dart';
 import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:http/http.dart' as http;
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -34,7 +37,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final SearchHistoryService searchHistoryService;
   final NavigationRouteRepository navigationRouteRepository;
   final StationsCache stationsCache;
+  final PromotedCompaniesRepository promotedCompaniesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
+  final Function(Company, MapLoadedState) onCompanyMarkerTapped;
 
   // Stream de ubicación
   StreamSubscription<Position>? _positionStreamSubscription;
@@ -64,7 +69,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.navigationRouteRepository,
     required this.searchHistoryService,
     required this.stationsCache,
+    required this.promotedCompaniesRepository,
     required this.onMarkerTapped,
+    required this.onCompanyMarkerTapped,
     StationType? initialMode,
   }) : _initialMode = initialMode,
        super(const MapInitialState()) {
@@ -95,10 +102,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     emit(const MapLoadingState());
 
     try {
-      // Cargar estaciones en paralelo
+      // Cargar estaciones y empresas promocionadas en paralelo
       final results = await Future.wait([
         stationRepository.getAllBicycleStationDetails(),
         stationRepository.getAllEVStationDetails(),
+        promotedCompaniesRepository.getPromotedCompanies(),
       ]);
 
       final bikeStations = results[0].fold(
@@ -113,10 +121,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         ),
         (stations) => stations as List<EVStationDetails>? ?? [],
       );
+      final promotedCompanies = results[2].fold(
+        (failure) => throw Exception(
+          'Error cargando empresas promocionadas: ${failure.message}',
+        ),
+        (companies) => companies as List<Company>? ?? [],
+      );
+
+      final companyIcons = await _loadCompanyIcons(promotedCompanies);
 
       // Crear ClusterManagerIds
       final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
       final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
+      final companyClusterManagerId = ClusterManagerId('company_cluster_manager');
 
       // Crear ClusterManagers
       final bikeClusterManager = ClusterManager(
@@ -137,6 +154,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         },
       );
 
+      final companyClusterManager = ClusterManager(
+        clusterManagerId: companyClusterManagerId,
+        onClusterTap: (Cluster cluster) {
+          if (kDebugMode) {
+            debugPrint('🟠 Cluster de empresas tapped: ${cluster.count} empresas');
+          }
+        },
+      );
+
       bikeIcon = await _getBikeCustomIcon();
       await _loadEvCustomIcons();
 
@@ -151,6 +177,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         evStations,
         evClusterManagerId,
       );
+
+      final companyMarkers = _buildMarkersForCompanies(promotedCompanies, companyClusterManagerId, companyIcons);
 
       // Cargar búsquedas recientes guardadas
       final savedBikeSearchIds = await searchHistoryService.getBikeSearches();
@@ -174,11 +202,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         MapLoadedState(
           bikeStations: bikeStations,
           evStations: evStations,
+          promotedCompanies: promotedCompanies,
           userLocation: null,
           currentMode: initialMode,
           currentMapType: MapType.normal,
           bikeMarkers: bikeMarkers,
           carMarkers: carMarkers,
+          companyMarkers: companyMarkers,
           centerPosition: _bcnCenter,
           searchQuery: null,
           searchResults: [],
@@ -189,6 +219,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           decodedPolyline: null,
           bikeClusterManager: bikeClusterManager,
           evClusterManager: evClusterManager,
+          companyClusterManager: companyClusterManager,
         ),
       );
 
@@ -684,6 +715,21 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return {};
   }
 
+  Set<Marker> _buildMarkersForCompanies(List<Company> companies, ClusterManagerId clusterManagerId, Map<String, BitmapDescriptor> companyIcons) {
+    return companies
+        .where((company) => company.location != null)
+        .map((company) {
+          return Marker(
+            markerId: MarkerId('company_${company.name}'),
+            position: company.location!,
+            icon: companyIcons[company.name] ?? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+            clusterManagerId: clusterManagerId,
+            onTap: () => onCompanyMarkerTapped(company, state as MapLoadedState),
+          );
+        })
+        .toSet();
+  }
+
   /// Handler: Iniciar grabación de ruta
   void _onStartRouteRecording(
     StartRouteRecordingEvent event,
@@ -995,6 +1041,32 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         distanceToNextStepMeters: null,
       ));
     }
+  }
+
+  Future<Map<String, BitmapDescriptor>> _loadCompanyIcons(List<Company> companies) async {
+    final icons = <String, BitmapDescriptor>{};
+    for (final company in companies) {
+      if (company.logoUrl != null && company.logoUrl!.isNotEmpty) {
+        try {
+          final response = await http.get(Uri.parse(company.logoUrl!));
+          if (response.statusCode == 200) {
+            final bytes = response.bodyBytes;
+            final codec = await ui.instantiateImageCodec(bytes, targetWidth: 40, targetHeight: 40);
+            final frame = await codec.getNextFrame();
+            final byteData = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+            if (byteData != null) {
+              final resizedBytes = byteData.buffer.asUint8List();
+              icons[company.name] = BitmapDescriptor.bytes(resizedBytes);
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error loading logo for ${company.name}: $e');
+          }
+        }
+      }
+    }
+    return icons;
   }
 
   @override

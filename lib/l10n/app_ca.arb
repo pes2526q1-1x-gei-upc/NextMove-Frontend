@@ -436,5 +436,7 @@
     "valid": "Vàlida",
     "invalid": "Invàlida",
     "recordCompleted": "Gravació de ruta finalitzada",
-    "recordCompletedMessage": "Gravació de ruta finalitzada amb èxit"
+    "recordCompletedMessage": "Gravació de ruta finalitzada amb èxit",
+    "trophies": "Trofeus",
+    "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0"
 }

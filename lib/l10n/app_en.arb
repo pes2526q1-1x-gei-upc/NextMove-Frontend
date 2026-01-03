@@ -449,5 +449,7 @@
     "valid": "Valid",
     "invalid": "Invalid",
     "recordCompleted": "Route recording completed",
-    "recordCompletedMessage": "Route recording successfully completed"
+    "recordCompletedMessage": "Route recording successfully completed",
+    "trophies": "Trophies",
+    "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0"
 }

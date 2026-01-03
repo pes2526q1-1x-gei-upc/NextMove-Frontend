@@ -451,5 +451,7 @@
     "valid": "Válida",
     "invalid": "Inválida",
     "recordCompleted": "Grabación de ruta finalizada",
-    "recordCompletedMessage": "Grabación de ruta finalizada con éxito"
+    "recordCompletedMessage": "Grabación de ruta finalizada con éxito",
+    "trophies": "Trofeos",
+    "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0"
 }
