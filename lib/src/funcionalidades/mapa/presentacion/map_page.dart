@@ -70,6 +70,7 @@ class _MapPageState extends State<MapPage> {
     target: LatLng(41.3851, 2.1734), // Barcelona por defecto
     zoom: 12,
   );
+  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
   
   StreamSubscription<Position>? _positionStream;
 
@@ -274,6 +275,9 @@ class _MapPageState extends State<MapPage> {
         setState(() {
           _isSearchBarFocused = false; // Esto debe cerrar las búsquedas recientes
         });
+        // Limpiar la búsqueda si hay texto
+        _searchBarKey.currentState?.clearSearch();
+        context.read<MapBloc>().add(const ClearSearchEvent());
       },
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
@@ -407,7 +411,16 @@ class _MapPageState extends State<MapPage> {
                             if (clusterManagerToShow != null) clusterManagerToShow,
                             state.companyClusterManager,
                           }.whereType<ClusterManager>().toSet(),
-                          onCameraMove: _onCameraMoveThrottled, 
+                          onCameraMove: _onCameraMoveThrottled,
+                          onTap: (LatLng position) {
+                            // Limpiar la búsqueda cuando se toca el mapa
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              _isSearchBarFocused = false;
+                            });
+                            _searchBarKey.currentState?.clearSearch();
+                            context.read<MapBloc>().add(const ClearSearchEvent());
+                          },
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
@@ -519,6 +532,7 @@ class _MapPageState extends State<MapPage> {
                     // Barra de búsqueda
                     if(!state.isNavigationMode)...[
                       SearchBarWidget(
+                        key: _searchBarKey,
                         hintText: AppLocalizations.of(context)!.searchStation,
                         onChanged: (query) {
                           if (kDebugMode) {
