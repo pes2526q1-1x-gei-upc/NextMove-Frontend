@@ -61,14 +61,15 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
-  final GlobalKey _mapKey = GlobalKey();
   PromotedCompaniesRepository promotedCompaniesRepository = PromotedCompaniesRepository();
-
-  //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
-  final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
+  CameraPosition? _cameraPositionBeforeMapTypeChange;
+  CameraPosition _currentCameraPosition = const CameraPosition(
+    target: LatLng(41.3851, 2.1734), // Barcelona por defecto
+    zoom: 12,
+  );
   
   StreamSubscription<Position>? _positionStream;
 
@@ -156,6 +157,9 @@ class _MapPageState extends State<MapPage> {
   }
   
   void _onCameraMoveThrottled(CameraPosition position) {
+    // Guardar la posición actual de la cámara
+    _currentCameraPosition = position;
+    
     final now = DateTime.now();
     
     // Throttling real: solo ejecutar si ha pasado el tiempo mínimo desde la última actualización
@@ -303,6 +307,16 @@ class _MapPageState extends State<MapPage> {
               _setZoomToViewport(state.routeViewport!); 
             }
             
+            // Actualizar la posición inicial cuando cambia el tipo de mapa
+            if (state is MapLoadedState && 
+                _cameraPositionBeforeMapTypeChange != null) {
+              // Actualizar la posición inicial con la posición guardada
+              setState(() {
+                _currentCameraPosition = _cameraPositionBeforeMapTypeChange!;
+                _cameraPositionBeforeMapTypeChange = null; // Limpiar
+              });
+            }
+            
             // Auto-follow camera during turn-by-turn navigation
             if (state is MapLoadedState && 
                 state.isTurnByTurnActive && 
@@ -386,11 +400,8 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         // Widget del mapa 
                         MapWidget(
-                          key: _mapKey,
-                          initialCameraPosition: CameraPosition(
-                            target: _bcnCenter,
-                            zoom: 12,
-                          ),
+                          key: ValueKey('map_${state.currentMapType}'), // Key que cambia con el tipo de mapa
+                          initialCameraPosition: _currentCameraPosition,
                           markers: markersToShow,
                           clusterManagers: {
                             if (clusterManagerToShow != null) clusterManagerToShow,
@@ -499,6 +510,9 @@ class _MapPageState extends State<MapPage> {
                         userLocation: state.userLocation,
                         mapController: _mapController,
                         currentMapType: state.currentMapType,
+                        onBeforeToggleMapType: (position) {
+                          _cameraPositionBeforeMapTypeChange = position;
+                        },
                       ),
                     
 

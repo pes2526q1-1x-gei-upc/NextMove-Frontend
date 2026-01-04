@@ -12,12 +12,14 @@ class MapControlsColumnWidget extends StatelessWidget {
   final LatLng? userLocation;
   final GoogleMapController? mapController;
   final MapType currentMapType;
+  final Function(CameraPosition)? onBeforeToggleMapType;
 
   const MapControlsColumnWidget({
     super.key,
     this.userLocation,
     this.mapController,
     required this.currentMapType,
+    this.onBeforeToggleMapType,
   });
 
   void _centerOnUser() {
@@ -62,8 +64,26 @@ class MapControlsColumnWidget extends StatelessWidget {
             children: [
               // Satellite/Map toggle button
               GestureDetector(
-                onTap: () =>
-                    context.read<MapBloc>().add(const ToggleMapTypeEvent()),
+                onTap: () async {
+                  // Capturar la posición actual de la cámara antes de cambiar el tipo
+                  if (mapController != null && onBeforeToggleMapType != null) {
+                    try {
+                      final visibleRegion = await mapController!.getVisibleRegion();
+                      final zoom = await mapController!.getZoomLevel();
+                      final center = LatLng(
+                        (visibleRegion.northeast.latitude + visibleRegion.southwest.latitude) / 2,
+                        (visibleRegion.northeast.longitude + visibleRegion.southwest.longitude) / 2,
+                      );
+                      onBeforeToggleMapType!(CameraPosition(
+                        target: center,
+                        zoom: zoom,
+                      ));
+                    } catch (e) {
+                      // Si hay error, continuar sin capturar la posición
+                    }
+                  }
+                  context.read<MapBloc>().add(const ToggleMapTypeEvent());
+                },
                 child: Container(
                   height: 50,
                   width: 50,
