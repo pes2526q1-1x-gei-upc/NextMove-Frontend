@@ -462,5 +462,7 @@
                 "example": "50"
             }
         }
-    },    "ok": "D'acord"
+    },
+    "ok": "D'acord",
+    "inactive": "Inactiu"
 }

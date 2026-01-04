@@ -340,6 +340,9 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     final bool isThisChallengeEnrolled =
         currentState.enrolledChallenge?.id == challenge.id;
     final bool isThisChallengeCompleted = challenge.isCompleted;
+    final bool isChallengeActive =
+        challenge.startingDate.isBefore(DateTime.now()) &&
+        challenge.endingDate.isAfter(DateTime.now());
 
     return Row(
       children: [
@@ -359,14 +362,19 @@ class TitleAndJoinButtonRow extends StatelessWidget {
             ((isEnrolledToAChallenge && isThisChallengeEnrolled)) ||
             isThisChallengeCompleted) ...[
           ElevatedButton(
-            onPressed: (isThisChallengeEnrolled || isThisChallengeCompleted)
+            onPressed:
+                (isThisChallengeEnrolled ||
+                    isThisChallengeCompleted ||
+                    !isChallengeActive)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  isThisChallengeEnrolled || isThisChallengeCompleted
+                  isThisChallengeEnrolled ||
+                      isThisChallengeCompleted ||
+                      !isChallengeActive
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
@@ -375,9 +383,14 @@ class TitleAndJoinButtonRow extends StatelessWidget {
                   ? l10n.enrolled
                   : isThisChallengeCompleted
                   ? l10n.completed
-                  : l10n.enroll,
+                  : isChallengeActive
+                  ? l10n.enroll
+                  : l10n.inactive,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isThisChallengeEnrolled || isThisChallengeCompleted
+                color:
+                    isThisChallengeEnrolled ||
+                        isThisChallengeCompleted ||
+                        !isChallengeActive
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),

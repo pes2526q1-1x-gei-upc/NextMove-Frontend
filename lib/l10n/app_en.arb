@@ -477,5 +477,6 @@
             }
         }
     },
-    "ok": "OK"
+    "ok": "OK",
+    "inactive": "Inactive"
 }

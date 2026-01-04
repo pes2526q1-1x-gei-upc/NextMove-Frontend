@@ -479,5 +479,6 @@
             }
         }
     },
-    "ok": "Aceptar"
+    "ok": "Aceptar",
+    "inactive": "Inactivo"
 }
