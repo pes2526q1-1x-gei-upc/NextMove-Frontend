@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/trophy_card.dart';
 
 class TrophiesPage extends StatelessWidget {
   final List<Challenge> challenges;
@@ -43,34 +44,7 @@ class TrophiesPage extends StatelessWidget {
                         ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final challenge = challenges[index];
-                      return Card(
-                        elevation: 4.0,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Image.asset(
-                                challenge.trophy.imagePath,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.broken_image,
-                                    size: 50,
-                                  );
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                challenge.name,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12.0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                      return TrophyCard(challenge: challenge);
                     }, childCount: challenges.length),
                   ),
                 ),
