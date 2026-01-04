@@ -466,5 +466,18 @@
     "validationMaxSpeedImpossible": "Velocidad máxima imposible",
     "trophies": "Trofeos",
     "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0",
-    "completed": "Superado"
+    "completed": "Superado",
+    "challengeCompletedTitle": "¡Reto completado!",
+    "challengeCompletedMessage": "¡Felicidades! Has completado el reto:",
+    "challengeProgressTitle": "¡Progreso en el reto!",
+    "challengeProgressMessage": "¡Buen progreso! Has alcanzado el {percentage}% del reto:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "Aceptar"
 }

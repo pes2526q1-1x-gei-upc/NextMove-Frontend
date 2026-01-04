@@ -140,6 +140,11 @@ class CancelNavigationEvent extends MapEvent {
 class ResetStatisticsNavigationEvent extends MapEvent {
   const ResetStatisticsNavigationEvent();
 }
+
+class ResetChallengeCompletionEvent extends MapEvent {
+  const ResetChallengeCompletionEvent();
+}
+
 /// Evento: iniciar navegación turn-by-turn
 class StartTurnByTurnNavigationEvent extends MapEvent {
   const StartTurnByTurnNavigationEvent();

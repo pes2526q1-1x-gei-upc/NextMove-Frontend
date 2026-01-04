@@ -29,6 +29,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.da
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/data/repositories/challenges_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/company_bottom_sheet_widget.dart';
 
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
@@ -248,6 +249,7 @@ class _MapPageState extends State<MapPage> {
         navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
         promotedCompaniesRepository: promotedCompaniesRepository,
+        challengesRepository: ChallengesRepository(),
         onMarkerTapped: _showStationBottomSheet,
         onCompanyMarkerTapped: _showCompanyBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
@@ -298,7 +300,32 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
               );
-            }            
+            }
+            if (state is MapLoadedState && state.challengeNotificationTitle != null) {
+              final mapBloc = context.read<MapBloc>();
+              final title = state.challengeNotificationTitle == 'challengeCompletedTitle'
+                  ? l10n.challengeCompletedTitle
+                  : l10n.challengeProgressTitle;
+              final message = state.challengeNotificationPercentage == null
+                  ? '${l10n.challengeCompletedMessage} ${state.challengeNotificationName}'
+                  : '${l10n.challengeProgressMessage(state.challengeNotificationPercentage.toString())} ${state.challengeNotificationName}';
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(title),
+                  content: Text(message),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        mapBloc.add(const ResetChallengeCompletionEvent());
+                      },
+                      child: Text(l10n.ok),
+                    ),
+                  ],
+                ),
+              );
+            }
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
             }

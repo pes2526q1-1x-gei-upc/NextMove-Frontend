@@ -464,5 +464,18 @@
     "validationMaxSpeedImpossible": "Maximum speed impossible",
     "trophies": "Trophies",
     "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
-    "completed": "Completed"
+    "completed": "Completed",
+    "challengeCompletedTitle": "Challenge completed!",
+    "challengeCompletedMessage": "Congratulations! You have completed the challenge:",
+    "challengeProgressTitle": "Challenge progress!",
+    "challengeProgressMessage": "Great progress! You have reached {percentage}% of the challenge:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "OK"
 }
