@@ -587,7 +587,7 @@ class _MapPageState extends State<MapPage> {
                                       ? Colors.red.shade700
                                       : Theme.of(context).colorScheme.error)
                                   : (Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.blue.shade700
+                                      ? Colors.green.shade700
                                       : Theme.of(context).colorScheme.primary),
                               borderRadius: BorderRadius.circular(25),
                               boxShadow: [

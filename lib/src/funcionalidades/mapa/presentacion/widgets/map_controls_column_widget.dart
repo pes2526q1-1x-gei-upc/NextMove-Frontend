@@ -54,13 +54,18 @@ class MapControlsColumnWidget extends StatelessWidget {
         }
 
         final isRecording = state.isRecordingRoute;
+        // Si está en modo bici, los botones deben estar más arriba para dejar espacio al botón de play
+        // Si está en modo coche, los botones están en la parte inferior
+        final bottomOffset = (state.currentMode == StationType.bicycle) ? 90.0 : 30.0;
         
         return Positioned(
-          bottom: 100, // Encima del botón de play (30 + 60 + 10 de margen)
+          bottom: bottomOffset,
           right: 16,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: state.currentMode == StationType.bicycle 
+                ? MainAxisAlignment.end 
+                : MainAxisAlignment.start,
             children: [
               // Satellite/Map toggle button
               GestureDetector(
@@ -109,7 +114,9 @@ class MapControlsColumnWidget extends StatelessWidget {
                 child: Container(
                   height: 50,
                   width: 50,
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: state.currentMode == StationType.bicycle
+                      ? const EdgeInsets.only(bottom: 10)
+                      : EdgeInsets.zero,
                   decoration: BoxDecoration(
                     color: cardColor,
                     shape: BoxShape.circle,
