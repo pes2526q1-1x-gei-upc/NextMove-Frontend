@@ -100,9 +100,9 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
 
         String errorMessage;
         if (e is custom_exceptions.ServerException) {
-          errorMessage = e.message ?? 'Error Desconocido';
+          errorMessage = e.message!;
         } else {
-          errorMessage = AppLocalizations.of(context)!.bikeDetectionError,
+          errorMessage = AppLocalizations.of(context)!.bikeDetectionError;
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
