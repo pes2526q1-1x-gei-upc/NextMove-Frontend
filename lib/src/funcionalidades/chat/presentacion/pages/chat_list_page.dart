@@ -391,18 +391,22 @@ class _ChatListPageState extends State<ChatListPage> {
             ),
           ),
         ),
-        floatingActionButton: !_showFriends
-            ? ChatListFab(
-                onPressed: () async {
-                  final result = await Navigator.of(context).push<bool>(
-                    MaterialPageRoute(
-                      builder: (context) => const CreateGroupPage(),
-                    ),
-                  );
-                  if (result == true && mounted) refreshChatList();
-                },
-              )
-            : null,
+        floatingActionButton: AnimatedSwitcher(
+          duration: Duration.zero,
+          child: !_showFriends
+              ? ChatListFab(
+                  key: const ValueKey('create-group-fab'),
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (context) => const CreateGroupPage(),
+                      ),
+                    );
+                    if (result == true && mounted) refreshChatList();
+                  },
+                )
+              : const SizedBox.shrink(key: ValueKey('empty-fab')),
+        ),
       ),
     );
   }
