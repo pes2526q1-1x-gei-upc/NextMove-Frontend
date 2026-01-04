@@ -11,7 +11,7 @@ class TrackRepository {
   final TrackDataProvider trackDataProvider;
   TrackRepository() : trackDataProvider = TrackDataProvider();
   
-  Future<Either<Failure, void>> saveRecordedTrack(RecordedTrack track, AppLocalizations l10n) async {
+  Future<Either<Failure, void>> saveRecordedTrack(RecordedTrack track, AppLocalizations l10n, {bool bikePhoto = false}) async {
     try {
       final validator = TrackValidator(l10n);
       final validationResult = validator.validate(track);
@@ -21,7 +21,7 @@ class TrackRepository {
         return Left(ValidationFailure(message: validationResult.reason!));
       }
 
-      await trackDataProvider.saveRecordedTrack(track);
+      await trackDataProvider.saveRecordedTrack(track, bikePhoto: bikePhoto);
       return Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

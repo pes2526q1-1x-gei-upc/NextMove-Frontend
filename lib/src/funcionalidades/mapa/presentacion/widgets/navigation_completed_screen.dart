@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/core/theme/app_theme.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/dataproviders/bike_detection_provider.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart' as custom_exceptions;
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 
 class NavigationCompletedScreen extends StatefulWidget {
   final VoidCallback onClose;
@@ -27,6 +30,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
   File? _selectedImage;
   bool _isValidating = false;
   bool? _isValidBike; // null = no validado, true = válido, false = inválido
+  bool _hasValidatedPhoto = false; // Para saber si ya se validó una foto (aunque sea inválida)
 
   Future<void> _pickImageFromCamera() async {
     try {
@@ -69,6 +73,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
         setState(() {
           _isValidating = false;
           _isValidBike = isValid;
+          _hasValidatedPhoto = true;
         });
 
         if (isValid) {
@@ -96,6 +101,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
         setState(() {
           _isValidating = false;
           _isValidBike = false;
+          _hasValidatedPhoto = true;
         });
 
         String errorMessage;
@@ -112,6 +118,33 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _saveAndClose() async {
+    if (!mounted) return;
+    
+    try {
+      final l10n = AppLocalizations.of(context)!;
+      final mapBloc = context.read<MapBloc>();
+      
+      // bike_photo se inicializa en false
+      // Solo será true si es modo bici Y la foto fue validada correctamente
+      final isBikeMode = widget.currentMode == StationType.bicycle;
+      final bikePhoto = isBikeMode && _isValidBike == true;
+      
+      // Enviar evento para guardar (se ejecutará de forma asíncrona)
+      mapBloc.add(SaveRecordedTrackEvent(l10n, bikePhoto: bikePhoto));
+    } catch (e) {
+      // Si hay un error, simplemente continuar para cerrar
+      if (mounted) {
+        debugPrint('Error al guardar recorrido: $e');
+      }
+    }
+    
+    // Cerrar la pantalla siempre
+    if (mounted) {
+      widget.onClose();
     }
   }
 
@@ -347,11 +380,11 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                     
                     const SizedBox(height: 48),
                     
-                    // Botón de cerrar
+                    // Botón de cerrar (guarda el recorrido antes de cerrar)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: widget.onClose,
+                        onPressed: _saveAndClose,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.seedColor,
                           foregroundColor: Colors.white,
