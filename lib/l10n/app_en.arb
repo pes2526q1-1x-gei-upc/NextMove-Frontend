@@ -475,5 +475,6 @@
     "validationImpossibleMovements": "Impossible movements detected",
     "validationMaxSpeedImpossible": "Maximum speed impossible",
     "trophies": "Trophies",
-    "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0"
+    "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
+    "favoriteStations": "Favorite Stations"
 }

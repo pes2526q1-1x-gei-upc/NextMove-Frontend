@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
@@ -84,10 +85,12 @@ class _FavoriteStationsListState extends State<FavoriteStationsList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Estaciones Favoritas'),
+          title: Text(l10n.favoriteStations),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -96,7 +99,7 @@ class _FavoriteStationsListState extends State<FavoriteStationsList> {
     if (_errorMessage != null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Estaciones Favoritas'),
+          title: Text(l10n.favoriteStations),
         ),
         body: Center(child: Text('Error: $_errorMessage')),
       );
@@ -113,7 +116,7 @@ class _FavoriteStationsListState extends State<FavoriteStationsList> {
         if (stations.isEmpty) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Estaciones Favoritas'),
+              title: Text(l10n.favoriteStations),
             ),
             body: const Center(
               child: Text('No tienes estaciones favoritas aún.'),
@@ -123,7 +126,7 @@ class _FavoriteStationsListState extends State<FavoriteStationsList> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Estaciones Favoritas'),
+            title: Text(l10n.favoriteStations),
             elevation: 0,
           ),
           body: ListView.separated(
