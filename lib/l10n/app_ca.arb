@@ -425,6 +425,30 @@
     "participantsAddedCorrectly": "Participant(s) afegit(s) correctament",
     "someParticipantsFailed": "Alguns participants no s'han pogut afegir",
     "noUsersAvailableToAdd": "No hi han usuaris disponibles per afegir",
+    "routeSavedSuccessfully": "Ruta desada correctament",
+    "backToMap": "Tornar al mapa",
+    "noRouteDataAvailable": "No hi ha dades de ruta disponibles",
+    "validationMinPoints": "La ruta ha de tenir almenys {count} punts",
+    "@validationMinPoints": {
+        "placeholders": {
+        "count": {
+            "type": "int"
+        }
+        }
+    },
+    "validationNoMovement": "La ruta no mostra moviment significatiu",
+    "validationInconsistentTime": "Dades temporals inconsistents",
+    "validationImpossibleSpeed": "Velocitat impossible detectada: {speed} km/h",
+    "@validationImpossibleSpeed": {
+        "placeholders": {
+        "speed": {
+            "type": "String"
+        }
+        }
+    },
+    "validationSuspiciousGPS": "Patró de GPS sospitós detectat",
+    "validationImpossibleMovements": "Moviments impossibles detectats",
+    "validationMaxSpeedImpossible": "Velocitat màxima impossible",
     "trophies": "Trofeus",
     "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0",
     "completed": "Superat"

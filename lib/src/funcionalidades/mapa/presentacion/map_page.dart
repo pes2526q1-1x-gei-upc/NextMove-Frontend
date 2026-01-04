@@ -13,6 +13,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/saved_track_statistics_page.dart';
+
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/turn_instruction_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_progress_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
@@ -59,6 +61,7 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
+  final GlobalKey _mapKey = GlobalKey();
   PromotedCompaniesRepository promotedCompaniesRepository = PromotedCompaniesRepository();
 
   //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
@@ -66,7 +69,6 @@ class _MapPageState extends State<MapPage> {
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
-
   
   StreamSubscription<Position>? _positionStream;
 
@@ -250,9 +252,9 @@ class _MapPageState extends State<MapPage> {
         onCompanyMarkerTapped: _showCompanyBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
       )..add(const LoadMapDataEvent()),
-      child: Builder(  // ← AÑADE ESTE Builder
+      child: Builder( 
         builder: (blocContext) {
-          _blocContext = blocContext;  // ← GUARDA el context
+          _blocContext = blocContext;  
           return _buildUI(blocContext);
         },
       ),    
@@ -283,6 +285,20 @@ class _MapPageState extends State<MapPage> {
                 ),
               );
             }
+            if (state is MapLoadedState && state.shouldShowStatistics) {
+              final mapBloc = context.read<MapBloc>();
+              mapBloc.add(const ResetStatisticsNavigationEvent());
+              
+              // Pestaña de estadísticas
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider<MapBloc>.value(
+                    value: mapBloc,
+                    child: const SavedTrackStatisticsPage(),
+                  ),
+                ),
+              );
+            }            
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
             }
@@ -370,6 +386,7 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         // Widget del mapa 
                         MapWidget(
+                          key: _mapKey,
                           initialCameraPosition: CameraPosition(
                             target: _bcnCenter,
                             zoom: 12,
