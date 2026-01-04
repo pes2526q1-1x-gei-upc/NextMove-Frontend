@@ -365,6 +365,7 @@ class _MapPageState extends State<MapPage> {
                           _hasShownCompletionScreen = false;
                         },
                         currentMode: state.currentMode,
+                        mapBloc: context.read<MapBloc>(),
                       ),
                     );
                   }

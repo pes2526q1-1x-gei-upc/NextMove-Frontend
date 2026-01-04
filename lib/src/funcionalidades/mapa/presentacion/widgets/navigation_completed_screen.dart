@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/core/theme/app_theme.dart';
@@ -13,11 +12,13 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 class NavigationCompletedScreen extends StatefulWidget {
   final VoidCallback onClose;
   final StationType currentMode;
+  final MapBloc mapBloc;
 
   const NavigationCompletedScreen({
     super.key,
     required this.onClose,
     required this.currentMode,
+    required this.mapBloc,
   });
 
   @override
@@ -30,7 +31,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
   File? _selectedImage;
   bool _isValidating = false;
   bool? _isValidBike; // null = no validado, true = válido, false = inválido
-  bool _hasValidatedPhoto = false; // Para saber si ya se validó una foto (aunque sea inválida)
+// Para saber si ya se validó una foto (aunque sea inválida)
 
   Future<void> _pickImageFromCamera() async {
     try {
@@ -73,7 +74,6 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
         setState(() {
           _isValidating = false;
           _isValidBike = isValid;
-          _hasValidatedPhoto = true;
         });
 
         if (isValid) {
@@ -101,7 +101,6 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
         setState(() {
           _isValidating = false;
           _isValidBike = false;
-          _hasValidatedPhoto = true;
         });
 
         String errorMessage;
@@ -126,7 +125,6 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
     
     try {
       final l10n = AppLocalizations.of(context)!;
-      final mapBloc = context.read<MapBloc>();
       
       // bike_photo se inicializa en false
       // Solo será true si es modo bici Y la foto fue validada correctamente
@@ -134,7 +132,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
       final bikePhoto = isBikeMode && _isValidBike == true;
       
       // Enviar evento para guardar (se ejecutará de forma asíncrona)
-      mapBloc.add(SaveRecordedTrackEvent(l10n, bikePhoto: bikePhoto));
+      widget.mapBloc.add(SaveRecordedTrackEvent(l10n, bikePhoto: bikePhoto));
     } catch (e) {
       // Si hay un error, simplemente continuar para cerrar
       if (mounted) {

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_route.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/bloc/route_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/presentacion/widgets/recorded_route_statistics.dart';
 import 'package:provider/provider.dart';
