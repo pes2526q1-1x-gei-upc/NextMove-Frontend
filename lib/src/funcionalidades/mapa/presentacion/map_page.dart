@@ -70,12 +70,9 @@ class _MapPageState extends State<MapPage> {
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
-<<<<<<< HEAD
   bool _wasRecordingRoute = false;
   bool _hasShownCompletionScreen = false;
 
-=======
->>>>>>> dev
   
   StreamSubscription<Position>? _positionStream;
 
