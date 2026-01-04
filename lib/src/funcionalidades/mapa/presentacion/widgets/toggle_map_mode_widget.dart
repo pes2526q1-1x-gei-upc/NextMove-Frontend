@@ -6,10 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ToggleMapModeWidget extends StatelessWidget {
   final StationType currentMode; // Viene del estado del BLoC
+  final double bottomOffset; // Offset desde abajo para ajustar posición
   
   const ToggleMapModeWidget({
     super.key,
     required this.currentMode,
+    this.bottomOffset = 30,
   });
 
   @override
@@ -30,11 +32,11 @@ class ToggleMapModeWidget extends StatelessWidget {
     ];
 
     return Positioned(
-      bottom: 30,
-      left: 100,
-      right: 100,
+      bottom: bottomOffset,
+      left: 150,
+      right: 130, // Más estrecho para dejar espacio al botón de play
       child: Container(
-        height: 56,
+        height: 50,
         decoration: BoxDecoration(
           color: baseColor,
           borderRadius: BorderRadius.circular(30),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
@@ -12,12 +11,14 @@ class MapControlsColumnWidget extends StatelessWidget {
   final LatLng? userLocation;
   final GoogleMapController? mapController;
   final MapType currentMapType;
+  final Function(CameraPosition)? onBeforeToggleMapType;
 
   const MapControlsColumnWidget({
     super.key,
     this.userLocation,
     this.mapController,
     required this.currentMapType,
+    this.onBeforeToggleMapType,
   });
 
   void _centerOnUser() {
@@ -53,17 +54,44 @@ class MapControlsColumnWidget extends StatelessWidget {
         }
 
         final isRecording = state.isRecordingRoute;
+        // Si está en modo bici, los botones deben estar más arriba para dejar espacio al botón de play
+        // Si está en modo coche, los botones están en la parte inferior
+        final bottomOffset = (state.currentMode == StationType.bicycle) ? 90.0 : 30.0;
         
         return Positioned(
-          bottom: 30,
+          bottom: bottomOffset,
           right: 16,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: state.currentMode == StationType.bicycle 
+                ? MainAxisAlignment.end 
+                : MainAxisAlignment.start,
             children: [
               // Satellite/Map toggle button
               GestureDetector(
-                onTap: () =>
-                    context.read<MapBloc>().add(const ToggleMapTypeEvent()),
+                onTap: () async {
+                  // Capturar la posición actual de la cámara antes de cambiar el tipo
+                  if (mapController != null && onBeforeToggleMapType != null) {
+                    try {
+                      final visibleRegion = await mapController!.getVisibleRegion();
+                      final zoom = await mapController!.getZoomLevel();
+                      final center = LatLng(
+                        (visibleRegion.northeast.latitude + visibleRegion.southwest.latitude) / 2,
+                        (visibleRegion.northeast.longitude + visibleRegion.southwest.longitude) / 2,
+                      );
+                      onBeforeToggleMapType!(CameraPosition(
+                        target: center,
+                        zoom: zoom,
+                      ));
+                    } catch (e) {
+                      // Si hay error, continuar sin capturar la posición
+                    }
+                  }
+                  // Verificar que el contexto sigue montado antes de usarlo
+                  if (context.mounted) {
+                    context.read<MapBloc>().add(const ToggleMapTypeEvent());
+                  }
+                },
                 child: Container(
                   height: 50,
                   width: 50,
@@ -89,7 +117,9 @@ class MapControlsColumnWidget extends StatelessWidget {
                 child: Container(
                   height: 50,
                   width: 50,
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: state.currentMode == StationType.bicycle
+                      ? const EdgeInsets.only(bottom: 10)
+                      : EdgeInsets.zero,
                   decoration: BoxDecoration(
                     color: cardColor,
                     shape: BoxShape.circle,
@@ -116,58 +146,16 @@ class MapControlsColumnWidget extends StatelessWidget {
                   child: Container(
                     height: 50,
                     width: 50,
-                    margin: const EdgeInsets.only(bottom: 10),
+                    margin: EdgeInsets.zero,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.secondaryContainer,
+                      color: cardColor,
                       shape: BoxShape.circle,
                       boxShadow: commonShadow,
                     ),
                     child: Icon(
                       Icons.bar_chart,
-                      color: theme.colorScheme.onSecondaryContainer,
+                      color: iconColor,
                       size: 24,
-                    ),
-                  ),
-                ),
-              ],
-
-              // Record/Stop button (only in bicycle mode)
-              if (state.currentMode == StationType.bicycle) ...[
-                GestureDetector(
-                  onTap: () {
-                    final bloc = context.read<MapBloc>();
-                    if (isRecording) {
-                      final l10n = AppLocalizations.of(context)!;
-                      bloc.add(StopRouteRecordingEvent(l10n));
-                    } else {
-                      bloc.add(const StartRouteRecordingEvent());
-                    }
-                  },
-                  child: Container(
-                    height: 60,
-                    width: 60,
-                    decoration: BoxDecoration(
-                      color: isRecording
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(
-                            alpha: isDark ? 0.55 : 0.25,
-                          ),
-                          spreadRadius: 1,
-                          blurRadius: 14,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      isRecording ? Icons.stop : Icons.play_arrow,
-                      color: isRecording
-                          ? theme.colorScheme.onError
-                          : theme.colorScheme.onPrimary,
-                      size: 32,
                     ),
                   ),
                 ),

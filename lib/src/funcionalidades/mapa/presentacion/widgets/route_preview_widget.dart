@@ -36,8 +36,9 @@ class RoutePreviewWidget extends StatelessWidget {
         ),
         
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
           child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Route Stats Row
                 Row(

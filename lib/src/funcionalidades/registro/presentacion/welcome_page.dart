@@ -93,7 +93,10 @@ class WelcomePage extends StatelessWidget {
                     // Caja de botones
                     Container(
                       width: buttonWidth,
-                      padding: const EdgeInsets.all(24),
+                      constraints: BoxConstraints(
+                        maxWidth: size.width - 48, // 24 padding a cada lado
+                      ),
+                      padding: EdgeInsets.all(size.width < 360 ? 16 : 24),
                       decoration: BoxDecoration(
                         color: theme.cardColor,
                         borderRadius: BorderRadius.circular(24),
@@ -108,28 +111,34 @@ class WelcomePage extends StatelessWidget {
                           color: theme.dividerColor.withValues(alpha: 0.1),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          _buildGoogleButton(context, double.infinity),
-                          const SizedBox(height: 16),
-                          Row(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final availableWidth = constraints.maxWidth;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(child: Divider(color: theme.dividerColor)),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  "o",
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.disabledColor,
+                              _buildGoogleButton(context, availableWidth),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(child: Divider(color: theme.dividerColor)),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                    child: Text(
+                                      "o",
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: theme.disabledColor,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  Expanded(child: Divider(color: theme.dividerColor)),
+                                ],
                               ),
-                              Expanded(child: Divider(color: theme.dividerColor)),
+                              const SizedBox(height: 16),
+                              _buildEmailButton(context, availableWidth),
                             ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildEmailButton(context, double.infinity),
-                        ],
+                          );
+                        },
                       ),
                     ),
                     
@@ -145,23 +154,39 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildGoogleButton(BuildContext context, double width) {
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360;
+    
     return SizedBox(
       width: width,
-      height: 56, 
-      child: SignInButton(
-        Buttons.Google,
-        text: AppLocalizations.of(context)!.signInWithGoogle,
-        onPressed: () {
-          context.read<AuthBloc>().add(SignInWithGoogleEvent());
-        },
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: Theme.of(context).dividerColor,
+      height: 56,
+      child: ClipRect(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: width,
+            height: 56,
+            child: SignInButton(
+              Buttons.Google,
+              text: AppLocalizations.of(context)!.signInWithGoogle,
+              onPressed: () {
+                context.read<AuthBloc>().add(SignInWithGoogleEvent());
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                ),
+              ),
+              elevation: 0,
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 8 : 12,
+                vertical: 8,
+              ),
+            ),
           ),
         ),
-        elevation: 0, 
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), 
       ),
     );
   }
