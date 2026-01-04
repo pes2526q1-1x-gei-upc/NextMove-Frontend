@@ -38,7 +38,6 @@ class ChallengesRepository {
   ) async {
     final completedChallengesData = await challengesRemoteDataProvider
         .getCompletedChallenges();
-    print('Received completedChallengesData: $completedChallengesData');
     if (challengesData != null && completedChallengesData != null) {
       for (var challenge in challengesData) {
         challenge['is_completed'] = completedChallengesData.any(

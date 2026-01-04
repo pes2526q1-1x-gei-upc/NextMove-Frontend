@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
-import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_progress_indicator.dart';
