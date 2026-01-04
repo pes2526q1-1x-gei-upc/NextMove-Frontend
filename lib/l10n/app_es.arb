@@ -461,9 +461,9 @@
     "validationMinPoints": "La ruta debe tener al menos {count} puntos",
     "@validationMinPoints": {
         "placeholders": {
-        "count": {
-            "type": "int"
-        }
+            "count": {
+                "type": "int"
+            }
         }
     },
     "validationNoMovement": "La ruta no muestra movimiento significativo",
@@ -471,9 +471,9 @@
     "validationImpossibleSpeed": "Velocidad imposible detectada: {speed} km/h",
     "@validationImpossibleSpeed": {
         "placeholders": {
-        "speed": {
-            "type": "String"
-        }
+            "speed": {
+                "type": "String"
+            }
         }
     },
     "validationSuspiciousGPS": "Patrón de GPS sospechoso detectado",
@@ -496,5 +496,15 @@
         }
     },
     "ok": "Aceptar",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "trophyLockedMessage": "¡Aún no has completado este reto!",
+    "trophyCongratulationsMessage": "¡Felicidades! Has ganado este trofeo por completar el reto \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
+    }
 }
