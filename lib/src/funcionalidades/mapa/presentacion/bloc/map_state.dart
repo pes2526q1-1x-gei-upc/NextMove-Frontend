@@ -52,6 +52,7 @@ class MapLoadedState extends MapState {
   final RouteViewport? routeViewport;
   final ClusterManager? bikeClusterManager;
   final ClusterManager? evClusterManager;
+  final bool shouldShowStatistics;
   final ClusterManager? companyClusterManager;
   
   // Turn-by-turn navigation fields
@@ -88,6 +89,7 @@ class MapLoadedState extends MapState {
     this.routeViewport,
     this.bikeClusterManager,
     this.evClusterManager,
+    this.shouldShowStatistics = false,
     this.companyClusterManager,
     this.isTurnByTurnActive = false,
     this.currentStepIndex,
@@ -124,6 +126,7 @@ class MapLoadedState extends MapState {
         routeViewport,
         bikeClusterManager,
         evClusterManager,
+        shouldShowStatistics,
         companyClusterManager,
         isTurnByTurnActive,
         currentStepIndex,
@@ -162,6 +165,7 @@ class MapLoadedState extends MapState {
     RouteViewport? routeViewport,
     ClusterManager? bikeClusterManager,
     ClusterManager? evClusterManager,
+    bool? shouldShowStatistics,
     ClusterManager? companyClusterManager,
     bool? isTurnByTurnActive,
     int? currentStepIndex,
@@ -196,6 +200,7 @@ class MapLoadedState extends MapState {
       routeViewport: routeViewport ?? this.routeViewport,
       bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
       evClusterManager: evClusterManager ?? this.evClusterManager,
+      shouldShowStatistics: shouldShowStatistics ?? this.shouldShowStatistics,
       companyClusterManager: companyClusterManager ?? this.companyClusterManager,
       isTurnByTurnActive: isTurnByTurnActive ?? this.isTurnByTurnActive,
       currentStepIndex: currentStepIndex ?? this.currentStepIndex,

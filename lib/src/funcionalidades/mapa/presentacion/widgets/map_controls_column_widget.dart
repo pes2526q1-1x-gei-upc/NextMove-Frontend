@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
@@ -136,7 +137,8 @@ class MapControlsColumnWidget extends StatelessWidget {
                   onTap: () {
                     final bloc = context.read<MapBloc>();
                     if (isRecording) {
-                      bloc.add(const StopRouteRecordingEvent());
+                      final l10n = AppLocalizations.of(context)!;
+                      bloc.add(StopRouteRecordingEvent(l10n));
                     } else {
                       bloc.add(const StartRouteRecordingEvent());
                     }

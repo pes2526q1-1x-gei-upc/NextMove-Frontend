@@ -90,6 +90,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<UpdateRecordingElapsedTimeEvent>(_onUpdateRecordingElapsedTime);
     on<ShowRouteToStationEvent>(_onShowRouteToStation);
     on<CancelNavigationEvent>(_onCancelNavigation);
+    on<ResetStatisticsNavigationEvent>(_onResetStatisticsNavigation);
     on<StartTurnByTurnNavigationEvent>(_onStartTurnByTurnNavigation);
     on<StopTurnByTurnNavigationEvent>(_onStopTurnByTurnNavigation);
   }
@@ -803,6 +804,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       final saveResult = await trackRepository.saveRecordedTrack(
         currentState.recordedTrack!,
+        event.l10n,
       );
       saveResult.fold(
         (failure) {
@@ -833,6 +835,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               isRecordingRoute: false,
               routePolyline: defaultPolyline,
               snackbarError: null,
+              shouldShowStatistics: true,
             ),
           );
         },
@@ -1073,6 +1076,16 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   Future<void> close() {
     _positionStreamSubscription?.cancel();
     return super.close();
+  }
+
+  void _onResetStatisticsNavigation(
+  ResetStatisticsNavigationEvent event,
+  Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(shouldShowStatistics: false));
+    }
   }
 }
 
