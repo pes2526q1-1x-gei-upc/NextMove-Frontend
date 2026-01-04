@@ -476,21 +476,27 @@ class _MapPageState extends State<MapPage> {
                         Positioned.fill(
                           bottom: 0,
                           child: DraggableScrollableSheet(
-                            initialChildSize: 0.28,
-                            minChildSize: 0.22,
-                            maxChildSize: 0.28,
+                            initialChildSize: 0.28, 
+                            minChildSize: 0.15,
+                            maxChildSize: 0.28, 
+                            snap: true,
+                            snapSizes: const [0.15, 0.28], 
                             builder: (context, scrollController) {
                               return NotificationListener<DraggableScrollableNotification>(
                                 onNotification: (notification) {
-                                  // Cuando el usuario suelta el drag y está en el mínimo
-                                  if (notification.extent <= notification.minExtent + 0.01) {
-                                    Future.delayed(const Duration(milliseconds: 150), () {
-                                      if (context.mounted) {
-                                        context.read<MapBloc>().add(CancelNavigationEvent());
-                                      }
-                                    });
+                                  // Cuando el usuario suelta el drag y está en el mínimo o cerca
+                                  if (notification.extent <= notification.minExtent + 0.05) {
+                                    // Solo cancelar si realmente está en el mínimo
+                                    if (notification.extent <= notification.minExtent + 0.02) {
+                                      Future.delayed(const Duration(milliseconds: 200), () {
+                                        if (context.mounted && 
+                                            notification.extent <= notification.minExtent + 0.02) {
+                                          context.read<MapBloc>().add(CancelNavigationEvent());
+                                        }
+                                      });
+                                    }
                                   }
-                                  return true;
+                                  return false; // Permitir que otros listeners también procesen
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -499,17 +505,32 @@ class _MapPageState extends State<MapPage> {
                                       top: Radius.circular(24),
                                     ),
                                   ),
-                                  child: SingleChildScrollView(
-                                    controller: scrollController,
-                                    child: RoutePreviewWidget(
-                                      route: state.navigationRoute!,
-                                      onStartPressed: () {
-                                        context.read<MapBloc>().add(const StartTurnByTurnNavigationEvent());
-                                      },
-                                      onCancelPressed: () {
-                                        context.read<MapBloc>().add(CancelNavigationEvent());
-                                      },
-                                    ),
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return SingleChildScrollView(
+                                        controller: scrollController,
+                                        physics: const ClampingScrollPhysics(),
+                                        padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context).padding.bottom + 8,
+                                        ),
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minHeight: constraints.maxHeight,
+                                          ),
+                                          child: IntrinsicHeight(
+                                            child: RoutePreviewWidget(
+                                              route: state.navigationRoute!,
+                                              onStartPressed: () {
+                                                context.read<MapBloc>().add(const StartTurnByTurnNavigationEvent());
+                                              },
+                                              onCancelPressed: () {
+                                                context.read<MapBloc>().add(CancelNavigationEvent());
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               );
