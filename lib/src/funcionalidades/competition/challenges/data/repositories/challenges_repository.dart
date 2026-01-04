@@ -16,6 +16,7 @@ class ChallengesRepository {
     try {
       final challengesData = await challengesRemoteDataProvider
           .getAllChallenges();
+      await addIsCompletedAttribute(challengesData);
       final List<Challenge>? challengeEntries = challengesData
           ?.map((entry) => Challenge.fromJson(entry))
           .toList();
@@ -29,6 +30,22 @@ class ChallengesRepository {
         print('UnknownFailure in getChallengesData: $e');
       }
       throw UnknownFailure();
+    }
+  }
+
+  Future<void> addIsCompletedAttribute(
+    List<Map<String, dynamic>>? challengesData,
+  ) async {
+    final completedChallengesData = await challengesRemoteDataProvider
+        .getCompletedChallenges();
+    print('Received completedChallengesData: $completedChallengesData');
+    if (challengesData != null && completedChallengesData != null) {
+      for (var challenge in challengesData) {
+        challenge['is_completed'] = completedChallengesData.any(
+          (completedChallengeName) =>
+              completedChallengeName == challenge['name'],
+        );
+      }
     }
   }
 

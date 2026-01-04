@@ -99,7 +99,7 @@ class ChallengesRemoteDataProvider {
       throw ServerException('Error en query: ${result.exception.toString()}');
     }
 
-    final List<dynamic>? data = result.data?['getCompletedChallenges'];
+    final List<dynamic>? data = result.data?['getTrophies'];
 
     if (kDebugMode) {
       print('Completed Challenges data: $data');

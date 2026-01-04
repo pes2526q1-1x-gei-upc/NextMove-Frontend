@@ -16,6 +16,7 @@ class EnrolledChallenge extends Challenge {
     required super.startingDate,
     required super.endingDate,
     super.photo,
+    required super.isCompleted,
     required this.completed,
     required this.totalDistance,
     required this.currentDistance,
@@ -36,6 +37,7 @@ class EnrolledChallenge extends Challenge {
         int.parse(json['ending_date'] as String),
       ),
       photo: json['photo'] as String?,
+      isCompleted: (json['completed'] as int? ?? 0) == 100,
       completed: json['completed'] as int? ?? 0,
       totalDistance: ((json['total_distance'] as num?)?.toDouble() ?? 0.0) / 1000, // meters to kilometers
       currentDistance: ((json['current_distance'] as num?)?.toDouble() ?? 0.0) / 1000, // meters to kilometers

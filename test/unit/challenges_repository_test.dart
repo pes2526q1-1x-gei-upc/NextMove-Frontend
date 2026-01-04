@@ -53,6 +53,7 @@ void main() {
         },
       ];
       when(() => mockDataProvider.getAllChallenges()).thenAnswer((_) async => mockData);
+      when(() => mockDataProvider.getCompletedChallenges()).thenAnswer((_) async => []);
 
       final result = await repository.getallChallenges();
 

@@ -72,6 +72,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
               startingDate: challenge.startingDate,
               endingDate: challenge.endingDate,
               photo: challenge.photo,
+              isCompleted: challenge.isCompleted,
               completed: 0,
               totalDistance: challenge.distance,
               currentDistance: 0.0,

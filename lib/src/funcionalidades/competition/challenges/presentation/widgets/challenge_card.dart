@@ -5,6 +5,7 @@ import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/c
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_progress_indicator.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
 
 class ChallengeCard extends StatelessWidget {
@@ -121,6 +122,7 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     final bool isEnrolledToAChallenge = currentState.hasEnrolledChallenge;
     final bool isThisChallengeEnrolled =
         currentState.enrolledChallenge?.id == challenge.id;
+    final bool isThisChallengeCompleted = challenge.isCompleted;
 
     return Row(
       children: [
@@ -137,22 +139,28 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && isThisChallengeEnrolled)))
+            ((isEnrolledToAChallenge && isThisChallengeEnrolled)) ||
+            isThisChallengeCompleted)
           ElevatedButton(
-            onPressed: (isThisChallengeEnrolled)
+            onPressed: (isThisChallengeEnrolled || isThisChallengeCompleted)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isThisChallengeEnrolled
+              backgroundColor:
+                  isThisChallengeEnrolled || isThisChallengeCompleted
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
             child: Text(
-              isThisChallengeEnrolled ? l10n.enrolled : l10n.enroll,
+              isThisChallengeEnrolled
+                  ? l10n.enrolled
+                  : isThisChallengeCompleted
+                  ? l10n.completed
+                  : l10n.enroll,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isThisChallengeEnrolled
+                color: isThisChallengeEnrolled || isThisChallengeCompleted
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),
@@ -326,43 +334,6 @@ class Photo extends StatelessWidget {
                 ),
               ),
       ),
-    );
-  }
-}
-
-class ChallengeProgressIndicator extends StatelessWidget {
-  const ChallengeProgressIndicator({
-    super.key,
-    required this.enrolledChallenge,
-    required this.theme,
-    required this.l10n,
-  });
-
-  final EnrolledChallenge enrolledChallenge;
-  final ThemeData theme;
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    final progressPercentage = enrolledChallenge.completed;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: progressPercentage / 100,
-          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '${enrolledChallenge.currentDistance.toStringAsFixed(1)} / ${enrolledChallenge.totalDistance.toStringAsFixed(1)} km ($progressPercentage%)',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-      ],
     );
   }
 }

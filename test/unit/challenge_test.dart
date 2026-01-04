@@ -20,7 +20,8 @@ void main() {
           'name': '10km Challenge',
           'points': 100,
           'starting_date': '1738368000000',
-          'photo': 'https://example.com/photo.jpg'
+          'photo': 'https://example.com/photo.jpg',
+          'is_completed': false
         };
         final challenge = Challenge.fromJson(jsonData);
 
@@ -51,6 +52,7 @@ void main() {
           'name': 'Test',
           'points': 50,
           'starting_date': '1738368000000',
+          'is_completed': false
         };
         final challenge = Challenge.fromJson(jsonData);
 

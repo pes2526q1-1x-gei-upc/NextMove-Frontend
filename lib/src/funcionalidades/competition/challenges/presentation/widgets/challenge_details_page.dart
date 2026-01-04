@@ -9,7 +9,6 @@ import 'package:nextmove_app/src/funcionalidades/competition/challenges/presenta
 import 'package:nextmove_app/src/shared/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class ChallengeDetailsPage extends StatelessWidget {
   const ChallengeDetailsPage({super.key, required this.challenge});
 
@@ -338,8 +337,10 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     final ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
     final currentState = challengesBloc.state as ChallengesLoaded;
     final bool isEnrolledToAChallenge = currentState.hasEnrolledChallenge;
-    final bool isThisChallengeEnrolled = currentState.enrolledChallenge?.id == challenge.id;
-    
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
+    final bool isThisChallengeCompleted = challenge.isCompleted;
+
     return Row(
       children: [
         Expanded(
@@ -355,22 +356,28 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && isThisChallengeEnrolled))) ...[
+            ((isEnrolledToAChallenge && isThisChallengeEnrolled)) ||
+            isThisChallengeCompleted) ...[
           ElevatedButton(
-            onPressed: (isThisChallengeEnrolled)
+            onPressed: (isThisChallengeEnrolled || isThisChallengeCompleted)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isThisChallengeEnrolled
+              backgroundColor:
+                  isThisChallengeEnrolled || isThisChallengeCompleted
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
             child: Text(
-              isThisChallengeEnrolled ? l10n.enrolled : l10n.enroll,
+              isThisChallengeEnrolled
+                  ? l10n.enrolled
+                  : isThisChallengeCompleted
+                  ? l10n.completed
+                  : l10n.enroll,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isThisChallengeEnrolled
+                color: isThisChallengeEnrolled || isThisChallengeCompleted
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),

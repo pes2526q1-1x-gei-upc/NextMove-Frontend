@@ -11,6 +11,7 @@ class Challenge {
   final DateTime startingDate;
   final DateTime endingDate;
   final String? photo;
+  final bool isCompleted;
 
   final Trophy trophy;
 
@@ -24,6 +25,7 @@ class Challenge {
     required this.startingDate,
     required this.endingDate,
     this.photo,
+    required this.isCompleted,
   }) : trophy = Trophy.fromChallengeName(name);
 
   factory Challenge.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Challenge {
         int.parse(json['ending_date'] as String),
       ),
       photo: json['photo'] as String?,
+      isCompleted: json['is_completed'] as bool,
     );
   }
 
@@ -54,6 +57,7 @@ class Challenge {
     DateTime? startingDate,
     DateTime? endingDate,
     String? photo,
+    bool? isCompleted,
   }) {
     return Challenge(
       id: id ?? this.id,
@@ -65,6 +69,7 @@ class Challenge {
       startingDate: startingDate ?? this.startingDate,
       endingDate: endingDate ?? this.endingDate,
       photo: photo ?? this.photo,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 }
