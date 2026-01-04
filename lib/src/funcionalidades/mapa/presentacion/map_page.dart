@@ -30,6 +30,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.da
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_history_button_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/search_results_list.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/data/repositories/challenges_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/company_bottom_sheet_widget.dart';
 
 import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/widgets/station_bottom_sheet_widget.dart';
@@ -62,17 +63,19 @@ class _MapPageState extends State<MapPage> {
   TrackRepository trackRepository = TrackRepository();
   RecordedRoutesRepository recordedRoutesRepository = RecordedRoutesRepository();
   NavigationRouteRepository navigationRouteRepository = NavigationRouteRepository();
-  final GlobalKey _mapKey = GlobalKey();
   PromotedCompaniesRepository promotedCompaniesRepository = PromotedCompaniesRepository();
-
-  //final LatLng _catCenter = const LatLng(41.8205, 1.8677);
-  final LatLng _bcnCenter = const LatLng(41.3851, 2.1734);
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
   bool _wasRecordingRoute = false;
   bool _hasShownCompletionScreen = false;
 
+  CameraPosition? _cameraPositionBeforeMapTypeChange;
+  CameraPosition _currentCameraPosition = const CameraPosition(
+    target: LatLng(41.3851, 2.1734), // Barcelona por defecto
+    zoom: 12,
+  );
+  final GlobalKey<SearchBarWidgetState> _searchBarKey = GlobalKey<SearchBarWidgetState>();
   
   StreamSubscription<Position>? _positionStream;
 
@@ -160,6 +163,9 @@ class _MapPageState extends State<MapPage> {
   }
   
   void _onCameraMoveThrottled(CameraPosition position) {
+    // Guardar la posición actual de la cámara
+    _currentCameraPosition = position;
+    
     final now = DateTime.now();
     
     // Throttling real: solo ejecutar si ha pasado el tiempo mínimo desde la última actualización
@@ -252,6 +258,7 @@ class _MapPageState extends State<MapPage> {
         navigationRouteRepository: navigationRouteRepository,
         stationsCache: context.read<StationsCache>(),
         promotedCompaniesRepository: promotedCompaniesRepository,
+        challengesRepository: ChallengesRepository(),
         onMarkerTapped: _showStationBottomSheet,
         onCompanyMarkerTapped: _showCompanyBottomSheet,
         initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
@@ -274,6 +281,9 @@ class _MapPageState extends State<MapPage> {
         setState(() {
           _isSearchBarFocused = false; // Esto debe cerrar las búsquedas recientes
         });
+        // Limpiar la búsqueda si hay texto
+        _searchBarKey.currentState?.clearSearch();
+        context.read<MapBloc>().add(const ClearSearchEvent());
       },
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
@@ -302,7 +312,32 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
               );
-            }            
+            }
+            if (state is MapLoadedState && state.challengeNotificationTitle != null) {
+              final mapBloc = context.read<MapBloc>();
+              final title = state.challengeNotificationTitle == 'challengeCompletedTitle'
+                  ? l10n.challengeCompletedTitle
+                  : l10n.challengeProgressTitle;
+              final message = state.challengeNotificationPercentage == null
+                  ? '${l10n.challengeCompletedMessage} ${state.challengeNotificationName}'
+                  : '${l10n.challengeProgressMessage(state.challengeNotificationPercentage.toString())} ${state.challengeNotificationName}';
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(title),
+                  content: Text(message),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        mapBloc.add(const ResetChallengeCompletionEvent());
+                      },
+                      child: Text(l10n.ok),
+                    ),
+                  ],
+                ),
+              );
+            }
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
             }
@@ -343,6 +378,14 @@ class _MapPageState extends State<MapPage> {
               if (state.isRecordingRoute) {
                 _hasShownCompletionScreen = false;
               }
+            // Actualizar la posición inicial cuando cambia el tipo de mapa
+            if (state is MapLoadedState && 
+                _cameraPositionBeforeMapTypeChange != null) {
+              // Actualizar la posición inicial con la posición guardada
+              setState(() {
+                _currentCameraPosition = _cameraPositionBeforeMapTypeChange!;
+                _cameraPositionBeforeMapTypeChange = null; // Limpiar
+              });
             }
             
             // Auto-follow camera during turn-by-turn navigation
@@ -428,17 +471,23 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         // Widget del mapa 
                         MapWidget(
-                          key: _mapKey,
-                          initialCameraPosition: CameraPosition(
-                            target: _bcnCenter,
-                            zoom: 12,
-                          ),
+                          key: ValueKey('map_${state.currentMapType}'), // Key que cambia con el tipo de mapa
+                          initialCameraPosition: _currentCameraPosition,
                           markers: markersToShow,
                           clusterManagers: {
                             if (clusterManagerToShow != null) clusterManagerToShow,
                             state.companyClusterManager,
                           }.whereType<ClusterManager>().toSet(),
                           onCameraMove: _onCameraMoveThrottled, 
+                          onTap: (LatLng position) {
+                            // Limpiar la búsqueda cuando se toca el mapa
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              _isSearchBarFocused = false;
+                            });
+                            _searchBarKey.currentState?.clearSearch();
+                            context.read<MapBloc>().add(const ClearSearchEvent());
+                          },
                       polyline: state.routePolyline,
                       mapType: state.currentMapType,
                       darkMode: Theme.of(context).brightness == Brightness.dark,
@@ -494,21 +543,27 @@ class _MapPageState extends State<MapPage> {
                         Positioned.fill(
                           bottom: 0,
                           child: DraggableScrollableSheet(
-                            initialChildSize: 0.28,
-                            minChildSize: 0.22,
-                            maxChildSize: 0.28,
+                            initialChildSize: 0.28, 
+                            minChildSize: 0.15,
+                            maxChildSize: 0.28, 
+                            snap: true,
+                            snapSizes: const [0.15, 0.28], 
                             builder: (context, scrollController) {
                               return NotificationListener<DraggableScrollableNotification>(
                                 onNotification: (notification) {
-                                  // Cuando el usuario suelta el drag y está en el mínimo
-                                  if (notification.extent <= notification.minExtent + 0.01) {
-                                    Future.delayed(const Duration(milliseconds: 150), () {
-                                      if (context.mounted) {
-                                        context.read<MapBloc>().add(CancelNavigationEvent());
-                                      }
-                                    });
+                                  // Cuando el usuario suelta el drag y está en el mínimo o cerca
+                                  if (notification.extent <= notification.minExtent + 0.05) {
+                                    // Solo cancelar si realmente está en el mínimo
+                                    if (notification.extent <= notification.minExtent + 0.02) {
+                                      Future.delayed(const Duration(milliseconds: 200), () {
+                                        if (context.mounted && 
+                                            notification.extent <= notification.minExtent + 0.02) {
+                                          context.read<MapBloc>().add(CancelNavigationEvent());
+                                        }
+                                      });
+                                    }
                                   }
-                                  return true;
+                                  return false; // Permitir que otros listeners también procesen
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -517,17 +572,32 @@ class _MapPageState extends State<MapPage> {
                                       top: Radius.circular(24),
                                     ),
                                   ),
-                                  child: SingleChildScrollView(
-                                    controller: scrollController,
-                                    child: RoutePreviewWidget(
-                                      route: state.navigationRoute!,
-                                      onStartPressed: () {
-                                        context.read<MapBloc>().add(const StartTurnByTurnNavigationEvent());
-                                      },
-                                      onCancelPressed: () {
-                                        context.read<MapBloc>().add(CancelNavigationEvent());
-                                      },
-                                    ),
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return SingleChildScrollView(
+                                        controller: scrollController,
+                                        physics: const ClampingScrollPhysics(),
+                                        padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context).padding.bottom + 8,
+                                        ),
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minHeight: constraints.maxHeight,
+                                          ),
+                                          child: IntrinsicHeight(
+                                            child: RoutePreviewWidget(
+                                              route: state.navigationRoute!,
+                                              onStartPressed: () {
+                                                context.read<MapBloc>().add(const StartTurnByTurnNavigationEvent());
+                                              },
+                                              onCancelPressed: () {
+                                                context.read<MapBloc>().add(CancelNavigationEvent());
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               );
@@ -541,12 +611,16 @@ class _MapPageState extends State<MapPage> {
                         userLocation: state.userLocation,
                         mapController: _mapController,
                         currentMapType: state.currentMapType,
+                        onBeforeToggleMapType: (position) {
+                          _cameraPositionBeforeMapTypeChange = position;
+                        },
                       ),
                     
 
                     // Barra de búsqueda
                     if(!state.isNavigationMode)...[
                       SearchBarWidget(
+                        key: _searchBarKey,
                         hintText: AppLocalizations.of(context)!.searchStation,
                         onChanged: (query) {
                           if (kDebugMode) {
@@ -577,7 +651,109 @@ class _MapPageState extends State<MapPage> {
                       ),
                    
 
-                    // Selector de modo (bici/coche)
+                    // Botón de play/stop (solo en modo bici) - A la derecha del toggle con texto
+                    if (state.currentMode == StationType.bicycle)
+                      Positioned(
+                        bottom: 30, // Misma altura que el toggle
+                        right: 16, // A la derecha, con margen
+                        child: GestureDetector(
+                          onTap: () {
+                            final bloc = context.read<MapBloc>();
+                            if (state.isRecordingRoute) {
+                              final l10n = AppLocalizations.of(context)!;
+                              bloc.add(StopRouteRecordingEvent(l10n));
+                            } else {
+                              bloc.add(const StartRouteRecordingEvent());
+                            }
+                          },
+                          child: Container(
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: state.isRecordingRoute
+                                  ? (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.red.shade700
+                                      : Theme.of(context).colorScheme.error)
+                                  : (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.green.shade700
+                                      : Theme.of(context).colorScheme.primary),
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.45 : 0.18,
+                                  ),
+                                  spreadRadius: 1,
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  state.isRecordingRoute ? Icons.stop : Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 6),
+                                Builder(
+                                  builder: (context) {
+                                    final text = state.isRecordingRoute 
+                                        ? AppLocalizations.of(context)!.stopRecording
+                                        : l10n.startRoute;
+                                    final words = text.split(' ');
+                                    
+                                    if (words.length == 1) {
+                                      // Si es una sola palabra, mostrarla centrada
+                                      return Text(
+                                        text,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.0,
+                                        ),
+                                      );
+                                    } else {
+                                      // Si hay múltiples palabras, mostrarlas en dos líneas
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            words[0],
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            words.skip(1).join(' '),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // Selector de modo (bici/coche) - Siempre fijo en la misma posición
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
                     Positioned(

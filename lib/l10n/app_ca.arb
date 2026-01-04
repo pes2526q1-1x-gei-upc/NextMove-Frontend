@@ -97,7 +97,7 @@
     "accessType": "Tipus d'accés",
     "error": "Error",
     "unknownPower": "Potència desconeguda",
-    "stations": "Estacions",
+    "stations": "Estacions properes",
     "saveChangesError": "Error al desar els canvis.",
     "bicycle": "Bicicleta",
     "car": "Cotxe",
@@ -119,6 +119,7 @@
     "ops": "Vaja!",
     "account": "Compte",
     "accountDetails": "Detalls del compte",
+    "myStatistics": "Estadístiques",
     "bloquedUsers": "Usuaris bloquejats",
     "noBloquedUsers": "No tens usuaris bloquejats.",
     "unblock": "Desbloquejar",
@@ -193,7 +194,8 @@
     "co2Saved": "CO₂ estalviat",
     "caloriesBurned": "Calories cremades",
     "currentSpeed": "Velocitat actual",
-    "stopRecording": "Aturar la gravació",
+    "stopRecording": "Aturar",
+    "startRoute": "Iniciar ruta",
     "opinions": "Valoracions",
     "unknown": "Desconegut",
     "station": "Estació",
@@ -254,6 +256,7 @@
     "minutes": "minuts",
     "permanent": "Permanent",
     "challenges": "Reptes",
+    "progress": "Progrés",
     "competition": "Competició",
     "noChallengesAvailable": "No hi ha reptes disponibles.",
     "points": "{count, plural, =1{{count} punt} other{{count} punts}}",
@@ -463,5 +466,19 @@
     "validationMaxSpeedImpossible": "Velocitat màxima impossible",
     "trophies": "Trofeus",
     "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0",
-    "favoriteStations": "Estacions Favorites"
+    "favoriteStations": "Estacions Favorites",
+    "completed": "Superat",
+    "challengeCompletedTitle": "Repte completat!",
+    "challengeCompletedMessage": "Felicitats! Has completat el repte:",
+    "challengeProgressTitle": "Progrés en el repte!",
+    "challengeProgressMessage": "Bon progrés! Has assolit el {percentage}% del repte:",    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "D'acord",
+    "inactive": "Inactiu"
 }

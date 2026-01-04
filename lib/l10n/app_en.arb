@@ -97,7 +97,7 @@
     "accessType": "Access type",
     "error": "Error",
     "unknown": "Unknown",
-    "stations": "Stations",
+    "stations": "Nearby stations",
     "saveChangesError": "Error saving changes.",
     "bicycle": "Bicycle",
     "car": "Car",
@@ -119,6 +119,7 @@
     "ops": "Oops!",
     "account": "Account",
     "accountDetails": "Account details",
+    "myStatistics": "Statistics",
     "bloquedUsers": "Blocked users",
     "noBloquedUsers": "You have no blocked users.",
     "unblock": "Unblock",
@@ -201,7 +202,8 @@
     "co2Saved": "CO₂ saved",
     "caloriesBurned": "Calories burned",
     "currentSpeed": "Current speed",
-    "stopRecording": "Stop recording",
+    "stopRecording": "Stop",
+    "startRoute": "Start route",
     "opinions": "Reviews",
     "unknownPower": "Unknown power",
     "station": "Station",
@@ -262,6 +264,7 @@
     "minutes": "minutes",
     "permanent": "Permanent",
     "challenges": "Challenges",
+    "progress": "Progress",
     "competition": "Competition",
     "noChallengesAvailable": "No challenges available.",
     "points": "{count, plural, =1{{count} point} other{{count} points}}",
@@ -476,5 +479,20 @@
     "validationMaxSpeedImpossible": "Maximum speed impossible",
     "trophies": "Trophies",
     "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
-    "favoriteStations": "Favorite Stations"
+    "favoriteStations": "Favorite Stations",
+    "completed": "Completed",
+    "challengeCompletedTitle": "Challenge completed!",
+    "challengeCompletedMessage": "Congratulations! You have completed the challenge:",
+    "challengeProgressTitle": "Challenge progress!",
+    "challengeProgressMessage": "Great progress! You have reached {percentage}% of the challenge:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "OK",
+    "inactive": "Inactive"
 }

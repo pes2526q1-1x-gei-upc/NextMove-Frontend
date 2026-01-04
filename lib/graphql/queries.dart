@@ -464,10 +464,27 @@ static const String getNavigationRouteQuery = r'''
     }
   }''';
 
-  static const String getEnrolledChallengesNames = r'''
+  static const String getEnrolledChallenge = r'''
   query getEnrolledChallenges {
     getEnrolledChallenges {
+      id
+      description
+      distance
       name
+      points
+      starting_date
+      ending_date
+      photo
+      company {
+        name
+        logo_url
+        email
+        url
+        description
+      }
+      completed
+      total_distance
+      current_distance
     }
   }''';
 

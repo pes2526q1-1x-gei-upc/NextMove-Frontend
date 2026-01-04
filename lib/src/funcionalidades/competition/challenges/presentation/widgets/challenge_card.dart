@@ -4,6 +4,7 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_progress_indicator.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
 
 class ChallengeCard extends StatelessWidget {
@@ -15,6 +16,10 @@ class ChallengeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final challengesBloc = context.read<ChallengesBloc>();
+    final currentState = challengesBloc.state as ChallengesLoaded;
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
 
     Text startDate = Text(
       formatDate(challenge.startingDate),
@@ -73,6 +78,13 @@ class ChallengeCard extends StatelessWidget {
                   challenge: challenge,
                   theme: theme,
                 ),
+                if (isThisChallengeEnrolled &&
+                    currentState.enrolledChallenge != null)
+                  ChallengeProgressIndicator(
+                    enrolledChallenge: currentState.enrolledChallenge!,
+                    theme: theme,
+                    l10n: l10n,
+                  ),
                 const SizedBox(height: 12),
                 StartAndFinishDates(
                   theme: theme,
@@ -105,8 +117,15 @@ class TitleAndJoinButtonRow extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
 
-    final bool isEnrolledToAChallenge =
-        (challengesBloc.state as ChallengesLoaded).isEnrolled;
+    final currentState = challengesBloc.state as ChallengesLoaded;
+    final bool isEnrolledToAChallenge = currentState.hasEnrolledChallenge;
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
+    final bool isThisChallengeCompleted = challenge.isCompleted;
+    final bool isChallengeActive =
+        challenge.startingDate.isBefore(DateTime.now()) &&
+        challenge.endingDate.isAfter(DateTime.now());
+
     return Row(
       children: [
         Expanded(
@@ -122,22 +141,38 @@ class TitleAndJoinButtonRow extends StatelessWidget {
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+            ((isEnrolledToAChallenge && isThisChallengeEnrolled)) ||
+            isThisChallengeCompleted)
           ElevatedButton(
-            onPressed: (challenge.isEnrolled)
+            onPressed:
+                (isThisChallengeEnrolled ||
+                    isThisChallengeCompleted ||
+                    !isChallengeActive)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: challenge.isEnrolled
+              backgroundColor:
+                  isThisChallengeEnrolled ||
+                      isThisChallengeCompleted ||
+                      !isChallengeActive
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
             child: Text(
-              challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+              isThisChallengeEnrolled
+                  ? l10n.enrolled
+                  : isThisChallengeCompleted
+                  ? l10n.completed
+                  : isChallengeActive
+                  ? l10n.enroll
+                  : l10n.inactive,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: challenge.isEnrolled
+                color:
+                    isThisChallengeEnrolled ||
+                        isThisChallengeCompleted ||
+                        !isChallengeActive
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),
@@ -266,7 +301,7 @@ class PointsAndDistanceRow extends StatelessWidget {
         Icon(Icons.route, size: 20),
         const SizedBox(width: 8),
         Text(
-          "${challenge.distance.toInt()} km",
+          "${challenge.distance.toStringAsFixed(1)} km",
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w600,
           ),
