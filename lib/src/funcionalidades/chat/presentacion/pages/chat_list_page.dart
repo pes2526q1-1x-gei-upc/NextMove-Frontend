@@ -41,6 +41,7 @@ class _ChatListPageState extends State<ChatListPage> {
   Set<String> _lastKnownGroupIds =
       {}; // IDs de grupos conocidos para detectar cambios
   StreamSubscription<Map<String, dynamic>>? _directChatCreatedSubscription;
+  bool _isNavigating = false; // Flag para prevenir múltiples navegaciones
 
   @override
   void dispose() {
@@ -224,12 +225,21 @@ class _ChatListPageState extends State<ChatListPage> {
     String? friendEmail, {
     String? friendPhoto,
   }) async {
+    // Prevenir múltiples navegaciones simultáneas
+    if (_isNavigating) {
+      return;
+    }
+
+    setState(() {
+      _isNavigating = true;
+    });
+
     final l10n = AppLocalizations.of(context)!;
-    final client = GraphQLProvider.of(context).value;
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final theme = Theme.of(context);
 
     try {
+      final client = GraphQLProvider.of(context).value;
       String email = friendEmail ?? '';
       String? photo = friendPhoto;
 
@@ -281,12 +291,20 @@ class _ChatListPageState extends State<ChatListPage> {
         shouldRefreshOnReturn: true,
       );
     } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('${l10n.error}: $e'),
-          backgroundColor: theme.colorScheme.error,
-        ),
-      );
+      if (mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('${l10n.error}: $e'),
+            backgroundColor: theme.colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isNavigating = false;
+        });
+      }
     }
   }
 
@@ -297,36 +315,53 @@ class _ChatListPageState extends State<ChatListPage> {
     bool shouldRefreshOnReturn = false,
     bool isGroup = false,
   }) async {
-    final chatBloc = context.read<ChatBloc>();
+    // Prevenir múltiples navegaciones simultáneas
+    if (_isNavigating) {
+      return;
+    }
 
-    final result = await Navigator.of(context).push<Map<String, dynamic>?>(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: chatBloc,
-          child: ChatRoomPage(
-            roomId: roomId,
-            roomName: roomName,
-            otherUserPhoto: otherUserPhoto,
-            isGroup: isGroup,
+    setState(() {
+      _isNavigating = true;
+    });
+
+    try {
+      final chatBloc = context.read<ChatBloc>();
+
+      final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+        MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: chatBloc,
+            child: ChatRoomPage(
+              roomId: roomId,
+              roomName: roomName,
+              otherUserPhoto: otherUserPhoto,
+              isGroup: isGroup,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    if (mounted) {
-      // Si se eliminó el grupo, se salió del grupo, o hay que refrescar, actualizar la lista
-      bool shouldRefresh = shouldRefreshOnReturn;
+      if (mounted) {
+        // Si se eliminó el grupo, se salió del grupo, o hay que refrescar, actualizar la lista
+        bool shouldRefresh = shouldRefreshOnReturn;
 
-      if (result is Map<String, dynamic>) {
-        final resultMap = result;
-        shouldRefresh =
-            shouldRefresh ||
-            resultMap['groupDeleted'] == true ||
-            resultMap['leftGroup'] == true;
+        if (result is Map<String, dynamic>) {
+          final resultMap = result;
+          shouldRefresh =
+              shouldRefresh ||
+              resultMap['groupDeleted'] == true ||
+              resultMap['leftGroup'] == true;
+        }
+
+        if (shouldRefresh) {
+          refreshChatList();
+        }
       }
-
-      if (shouldRefresh) {
-        refreshChatList();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isNavigating = false;
+        });
       }
     }
   }
