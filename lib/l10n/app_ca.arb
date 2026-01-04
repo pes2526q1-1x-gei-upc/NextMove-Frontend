@@ -97,7 +97,7 @@
     "accessType": "Tipus d'accés",
     "error": "Error",
     "unknownPower": "Potència desconeguda",
-    "stations": "Estacions",
+    "stations": "Estacions properes",
     "saveChangesError": "Error al desar els canvis.",
     "bicycle": "Bicicleta",
     "car": "Cotxe",

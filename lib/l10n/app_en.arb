@@ -97,7 +97,7 @@
     "accessType": "Access type",
     "error": "Error",
     "unknown": "Unknown",
-    "stations": "Stations",
+    "stations": "Nearby stations",
     "saveChangesError": "Error saving changes.",
     "bicycle": "Bicycle",
     "car": "Car",
