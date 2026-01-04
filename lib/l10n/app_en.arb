@@ -504,5 +504,23 @@
                 "example": "Urban Cyclist"
             }
         }
+    },
+    "trophyOfChallenge": "Trophy of the challenge: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "shareTrophyMessage": "I have earned a trophy in NextMove for the challenge \"{challengeName}\"! Check out my trophy and download the app to compete with me and the rest of the community.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
     }
 }

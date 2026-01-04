@@ -506,5 +506,23 @@
                 "example": "Ciclista Urbano"
             }
         }
+    },
+   "trophyOfChallenge": "Trofeo del reto: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
+    },
+    "shareTrophyMessage": "He ganado un trofeo en NextMove por el reto \"{challengeName}\"! Mira mi trofeo y descarga la aplicación para competir conmigo y el resto de la comunidad.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
     }
 }
