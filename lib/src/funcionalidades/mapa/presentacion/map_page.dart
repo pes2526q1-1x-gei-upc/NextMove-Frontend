@@ -378,6 +378,8 @@ class _MapPageState extends State<MapPage> {
               if (state.isRecordingRoute) {
                 _hasShownCompletionScreen = false;
               }
+            }
+            
             // Actualizar la posición inicial cuando cambia el tipo de mapa
             if (state is MapLoadedState && 
                 _cameraPositionBeforeMapTypeChange != null) {
