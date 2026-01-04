@@ -75,8 +75,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)!.bikePhotoAccepted ?? 
-                '¡Foto aceptada! Has ganado 50 puntos extra',
+                AppLocalizations.of(context)!.bikePhotoAccepted,
               ),
               backgroundColor: AppTheme.seedColor,
             ),
@@ -85,8 +84,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)!.bikePhotoRejected ?? 
-                'No se detectó una bicicleta válida en la imagen. Por favor, intenta de nuevo.',
+                AppLocalizations.of(context)!.bikePhotoRejected,
               ),
               backgroundColor: Colors.orange,
             ),
@@ -104,8 +102,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
         if (e is custom_exceptions.ServerException) {
           errorMessage = e.message ?? 'Error Desconocido';
         } else {
-          errorMessage = AppLocalizations.of(context)!.bikeDetectionError ?? 
-                        'Error al validar la imagen. Por favor, intenta de nuevo.';
+          errorMessage = AppLocalizations.of(context)!.bikeDetectionError,
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -158,7 +155,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                     
                     // Título
                     Text(
-                      l10n.recordCompleted!,
+                      l10n.recordCompleted,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -172,7 +169,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                     
                     // Mensaje descriptivo
                     Text(
-                      l10n.recordCompletedMessage!,
+                      l10n.recordCompletedMessage,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -207,7 +204,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                l10n.uploadBikePhotoPoints ?? 'Sube una foto de tu bici y gana 50 puntos extra',
+                                l10n.uploadBikePhotoPoints,
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -271,7 +268,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                                                   ),
                                                   const SizedBox(height: 16),
                                                   Text(
-                                                    l10n.validatingPhoto ?? 'Validando foto...',
+                                                    l10n.validatingPhoto,
                                                     style: const TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 14,
@@ -295,7 +292,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
-                                        l10n.tapToTakePhoto ?? 'Toca para tomar una foto',
+                                        l10n.tapToTakePhoto,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -331,8 +328,8 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                                       const SizedBox(width: 4),
                                       Text(
                                         _isValidBike == true
-                                          ? l10n.valid ?? 'Válida'
-                                          : l10n.invalid ?? 'Inválida',
+                                          ? l10n.valid
+                                          : l10n.invalid,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -365,7 +362,7 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
                           elevation: 0,
                         ),
                         child: Text(
-                          l10n.close ?? 'Cerrar',
+                          l10n.close,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
