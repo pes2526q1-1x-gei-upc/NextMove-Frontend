@@ -20,7 +20,10 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/data/repositories/challenges_repository.dart';
 import 'package:http/http.dart' as http;
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'map_events.dart';
 import 'map_state.dart';
 
@@ -38,6 +41,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final NavigationRouteRepository navigationRouteRepository;
   final StationsCache stationsCache;
   final PromotedCompaniesRepository promotedCompaniesRepository;
+  final ChallengesRepository challengesRepository;
   final Function(StationDetails, MapLoadedState) onMarkerTapped;
   final Function(Company, MapLoadedState) onCompanyMarkerTapped;
 
@@ -70,6 +74,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     required this.searchHistoryService,
     required this.stationsCache,
     required this.promotedCompaniesRepository,
+    required this.challengesRepository,
     required this.onMarkerTapped,
     required this.onCompanyMarkerTapped,
     StationType? initialMode,
@@ -91,6 +96,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ShowRouteToStationEvent>(_onShowRouteToStation);
     on<CancelNavigationEvent>(_onCancelNavigation);
     on<ResetStatisticsNavigationEvent>(_onResetStatisticsNavigation);
+    on<ResetChallengeCompletionEvent>(_onResetChallengeCompletion);
     on<StartTurnByTurnNavigationEvent>(_onStartTurnByTurnNavigation);
     on<StopTurnByTurnNavigationEvent>(_onStopTurnByTurnNavigation);
   }
@@ -802,12 +808,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
+      final previousChallengeResult = await challengesRepository.getEnrolledChallenge();
+      final previousChallenge = previousChallengeResult.fold(
+        (failure) => null,
+        (challenge) => challenge,
+      );
+      final previousProgress = previousChallenge?.completed;
+
       final saveResult = await trackRepository.saveRecordedTrack(
         currentState.recordedTrack!,
         event.l10n,
       );
-      saveResult.fold(
-        (failure) {
+      await saveResult.fold(
+        (failure) async {
           if (kDebugMode) {
             print('Error saving recorded track: ${failure.message}');
           }
@@ -826,19 +839,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             ),
           );
         },
-        (_) {
-          if (kDebugMode) {
-            print('Recorded track saved successfully.');
-          }
-          emit(
-            currentState.copyWith(
-              isRecordingRoute: false,
-              routePolyline: defaultPolyline,
-              snackbarError: null,
-              shouldShowStatistics: true,
-            ),
-          );
-        },
+        (_) async => await _handleSaveSuccess(currentState, emit, previousProgress, event.l10n, previousChallenge),
       );
     }
   }
@@ -1086,6 +1087,141 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (currentState is MapLoadedState) {
       emit(currentState.copyWith(shouldShowStatistics: false));
     }
+  }
+
+  void _onResetChallengeCompletion(
+    ResetChallengeCompletionEvent event,
+    Emitter<MapState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is MapLoadedState) {
+      emit(currentState.copyWith(
+        challengeNotificationTitle: null,
+        challengeNotificationMessage: null,
+        challengeNotificationPercentage: null,
+        challengeNotificationName: null,
+      ));
+    }
+  }
+
+  Future<void> _handleSaveSuccess(
+    MapLoadedState currentState,
+    Emitter<MapState> emit,
+    int? previousProgress,
+    AppLocalizations l10n,
+    EnrolledChallenge? previousChallenge,
+  ) async {
+    // Check for challenge progress after saving the route
+    final challengeResult = await challengesRepository.getEnrolledChallenge();
+    challengeResult.fold(
+      (failure) {
+        if (kDebugMode) {
+          print('Error fetching enrolled challenge after save: ${failure.message}');
+        }
+      },
+      (challenge) {
+        if (challenge != null) {
+          final newProgress = challenge.completed;
+          if (kDebugMode) {
+            print('Challenge progress after save: $newProgress% (previous: $previousProgress%)');
+          }
+          int? milestone;
+          if (previousProgress != null) {
+            if (previousProgress < 100 && newProgress >= 100) {
+              milestone = 100;
+            } else if (previousProgress < 75 && newProgress >= 75) {
+              milestone = 75;
+            } else if (previousProgress < 50 && newProgress >= 50) {
+              milestone = 50;
+            } else if (previousProgress < 25 && newProgress >= 25) {
+              milestone = 25;
+            }
+          }
+          if (milestone != null) {
+            final title = milestone == 100
+                ? l10n.challengeCompletedTitle
+                : l10n.challengeProgressTitle;
+            final message = milestone == 100
+                ? l10n.challengeCompletedMessage
+                : l10n.challengeProgressMessage(milestone.toString());
+            if (kDebugMode) {
+              print('Showing challenge notification: $title - $message');
+            }
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+                challengeNotificationTitle: title,
+                challengeNotificationMessage: message,
+                challengeNotificationPercentage: milestone,
+                challengeNotificationName: challenge.name,
+              ),
+            );
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+                challengeNotificationTitle: null,
+                challengeNotificationMessage: null,
+                challengeNotificationPercentage: null,
+                challengeNotificationName: null,
+              ),
+            );
+          } else {
+            // No progress milestone crossed, just reset recording state
+            if (kDebugMode) {
+              print('No milestone crossed, resetting recording state');
+            }
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+              ),
+            );
+          }
+        } else {
+          // Check if challenge was completed and removed from enrolled
+          if (previousChallenge != null) {
+            final title = l10n.challengeCompletedTitle;
+            final message = l10n.challengeCompletedMessage;
+            if (kDebugMode) {
+              print('Challenge completed and removed from enrolled: $title - $message for ${previousChallenge.name}');
+            }
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+                challengeNotificationTitle: title,
+                challengeNotificationMessage: message,
+                challengeNotificationPercentage: 100,
+                challengeNotificationName: previousChallenge.name,
+              ),
+            );
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+                challengeNotificationTitle: null,
+                challengeNotificationMessage: null,
+                challengeNotificationPercentage: null,
+                challengeNotificationName: null,
+              ),
+            );
+          } else {
+            if (kDebugMode) {
+              print('No enrolled challenge found');
+            }
+            // No enrolled challenge, just reset recording state
+            emit(
+              currentState.copyWith(
+                isRecordingRoute: false,
+                routePolyline: defaultPolyline,
+              ),
+            );
+          }
+        }
+      },
+    );
   }
 }
 

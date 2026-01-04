@@ -263,6 +263,7 @@
     "minutes": "minutos",
     "permanent": "Permanente",
     "challenges": "Retos",
+    "progress": "Progreso",
     "competition": "Competición",
     "noChallengesAvailable": "No hay retos disponibles.",
     "points": "{count, plural, =1{{count} punto} other{{count} puntos}}",
@@ -466,5 +467,20 @@
     "validationImpossibleMovements": "Movimientos imposibles detectados",
     "validationMaxSpeedImpossible": "Velocidad máxima imposible",
     "trophies": "Trofeos",
-    "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0"
+    "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0",
+    "completed": "Superado",
+    "challengeCompletedTitle": "¡Reto completado!",
+    "challengeCompletedMessage": "¡Felicidades! Has completado el reto:",
+    "challengeProgressTitle": "¡Progreso en el reto!",
+    "challengeProgressMessage": "¡Buen progreso! Has alcanzado el {percentage}% del reto:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "Aceptar",
+    "inactive": "Inactivo"
 }

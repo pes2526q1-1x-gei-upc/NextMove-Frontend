@@ -54,7 +54,10 @@ class MapLoadedState extends MapState {
   final ClusterManager? evClusterManager;
   final bool shouldShowStatistics;
   final ClusterManager? companyClusterManager;
-  
+  final String? challengeNotificationMessage;
+  final String? challengeNotificationTitle;
+  final int? challengeNotificationPercentage;
+  final String? challengeNotificationName;  
   // Turn-by-turn navigation fields
   final bool isTurnByTurnActive;
   final int? currentStepIndex;
@@ -91,6 +94,10 @@ class MapLoadedState extends MapState {
     this.evClusterManager,
     this.shouldShowStatistics = false,
     this.companyClusterManager,
+    this.challengeNotificationTitle,
+    this.challengeNotificationMessage,
+    this.challengeNotificationPercentage,
+    this.challengeNotificationName,
     this.isTurnByTurnActive = false,
     this.currentStepIndex,
     this.distanceToNextStepMeters,
@@ -128,6 +135,10 @@ class MapLoadedState extends MapState {
         evClusterManager,
         shouldShowStatistics,
         companyClusterManager,
+        challengeNotificationTitle,
+        challengeNotificationMessage,
+        challengeNotificationPercentage,
+        challengeNotificationName,
         isTurnByTurnActive,
         currentStepIndex,
         distanceToNextStepMeters,
@@ -167,6 +178,10 @@ class MapLoadedState extends MapState {
     ClusterManager? evClusterManager,
     bool? shouldShowStatistics,
     ClusterManager? companyClusterManager,
+    String? challengeNotificationTitle,
+    String? challengeNotificationMessage,
+    int? challengeNotificationPercentage,
+    String? challengeNotificationName,
     bool? isTurnByTurnActive,
     int? currentStepIndex,
     int? distanceToNextStepMeters,
@@ -202,6 +217,10 @@ class MapLoadedState extends MapState {
       evClusterManager: evClusterManager ?? this.evClusterManager,
       shouldShowStatistics: shouldShowStatistics ?? this.shouldShowStatistics,
       companyClusterManager: companyClusterManager ?? this.companyClusterManager,
+      challengeNotificationTitle: challengeNotificationTitle ?? this.challengeNotificationTitle,
+      challengeNotificationMessage: challengeNotificationMessage ?? this.challengeNotificationMessage,
+      challengeNotificationPercentage: challengeNotificationPercentage ?? this.challengeNotificationPercentage,
+      challengeNotificationName: challengeNotificationName ?? this.challengeNotificationName,
       isTurnByTurnActive: isTurnByTurnActive ?? this.isTurnByTurnActive,
       currentStepIndex: currentStepIndex ?? this.currentStepIndex,
       distanceToNextStepMeters: distanceToNextStepMeters ?? this.distanceToNextStepMeters,

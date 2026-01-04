@@ -256,6 +256,7 @@
     "minutes": "minuts",
     "permanent": "Permanent",
     "challenges": "Reptes",
+    "progress": "Progrés",
     "competition": "Competició",
     "noChallengesAvailable": "No hi ha reptes disponibles.",
     "points": "{count, plural, =1{{count} punt} other{{count} punts}}",
@@ -451,5 +452,19 @@
     "validationImpossibleMovements": "Moviments impossibles detectats",
     "validationMaxSpeedImpossible": "Velocitat màxima impossible",
     "trophies": "Trofeus",
-    "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0"
+    "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0",
+    "completed": "Superat",
+    "challengeCompletedTitle": "Repte completat!",
+    "challengeCompletedMessage": "Felicitats! Has completat el repte:",
+    "challengeProgressTitle": "Progrés en el repte!",
+    "challengeProgressMessage": "Bon progrés! Has assolit el {percentage}% del repte:",    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "D'acord",
+    "inactive": "Inactiu"
 }
