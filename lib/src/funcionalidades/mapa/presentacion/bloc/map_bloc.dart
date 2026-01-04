@@ -99,6 +99,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<ResetChallengeCompletionEvent>(_onResetChallengeCompletion);
     on<StartTurnByTurnNavigationEvent>(_onStartTurnByTurnNavigation);
     on<StopTurnByTurnNavigationEvent>(_onStopTurnByTurnNavigation);
+    on<SaveRecordedTrackEvent>(_onSaveRecordedTrack);
   }
 
   /// Handler: Cargar datos iniciales (estaciones y ubicación)
@@ -808,6 +809,23 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
+      // No guardar automáticamente, solo detener la grabación y mostrar la pantalla
+      emit(
+        currentState.copyWith(
+          isRecordingRoute: false,
+          routePolyline: defaultPolyline,
+          shouldShowStatistics: true,
+        ),
+      );
+    }
+  }
+
+  void _onSaveRecordedTrack(
+    SaveRecordedTrackEvent event,
+    Emitter<MapState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is MapLoadedState && currentState.recordedTrack != null) {
       final previousChallengeResult = await challengesRepository.getEnrolledChallenge();
       final previousChallenge = previousChallengeResult.fold(
         (failure) => null,
@@ -818,6 +836,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final saveResult = await trackRepository.saveRecordedTrack(
         currentState.recordedTrack!,
         event.l10n,
+        bikePhoto: event.bikePhoto,
       );
       await saveResult.fold(
         (failure) async {
@@ -826,15 +845,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           }
           emit(
             currentState.copyWith(
-              isRecordingRoute: false,
-              routePolyline: defaultPolyline,
               snackbarError: failure.message,
             ),
           );
           emit(
             currentState.copyWith(
-              isRecordingRoute: false,
-              routePolyline: defaultPolyline,
               snackbarError: null,
             ),
           );

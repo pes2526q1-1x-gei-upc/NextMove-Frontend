@@ -17,6 +17,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/saved
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/turn_instruction_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_progress_widget.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_completed_screen.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -66,6 +67,9 @@ class _MapPageState extends State<MapPage> {
   final searchHistoryService = SearchHistoryService();
   bool _isSearchBarFocused = false;
   bool _hasCenteredOnUser = false;
+  bool _wasRecordingRoute = false;
+  bool _hasShownCompletionScreen = false;
+
   CameraPosition? _cameraPositionBeforeMapTypeChange;
   CameraPosition _currentCameraPosition = const CameraPosition(
     target: LatLng(41.3851, 2.1734), // Barcelona por defecto
@@ -336,6 +340,45 @@ class _MapPageState extends State<MapPage> {
             }
             if(state is MapLoadedState && state.routeViewport != null){
               _setZoomToViewport(state.routeViewport!); 
+            }
+            
+            // Detectar cuando se guarda exitosamente una ruta grabada
+            if (state is MapLoadedState) {
+              // Si estaba grabando y ahora no está grabando, y no hay errores, y tiene suficientes puntos
+              if (_wasRecordingRoute && 
+                  !state.isRecordingRoute && 
+                  !_hasShownCompletionScreen &&
+                  state.snackbarError == null &&
+                  state.recordedTrack != null &&
+                  state.recordedTrack!.points.length >= 2) {
+                _hasShownCompletionScreen = true;
+                // Esperar un momento antes de mostrar la pantalla para que la transición sea suave
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  if (mounted && context.mounted) {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierColor: Colors.black.withValues(alpha: 0.7),
+                      builder: (dialogContext) => NavigationCompletedScreen(
+                        onClose: () {
+                          Navigator.of(dialogContext).pop();
+                          _hasShownCompletionScreen = false;
+                        },
+                        currentMode: state.currentMode,
+                        mapBloc: context.read<MapBloc>(),
+                      ),
+                    );
+                  }
+                });
+              }
+              
+              // Actualizar el estado de grabación
+              _wasRecordingRoute = state.isRecordingRoute;
+              
+              // Resetear el flag cuando se inicia una nueva grabación
+              if (state.isRecordingRoute) {
+                _hasShownCompletionScreen = false;
+              }
             }
             
             // Actualizar la posición inicial cuando cambia el tipo de mapa

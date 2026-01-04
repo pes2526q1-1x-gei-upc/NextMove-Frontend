@@ -9,7 +9,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart
 
 class TrackDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
-  Future<void> saveRecordedTrack(RecordedTrack track) async {
+  Future<void> saveRecordedTrack(RecordedTrack track, {bool bikePhoto = false}) async {
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLMutations.createTrackMutation),
       variables: {
@@ -33,7 +33,8 @@ class TrackDataProvider {
         'tiempo_fin': track.endTime.toIso8601String(),
         'fecha_recorrido': track.startTime
             .toLocal()
-            .toIso8601String()
+            .toIso8601String(),
+        'bike_photo': bikePhoto,
       },
     );
     final QueryResult result = await client.mutate(options);

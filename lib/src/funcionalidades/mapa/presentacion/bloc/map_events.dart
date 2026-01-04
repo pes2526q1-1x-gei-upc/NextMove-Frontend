@@ -105,6 +105,17 @@ class StopRouteRecordingEvent extends MapEvent {
   List<Object?> get props => [l10n];
 }
 
+/// Evento: guardar recorrido grabado
+class SaveRecordedTrackEvent extends MapEvent {
+  final AppLocalizations l10n;
+  final bool bikePhoto;
+  
+  const SaveRecordedTrackEvent(this.l10n, {this.bikePhoto = false});
+  
+  @override
+  List<Object?> get props => [l10n, bikePhoto];
+}
+
 /// Evento: agregar punto a la ruta actual
 class AddRoutePointEvent extends MapEvent {
   final TrackPoint point;

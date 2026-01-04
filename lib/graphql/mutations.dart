@@ -75,7 +75,7 @@ class GraphQLMutations {
 
   // === Recorridos ===
   static const String createTrackMutation = r'''
-    mutation createTrackMutation($user_email: String!, $distancia: Float!, $velocidad_media: Float!, $velocidad_maxima: Float!, $co2: Float!, $kcal: Float!, $elevacion_positiva: Float!, $elevacion_negativa: Float!, $origen: CoordinatesInput!, $destino: CoordinatesInput!, $tiempo_inicio: String!, $tiempo_fin: String!, $fecha_recorrido: String!) {
+    mutation createTrackMutation($user_email: String!, $distancia: Float!, $velocidad_media: Float!, $velocidad_maxima: Float!, $co2: Float!, $kcal: Float!, $elevacion_positiva: Float!, $elevacion_negativa: Float!, $origen: CoordinatesInput!, $destino: CoordinatesInput!, $tiempo_inicio: String!, $tiempo_fin: String!, $fecha_recorrido: String!, $bike_photo: Boolean!) {
     createRecorrido(input: {
       user_email: $user_email,
       distancia: $distancia,
@@ -89,7 +89,8 @@ class GraphQLMutations {
       destino: $destino,
       tiempo_inicio: $tiempo_inicio,
       tiempo_fin: $tiempo_fin,
-      fecha_recorrido: $fecha_recorrido
+      fecha_recorrido: $fecha_recorrido,
+      bike_photo: $bike_photo
     }) {
       user_email
       distancia
