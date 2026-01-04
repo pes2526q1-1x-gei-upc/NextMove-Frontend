@@ -411,7 +411,7 @@ class _MapPageState extends State<MapPage> {
                             if (clusterManagerToShow != null) clusterManagerToShow,
                             state.companyClusterManager,
                           }.whereType<ClusterManager>().toSet(),
-                          onCameraMove: _onCameraMoveThrottled,
+                          onCameraMove: _onCameraMoveThrottled, 
                           onTap: (LatLng position) {
                             // Limpiar la búsqueda cuando se toca el mapa
                             FocusScope.of(context).unfocus();
@@ -563,7 +563,109 @@ class _MapPageState extends State<MapPage> {
                       ),
                    
 
-                    // Selector de modo (bici/coche)
+                    // Botón de play/stop (solo en modo bici) - A la derecha del toggle con texto
+                    if (state.currentMode == StationType.bicycle)
+                      Positioned(
+                        bottom: 30, // Misma altura que el toggle
+                        right: 16, // A la derecha, con margen
+                        child: GestureDetector(
+                          onTap: () {
+                            final bloc = context.read<MapBloc>();
+                            if (state.isRecordingRoute) {
+                              final l10n = AppLocalizations.of(context)!;
+                              bloc.add(StopRouteRecordingEvent(l10n));
+                            } else {
+                              bloc.add(const StartRouteRecordingEvent());
+                            }
+                          },
+                          child: Container(
+                            height: 50,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: state.isRecordingRoute
+                                  ? (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.red.shade700
+                                      : Theme.of(context).colorScheme.error)
+                                  : (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.blue.shade700
+                                      : Theme.of(context).colorScheme.primary),
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(
+                                    alpha: Theme.of(context).brightness == Brightness.dark ? 0.45 : 0.18,
+                                  ),
+                                  spreadRadius: 1,
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  state.isRecordingRoute ? Icons.stop : Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 6),
+                                Builder(
+                                  builder: (context) {
+                                    final text = state.isRecordingRoute 
+                                        ? AppLocalizations.of(context)!.stopRecording
+                                        : l10n.startRoute;
+                                    final words = text.split(' ');
+                                    
+                                    if (words.length == 1) {
+                                      // Si es una sola palabra, mostrarla centrada
+                                      return Text(
+                                        text,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.0,
+                                        ),
+                                      );
+                                    } else {
+                                      // Si hay múltiples palabras, mostrarlas en dos líneas
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            words[0],
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            words.skip(1).join(' '),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // Selector de modo (bici/coche) - Siempre fijo en la misma posición
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
                     Positioned(
