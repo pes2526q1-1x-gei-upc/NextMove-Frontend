@@ -87,7 +87,10 @@ class MapControlsColumnWidget extends StatelessWidget {
                       // Si hay error, continuar sin capturar la posición
                     }
                   }
-                  context.read<MapBloc>().add(const ToggleMapTypeEvent());
+                  // Verificar que el contexto sigue montado antes de usarlo
+                  if (context.mounted) {
+                    context.read<MapBloc>().add(const ToggleMapTypeEvent());
+                  }
                 },
                 child: Container(
                   height: 50,

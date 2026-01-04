@@ -16,7 +16,7 @@ class UserStatisticsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.myStatistics ?? 'Mis Estadísticas'),
+        title: Text(l10n.myStatistics),
         elevation: 0,
       ),
       body: BlocBuilder<UserBloc, UserState>(
@@ -103,7 +103,7 @@ class UserStatisticsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              l10n.myStatistics ?? 'Mis Estadísticas',
+                              l10n.myStatistics,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),

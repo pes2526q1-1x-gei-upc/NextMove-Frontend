@@ -127,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const ProfileMenuDivider(),
                         ProfileMenuOption(
                           icon: Icons.bar_chart_rounded,
-                          text: l10n.myStatistics ?? 'Estadísticas',
+                          text: l10n.myStatistics,
                           onTap: () {
                             Navigator.push(
                               context,
