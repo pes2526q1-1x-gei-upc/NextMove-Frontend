@@ -16,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_statistics_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
@@ -118,6 +119,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                 builder: (context) => BlocProvider.value(
                                   value: userBloc,
                                   child: const EditUserDataPreferencesPage(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const ProfileMenuDivider(),
+                        ProfileMenuOption(
+                          icon: Icons.bar_chart_rounded,
+                          text: l10n.myStatistics,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: context.read<UserBloc>(),
+                                  child: const UserStatisticsPage(),
                                 ),
                               ),
                             );

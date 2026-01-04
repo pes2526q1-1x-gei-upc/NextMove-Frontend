@@ -65,6 +65,7 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
           // Current Speed 
             Card(
               elevation: 2,
+              color: Theme.of(context).cardColor,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(

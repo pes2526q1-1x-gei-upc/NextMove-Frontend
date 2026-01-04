@@ -29,9 +29,12 @@ class RecordedRouteStatistics extends StatelessWidget {
         ? '${track.startTime!.hour.toString().padLeft(2, '0')}:${track.startTime!.minute.toString().padLeft(2, '0')}'
         : '';
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.routeStatistics)),
+      appBar: AppBar(
+        title: Text(l10n.routeStatistics),
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,13 +42,50 @@ class RecordedRouteStatistics extends StatelessWidget {
               controller: widgetsToImageController,
               child: Column(
                 children: [
-                  Text(
-                    l10n.routeRecordedOn(date, time),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: Theme.of(context).brightness == Brightness.dark
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.withValues(
+                              alpha: Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.calendar_today,
+                            color: Colors.purple,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.routeRecordedOn(date, time),
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   StatisticsWidget(
                     track: RecordedRouteWrapper(track),
                     elapsedTime: duration,
@@ -57,7 +97,7 @@ class RecordedRouteStatistics extends StatelessWidget {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: FloatingActionButton.extended(
+              child: ElevatedButton.icon(
                 onPressed: () async {
                   try {
                     Uint8List? widgetImageBytes = await widgetsToImageController
@@ -97,6 +137,12 @@ class RecordedRouteStatistics extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
