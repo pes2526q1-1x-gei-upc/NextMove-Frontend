@@ -119,6 +119,7 @@
     "ops": "Oops!",
     "account": "Account",
     "accountDetails": "Account details",
+    "myStatistics": "Statistics",
     "bloquedUsers": "Blocked users",
     "noBloquedUsers": "You have no blocked users.",
     "unblock": "Unblock",
