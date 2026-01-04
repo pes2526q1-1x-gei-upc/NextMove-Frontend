@@ -512,6 +512,8 @@ static const String getNavigationRouteQuery = r'''
   query GetFavBikeStations {
     getFavBikeStations {
       station_id
+      nombre
+      direccion
     }
   }''';
   static const String getOrCreateDirectChatQuery = r'''
@@ -591,17 +593,122 @@ static const String getNavigationRouteQuery = r'''
   // === Compañías ===
 
   static const String getPromotedCompanies = r'''
-  query getPromotedCompanies {
-    getPromotedCompanies {
-      location {
-        latitude
-        longitude
-      }
-      url
-      name
-      email
-      description
-      logo_url
+query getPromotedCompanies {
+  getPromotedCompanies {
+    location {
+      latitude
+      longitude
     }
+    url
+    name
+    email
+    description
+    logo_url
+  }
+}''';
+
+  // === Alertas de Estaciones ===
+  static const String getStationAlerts = r'''
+  query GetStationAlerts {
+    getStationAlerts {
+      id
+      userEmail
+      stationId
+      horas
+      diasSemana
+      activa
+      createdAt
+      updatedAt
+      stationNombre
+      stationDireccion
+    }
+  }''';
+
+  static const String getStationAlert = r'''
+  query GetStationAlert($id: ID!) {
+    getStationAlert(id: $id) {
+      id
+      userEmail
+      stationId
+      horas
+      diasSemana
+      activa
+      createdAt
+      updatedAt
+      stationNombre
+      stationDireccion
+    }
+  }''';
+
+  static const String createStationAlert = r'''
+  mutation CreateStationAlert($input: CreateAlertInput!) {
+    createStationAlert(input: $input) {
+      id
+      userEmail
+      stationId
+      horas
+      diasSemana
+      activa
+      createdAt
+      updatedAt
+      stationNombre
+      stationDireccion
+    }
+  }''';
+
+  static const String updateStationAlert = r'''
+  mutation UpdateStationAlert($input: UpdateAlertInput!) {
+    updateStationAlert(input: $input) {
+      id
+      userEmail
+      stationId
+      horas
+      diasSemana
+      activa
+      createdAt
+      updatedAt
+      stationNombre
+      stationDireccion
+    }
+  }''';
+
+  static const String deleteStationAlert = r'''
+  mutation DeleteStationAlert($id: ID!) {
+    deleteStationAlert(id: $id)
+  }''';
+
+  static const String toggleStationAlert = r'''
+  mutation ToggleStationAlert($id: ID!, $activa: Boolean!) {
+    toggleStationAlert(id: $id, activa: $activa) {
+      id
+      userEmail
+      stationId
+      horas
+      diasSemana
+      activa
+      createdAt
+      updatedAt
+      stationNombre
+      stationDireccion
+    }
+  }''';
+
+  // === Tokens FCM ===
+  static const String registerFCMToken = r'''
+  mutation RegisterFCMToken($input: RegisterFCMTokenInput!) {
+    registerFCMToken(input: $input) {
+      id
+      userEmail
+      fcmToken
+      deviceId
+      platform
+      createdAt
+      updatedAt
+    }
+  }''';
+
+  static const String deleteFCMToken = r'''
+  mutation DeleteFCMToken($fcmToken: String!) {
+    deleteFCMToken(fcmToken: $fcmToken)
   }''';
 }

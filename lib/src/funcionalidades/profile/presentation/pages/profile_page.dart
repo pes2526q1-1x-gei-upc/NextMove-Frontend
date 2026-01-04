@@ -19,6 +19,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/bloc
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_statistics_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
+import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/bloc/alert_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/pages/alerts_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -209,9 +211,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ProfileMenuOption(
                           icon: Icons.notifications_none_rounded,
                           text: l10n.notifications,
-                          onTap: () => {
-                            // ignore: avoid_print
-                            if (kDebugMode) {print("Click en Notificaciones")},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => AlertBloc(),
+                                  child: const AlertsPage(),
+                                ),
+                              ),
+                            );
                           },
                         ),
                         const ProfileMenuDivider(),
