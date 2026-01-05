@@ -277,6 +277,7 @@
             }
         }
     },
+    "totalPoints": "Total points",
     "dates": "Dates",
     "startDate": "Start date",
     "endDate": "End date",

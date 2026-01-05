@@ -269,6 +269,7 @@
             }
         }
     },
+    "totalPoints": "Punts totals",
     "dates": "Dates",
     "startDate": "Data d'inici",
     "endDate": "Data de finalització",

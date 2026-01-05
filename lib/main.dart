@@ -33,8 +33,10 @@ import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_blo
 import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket_datasource.dart';
 import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
 import 'package:nextmove_app/config/socket_config.dart';
+import 'package:nextmove_app/src/services/notification_service.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final UserProvider userProvider = UserProvider();
 final LocaleProvider localeProvider = LocaleProvider();
 final ThemeProvider themeProvider = ThemeProvider();
@@ -101,6 +103,7 @@ class NextMoveAppState extends State<NextMoveApp> {
         child: Consumer<ThemeProvider>(
           builder: (context, theme, _) {
             return MaterialApp(
+              navigatorKey: navigatorKey,
               title: 'NextMove',
               debugShowCheckedModeBanner: false,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -205,6 +208,22 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
 
     if (mounted) {
       context.read<UserBloc>().add(LoadUserProfile(user.uid));
+    }
+
+    // Registrar token FCM cuando el usuario inicia sesión
+    // Nota: En iOS puede que el token no esté disponible inmediatamente,
+    // por lo que se registrará automáticamente cuando esté disponible
+    try {
+      final notificationService = NotificationService();
+      final token = await notificationService.getToken();
+      if (token != null) {
+        await notificationService.registerFCMToken(token);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error registrando token FCM al iniciar sesión: $e');
+        print('El token se registrará automáticamente cuando esté disponible');
+      }
     }
 
     if (mounted) {

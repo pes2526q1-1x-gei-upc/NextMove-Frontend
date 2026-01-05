@@ -276,6 +276,7 @@
             }
         }
     },
+    "totalPoints": "Puntos Totales",
     "dates": "Fechas",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de finalización",
