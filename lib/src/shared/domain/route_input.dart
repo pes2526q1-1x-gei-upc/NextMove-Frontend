@@ -6,12 +6,14 @@ class RouteInput {
   final LatLng destination;
   final TravelModeEnum mode;
   final RoutingPreferenceEnum routingPreference;
+  final String? languageCode;
 
   RouteInput({
     required this.origin,
     required this.destination,
     required this.mode,
     required this.routingPreference,
+    this.languageCode,
   });
 
   Map<String, dynamic> toVariables() {
@@ -26,6 +28,7 @@ class RouteInput {
       },
       'travelMode': mode.name,
       'routingPreference': routingPreference.name,
+      'languageCode': languageCode ?? 'es',
     };
   }
 

@@ -61,10 +61,15 @@ dependencies:
   http_parser: ^4.1.2
   email_validator: ^3.0.0
   shared_preferences: ^2.2.2
+  socket_io_client: ^2.0.3+1
   flutter_polyline_points: ^3.1.0
   test_rocket: ^0.3.0
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
+  widgets_to_image: ^2.0.1
+  share_plus: ^12.0.1
+  url_launcher: ^6.3.2
+  eventide: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -92,6 +97,7 @@ flutter:
   assets:
     - assets/
     - assets/icon/
+    - assets/trophies/
     - .env
   #   - images/a_dot_ham.jpeg
 

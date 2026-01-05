@@ -98,7 +98,7 @@
     "error": "Error",
     "unknownPower": "Potencia desconocida",
     "unknown": "Desconocido",
-    "stations": "Estaciones",
+    "stations": "Estaciones cercanas",
     "saveChangesError": "Error al guardar los cambios.",
     "bicycle": "Bicicleta",
     "car": "Coche",
@@ -120,6 +120,7 @@
     "ops": "¡Vaya!",
     "account": "Cuenta",
     "accountDetails": "Detalles de la cuenta",
+    "myStatistics": "Estadísticas",
     "bloquedUsers": "Usuarios bloqueados",
     "noBloquedUsers": "No tienes usuarios bloqueados.",
     "unblock": "Desbloquear",
@@ -202,7 +203,8 @@
     "co2Saved": "CO₂ ahorrado",
     "caloriesBurned": "Calorías quemadas",
     "currentSpeed": "Velocidad actual",
-    "stopRecording": "Detener grabación",
+    "stopRecording": "Detener",
+    "startRoute": "Iniciar ruta",
     "opinions": "Valoraciones",
     "station": "Estación",
     "seeOpinions": "Ver reviews",
@@ -226,7 +228,6 @@
     "bad": "Mala",
     "thankYouForYourReview": "¡Gracias por tu valoración!",
     "errorLoadingReviews": "Error al cargar las valoraciones",
-    "retry": "Reintentar",
     "firstToReview": "¡Sé el primero en valorar esta estación!",
     "editReview": "Editar valoración",
     "sureActionConfirmation": "Esta acción no se puede deshacer. ¿Estás seguro de que quieres continuar?",
@@ -244,7 +245,6 @@
     "start": "Iniciar",
     "estTime": "Tiempo estimado",
     "uLoc": "Tu ubicación",
-    "social": "Social",
     "ranking": "Ránquing",
     "numberOfRoutes": "Número de rutas",
     "challengesParticipated": "Retos participados",
@@ -263,13 +263,238 @@
     "minutes": "minutos",
     "permanent": "Permanente",
     "challenges": "Retos",
+    "progress": "Progreso",
     "competition": "Competición",
     "noChallengesAvailable": "No hay retos disponibles.",
     "points": "{count, plural, =1{{count} punto} other{{count} puntos}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
     "dates": "Fechas",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de finalización",
     "company": "Empresa",
     "enroll": "Inscribirse",
-    "enrolled": "Inscrito"
+    "enrolled": "Inscrito",
+    "share": "Compartir",
+    "routeRecordedOn": "Estadísticas de la ruta grabada el día {date} a las {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    },
+    "arrival": "Llegada",
+    "enxmet": "En",
+    "shareRouteStatisticsMessage": "¡He grabado una ruta en bicicleta usando NextMove! Mira mis estadísticas y descarga la aplicación para competir conmigo y el resto de la comunidad.",
+    "errorAddingToCalendar": "Se ha producido un error al añadir el reto al calendario.",
+    "social": "Social",
+    "chats": "Chats",
+    "connectingToServer": "Conectando al servidor...",
+    "connectionError": "Error de conexión",
+    "retry": "Reintentar",
+    "errorLoadingFriends": "Error cargando amigos",
+    "noFriendsYet": "No tienes amigos aún",
+    "addFriendsToStartChatting": "Agrega amigos para empezar a chatear",
+    "noFriendsFound": "No se encontraron amigos",
+    "tryAnotherSearchTerm": "Prueba con otro término de búsqueda",
+    "results": "Resultados",
+    "groupResults": "Resultados de grupos",
+    "tapToChat": "Toca para chatear",
+    "searchChats": "Buscar chats...",
+    "searchGroups": "Buscar grupos...",
+    "noGroupsAvailable": "No te has unido a ningún grupo aún",
+    "groupsComingSoon": "Busca grupos para unirte a uno",
+    "noMessagesYet": "No hay mensajes aún.\n¡Envía el primero!",
+    "typing": "escribiendo...",
+    "back": "Volver",
+    "loadingRoom": "Cargando sala...",
+    "writeAMessage": "Escribe un mensaje...",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "groupDetails": "Detalles del grupo",
+    "participants": "Participantes",
+    "addParticipants": "Añadir participantes",
+    "userWithoutValidEmail": "Este usuario no tiene email válido",
+    "errorAddingParticipant": "Error al añadir {email}: {error}",
+    "@errorAddingParticipant": {
+        "placeholders": {
+            "email": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "couldNotAddParticipants": "No se pudo añadir ningún participante",
+    "editGroup": "Editar Grupo",
+    "groupUpdatedSuccessfully": "Grupo actualizado correctamente",
+    "youHaveBeenKickedFrom": "Has sido expulsado de {groupName}",
+    "@youHaveBeenKickedFrom": {
+        "placeholders": {
+            "groupName": {
+                "type": "String"
+            }
+        }
+    },
+    "youLeftTheGroup": "Has salido del grupo",
+    "errorLeavingGroup": "Error al salir del grupo: {error}",
+    "@errorLeavingGroup": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "user": "Usuario",
+    "admin": "Admin",
+    "you": "Tú",
+    "adminRoleRemoved": "Se quitó el rol de admin a {nickname}",
+    "@adminRoleRemoved": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "adminRoleGranted": "Se otorgó el rol de admin a {nickname}",
+    "@adminRoleGranted": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "removeAdmin": "Quitar admin",
+    "makeAdmin": "Hacer admin",
+    "participantKicked": "Se expulsó a {nickname} del grupo",
+    "@participantKicked": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "kick": "Expulsar",
+    "kickParticipant": "Expulsar participante",
+    "areYouSureKickParticipant": "¿Estás seguro de que quieres expulsar a {nickname} del grupo?",
+    "@areYouSureKickParticipant": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "add": "Añadir",
+    "leaveGroup": "Salir del grupo",
+    "areYouSureLeaveGroup": "¿Estás seguro de que quieres salir del grupo?",
+    "leave": "Salir",
+    "groupDeleted": "Grupo eliminado",
+    "createGroup": "Crear Grupo",
+    "createAGroupToStart": "Crea un grupo para empezar",
+    "deleteMessage": "Eliminar mensaje",
+    "messageDeleted": "Mensaje eliminado",
+    "friendshipDeleted": "La amistad ha sido eliminada",
+    "groupHasBeenDeleted": "El grupo ha sido eliminado",
+    "youHaveBeenKickedFromGroup": "Has sido expulsado del grupo",
+    "editingMessage": "Editando mensaje...",
+    "groupNameRequired": "El nombre del grupo es obligatorio",
+    "selectAtLeastOneFriend": "Selecciona al menos un amigo",
+    "groupCreatedSuccessfully": "Grupo creado exitosamente",
+    "errorLoadingFriendsList": "Error al cargar amigos",
+    "noFriendsFoundSearch": "No se encontraron amigos",
+    "groupNotFound": "Grupo no encontrado",
+    "editGroupTooltip": "Editar grupo",
+    "edit": "Editar",
+    "areYouSureDeleteMessage": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.",
+    "confirmDeleteMessage": "Mensaje eliminado",
+    "noGroupsYet": "No tienes grupos",
+    "group": "Grupo",
+    "member": "Miembro",
+    "members": "Miembros",
+    "deleteGroup": "Eliminar grupo",
+    "areYouSureDeleteGroup": "Estas seguro de que quieres eliminar el grupo? Esta acción no se puede deshacer",
+    "confirmDeleteGroup": "Grupo eliminado",
+    "isWriting": "está escribiendo...",
+    "areWriting": "están escribiendo...",
+    "and": "y",
+    "more": "más",
+    "participantsAddedCorrectly": "Participante(s) añadido(s) correctamente",
+    "someParticipantsFailed": "Algunos participantes no se pudieron añadir",
+    "noUsersAvailableToAdd": "No hay usuarios disponibles para añadir",
+    "groupName": "Nombre del grupo",
+    "nameIsRequired": "El nombre es obligatorio",
+    "editedLabel": "(editado)",
+    "create": "Crear",
+    "descriptionOptional": "Descripción (opcional)",
+    "noFriendsToAdd": "No tienes amigos para añadir al grupo",
+    "couldNotFindUserEmail": "No se pudo encontrar el correo del usuario",
+    "deleteMessageConfirmation": "¿Estás seguro de que quieres eliminar este mensaje? Esta acción no se puede deshacer.",
+    "routeCompleted": "Recorrido finalizado",
+    "routeCompletedMessage": "Has llegado a tu destino",
+    "close": "Cerrar",
+    "uploadBikePhotoPoints": "Sube una foto de tu bici y gana 50 puntos extra",
+    "tapToTakePhoto": "Toca para tomar una foto",
+    "validatingPhoto": "Validando foto...",
+    "bikePhotoAccepted": "¡Foto aceptada! Has ganado 50 puntos extra",
+    "bikePhotoRejected": "No se detectó una bicicleta válida en la imagen. Por favor, intenta de nuevo.",
+    "bikeDetectionError": "Error al validar la imagen. Por favor, intenta de nuevo.",
+    "valid": "Válida",
+    "invalid": "Inválida",
+    "recordCompleted": "Grabación de ruta finalizada",
+    "recordCompletedMessage": "Grabación de ruta finalizada con éxito",
+    "routeSavedSuccessfully": "Ruta guardada correctamente",
+    "backToMap": "Volver al mapa",
+    "noRouteDataAvailable": "No hay datos de ruta disponibles",
+    "validationMinPoints": "La ruta debe tener al menos {count} puntos",
+    "@validationMinPoints": {
+        "placeholders": {
+        "count": {
+            "type": "int"
+        }
+        }
+    },
+    "validationNoMovement": "La ruta no muestra movimiento significativo",
+    "validationInconsistentTime": "Datos temporales inconsistentes",
+    "validationImpossibleSpeed": "Velocidad imposible detectada: {speed} km/h",
+    "@validationImpossibleSpeed": {
+        "placeholders": {
+        "speed": {
+            "type": "String"
+        }
+        }
+    },
+    "validationSuspiciousGPS": "Patrón de GPS sospechoso detectado",
+    "validationImpossibleMovements": "Movimientos imposibles detectados",
+    "validationMaxSpeedImpossible": "Velocidad máxima imposible",
+    "trophies": "Trofeos",
+    "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0",
+    "favoriteStations": "Estaciones Favoritas",
+    "completed": "Superado",
+    "challengeCompletedTitle": "¡Reto completado!",
+    "challengeCompletedMessage": "¡Felicidades! Has completado el reto:",
+    "challengeProgressTitle": "¡Progreso en el reto!",
+    "challengeProgressMessage": "¡Buen progreso! Has alcanzado el {percentage}% del reto:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "Aceptar",
+    "inactive": "Inactivo"
 }

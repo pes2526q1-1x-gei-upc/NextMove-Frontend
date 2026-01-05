@@ -11,14 +11,41 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/pr
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/appearance_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart'; // Import LoadUserProfile
+import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_statistics_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAndLoadUser();
+  }
+
+  void _checkAndLoadUser() {
+    final userBloc = context.read<UserBloc>();
+    final state = userBloc.state;
+    if (state is UserInitial ||
+        state is UserNeedsToSignUp ||
+        state is UserError) {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        userBloc.add(LoadUserProfile(currentUser.uid));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,23 +72,17 @@ class ProfilePage extends StatelessWidget {
             } else if (state is UserError) {
               displayName = l10n.ops;
               subText = l10n.errorLoadingProfile;
+              // Attempt to recover potentially?
+            } else if (state is UserNeedsToSignUp) {
+              displayName = "Perfil incompleto";
+              subText = "Necesitas completar tu registro";
             }
-
 
             String? userPhotoUrl;
             if (currentUser != null) {
-
               userPhotoUrl = currentUser.photo;
-
-
-              if (userPhotoUrl.isNotEmpty) {
-                debugPrint('ProfilePage: User has photo URL: $userPhotoUrl');
-              } else {
-                debugPrint('ProfilePage: User has no photo (URL is null or empty)');
-              }
             } else {
               userPhotoUrl = null;
-              debugPrint('ProfilePage: Current user is null, cannot load photo');
             }
 
             return SingleChildScrollView(
@@ -78,8 +99,7 @@ class ProfilePage extends StatelessWidget {
                     ProfileHeaderWidget(
                       title: displayName,
                       subtitle: subText,
-                      imageUrl:
-                          userPhotoUrl,
+                      imageUrl: userPhotoUrl,
                     ),
 
                     const SizedBox(height: 30),
@@ -99,6 +119,22 @@ class ProfilePage extends StatelessWidget {
                                 builder: (context) => BlocProvider.value(
                                   value: userBloc,
                                   child: const EditUserDataPreferencesPage(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const ProfileMenuDivider(),
+                        ProfileMenuOption(
+                          icon: Icons.bar_chart_rounded,
+                          text: l10n.myStatistics,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: context.read<UserBloc>(),
+                                  child: const UserStatisticsPage(),
                                 ),
                               ),
                             );
@@ -143,7 +179,6 @@ class ProfilePage extends StatelessWidget {
                             );
                           },
                         ),
-                        
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -194,10 +229,10 @@ class ProfilePage extends StatelessWidget {
                     const ProfileLogoutButton(),
 
                     const SizedBox(height: 15),
-                    // --- BOTÓN ELIMINAR CUENTA ---
 
+                    // --- BOTÓN ELIMINAR CUENTA ---
                     const DeleteAccountButton(),
-                    
+
                     const SizedBox(height: 30),
 
                     // --- FOOTER ---

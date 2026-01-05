@@ -13,12 +13,6 @@ class GraphQLQueries {
       phoneNumber
       preferredLanguage
       createdAt
-      isBanned
-      banInfo {
-        reason
-        description
-        duration
-      }
     }
   }
   ''';
@@ -231,6 +225,7 @@ class GraphQLQueries {
     ListFriends(){
       name
       photo
+      email
     }
   }''';
 
@@ -312,71 +307,73 @@ class GraphQLQueries {
     } 
   ''';
 
-    static const String getNavigationRouteQuery = r'''
-      query ComputeRoute(
-        $origin: CoordinatesInput!
-        $destination: CoordinatesInput!
-        $travelMode: TravelMode!
-        $routingPreference: RoutingPreference!
+static const String getNavigationRouteQuery = r'''
+  query ComputeRoute(
+    $origin: CoordinatesInput!
+    $destination: CoordinatesInput!
+    $travelMode: TravelMode!
+    $routingPreference: RoutingPreference!
+    $languageCode: String!
+  ) {
+      computeRoute(
+        input: {
+          origin: $origin
+          destination: $destination
+          travelMode: $travelMode
+          routingPreference: $routingPreference
+          languageCode: $languageCode
+        }
       ) {
-          computeRoute(
-            input: {
-              origin: $origin
-              destination: $destination
-              travelMode: $travelMode
-              routingPreference: $routingPreference
+        recommendedRoute {
+          distance
+          distanceMeters
+          duration
+          durationSeconds
+          polyline
+          isEcoFriendly
+          routeLabels
+          startLocation {
+            latitude
+            longitude
+          }
+          endLocation {
+            latitude
+            longitude
+          }
+          viewport {
+            low {
+              latitude
+              longitude
             }
-          ) {
-            recommendedRoute {
-              distance
-              distanceMeters
-              duration
-              durationSeconds
-              polyline
-              isEcoFriendly
-              routeLabels
-              startLocation {
-                latitude
-                longitude
-              }
-              endLocation {
-                latitude
-                longitude
-              }
-              viewport {
-                low {
-                  latitude
-                  longitude
-                }
-                high {
-                  latitude
-                  longitude
-                }
-              }
-              travelAdvisory {
-                hasTollRoads
-                estimatedTollPrice
-                fuelConsumption
-              }
-              steps {
-                instruction
-                distance
-                distanceMeters
-                duration
-                durationSeconds
-                startLocation {
-                  latitude
-                  longitude
-                }
-                endLocation {
-                  latitude
-                  longitude
-                }
-                polyline
-              }
+            high {
+              latitude
+              longitude
             }
           }
-        }''';
+          travelAdvisory {
+            hasTollRoads
+            estimatedTollPrice
+            fuelConsumption
+          }
+          steps {
+            instruction
+            distance
+            distanceMeters
+            duration
+            durationSeconds
+            startLocation {
+              latitude
+              longitude
+            }
+            endLocation {
+              latitude
+              longitude
+            }
+            polyline
+          }
+        }
+      }
+    }''';
   static const String addFavStation = r'''
     mutation addFavStation($stationId: String!, $stationType: String!) {
       addFavStation(station_id: $stationId, type: $stationType)
@@ -395,6 +392,7 @@ class GraphQLQueries {
   query getRanking($metric: String!) {
     ranking(metric: $metric) {
       email
+      nickname
       num_rutas
       km_recorridos
       elevacion_positiva
@@ -458,20 +456,152 @@ class GraphQLQueries {
       photo
       company {
         name
-        photo
+        logo_url
+        email
+        url
+        description
       }
     }
   }''';
 
-  static const String getEnrolledChallengesNames = r'''
+  static const String getEnrolledChallenge = r'''
   query getEnrolledChallenges {
     getEnrolledChallenges {
+      id
+      description
+      distance
       name
+      points
+      starting_date
+      ending_date
+      photo
+      company {
+        name
+        logo_url
+        email
+        url
+        description
+      }
+      completed
+      total_distance
+      current_distance
     }
   }''';
 
   static const String enrollInChallenge = r'''
   mutation enrollInChallenge($challengeId: String!) {
     enrollChallenge(challenge_id: $challengeId)
+  }''';
+
+  static const String getCompletedChallenges = r'''
+  query getCompletedChallenges {
+    getTrophies {
+      name
+    }
+  }''';
+
+  static const String getFavCarStations = r'''
+  query GetFavCarStations {
+    getFavCarStations {
+      station_id
+    }
+  }
+  ''';
+
+  static const String getFavBikeStations = r'''
+  query GetFavBikeStations {
+    getFavBikeStations {
+      station_id
+    }
+  }''';
+  static const String getOrCreateDirectChatQuery = r'''
+    query GetOrCreateDirectChat($userEmail: String!) {
+      getOrCreateDirectChat(userEmail: $userEmail) {
+        id
+        type
+        name
+      }
+    }
+  ''';
+
+  static const String myChatsQuery = r'''
+    query MyChats {
+      myChats {
+        id
+        type
+        name
+        description
+        photo
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+          isAdmin
+        }
+        lastMessage {
+          content
+          sender
+          timestamp
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static const String chatMessagesQuery = r'''
+    query ChatMessages($chatId: ID!, $limit: Int, $offset: Int) {
+      chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
+        id
+        chatId
+        senderEmail
+        senderNickname
+        senderPhoto
+        content
+        type
+        createdAt
+        deleted
+        deletedAt
+        edited
+        editedAt
+      }
+    }
+  ''';
+
+  static const String getChatDetailsQuery = r'''
+    query GetChatDetails($chatId: ID!) {
+      myChats {
+        id
+        type
+        name
+        description
+        participants {
+          userEmail
+          nickname
+          photoUrl
+          joinedAt
+        }
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  // === Compañías ===
+
+  static const String getPromotedCompanies = r'''
+  query getPromotedCompanies {
+    getPromotedCompanies {
+      location {
+        latitude
+        longitude
+      }
+      url
+      name
+      email
+      description
+      logo_url
+    }
   }''';
 }

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 /// Clase base abstracta para todos los eventos del mapa
 abstract class MapEvent extends Equatable {
@@ -35,15 +36,17 @@ class UpdateUserLocationEvent extends MapEvent {
   final double latitude;
   final double longitude;
   final double altitude;
+  final double heading; // Orientación en grados (0-360)
 
   const UpdateUserLocationEvent({
     required this.latitude,
     required this.longitude,
     required this.altitude,
+    required this.heading,
   });
 
   @override
-  List<Object?> get props => [latitude, longitude, altitude];
+  List<Object?> get props => [latitude, longitude, altitude, heading];
 }
 
 /// Evento: solicitar permisos de ubicación
@@ -95,7 +98,22 @@ class StartRouteRecordingEvent extends MapEvent {
 
 /// Evento: detener grabación de ruta
 class StopRouteRecordingEvent extends MapEvent {
-  const StopRouteRecordingEvent();
+  final AppLocalizations l10n;
+  const StopRouteRecordingEvent(this.l10n);
+  
+  @override
+  List<Object?> get props => [l10n];
+}
+
+/// Evento: guardar recorrido grabado
+class SaveRecordedTrackEvent extends MapEvent {
+  final AppLocalizations l10n;
+  final bool bikePhoto;
+  
+  const SaveRecordedTrackEvent(this.l10n, {this.bikePhoto = false});
+  
+  @override
+  List<Object?> get props => [l10n, bikePhoto];
 }
 
 /// Evento: agregar punto a la ruta actual
@@ -115,17 +133,36 @@ class UpdateRecordingElapsedTimeEvent extends MapEvent {
 
 class ShowRouteToStationEvent extends MapEvent {
   final StationDetails station;
-  //final LatLng? userLocation;
-
+  final String? languageCode;
+  
   const ShowRouteToStationEvent({
     required this.station,
-    //this.userLocation,
+    this.languageCode,
   });
 
   @override
-  List<Object?> get props => [station /*, userLocation*/];
+  List<Object?> get props => [station, languageCode];
 }
 
 class CancelNavigationEvent extends MapEvent {
   const CancelNavigationEvent();
 }
+
+class ResetStatisticsNavigationEvent extends MapEvent {
+  const ResetStatisticsNavigationEvent();
+}
+
+class ResetChallengeCompletionEvent extends MapEvent {
+  const ResetChallengeCompletionEvent();
+}
+
+/// Evento: iniciar navegación turn-by-turn
+class StartTurnByTurnNavigationEvent extends MapEvent {
+  const StartTurnByTurnNavigationEvent();
+}
+
+/// Evento: detener navegación turn-by-turn
+class StopTurnByTurnNavigationEvent extends MapEvent {
+  const StopTurnByTurnNavigationEvent();
+}
+

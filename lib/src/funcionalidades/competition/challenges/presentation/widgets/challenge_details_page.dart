@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/challenge.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/enrolled_challenge.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/bloc/challenges_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/utils.dart';
+import 'package:eventide/eventide.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/presentation/widgets/challenge_progress_indicator.dart';
+import 'package:nextmove_app/src/shared/utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChallengeDetailsPage extends StatelessWidget {
   const ChallengeDetailsPage({super.key, required this.challenge});
@@ -33,12 +37,17 @@ class ChallengeDetailsPage extends StatelessWidget {
 
     return BlocBuilder<ChallengesBloc, ChallengesState>(
       builder: (context, state) {
-        final updatedChallenge = (state is ChallengesLoaded)
-            ? state.challenges.firstWhere(
-                (c) => c.id == challenge.id,
-                orElse: () => challenge,
-              )
-            : challenge;
+        Challenge displayChallenge = challenge;
+        if (state is ChallengesLoaded) {
+          if (state.enrolledChallenge?.id == challenge.id) {
+            displayChallenge = state.enrolledChallenge!;
+          } else {
+            displayChallenge = state.challenges.firstWhere(
+              (c) => c.id == challenge.id,
+              orElse: () => challenge,
+            );
+          }
+        }
         return Scaffold(
           appBar: AppBar(title: Text(challenge.name), elevation: 0),
           body: SingleChildScrollView(
@@ -84,7 +93,7 @@ class ChallengeDetailsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TitleAndJoinButtonRow(
-                        challenge: updatedChallenge,
+                        challenge: displayChallenge,
                         theme: theme,
                       ),
                       const SizedBox(height: 16),
@@ -100,12 +109,23 @@ class ChallengeDetailsPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
 
+                      if (displayChallenge is EnrolledChallenge) ...[
+                        sectionTitle(context, l10n.progress),
+                        const SizedBox(height: 12),
+                        ChallengeProgressIndicator(
+                          enrolledChallenge: displayChallenge,
+                          theme: theme,
+                          l10n: l10n,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
                       infoRow(
                         context,
                         Icons.star,
                         l10n.points(challenge.points),
                         Icons.route,
-                        "${challenge.distance.toInt()} km",
+                        "${challenge.distance.toStringAsFixed(1)} km",
                       ),
                       const SizedBox(height: 24),
 
@@ -203,10 +223,10 @@ class ChallengeDetailsPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                if (challenge.company.logo != null)
+                if (challenge.company.logoUrl != null)
                   CircleAvatar(
                     radius: 24,
-                    backgroundImage: NetworkImage(challenge.company.logo!),
+                    backgroundImage: NetworkImage(challenge.company.logoUrl!),
                     onBackgroundImageError: (_, __) =>
                         const Icon(Icons.business),
                   )
@@ -245,9 +265,25 @@ class ChallengeDetailsPage extends StatelessWidget {
                 children: [
                   Icon(Icons.email, size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    challenge.company.email!,
-                    style: theme.textTheme.bodyMedium,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final Uri emailUri = Uri(
+                          scheme: 'mailto',
+                          path: challenge.company.email!,
+                        );
+                        if (await canLaunchUrl(emailUri)) {
+                          await launchUrl(emailUri);
+                        }
+                      },
+                      child: Text(
+                        challenge.company.email!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -258,9 +294,22 @@ class ChallengeDetailsPage extends StatelessWidget {
                 children: [
                   Icon(Icons.link, size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    challenge.company.url!,
-                    style: theme.textTheme.bodyMedium,
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final Uri url = Uri.parse(challenge.company.url!);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        }
+                      },
+                      child: Text(
+                        challenge.company.url!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -286,42 +335,108 @@ class TitleAndJoinButtonRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final ChallengesBloc challengesBloc = context.read<ChallengesBloc>();
-    final bool isEnrolledToAChallenge =
-        (challengesBloc.state as ChallengesLoaded).isEnrolled;
+    final currentState = challengesBloc.state as ChallengesLoaded;
+    final bool isEnrolledToAChallenge = currentState.hasEnrolledChallenge;
+    final bool isThisChallengeEnrolled =
+        currentState.enrolledChallenge?.id == challenge.id;
+    final bool isThisChallengeCompleted = challenge.isCompleted;
+    final bool isChallengeActive =
+        challenge.startingDate.isBefore(DateTime.now()) &&
+        challenge.endingDate.isAfter(DateTime.now());
+
     return Row(
       children: [
         Expanded(
-          child: Text(
-            challenge.name,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Text(
+              challenge.name,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
         ),
         if (!isEnrolledToAChallenge ||
-            ((isEnrolledToAChallenge && challenge.isEnrolled)))
+            ((isEnrolledToAChallenge && isThisChallengeEnrolled)) ||
+            isThisChallengeCompleted) ...[
           ElevatedButton(
-            onPressed: (challenge.isEnrolled)
+            onPressed:
+                (isThisChallengeEnrolled ||
+                    isThisChallengeCompleted ||
+                    !isChallengeActive)
                 ? null
                 : () {
                     challengesBloc.add(EnrollInChallengeEvent(challenge.id));
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: challenge.isEnrolled
+              backgroundColor:
+                  isThisChallengeEnrolled ||
+                      isThisChallengeCompleted ||
+                      !isChallengeActive
                   ? theme.colorScheme.primaryContainer
                   : theme.colorScheme.primary,
             ),
             child: Text(
-              challenge.isEnrolled ? l10n.enrolled : l10n.enroll,
+              isThisChallengeEnrolled
+                  ? l10n.enrolled
+                  : isThisChallengeCompleted
+                  ? l10n.completed
+                  : isChallengeActive
+                  ? l10n.enroll
+                  : l10n.inactive,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: challenge.isEnrolled
+                color:
+                    isThisChallengeEnrolled ||
+                        isThisChallengeCompleted ||
+                        !isChallengeActive
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onPrimary,
               ),
             ),
           ),
+          const SizedBox(width: 8),
+        ],
+        ElevatedButton(
+          onPressed: () async {
+            await addChallengeToCalendar(context, challenge);
+          },
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+          ),
+          child: Icon(Icons.calendar_month),
+        ),
       ],
     );
+  }
+
+  Future<void> addChallengeToCalendar(
+    BuildContext context,
+    Challenge challenge,
+  ) async {
+    AppLocalizations l10n = AppLocalizations.of(context)!;
+    try {
+      await Eventide().createEventThroughNativePlatform(
+        title: challenge.name,
+        startDate: challenge.startingDate,
+        endDate: challenge.endingDate,
+        isAllDay: true,
+        description: challenge.description,
+        url: challenge.company.url,
+      );
+    } catch (e) {
+      if (e is ETPresentationException || e is ETGenericException) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${l10n.errorAddingToCalendar}: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 }

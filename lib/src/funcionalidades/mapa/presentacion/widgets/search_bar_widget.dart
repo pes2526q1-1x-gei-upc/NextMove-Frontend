@@ -50,6 +50,8 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
 
   void clearSearch() {
     _searchController.clear();
+    _debounce?.cancel();
+    context.read<MapBloc>().add(const ClearSearchEvent());
     setState(() {});
   }
 

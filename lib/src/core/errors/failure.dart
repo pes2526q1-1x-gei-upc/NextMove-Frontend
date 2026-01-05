@@ -25,3 +25,7 @@ class ConnectionFailure extends Failure {
 class UnknownFailure extends Failure {
   const UnknownFailure({super.message = 'Error desconocido'});
 }
+
+class ValidationFailure extends Failure {
+  ValidationFailure({String? message}) : super(message: message ?? 'Validation failed');
+}

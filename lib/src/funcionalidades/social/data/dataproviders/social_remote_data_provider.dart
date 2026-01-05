@@ -31,7 +31,7 @@ class SocialRemoteDataProvider {
     return data.map((json) {
       final friendNick = json['name'] ?? 'Desconocido';
       return UserEntity(
-        email: "", 
+        email: json['email'] ?? "", 
         apodo: friendNick,
         nombreCompleto: friendNick, 
         fechaNacimiento: DateTime.now(),

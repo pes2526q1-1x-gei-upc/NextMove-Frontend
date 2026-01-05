@@ -75,10 +75,16 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
-    final statsData = await _fetchStatistics(data['email']);
-
-    if (statsData != null) {
-      data['statistics'] = statsData;
+    // _fetchStatistics is now optional to prevent blocking profile load
+    try {
+      final statsData = await _fetchStatistics(data['email']);
+      if (statsData != null) {
+        data['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(data);
@@ -110,10 +116,15 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
-    final statsData = await _fetchStatistics(email);
-
-    if (statsData != null) {
-      data['statistics'] = statsData;
+    try {
+      final statsData = await _fetchStatistics(email);
+      if (statsData != null) {
+        data['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(data);
@@ -132,9 +143,8 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw (stats): ${result.exception.toString()}');
       }
-      throw custom_exceptions.ServerException(
-        'Error al obtener estadísticas: ${result.exception}',
-      );
+      // Return null instead of throwing to allow partial data loading
+      return null;
     }
 
     final statsData = result.data?['userStats'];
@@ -144,7 +154,7 @@ class UserRemoteDataProvider {
           'No se encontraron estadísticas para el usuario con email: $email',
         );
       }
-      return;
+      return null;
     }
 
     return statsData;
@@ -208,6 +218,17 @@ class UserRemoteDataProvider {
       print(
         "UserRemoteDataProvider: Found user: ${exactMatch['nickname']} (Email: ${exactMatch['email']})",
       );
+    }
+
+    try {
+      final statsData = await _fetchStatistics(exactMatch['email']);
+      if (statsData != null) {
+        exactMatch['statistics'] = statsData;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Warning: Failed to load statistics (ignoring): $e');
+      }
     }
 
     return UserEntity.fromRawData(exactMatch);
@@ -437,6 +458,74 @@ class UserRemoteDataProvider {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['imageUrl'];
+      } else {
+        if (kDebugMode) {
+          print('Upload failed: ${response.statusCode} - ${response.body}');
+        }
+        throw custom_exceptions.ServerException(
+          'Error al subir foto: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Exception uploading photo: $e');
+      }
+      throw custom_exceptions.ServerException(
+        'Error de conexión al subir foto',
+      );
+    }
+  }
+
+  Future<String> uploadPhoto(File file) async {
+    final user = firebaseAuth.currentUser;
+    if (user == null) {
+      throw custom_exceptions.AuthException(message: 'Usuario no autenticado');
+    }
+
+    final token = await user.getIdToken();
+    final endpoint = dotenv.env['GRAPHQL_ENDPOINT'];
+
+    if (endpoint == null) {
+      throw custom_exceptions.ServerException('GRAPHQL_ENDPOINT no definido');
+    }
+
+    // Construimos la URL hacia el nuevo endpoint genérico
+    final baseUrl = endpoint.replaceAll('/graphql', '');
+    final uploadUrl = '$baseUrl/api/upload-photo'; // <--- NOMBRE ACTUALIZADO
+
+    if (kDebugMode) {
+      print('Uploading photo to: $uploadUrl');
+    }
+
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Determinar el tipo MIME para que S3 lo reconozca bien
+      final mimeType = lookupMimeType(file.path);
+      MediaType? mediaType;
+      if (mimeType != null) {
+        final split = mimeType.split('/');
+        if (split.length == 2) {
+          mediaType = MediaType(split[0], split[1]);
+        }
+      }
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          file.path,
+          contentType: mediaType,
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        // El backend ahora solo devuelve la URL
         return jsonResponse['imageUrl'];
       } else {
         if (kDebugMode) {

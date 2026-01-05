@@ -1,4 +1,5 @@
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/trophy.dart';
 
 class Challenge {
   final String id;
@@ -9,8 +10,10 @@ class Challenge {
   final int points;
   final DateTime startingDate;
   final DateTime endingDate;
-  final bool isEnrolled;
   final String? photo;
+  final bool isCompleted;
+
+  final Trophy trophy;
 
   Challenge({
     required this.id,
@@ -21,20 +24,17 @@ class Challenge {
     required this.points,
     required this.startingDate,
     required this.endingDate,
-    required this.isEnrolled,
     this.photo,
-  });
+    required this.isCompleted,
+  }) : trophy = Trophy.fromChallengeName(name);
 
-  factory Challenge.fromJson(
-    Map<String, dynamic> json,
-    List<String> enrolledChallengesNames,
-  ) {
+  factory Challenge.fromJson(Map<String, dynamic> json) {
     return Challenge(
       id: json['id'] as String,
       name: json['name'] as String,
       company: Company.fromJson(json['company'] as Map<String, dynamic>),
       description: json['description'] as String,
-      distance: (json['distance'] as num).toDouble(),
+      distance: ((json['distance'] as num).toDouble()) / 1000, // meters to kilometers
       points: json['points'] as int,
       startingDate: DateTime.fromMillisecondsSinceEpoch(
         int.parse(json['starting_date'] as String),
@@ -42,7 +42,8 @@ class Challenge {
       endingDate: DateTime.fromMillisecondsSinceEpoch(
         int.parse(json['ending_date'] as String),
       ),
-      isEnrolled: enrolledChallengesNames.contains(json['name'] as String),
+      photo: json['photo'] as String?,
+      isCompleted: json['is_completed'] as bool,
     );
   }
 
@@ -55,8 +56,8 @@ class Challenge {
     int? points,
     DateTime? startingDate,
     DateTime? endingDate,
-    bool? isEnrolled,
     String? photo,
+    bool? isCompleted,
   }) {
     return Challenge(
       id: id ?? this.id,
@@ -67,8 +68,8 @@ class Challenge {
       points: points ?? this.points,
       startingDate: startingDate ?? this.startingDate,
       endingDate: endingDate ?? this.endingDate,
-      isEnrolled: isEnrolled ?? this.isEnrolled,
       photo: photo ?? this.photo,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 }

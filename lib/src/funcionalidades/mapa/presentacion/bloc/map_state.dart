@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/navigation_route.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/company.dart';
 
 /// Clase base abstracta para todos los estados del mapa
 abstract class MapState extends Equatable {
@@ -26,11 +27,13 @@ class MapLoadingState extends MapState {
 class MapLoadedState extends MapState {
   final List<StationDetails> bikeStations;
   final List<StationDetails> evStations;
+  final List<Company> promotedCompanies;
   final LatLng? userLocation;
   final StationType currentMode;
   final MapType currentMapType;
   final Set<Marker> bikeMarkers;
   final Set<Marker> carMarkers;
+  final Set<Marker> companyMarkers;
   final LatLng centerPosition;
   final String? searchQuery;
   final List<StationDetails> searchResults;
@@ -49,15 +52,28 @@ class MapLoadedState extends MapState {
   final RouteViewport? routeViewport;
   final ClusterManager? bikeClusterManager;
   final ClusterManager? evClusterManager;
+  final bool shouldShowStatistics;
+  final ClusterManager? companyClusterManager;
+  final String? challengeNotificationMessage;
+  final String? challengeNotificationTitle;
+  final int? challengeNotificationPercentage;
+  final String? challengeNotificationName;  
+  // Turn-by-turn navigation fields
+  final bool isTurnByTurnActive;
+  final int? currentStepIndex;
+  final int? distanceToNextStepMeters;
+  final double? userHeading; // Orientación del usuario para rotar el mapa (0-360)
 
   const MapLoadedState({
     required this.bikeStations,
     required this.evStations,
+    required this.promotedCompanies,
     this.userLocation,
     required this.currentMode,
     required this.currentMapType,
     required this.bikeMarkers,
     required this.carMarkers,
+    required this.companyMarkers,
     required this.centerPosition,
     this.searchQuery,
     this.searchResults = const [],
@@ -76,17 +92,29 @@ class MapLoadedState extends MapState {
     this.routeViewport,
     this.bikeClusterManager,
     this.evClusterManager,
+    this.shouldShowStatistics = false,
+    this.companyClusterManager,
+    this.challengeNotificationTitle,
+    this.challengeNotificationMessage,
+    this.challengeNotificationPercentage,
+    this.challengeNotificationName,
+    this.isTurnByTurnActive = false,
+    this.currentStepIndex,
+    this.distanceToNextStepMeters,
+    this.userHeading,
   });
 
   @override
   List<Object?> get props => [
         bikeStations,
         evStations,
+        promotedCompanies,
         userLocation,
         currentMode,
         currentMapType,
         bikeMarkers,
         carMarkers,
+        companyMarkers,
         centerPosition,
         searchQuery,
         searchResults,
@@ -105,17 +133,29 @@ class MapLoadedState extends MapState {
         routeViewport,
         bikeClusterManager,
         evClusterManager,
+        shouldShowStatistics,
+        companyClusterManager,
+        challengeNotificationTitle,
+        challengeNotificationMessage,
+        challengeNotificationPercentage,
+        challengeNotificationName,
+        isTurnByTurnActive,
+        currentStepIndex,
+        distanceToNextStepMeters,
+        userHeading,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
   MapLoadedState copyWith({
     List<StationDetails>? bikeStations,
     List<StationDetails>? evStations,
+    List<Company>? promotedCompanies,
     LatLng? userLocation,
     StationType? currentMode,
     MapType? currentMapType,
     Set<Marker>? bikeMarkers,
     Set<Marker>? carMarkers,
+    Set<Marker>? companyMarkers,
     LatLng? centerPosition,
     String? searchQuery,
     bool clearSearchQuery = false,
@@ -136,15 +176,27 @@ class MapLoadedState extends MapState {
     RouteViewport? routeViewport,
     ClusterManager? bikeClusterManager,
     ClusterManager? evClusterManager,
+    bool? shouldShowStatistics,
+    ClusterManager? companyClusterManager,
+    String? challengeNotificationTitle,
+    String? challengeNotificationMessage,
+    int? challengeNotificationPercentage,
+    String? challengeNotificationName,
+    bool? isTurnByTurnActive,
+    int? currentStepIndex,
+    int? distanceToNextStepMeters,
+    double? userHeading,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
       evStations: evStations ?? this.evStations,
+      promotedCompanies: promotedCompanies ?? this.promotedCompanies,
       userLocation: userLocation ?? this.userLocation,
       currentMode: currentMode ?? this.currentMode,
       currentMapType: currentMapType ?? this.currentMapType,
       bikeMarkers: bikeMarkers ?? this.bikeMarkers,
       carMarkers: carMarkers ?? this.carMarkers,
+      companyMarkers: companyMarkers ?? this.companyMarkers,
       centerPosition: centerPosition ?? this.centerPosition,
       searchQuery: clearSearchQuery ? null : (searchQuery ?? this.searchQuery),
       searchResults: searchResults ?? this.searchResults,
@@ -163,6 +215,16 @@ class MapLoadedState extends MapState {
       routeViewport: routeViewport ?? this.routeViewport,
       bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
       evClusterManager: evClusterManager ?? this.evClusterManager,
+      shouldShowStatistics: shouldShowStatistics ?? this.shouldShowStatistics,
+      companyClusterManager: companyClusterManager ?? this.companyClusterManager,
+      challengeNotificationTitle: challengeNotificationTitle ?? this.challengeNotificationTitle,
+      challengeNotificationMessage: challengeNotificationMessage ?? this.challengeNotificationMessage,
+      challengeNotificationPercentage: challengeNotificationPercentage ?? this.challengeNotificationPercentage,
+      challengeNotificationName: challengeNotificationName ?? this.challengeNotificationName,
+      isTurnByTurnActive: isTurnByTurnActive ?? this.isTurnByTurnActive,
+      currentStepIndex: currentStepIndex ?? this.currentStepIndex,
+      distanceToNextStepMeters: distanceToNextStepMeters ?? this.distanceToNextStepMeters,
+      userHeading: userHeading ?? this.userHeading,
     );
   }
 

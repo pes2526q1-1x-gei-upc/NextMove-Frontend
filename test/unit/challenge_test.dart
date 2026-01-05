@@ -6,6 +6,7 @@ void main() {
     group('fromJson', () {
       test('should parse valid JSON data correctly', () {
         final jsonData = {
+          'id': 'challenge-1',
           'company': {
             'name': 'Test Company',
             'email': 'test@company.com',
@@ -14,28 +15,30 @@ void main() {
             'logo': 'https://testcompany.com/logo.png',
           },
           'description': 'Complete a 10km run',
-          'distance': 10.0,
+          'distance': 10000.0,
           'ending_date': '1740009600000',
           'name': '10km Challenge',
           'points': 100,
-          'starting_date': '1738368000000'
+          'starting_date': '1738368000000',
+          'photo': 'https://example.com/photo.jpg',
+          'is_completed': false
         };
-        final enrolledChallengesNames = ['10km Challenge', 'Another Challenge'];
+        final challenge = Challenge.fromJson(jsonData);
 
-        final challenge = Challenge.fromJson(jsonData, enrolledChallengesNames);
-
+        expect(challenge.id, 'challenge-1');
         expect(challenge.company.name, 'Test Company');
         expect(challenge.description, 'Complete a 10km run');
         expect(challenge.distance, 10.0);
         expect(challenge.name, '10km Challenge');
         expect(challenge.points, 100);
-        expect(challenge.isEnrolled, true);
         expect(challenge.endingDate, DateTime.fromMillisecondsSinceEpoch(1740009600000));
         expect(challenge.startingDate, DateTime.fromMillisecondsSinceEpoch(1738368000000));
+        expect(challenge.photo, 'https://example.com/photo.jpg');
       });
 
       test('should handle integer distance', () {
         final jsonData = {
+          'id': 'challenge-2',
           'company': {
             'name': 'Another Company',
             'email': 'another@company.com',
@@ -44,19 +47,24 @@ void main() {
             'logo': null,
           },
           'description': 'Test challenge',
-          'distance': 5, // Integer instead of double
+          'distance': 5000,
           'ending_date': '1740009600000',
           'name': 'Test',
           'points': 50,
           'starting_date': '1738368000000',
+          'is_completed': false
         };
-        final enrolledChallengesNames = ['Different Challenge'];
+        final challenge = Challenge.fromJson(jsonData);
 
-        final challenge = Challenge.fromJson(jsonData, enrolledChallengesNames);
-
+        expect(challenge.id, 'challenge-2');
         expect(challenge.company.name, 'Another Company');
+        expect(challenge.description, 'Test challenge');
         expect(challenge.distance, 5.0);
-        expect(challenge.isEnrolled, false);
+        expect(challenge.name, 'Test');
+        expect(challenge.points, 50);
+        expect(challenge.endingDate, DateTime.fromMillisecondsSinceEpoch(1740009600000));
+        expect(challenge.startingDate, DateTime.fromMillisecondsSinceEpoch(1738368000000));
+        expect(challenge.photo, null);
       });
     });
   });

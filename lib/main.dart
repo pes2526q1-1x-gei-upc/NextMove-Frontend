@@ -24,9 +24,15 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_user_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/banned_user_page.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
+
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket_datasource.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
+import 'package:nextmove_app/config/socket_config.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final UserProvider userProvider = UserProvider();
@@ -185,6 +191,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         await _handleUserLogin(user);
       } else {
         if (mounted) {
+          // Desconectar el socket cuando el usuario cierra sesión
+          SocketConfig.disconnect();
           userProvider.clearUser();
           localeProvider.clearLocale();
           setState(() {
@@ -228,7 +236,11 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
-
+        final fireBaseUser = FirebaseAuth.instance.currentUser;
+        if (fireBaseUser != null) {
+          final token = await fireBaseUser.getIdToken();
+          debugPrint('Bearer $token') ;
+        }
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
         }
@@ -273,7 +285,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => BlockedUserPage(banInfo: _banInfo),
+              builder: (context) => BannedUserPage(banInfo: _banInfo),
             ),
           );
         });
@@ -309,12 +321,20 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final Set<int> _visitedIndices = {0};
+  final GlobalKey<_ChatsPlaceholderState> _chatsPlaceholderKey = GlobalKey<_ChatsPlaceholderState>();
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       _visitedIndices.add(index);
     });
+    
+    // Si se selecciona la página de chats (índice 1), refrescar la lista
+    if (index == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _chatsPlaceholderKey.currentState?.refreshChatList();
+      });
+    }
   }
 
   @override
@@ -328,7 +348,7 @@ class _MainScreenState extends State<MainScreen> {
           const MapPage(),
 
           _visitedIndices.contains(1)
-              ? const ChatsPlaceholder()
+              ? ChatsPlaceholder(key: _chatsPlaceholderKey)
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(2)
@@ -386,13 +406,42 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class ChatsPlaceholder extends StatelessWidget {
+class ChatsPlaceholder extends StatefulWidget {
   const ChatsPlaceholder({super.key});
+  
+  @override
+  State<ChatsPlaceholder> createState() => _ChatsPlaceholderState();
+}
+
+class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
+  late final ChatBloc _chatBloc;
+  final GlobalKey<State<ChatListPage>> _chatListPageKey = GlobalKey<State<ChatListPage>>();
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = ChatBloc(
+      ChatRepository(SocketDataSource()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.close();
+    super.dispose();
+  }
+
+  /// Método público para refrescar la lista de chats
+  /// Se llama desde MainScreen cuando se selecciona el índice de chat
+  void refreshChatList() {
+    ChatListPage.refresh(_chatListPageKey);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Chats")),
-      body: const Center(child: Text("Pantalla de Chats")),
+    return BlocProvider.value(
+      value: _chatBloc,
+      child: ChatListPage(key: _chatListPageKey),
     );
   }
 }
