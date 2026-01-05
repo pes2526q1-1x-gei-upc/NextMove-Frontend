@@ -226,6 +226,8 @@ class _RankingUserTileState extends State<RankingUserTile> {
             ? '${widget.entry.challengesParticipated ?? 0}'
             : widget.selectedMetric == 'num_retos_completados'
             ? '${widget.entry.challengesCompleted ?? 0}'
+            : widget.selectedMetric == 'puntos_totales'
+            ? '${widget.entry.points ?? 0}'
             : '${(widget.entry.elevationGain ?? 0.0).toStringAsFixed(2)} m',
         style: TextStyle(
           fontWeight: isCurrentUser ? FontWeight.w500 : FontWeight.normal,

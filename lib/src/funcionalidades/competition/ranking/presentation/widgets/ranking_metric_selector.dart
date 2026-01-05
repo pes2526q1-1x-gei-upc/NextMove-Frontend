@@ -23,6 +23,7 @@ class RankingMetricSelector extends StatelessWidget {
       {'key': 'co2_ahorrado', 'label': l10n.co2Saved},
       {'key': 'num_retos_participados', 'label': l10n.challengesParticipated},
       {'key': 'num_retos_completados', 'label': l10n.challengesCompleted},
+      {'key': 'puntos_totales', 'label': l10n.totalPoints},
     ];
 
     List<DropdownMenuItem<String>> metricsDropdownItems = metrics

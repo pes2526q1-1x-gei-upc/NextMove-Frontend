@@ -400,6 +400,7 @@ static const String getNavigationRouteQuery = r'''
       calorias_quemadas
       num_retos_participados
       num_retos_completados
+      puntos_totales
     }
   }''';
 
@@ -431,6 +432,7 @@ static const String getNavigationRouteQuery = r'''
       num_retos_participados
       num_retos_completados
       num_rutas
+      puntos_totales
     }
   }''';
 

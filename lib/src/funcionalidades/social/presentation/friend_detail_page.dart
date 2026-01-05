@@ -105,6 +105,16 @@ class FriendDetailsPage extends StatelessWidget {
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
                     if (state is UserLoaded) {
+                      final userProvider = Provider.of<UserProvider>(
+                        context,
+                        listen: false,
+                      );
+                      final currentUserEmail = userProvider.email;
+                      
+                      if (currentUserEmail == state.user.email) {
+                        return const SizedBox.shrink();
+                      }
+                      
                       return IconButton(
                         icon: const Icon(
                           Icons.block_rounded,
