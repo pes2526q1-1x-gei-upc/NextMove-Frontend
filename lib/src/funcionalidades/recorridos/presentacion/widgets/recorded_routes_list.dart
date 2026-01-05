@@ -49,7 +49,24 @@ class RouteHistoryList extends StatelessWidget {
                   elevation: 0,
                 ),
                 body: Center(
-                  child: Text(l10n.noRoutesFound),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.route_outlined,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.noRecordedRoutesYet,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
