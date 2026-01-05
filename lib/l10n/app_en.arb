@@ -522,5 +522,6 @@
                 "example": "Urban Cyclist"
             }
         }
-    }
+    },
+    "trophyWonMessage": "Here is the trophy you have just won for this challenge!"
 }

@@ -524,5 +524,6 @@
                 "example": "Ciclista Urbano"
             }
         }
-    }
+    },
+    "trophyWonMessage": "¡Aquí está el trofeo que acabas de ganar por este reto!"
 }

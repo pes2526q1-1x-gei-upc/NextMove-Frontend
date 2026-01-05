@@ -509,5 +509,6 @@
                 "example": "Ciclista Urbà"
             }
         }
-    }
+    },
+    "trophyWonMessage": "Aquí està el trofeu que acabes de guanyar per aquest repte!"
 }
