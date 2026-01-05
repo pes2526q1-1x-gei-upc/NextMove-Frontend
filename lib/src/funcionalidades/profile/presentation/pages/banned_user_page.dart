@@ -1,11 +1,83 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/shared/utils.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/auth_service.dart';
 
-class BannedUserPage extends StatelessWidget {
+class BannedUserPage extends StatefulWidget {
   final Map<String, dynamic>? banInfo;
+  final ValueNotifier<GraphQLClient>? client;
+  final VoidCallback? onUnbanned;
 
-  const BannedUserPage({super.key, this.banInfo});
+  const BannedUserPage({
+    super.key,
+    this.banInfo,
+    this.client,
+    this.onUnbanned,
+  });
+
+  @override
+  State<BannedUserPage> createState() => _BannedUserPageState();
+}
+
+class _BannedUserPageState extends State<BannedUserPage> {
+  Timer? _checkTimer;
+  bool _isChecking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Verificar cada 30 segundos si el usuario sigue baneado
+    _checkTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _checkBanStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _checkTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _checkBanStatus() async {
+    if (_isChecking || !mounted) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || widget.client == null) return;
+
+    setState(() {
+      _isChecking = true;
+    });
+
+    try {
+      final authService = AuthService(widget.client!.value);
+      final meData = await authService.getCurrentUser();
+
+      if (meData != null) {
+        final isBanned = meData['isBanned'] as bool? ?? false;
+
+        if (!isBanned) {
+          // El usuario ya no está baneado
+          if (mounted) {
+            // Notificar al AuthStateHandler para que actualice el estado
+            widget.onUnbanned?.call();
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        debugPrint('Error verificando estado de baneo: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isChecking = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +156,12 @@ class BannedUserPage extends StatelessWidget {
                         context,
                         Icons.access_time_rounded,
                         l10n.endDate,
-                        banInfo != null
-                            ? ((banInfo!['isPermanent'] as bool) == true
+                        widget.banInfo != null
+                            ? ((widget.banInfo!['isPermanent'] as bool) == true
                                   ? l10n.permanent
                                   : formatDate(
                                       DateTime.parse(
-                                        banInfo!['bannedUntil'] as String,
+                                        widget.banInfo!['bannedUntil'] as String,
                                       ).toLocal(),
                                     ))
                             : "N/A",
@@ -99,8 +171,8 @@ class BannedUserPage extends StatelessWidget {
                         context,
                         Icons.warning_rounded,
                         l10n.suspensionReason,
-                        banInfo != null
-                            ? (banInfo!['reason'] as String?) ?? "N/A"
+                        widget.banInfo != null
+                            ? (widget.banInfo!['reason'] as String?) ?? "N/A"
                             : "N/A",
                       ),
                       const SizedBox(height: 16),
@@ -108,10 +180,23 @@ class BannedUserPage extends StatelessWidget {
                         context,
                         Icons.abc,
                         l10n.description,
-                        banInfo != null
-                            ? (banInfo!['description'] as String?) ?? "N/A"
+                        widget.banInfo != null
+                            ? (widget.banInfo!['description'] as String?) ?? "N/A"
                             : "N/A",
                       ),
+                      if (_isChecking) ...[
+                        const SizedBox(height: 16),
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,

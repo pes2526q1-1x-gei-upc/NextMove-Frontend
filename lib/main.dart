@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/competition/competition_page.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/data/dataproviders/user_remote_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -149,21 +149,55 @@ class AuthStateHandler extends StatefulWidget {
   State<AuthStateHandler> createState() => _AuthStateHandlerState();
 }
 
-class _AuthStateHandlerState extends State<AuthStateHandler> {
+class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBindingObserver {
   bool _isLoadingUserData = true;
   bool _isLoggedIn = false;
   bool _isBanned = false;
   Map<String, dynamic>? _banInfo;
-  bool _hasPushedBlockedPage = false;
+  Timer? _banCheckTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _isLoggedIn = widget.isLoggedIn;
     if (_isLoggedIn) {
       _handleUserLogin(FirebaseAuth.instance.currentUser!);
     }
     _setupAuthListener();
+    _startBanCheckTimer();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _banCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startBanCheckTimer() {
+    // Verificar estado de baneo cada 60 segundos mientras el usuario está logueado
+    _banCheckTimer?.cancel();
+    _banCheckTimer = Timer.periodic(const Duration(seconds: 60), (_) {
+      if (_isLoggedIn && !_isBanned) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null && mounted) {
+          _loadUserData(user);
+        }
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Verificar estado de baneo cuando la app vuelve al foreground
+    // Esto es especialmente útil para iOS donde no llegan notificaciones push
+    if (state == AppLifecycleState.resumed && _isLoggedIn) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        _loadUserData(user);
+      }
+    }
   }
 
   Future<void> _handleUserLogin(User user) async {
@@ -189,17 +223,18 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
 
       if (user != null) {
         await _handleUserLogin(user);
+        _startBanCheckTimer();
       } else {
         if (mounted) {
           // Desconectar el socket cuando el usuario cierra sesión
           SocketConfig.disconnect();
           userProvider.clearUser();
           localeProvider.clearLocale();
+          _banCheckTimer?.cancel();
           setState(() {
             _isLoggedIn = false;
             _isLoadingUserData = false;
             _isBanned = false;
-            _hasPushedBlockedPage = false;
           });
         }
       }
@@ -215,11 +250,31 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
-        _isBanned = meData['isBanned'] as bool? ?? false;
+        final isBanned = meData['isBanned'] as bool? ?? false;
 
-        if (_isBanned) {
+        if (kDebugMode) {
+          debugPrint("=== Estado de baneo ===");
+          debugPrint("isBanned: $isBanned");
+          debugPrint("banInfo: ${meData['banInfo']}");
+          debugPrint("========================");
+        }
+
+        if (isBanned) {
+          // Usuario baneado - actualizar estado para mostrar pantalla de baneo
+          if (kDebugMode) {
+            debugPrint("Usuario baneado detectado, mostrando pantalla de baneo");
+          }
+          setState(() {
+            _isBanned = true;
           _banInfo = meData['banInfo'] as Map<String, dynamic>?;
+            _isLoadingUserData = false;
+          });
           return;
+        }
+
+        // Usuario no está baneado - cargar datos normalmente
+        if (kDebugMode && _isBanned) {
+          debugPrint("Usuario desbaneado detectado, redirigiendo a pantalla principal");
         }
 
         userProvider.setUser(
@@ -243,6 +298,15 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         }
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
+        }
+
+        // Actualizar estado después de cargar todos los datos
+        if (mounted) {
+          setState(() {
+            _isBanned = false;
+            _banInfo = null;
+            _isLoadingUserData = false;
+          });
         }
       } else {
         if (kDebugMode) {
@@ -279,23 +343,23 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
     }
 
     if (_isBanned) {
-      if (!_hasPushedBlockedPage) {
-        _hasPushedBlockedPage = true;
-        UserRemoteDataProvider().logout();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => BannedUserPage(banInfo: _banInfo),
-            ),
-          );
-        });
-      }
-      return BlocProvider(
-        create: (context) => AuthBloc(),
-        child: const WelcomePage(),
+      // Si el usuario está baneado, mostrar solo la página de baneo
+      // No permitir navegación a otras partes de la app
+      return PopScope(
+        canPop: false, // Prevenir que el usuario salga de la página de baneo
+        child: BannedUserPage(
+          banInfo: _banInfo,
+          client: widget.client,
+          onUnbanned: () {
+            // Cuando el usuario es desbaneado, recargar datos
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              _loadUserData(user);
+            }
+          },
+        ),
       );
     } else {
-      _hasPushedBlockedPage = false;
       return _isLoggedIn
           ? const MainScreen()
           : BlocProvider(

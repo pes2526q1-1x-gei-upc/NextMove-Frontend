@@ -13,6 +13,14 @@ class GraphQLQueries {
       phoneNumber
       preferredLanguage
       createdAt
+      isBanned
+      banInfo {
+        reason
+        description
+        bannedUntil
+        isPermanent
+        createdAt
+      }
     }
   }
   ''';
