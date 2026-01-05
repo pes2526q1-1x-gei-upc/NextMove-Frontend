@@ -291,21 +291,26 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                disabledBackgroundColor: widget.themeColor.withOpacity(0.5),
+                disabledBackgroundColor: widget.themeColor.withValues(alpha: 0.5),
               ),
               onPressed: (_selectedScore == 0 || _isSubmitting)
                   ? null
                   : () async {
+                      if (!mounted) return;
+                      
                       final commentText = _commentController.text.trim();
+                      final assessmentBloc = context.read<AssessmentBloc>();
                       
                       // Validar palabras ofensivas
                       final isOffensive = await _badWordsService.checkOffensiveText(commentText);
+                      
+                      if (!mounted) return;
                       
                       if (isOffensive) {
                         setState(() {
                           _isSubmitting = false;
                           _pendingOperation = false;
-                          _errorMessage = 'El comentario contiene lenguaje ofensivo';
+                          _errorMessage = l10n.offensiveText;
                         });
                         return;
                       }
@@ -316,7 +321,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         _errorMessage = null; 
                       });
                       if (isEditing) {
-                        context.read<AssessmentBloc>().add(
+                        assessmentBloc.add(
                           UpdateAssessmentEvent(
                             stationId: widget.stationId,
                             score: _selectedScore,
@@ -324,7 +329,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           ),
                         );
                       } else {
-                        context.read<AssessmentBloc>().add(
+                        assessmentBloc.add(
                           CreateAssessmentEvent(
                             stationId: widget.stationId,
                             score: _selectedScore,

@@ -494,5 +494,6 @@
         }
     },
     "ok": "OK",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "offensiveText": "The text contains offensive language"
 }

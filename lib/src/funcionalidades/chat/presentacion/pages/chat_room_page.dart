@@ -169,15 +169,24 @@ class _ChatRoomPageState extends State<ChatRoomPage>
   }
 
   void _sendMessage() async {
+    if (!mounted) return;
+    
     final content = _messageController.text.trim();
     if (content.isEmpty) return;
     
+    final chatBloc = context.read<ChatBloc>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
     // Validar palabras ofensivas
     final isOffensive = await _badWordsService.checkOffensiveText(content);
+    
+    if (!mounted) return;
+    
     if (isOffensive) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('El mensaje contiene lenguaje ofensivo'),
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.offensiveText),
           backgroundColor: Colors.red,
         ),
       );
@@ -186,11 +195,11 @@ class _ChatRoomPageState extends State<ChatRoomPage>
     
     if (_isTyping) {
       _isTyping = false;
-      context.read<ChatBloc>().add(StopTyping(widget.roomId));
+      chatBloc.add(StopTyping(widget.roomId));
     }
     if (_editingMessage != null) {
       // Editar mensaje
-      context.read<ChatBloc>().add(
+      chatBloc.add(
         EditMessage(
           messageId: _editingMessage!.id,
           roomId: _editingMessage!.roomId,
@@ -203,7 +212,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
       _messageController.clear();
     } else {
       // Enviar nuevo mensaje
-      context.read<ChatBloc>().add(
+      chatBloc.add(
         SendMessage(roomId: widget.roomId, content: content),
       );
       _messageController.clear();

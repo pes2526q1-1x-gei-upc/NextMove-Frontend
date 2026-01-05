@@ -496,5 +496,6 @@
         }
     },
     "ok": "Aceptar",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "offensiveText": "El texto contiene lenguaje ofensivo"
 }

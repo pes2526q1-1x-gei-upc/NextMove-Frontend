@@ -480,5 +480,6 @@
         }
     },
     "ok": "D'acord",
-    "inactive": "Inactiu"
+    "inactive": "Inactiu",
+    "offensiveText": "El text conté llenguatge ofensiu"
 }
