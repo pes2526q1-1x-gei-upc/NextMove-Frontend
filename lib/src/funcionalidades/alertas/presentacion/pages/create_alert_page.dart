@@ -240,7 +240,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                   )
                 else
                   DropdownButtonFormField<String>(
-                    value: _selectedStationId,
+                    initialValue: _selectedStationId,
                     decoration: InputDecoration(
                       labelText: 'Selecciona una estación',
                       border: OutlineInputBorder(

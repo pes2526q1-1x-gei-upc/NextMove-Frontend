@@ -34,8 +34,6 @@ import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket
 import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
 import 'package:nextmove_app/config/socket_config.dart';
 import 'package:nextmove_app/src/services/notification_service.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
-import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

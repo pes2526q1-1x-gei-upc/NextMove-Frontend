@@ -295,7 +295,9 @@ class NotificationService {
     try {
       _fcmToken = await _firebaseMessaging.getToken();
       if (kDebugMode && _fcmToken != null) {
-        print('FCM Token obtenido: $_fcmToken');
+        if (kDebugMode) {
+          print('FCM Token obtenido: $_fcmToken');
+        }
       }
       return _fcmToken;
     } catch (e) {
