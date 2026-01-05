@@ -483,6 +483,7 @@
     "trophies": "Trofeos",
     "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0",
     "favoriteStations": "Estaciones Favoritas",
+    "noFavoriteStationsYet": "Todavía no hay estaciones favoritas",
     "completed": "Superado",
     "challengeCompletedTitle": "¡Reto completado!",
     "challengeCompletedMessage": "¡Felicidades! Has completado el reto:",

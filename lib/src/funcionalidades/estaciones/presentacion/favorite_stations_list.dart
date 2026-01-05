@@ -117,9 +117,27 @@ class _FavoriteStationsListState extends State<FavoriteStationsList> {
           return Scaffold(
             appBar: AppBar(
               title: Text(l10n.favoriteStations),
+              elevation: 0,
             ),
-            body: const Center(
-              child: Text('No tienes estaciones favoritas aún.'),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.star_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.noFavoriteStationsYet,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           );
         }

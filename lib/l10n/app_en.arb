@@ -481,6 +481,7 @@
     "trophies": "Trophies",
     "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
     "favoriteStations": "Favorite Stations",
+    "noFavoriteStationsYet": "No favorite stations yet",
     "completed": "Completed",
     "challengeCompletedTitle": "Challenge completed!",
     "challengeCompletedMessage": "Congratulations! You have completed the challenge:",
