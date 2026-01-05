@@ -459,9 +459,9 @@
     "validationMinPoints": "The route must have at least {count} points",
     "@validationMinPoints": {
         "placeholders": {
-        "count": {
-            "type": "int"
-        }
+            "count": {
+                "type": "int"
+            }
         }
     },
     "validationNoMovement": "The route shows no significant movement",
@@ -469,9 +469,9 @@
     "validationImpossibleSpeed": "Impossible speed detected: {speed} km/h",
     "@validationImpossibleSpeed": {
         "placeholders": {
-        "speed": {
-            "type": "String"
-        }
+            "speed": {
+                "type": "String"
+            }
         }
     },
     "validationSuspiciousGPS": "Suspicious GPS pattern detected",
@@ -494,5 +494,15 @@
         }
     },
     "ok": "OK",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "trophyLockedMessage": "You haven't completed this challenge yet!",
+    "trophyCongratulationsMessage": "Congratulations! You have earned this trophy for completing the challenge \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    }
 }
