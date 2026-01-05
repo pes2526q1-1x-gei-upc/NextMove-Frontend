@@ -14,6 +14,7 @@ import 'package:nextmove_app/config/socket_config.dart';
 import '../widgets/chat_room_body.dart';
 import '../utils/chat_room_data_handler.dart';
 import '../utils/chat_navigation_handler.dart';
+import 'package:nextmove_app/src/core/services/bad_words_service.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
@@ -44,6 +45,7 @@ class _ChatRoomPageState extends State<ChatRoomPage>
   String? _currentGroupPhoto;
   bool _isNavigatingAway = false; 
   Message? _editingMessage;
+  final BadWordsService _badWordsService = BadWordsService();
 
   bool get _isEditing => _editingMessage != null;
 
@@ -166,9 +168,22 @@ class _ChatRoomPageState extends State<ChatRoomPage>
     });
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final content = _messageController.text.trim();
     if (content.isEmpty) return;
+    
+    // Validar palabras ofensivas
+    final isOffensive = await _badWordsService.checkOffensiveText(content);
+    if (isOffensive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El mensaje contiene lenguaje ofensivo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
     if (_isTyping) {
       _isTyping = false;
       context.read<ChatBloc>().add(StopTyping(widget.roomId));

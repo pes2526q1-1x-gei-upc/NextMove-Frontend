@@ -5,6 +5,7 @@ import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/a
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_event.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/presentation/bloc/assessment_state.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/domain/assessment_entity.dart';
+import 'package:nextmove_app/src/core/services/bad_words_service.dart';
 
 class RateStationBottomSheet extends StatefulWidget {
   final String stationId;
@@ -30,6 +31,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
   bool _isSubmitting = false;
   bool _pendingOperation = false;
   String? _errorMessage;
+  final BadWordsService _badWordsService = BadWordsService();
 
   @override
   void initState() {
@@ -293,7 +295,21 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               ),
               onPressed: (_selectedScore == 0 || _isSubmitting)
                   ? null
-                  : () {
+                  : () async {
+                      final commentText = _commentController.text.trim();
+                      
+                      // Validar palabras ofensivas
+                      final isOffensive = await _badWordsService.checkOffensiveText(commentText);
+                      
+                      if (isOffensive) {
+                        setState(() {
+                          _isSubmitting = false;
+                          _pendingOperation = false;
+                          _errorMessage = 'El comentario contiene lenguaje ofensivo';
+                        });
+                        return;
+                      }
+
                       setState(() {
                         _pendingOperation = true;
                         _isSubmitting = true;
@@ -304,7 +320,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           UpdateAssessmentEvent(
                             stationId: widget.stationId,
                             score: _selectedScore,
-                            comment: _commentController.text,
+                            comment: commentText,
                           ),
                         );
                       } else {
@@ -312,7 +328,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                           CreateAssessmentEvent(
                             stationId: widget.stationId,
                             score: _selectedScore,
-                            comment: _commentController.text,
+                            comment: commentText,
                           ),
                         );
                       }
