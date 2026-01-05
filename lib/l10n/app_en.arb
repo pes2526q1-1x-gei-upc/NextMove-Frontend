@@ -497,6 +497,7 @@
     },
     "ok": "OK",
     "inactive": "Inactive",
+    "offensiveText": "The text contains offensive language",
     "trophyLockedMessage": "You haven't completed this challenge yet!",
     "trophyCongratulationsMessage": "Congratulations! You have earned this trophy for completing the challenge \"{challengeName}\".",
     "@trophyCongratulationsMessage": {

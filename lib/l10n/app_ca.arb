@@ -484,6 +484,7 @@
     },
     "ok": "D'acord",
     "inactive": "Inactiu",
+    "offensiveText": "El text conté llenguatge ofensiu",
     "trophyLockedMessage": "Encara no has completat aquest repte!",
     "trophyCongratulationsMessage": "Enhorabona! Has obtingut aquest trofeu per haver completat el repte \"{challengeName}\".",
     "@trophyCongratulationsMessage": {

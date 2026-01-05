@@ -307,6 +307,12 @@ class GraphQLQueries {
     } 
   ''';
 
+  static const String checkOffensiveText = r'''
+    query checkOffensiveText($text: String!){
+      checkOffensiveText(text: $text)
+    } 
+  ''';
+
 static const String getNavigationRouteQuery = r'''
   query ComputeRoute(
     $origin: CoordinatesInput!

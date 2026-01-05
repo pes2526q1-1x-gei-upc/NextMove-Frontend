@@ -499,6 +499,7 @@
     },
     "ok": "Aceptar",
     "inactive": "Inactivo",
+    "offensiveText": "El texto contiene lenguaje ofensivo",
     "trophyLockedMessage": "¡Aún no has completado este reto!",
     "trophyCongratulationsMessage": "¡Felicidades! Has ganado este trofeo por completar el reto \"{challengeName}\".",
     "@trophyCongratulationsMessage": {
