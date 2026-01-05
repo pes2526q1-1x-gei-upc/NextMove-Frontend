@@ -188,6 +188,7 @@
     "howToGetThere": "Cómo llegar",
     "routeHistory": "Historial de recorridos grabados",
     "noRoutesFound": "No se han encontrado rutas grabadas.",
+    "noRecordedRoutesYet": "Todavía no hay recorridos",
     "distance": "Distancia",
     "avgSpeed": "Velocidad media",
     "routeStatistics": "Estadísticas de la ruta",
@@ -461,9 +462,9 @@
     "validationMinPoints": "La ruta debe tener al menos {count} puntos",
     "@validationMinPoints": {
         "placeholders": {
-        "count": {
-            "type": "int"
-        }
+            "count": {
+                "type": "int"
+            }
         }
     },
     "validationNoMovement": "La ruta no muestra movimiento significativo",
@@ -471,9 +472,9 @@
     "validationImpossibleSpeed": "Velocidad imposible detectada: {speed} km/h",
     "@validationImpossibleSpeed": {
         "placeholders": {
-        "speed": {
-            "type": "String"
-        }
+            "speed": {
+                "type": "String"
+            }
         }
     },
     "validationSuspiciousGPS": "Patrón de GPS sospechoso detectado",
@@ -482,6 +483,7 @@
     "trophies": "Trofeos",
     "trophyAttribution": "Imágenes de trofeos por Christopher Lielasus Morrow, licenciadas bajo CC BY 4.0",
     "favoriteStations": "Estaciones Favoritas",
+    "noFavoriteStationsYet": "Todavía no hay estaciones favoritas",
     "completed": "Superado",
     "challengeCompletedTitle": "¡Reto completado!",
     "challengeCompletedMessage": "¡Felicidades! Has completado el reto:",
@@ -497,5 +499,34 @@
     },
     "ok": "Aceptar",
     "inactive": "Inactivo",
-    "offensiveText": "El texto contiene lenguaje ofensivo"
+    "offensiveText": "El texto contiene lenguaje ofensivo",
+    "trophyLockedMessage": "¡Aún no has completado este reto!",
+    "trophyCongratulationsMessage": "¡Felicidades! Has ganado este trofeo por completar el reto \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
+    },
+   "trophyOfChallenge": "Trofeo del reto: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
+    },
+    "shareTrophyMessage": "He ganado un trofeo en NextMove por el reto \"{challengeName}\"! Mira mi trofeo y descarga la aplicación para competir conmigo y el resto de la comunidad.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbano"
+            }
+        }
+    },
+    "trophyWonMessage": "¡Aquí está el trofeo que acabas de ganar por este reto!"
 }

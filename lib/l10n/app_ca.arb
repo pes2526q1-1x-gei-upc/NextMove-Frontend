@@ -179,6 +179,7 @@
     "howToGetThere": "Indicacions",
     "routeHistory": "Historial de recorreguts enregistrats",
     "noRoutesFound": "No s'han trobat recorreguts enregistrats.",
+    "noRecordedRoutesYet": "Encara no hi ha recorreguts",
     "avgSpeed": "Velocitat mitjana",
     "routeStatistics": "Estadístiques de la ruta",
     "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
@@ -446,9 +447,9 @@
     "validationMinPoints": "La ruta ha de tenir almenys {count} punts",
     "@validationMinPoints": {
         "placeholders": {
-        "count": {
-            "type": "int"
-        }
+            "count": {
+                "type": "int"
+            }
         }
     },
     "validationNoMovement": "La ruta no mostra moviment significatiu",
@@ -456,9 +457,9 @@
     "validationImpossibleSpeed": "Velocitat impossible detectada: {speed} km/h",
     "@validationImpossibleSpeed": {
         "placeholders": {
-        "speed": {
-            "type": "String"
-        }
+            "speed": {
+                "type": "String"
+            }
         }
     },
     "validationSuspiciousGPS": "Patró de GPS sospitós detectat",
@@ -467,11 +468,13 @@
     "trophies": "Trofeus",
     "trophyAttribution": "Imatges de trofeus per Christopher Lielasus Morrow, llicenciades sota CC BY 4.0",
     "favoriteStations": "Estacions Favorites",
+    "noFavoriteStationsYet": "Encara no hi ha estacions favorites",
     "completed": "Superat",
     "challengeCompletedTitle": "Repte completat!",
     "challengeCompletedMessage": "Felicitats! Has completat el repte:",
     "challengeProgressTitle": "Progrés en el repte!",
-    "challengeProgressMessage": "Bon progrés! Has assolit el {percentage}% del repte:",    "@challengeProgressMessage": {
+    "challengeProgressMessage": "Bon progrés! Has assolit el {percentage}% del repte:",
+    "@challengeProgressMessage": {
         "placeholders": {
             "percentage": {
                 "type": "String",
@@ -481,5 +484,34 @@
     },
     "ok": "D'acord",
     "inactive": "Inactiu",
-    "offensiveText": "El text conté llenguatge ofensiu"
+    "offensiveText": "El text conté llenguatge ofensiu",
+    "trophyLockedMessage": "Encara no has completat aquest repte!",
+    "trophyCongratulationsMessage": "Enhorabona! Has obtingut aquest trofeu per haver completat el repte \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbà"
+            }
+        }
+    },
+    "trophyOfChallenge": "Trofeu del repte: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbà"
+            }
+        }
+    },
+    "shareTrophyMessage": "He guanyat un trofeu a NextMove per al repte \"{challengeName}\"! Mira el meu trofeu i descarrega l'aplicació per competir amb mi i la resta de la comunitat.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Ciclista Urbà"
+            }
+        }
+    },
+    "trophyWonMessage": "Aquí està el trofeu que acabes de guanyar per aquest repte!"
 }

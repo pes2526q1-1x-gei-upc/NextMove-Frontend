@@ -11,13 +11,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigation_route_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/promoted_companies_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_completed_screen.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_info_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/route_preview_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/saved_track_statistics_page.dart';
 
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/turn_instruction_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_progress_widget.dart';
-import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navigation_completed_screen.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/trophy.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
 // Imports del BLoC
@@ -315,17 +316,31 @@ class _MapPageState extends State<MapPage> {
             }
             if (state is MapLoadedState && state.challengeNotificationTitle != null) {
               final mapBloc = context.read<MapBloc>();
-              final title = state.challengeNotificationTitle == 'challengeCompletedTitle'
+              final title = state.challengeNotificationPercentage == 100
                   ? l10n.challengeCompletedTitle
                   : l10n.challengeProgressTitle;
-              final message = state.challengeNotificationPercentage == null
+              final message = state.challengeNotificationPercentage == 100
                   ? '${l10n.challengeCompletedMessage} ${state.challengeNotificationName}'
                   : '${l10n.challengeProgressMessage(state.challengeNotificationPercentage.toString())} ${state.challengeNotificationName}';
+              final content = state.challengeNotificationPercentage == 100
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("$message\n${l10n.trophyWonMessage}"),
+                        const SizedBox(height: 16),
+                        Image.asset(
+                          Trophy.fromChallengeName(state.challengeNotificationName!).imagePath,
+                          width: 100,
+                          height: 100,
+                        ),
+                      ],
+                    )
+                  : Text(message);
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
                   title: Text(title),
-                  content: Text(message),
+                  content: content,
                   actions: [
                     TextButton(
                       onPressed: () {
