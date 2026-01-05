@@ -187,6 +187,7 @@
     "howToGetThere": "Directions",
     "routeHistory": "Recorded route history",
     "noRoutesFound": "No recorded routes were found.",
+    "noRecordedRoutesYet": "No recorded routes yet",
     "distance": "Distance",
     "avgSpeed": "Average speed",
     "routeStatistics": "Route statistics",

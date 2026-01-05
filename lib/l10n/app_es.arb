@@ -188,6 +188,7 @@
     "howToGetThere": "Cómo llegar",
     "routeHistory": "Historial de recorridos grabados",
     "noRoutesFound": "No se han encontrado rutas grabadas.",
+    "noRecordedRoutesYet": "Todavía no hay recorridos",
     "distance": "Distancia",
     "avgSpeed": "Velocidad media",
     "routeStatistics": "Estadísticas de la ruta",

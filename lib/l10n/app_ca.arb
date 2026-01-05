@@ -179,6 +179,7 @@
     "howToGetThere": "Indicacions",
     "routeHistory": "Historial de recorreguts enregistrats",
     "noRoutesFound": "No s'han trobat recorreguts enregistrats.",
+    "noRecordedRoutesYet": "Encara no hi ha recorreguts",
     "avgSpeed": "Velocitat mitjana",
     "routeStatistics": "Estadístiques de la ruta",
     "noRouteDataAvailable": "No hi ha dades de ruta disponibles.",
