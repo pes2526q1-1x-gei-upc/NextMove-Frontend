@@ -176,9 +176,9 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
   }
 
   void _startBanCheckTimer() {
-    // Verificar estado de baneo cada 60 segundos mientras el usuario está logueado
+    // Verificar estado de baneo cada 2 segundos mientras el usuario está logueado
     _banCheckTimer?.cancel();
-    _banCheckTimer = Timer.periodic(const Duration(seconds: 60), (_) {
+    _banCheckTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       if (_isLoggedIn && !_isBanned) {
         final user = FirebaseAuth.instance.currentUser;
         if (user != null && mounted) {

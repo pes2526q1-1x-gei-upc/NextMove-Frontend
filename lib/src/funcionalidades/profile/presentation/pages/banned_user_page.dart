@@ -11,12 +11,7 @@ class BannedUserPage extends StatefulWidget {
   final ValueNotifier<GraphQLClient>? client;
   final VoidCallback? onUnbanned;
 
-  const BannedUserPage({
-    super.key,
-    this.banInfo,
-    this.client,
-    this.onUnbanned,
-  });
+  const BannedUserPage({super.key, this.banInfo, this.client, this.onUnbanned});
 
   @override
   State<BannedUserPage> createState() => _BannedUserPageState();
@@ -29,8 +24,8 @@ class _BannedUserPageState extends State<BannedUserPage> {
   @override
   void initState() {
     super.initState();
-    // Verificar cada 30 segundos si el usuario sigue baneado
-    _checkTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    // Verificar cada 2 segundos si el usuario sigue baneado
+    _checkTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       _checkBanStatus();
     });
   }
@@ -161,7 +156,8 @@ class _BannedUserPageState extends State<BannedUserPage> {
                                   ? l10n.permanent
                                   : formatDate(
                                       DateTime.parse(
-                                        widget.banInfo!['bannedUntil'] as String,
+                                        widget.banInfo!['bannedUntil']
+                                            as String,
                                       ).toLocal(),
                                     ))
                             : "N/A",
@@ -181,22 +177,10 @@ class _BannedUserPageState extends State<BannedUserPage> {
                         Icons.abc,
                         l10n.description,
                         widget.banInfo != null
-                            ? (widget.banInfo!['description'] as String?) ?? "N/A"
+                            ? (widget.banInfo!['description'] as String?) ??
+                                  "N/A"
                             : "N/A",
                       ),
-                      if (_isChecking) ...[
-                        const SizedBox(height: 16),
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          ),
-                        ),
-                      ],
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         context,
