@@ -66,6 +66,7 @@ class UserEntity extends Equatable {
                   (data['statistics']['num_retos_participados'] ?? 0).toDouble(),
               challengesCompleted:
                   (data['statistics']['num_retos_completados'] ?? 0).toDouble(),
+              points: (data['statistics']['puntos_totales'] ?? 0).toInt(),
             )
           : null,
     );
@@ -196,6 +197,7 @@ class UserStatistics {
   final double elevationGain;
   final double challengesParticipated;
   final double challengesCompleted;
+  final int points;
 
   UserStatistics({
     required this.totalRoutes,
@@ -205,5 +207,6 @@ class UserStatistics {
     required this.co2Saved,
     required this.challengesParticipated,
     required this.challengesCompleted,
+    required this.points,
   });
 }

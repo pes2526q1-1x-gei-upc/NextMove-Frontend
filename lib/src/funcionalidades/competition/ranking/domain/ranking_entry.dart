@@ -8,6 +8,7 @@ class RankingEntry {
   final double? co2Saved;
   final int? challengesParticipated;
   final int? challengesCompleted;
+  final int? points;
 
   // final int? score;
 
@@ -22,6 +23,7 @@ class RankingEntry {
     this.co2Saved,
     this.challengesParticipated,
     this.challengesCompleted,
+    this.points,
   });
 
   factory RankingEntry.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class RankingEntry {
       co2Saved: (json['co2_ahorrado'] as num?)?.toDouble(),
       challengesParticipated: json['num_retos_participados'] as int?,
       challengesCompleted: json['num_retos_completados'] as int?,
+      points: json['puntos_totales'] as int?,
     );
   }
 }

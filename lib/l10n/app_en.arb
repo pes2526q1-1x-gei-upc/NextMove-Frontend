@@ -187,6 +187,7 @@
     "howToGetThere": "Directions",
     "routeHistory": "Recorded route history",
     "noRoutesFound": "No recorded routes were found.",
+    "noRecordedRoutesYet": "No recorded routes yet",
     "distance": "Distance",
     "avgSpeed": "Average speed",
     "routeStatistics": "Route statistics",
@@ -276,6 +277,7 @@
             }
         }
     },
+    "totalPoints": "Total points",
     "dates": "Dates",
     "startDate": "Start date",
     "endDate": "End date",
@@ -459,9 +461,9 @@
     "validationMinPoints": "The route must have at least {count} points",
     "@validationMinPoints": {
         "placeholders": {
-        "count": {
-            "type": "int"
-        }
+            "count": {
+                "type": "int"
+            }
         }
     },
     "validationNoMovement": "The route shows no significant movement",
@@ -469,9 +471,9 @@
     "validationImpossibleSpeed": "Impossible speed detected: {speed} km/h",
     "@validationImpossibleSpeed": {
         "placeholders": {
-        "speed": {
-            "type": "String"
-        }
+            "speed": {
+                "type": "String"
+            }
         }
     },
     "validationSuspiciousGPS": "Suspicious GPS pattern detected",
@@ -480,6 +482,7 @@
     "trophies": "Trophies",
     "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
     "favoriteStations": "Favorite Stations",
+    "noFavoriteStationsYet": "No favorite stations yet",
     "completed": "Completed",
     "challengeCompletedTitle": "Challenge completed!",
     "challengeCompletedMessage": "Congratulations! You have completed the challenge:",
@@ -494,5 +497,35 @@
         }
     },
     "ok": "OK",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "offensiveText": "The text contains offensive language",
+    "trophyLockedMessage": "You haven't completed this challenge yet!",
+    "trophyCongratulationsMessage": "Congratulations! You have earned this trophy for completing the challenge \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "trophyOfChallenge": "Trophy of the challenge: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "shareTrophyMessage": "I have earned a trophy in NextMove for the challenge \"{challengeName}\"! Check out my trophy and download the app to compete with me and the rest of the community.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "trophyWonMessage": "Here is the trophy you have just won for this challenge!"
 }

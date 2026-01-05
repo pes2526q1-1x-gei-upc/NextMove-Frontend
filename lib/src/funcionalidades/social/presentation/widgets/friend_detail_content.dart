@@ -37,9 +37,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           // --- AVATAR Y NOMBRE ---
           Center(
             child: Column(
@@ -60,18 +59,20 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                             ),
                           ],
                     color: theme.colorScheme.surfaceContainerHighest,
-                    image: hasPhoto 
+                    image: hasPhoto
                         ? DecorationImage(
                             image: NetworkImage(widget.user.photo),
                             fit: BoxFit.cover,
                             onError: (exception, stackTrace) {
-                               debugPrint("Error cargando foto detalle: $exception");
+                              debugPrint(
+                                "Error cargando foto detalle: $exception",
+                              );
                             },
                           )
                         : null,
                   ),
                   // Si no hay foto o falla, mostramos el icono
-                  child: !hasPhoto 
+                  child: !hasPhoto
                       ? Icon(
                           Icons.person,
                           size: 60,
@@ -83,9 +84,9 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                 Text(
                   widget.user.nombreCompleto,
                   style: theme.textTheme.headlineSmall?.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 if (widget.user.apodo.isNotEmpty)
@@ -154,11 +155,7 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                   value: widget.user.email,
                 ),
                 if (widget.user.descripcion.isNotEmpty) ...[
-                  Divider(
-                    height: 1,
-                    indent: 50,
-                    color: theme.dividerColor,
-                  ),
+                  Divider(height: 1, indent: 50, color: theme.dividerColor),
                   ProfileInfoRowWidget(
                     icon: Icons.description_outlined,
                     label: l10n.userDescription,
@@ -169,13 +166,17 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                 ProfileInfoRowWidget(
                   icon: Icons.cake_outlined,
                   label: l10n.birthdate,
-                  value: DateFormat('dd/MM/yyyy').format(widget.user.fechaNacimiento),
+                  value: DateFormat(
+                    'dd/MM/yyyy',
+                  ).format(widget.user.fechaNacimiento),
                 ),
                 Divider(height: 1, indent: 50, color: theme.dividerColor),
                 ProfileInfoRowWidget(
                   icon: Icons.calendar_month_outlined,
                   label: l10n.memberSince,
-                  value: DateFormat('MMMM yyyy').format(widget.user.fechaRegistro),
+                  value: DateFormat(
+                    'MMMM yyyy',
+                  ).format(widget.user.fechaRegistro),
                 ),
               ],
             ),
@@ -188,10 +189,12 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
               children: [
                 ProfileInfoRowWidget(
                   icon: _isBike(widget.user.modoPreferido)
-                      ? Icons.directions_bike 
+                      ? Icons.directions_bike
                       : Icons.electric_car,
                   label: l10n.preferredMode,
-                  value: _isBike(widget.user.modoPreferido) ? l10n.bicycle : l10n.car,
+                  value: _isBike(widget.user.modoPreferido)
+                      ? l10n.bicycle
+                      : l10n.car,
                 ),
                 Divider(height: 1, indent: 50, color: theme.dividerColor),
                 ProfileInfoRowWidget(
@@ -204,6 +207,30 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
           ] else ...[
             // --- SECCIÓN: ESTADÍSTICAS ---
             if (widget.user.statistics != null) ...[
+              // Points
+              _buildSectionCard(
+                context,
+                icon: Icons.stars,
+                iconColor: Colors.amber,
+                title: l10n.totalPoints,
+                isDark: isDark,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatItem(
+                        context,
+                        icon: Icons.emoji_events,
+                        label: l10n.totalPoints,
+                        value: '${widget.user.statistics!.points}',
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
               // Main Statistics Row
               Row(
                 children: [
@@ -223,7 +250,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                       context,
                       icon: Icons.straighten,
                       title: l10n.distance,
-                      value: '${widget.user.statistics!.distance.toStringAsFixed(2)} km',
+                      value:
+                          '${widget.user.statistics!.distance.toStringAsFixed(2)} km',
                       color: Colors.purple,
                       isDark: isDark,
                     ),
@@ -247,7 +275,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                         context,
                         icon: Icons.cloud_queue,
                         label: l10n.co2Saved,
-                        value: '${widget.user.statistics!.co2Saved.toStringAsFixed(2)} kg',
+                        value:
+                            '${widget.user.statistics!.co2Saved.toStringAsFixed(2)} kg',
                         color: Colors.blue,
                       ),
                     ),
@@ -256,7 +285,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                         context,
                         icon: Icons.local_fire_department,
                         label: l10n.caloriesBurned,
-                        value: '${widget.user.statistics!.caloriesBurned.toStringAsFixed(0)} kcal',
+                        value:
+                            '${widget.user.statistics!.caloriesBurned.toStringAsFixed(0)} kcal',
                         color: Colors.orange,
                       ),
                     ),
@@ -280,7 +310,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                         context,
                         icon: Icons.trending_up,
                         label: l10n.elevationGain,
-                        value: '${widget.user.statistics!.elevationGain.toStringAsFixed(1)} m',
+                        value:
+                            '${widget.user.statistics!.elevationGain.toStringAsFixed(1)} m',
                         color: Colors.green,
                       ),
                     ),
@@ -304,7 +335,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                         context,
                         icon: Icons.group,
                         label: l10n.challengesParticipated,
-                        value: '${widget.user.statistics!.challengesParticipated.toInt()}',
+                        value:
+                            '${widget.user.statistics!.challengesParticipated.toInt()}',
                         color: Colors.blue,
                       ),
                     ),
@@ -313,7 +345,8 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
                         context,
                         icon: Icons.check_circle,
                         label: l10n.challengesCompleted,
-                        value: '${widget.user.statistics!.challengesCompleted.toInt()}',
+                        value:
+                            '${widget.user.statistics!.challengesCompleted.toInt()}',
                         color: Colors.green,
                       ),
                     ),
@@ -323,7 +356,7 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
             ] else
               _NoStatisticsMessage(),
           ],
-            
+
           const SizedBox(height: 40),
         ],
       ),
@@ -347,7 +380,7 @@ class _ToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -356,9 +389,7 @@ class _ToggleButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
           decoration: BoxDecoration(
-            color: isSelected 
-                ? theme.cardColor 
-                : Colors.transparent,
+            color: isSelected ? theme.cardColor : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -367,8 +398,8 @@ class _ToggleButton extends StatelessWidget {
               Icon(
                 icon,
                 size: 18,
-                color: isSelected 
-                    ? theme.colorScheme.primary 
+                color: isSelected
+                    ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 6),
@@ -376,8 +407,8 @@ class _ToggleButton extends StatelessWidget {
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected 
-                      ? theme.colorScheme.primary 
+                  color: isSelected
+                      ? theme.colorScheme.primary
                       : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -389,158 +420,154 @@ class _ToggleButton extends StatelessWidget {
   }
 }
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String value,
-    required Color color,
-    required bool isDark,
-  }) {
-    final theme = Theme.of(context);
-    final iconBgColor = color.withValues(alpha: isDark ? 0.2 : 0.1);
+Widget _buildStatCard(
+  BuildContext context, {
+  required IconData icon,
+  required String title,
+  required String value,
+  required Color color,
+  required bool isDark,
+}) {
+  final theme = Theme.of(context);
+  final iconBgColor = color.withValues(alpha: isDark ? 0.2 : 0.1);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: BorderRadius.circular(12),
+  return Container(
+    decoration: BoxDecoration(
+      color: theme.cardColor,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: isDark
+          ? null
+          : [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              child: Icon(icon, color: color, size: 24),
+            ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required Widget child,
-    required bool isDark,
-  }) {
-    final theme = Theme.of(context);
-    final iconBgColor = iconColor.withValues(alpha: isDark ? 0.2 : 0.1);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            child: Icon(icon, color: color, size: 24),
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildSectionCard(
+  BuildContext context, {
+  required IconData icon,
+  required Color iconColor,
+  required String title,
+  required Widget child,
+  required bool isDark,
+}) {
+  final theme = Theme.of(context);
+  final iconBgColor = iconColor.withValues(alpha: isDark ? 0.2 : 0.1);
+
+  return Container(
+    decoration: BoxDecoration(
+      color: theme.cardColor,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: isDark
+          ? null
+          : [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          child,
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildStatItem(
+  BuildContext context, {
+  required IconData icon,
+  required String label,
+  required String value,
+  required Color color,
+}) {
+  final theme = Theme.of(context);
+
+  return Column(
+    children: [
+      Icon(icon, color: color, size: 24),
+      const SizedBox(height: 8),
+      Text(
+        label,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
         ),
-      ],
-    );
-  }
+        textAlign: TextAlign.center,
+      ),
+      const SizedBox(height: 4),
+      Text(
+        value,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ],
+  );
+}
 
 class _NoStatisticsMessage extends StatelessWidget {
   @override
