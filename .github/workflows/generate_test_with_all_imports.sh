@@ -8,7 +8,8 @@ if [ "$packageName" = "" ]; then
 fi
 
 echo "// ignore_for_file: unused_import" > "$outputFile"
-find lib -name '*.dart' |
-grep -v '.g.dart' | grep -v 'generated_plugin_registrant' | grep -v '_state\.dart$' | grep -v '_event\.dart$' | grep -v 'main\.dart$' | grep -v 'firebase_options\.dart$' | grep -v 'app_localizations.*\.dart$' | grep -v '_widget\.dart$' | grep -v '_page\.dart$' | grep -v 'queries\.dart$' | grep -v '/presentation/' | grep -v '/config/' | grep -v 'remote_.*data_provider\.dart$' | grep -v 'recorded_route_data_provider\.dart$' | grep -v '/data/dataProviders/' | grep -v '/graphql/' | grep -v '/enums/' | grep -v '/theme/' | awk -v package=$packageName '{gsub("^lib", "", $1); printf("import '\''package:%s%s'\'';\n", package, $1);}' >> "$outputFile"
+grep -r --include="*.dart" -l "^" lib/ | grep -v -E "(\.g\.dart$|_state\.dart$|_event\.dart$|.*/main\.dart$|.*/firebase_options\.dart$|.*/l10n/|.*/config/|.*/graphql/|.*/enums/|.*/theme/|.*/data/dataProviders/|_widget\.dart$|_page\.dart$|data_provider\.dart$)" \
+| awk -v package=$packageName '{gsub("^lib", "", $1); printf("import '\''package:%s%s'\'';\n", package, $1);}' >> "$outputFile"
+
 echo "" >> "$outputFile"
 echo "void main() {}" >> "$outputFile"

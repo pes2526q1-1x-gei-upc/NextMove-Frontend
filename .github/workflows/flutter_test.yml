@@ -33,6 +33,8 @@ jobs:
           cache: true
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Print generated test file
+        run: cat test/coverage_test.dart
       - name: Create .env file from ENV_FILE secret
         run: echo "$ENV_FILE" > .env
       - name: Generate localization files
@@ -100,7 +102,23 @@ jobs:
           echo "ignore_errors = deprecated" > ~/.lcovrc
 
       - name: Generate LCOV report
-        run: lcov --ignore-errors unused,deprecated --remove coverage/lcov.info '*/main.dart' '*/firebase_options.dart' '*/app_localizations*.dart' '*/graphql/*' '*/presentation/*' '*/enums/*' '*/theme/*' -o coverage/lcov.info
+        run: |
+          lcov --ignore-errors unused,deprecated --remove coverage/lcov.info \
+            '*.g.dart' \
+            '*_state.dart' \
+            '*_event.dart' \
+            '*/main.dart' \
+            '*/firebase_options.dart' \
+            '*/l10n/*' \
+            '*/config/*' \
+            '*/graphql/*' \
+            '*/enums/*' \
+            '*/theme/*' \
+            '*/data/dataProviders/*' \
+            '*_widget.dart' \
+            '*_page.dart' \
+            '*data_provider.dart' \
+            -o coverage/lcov.info
 
       - name: Report code coverage
         uses: zgosalvez/github-actions-report-lcov@v4

@@ -8,7 +8,10 @@ import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_rout
 
 class RecordedRoutesRepository {
   final RecordedRouteDataProvider recordedRouteDataProvider;
-  RecordedRoutesRepository() : recordedRouteDataProvider = RecordedRouteDataProvider();
+
+  RecordedRoutesRepository({RecordedRouteDataProvider? recordedRouteDataProvider})
+      : recordedRouteDataProvider =
+            recordedRouteDataProvider ?? RecordedRouteDataProvider();
 
   Future<Either<Failure, List<RecordedRoute>>> getRecordedRoutesByUser(String userEmail) async {
     try {
