@@ -227,6 +227,31 @@ class _AlertCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  /// Obtiene el nombre de la estación para mostrar, con fallback si no está disponible
+  String _getStationDisplayName(dynamic alert) {
+    // Si hay un nombre de estación válido y no es solo el ID, usarlo
+    if (alert.stationNombre != null && 
+        alert.stationNombre!.isNotEmpty && 
+        alert.stationNombre != alert.stationId) {
+      return alert.stationNombre!;
+    }
+    
+    // Si hay dirección, usar una parte de ella como nombre
+    if (alert.stationDireccion != null && alert.stationDireccion!.isNotEmpty) {
+      // Extraer el nombre de la calle de la dirección (antes de la coma o número)
+      final addressParts = alert.stationDireccion!.split(',');
+      if (addressParts.isNotEmpty) {
+        final streetName = addressParts[0].trim();
+        if (streetName.isNotEmpty) {
+          return streetName;
+        }
+      }
+    }
+    
+    // Fallback: mostrar "Estación" seguido del ID
+    return 'Estación ${alert.stationId}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -259,7 +284,7 @@ class _AlertCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        alert.stationNombre ?? 'Estación ${alert.stationId}',
+                        _getStationDisplayName(alert),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
