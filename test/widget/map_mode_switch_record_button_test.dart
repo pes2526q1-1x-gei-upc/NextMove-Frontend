@@ -36,6 +36,38 @@ void main() {
               currentMapType: MapType.normal,
             ),
           ),
+          if (state.currentMode == StationType.bicycle)
+            Positioned(
+              bottom: 30,
+              right: 16,
+              child: Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: state.isRecordingRoute ? Colors.red : Colors.green,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      state.isRecordingRoute ? Icons.stop : Icons.play_arrow,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      state.isRecordingRoute ? 'Stop' : 'Start',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

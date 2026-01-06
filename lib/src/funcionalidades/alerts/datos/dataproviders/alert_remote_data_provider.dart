@@ -3,7 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/dominio/alert_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dart';
 
 Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
   GraphQLClient client = GraphQLConfig.initializeClient().value;

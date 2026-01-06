@@ -18,8 +18,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/bloc
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/user_statistics_page.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/bloc/alert_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/pages/alerts_page.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/bloc/alert_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/pages/alerts_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

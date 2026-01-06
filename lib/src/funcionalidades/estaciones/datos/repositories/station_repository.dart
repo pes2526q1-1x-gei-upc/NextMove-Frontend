@@ -7,7 +7,10 @@ import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_mode
 
 class StationRepository {
   final StationRemoteDataProvider stationRemoteDataProvider;
-  StationRepository() : stationRemoteDataProvider = StationRemoteDataProvider();
+
+  StationRepository({StationRemoteDataProvider? stationRemoteDataProvider})
+      : stationRemoteDataProvider =
+            stationRemoteDataProvider ?? StationRemoteDataProvider();
 
   Future<Either<Failure, List<BicycleStationDetails>?>>
   getAllNearbyBicycleStationDetails(double latitude, double longitude) async {

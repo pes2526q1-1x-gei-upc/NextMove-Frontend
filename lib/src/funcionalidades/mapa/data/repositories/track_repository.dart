@@ -9,7 +9,8 @@ import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class TrackRepository {
   final TrackDataProvider trackDataProvider;
-  TrackRepository() : trackDataProvider = TrackDataProvider();
+  TrackRepository({TrackDataProvider? trackDataProvider})
+      : trackDataProvider = trackDataProvider ?? TrackDataProvider();
   
   Future<Either<Failure, void>> saveRecordedTrack(RecordedTrack track, AppLocalizations l10n, {bool bikePhoto = false}) async {
     try {
