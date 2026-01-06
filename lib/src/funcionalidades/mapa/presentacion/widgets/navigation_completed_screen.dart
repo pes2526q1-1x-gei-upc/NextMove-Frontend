@@ -126,12 +126,12 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
     try {
       final l10n = AppLocalizations.of(context)!;
       
-      // bike_photo se inicializa en false
-      // Solo será true si es modo bici Y la foto fue validada correctamente
+      // Guardar la ruta con o sin foto según corresponda
+      // bike_photo será true solo si es modo bici Y la foto fue validada correctamente
       final isBikeMode = widget.currentMode == StationType.bicycle;
       final bikePhoto = isBikeMode && _isValidBike == true;
       
-      // Enviar evento para guardar (se ejecutará de forma asíncrona)
+      // Enviar evento para guardar la ruta (se ejecutará de forma asíncrona)
       widget.mapBloc.add(SaveRecordedTrackEvent(l10n, bikePhoto: bikePhoto));
     } catch (e) {
       // Si hay un error, simplemente continuar para cerrar

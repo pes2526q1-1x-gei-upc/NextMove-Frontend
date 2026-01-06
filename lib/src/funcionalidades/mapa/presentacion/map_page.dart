@@ -359,11 +359,12 @@ class _MapPageState extends State<MapPage> {
             
             // Detectar cuando se guarda exitosamente una ruta grabada
             if (state is MapLoadedState) {
-              // Si estaba grabando y ahora no está grabando, y no hay errores, y tiene suficientes puntos
+              // Solo mostrar NavigationCompletedScreen si el guardado fue exitoso
               if (_wasRecordingRoute && 
                   !state.isRecordingRoute && 
                   !_hasShownCompletionScreen &&
                   state.snackbarError == null &&
+                  state.routeSavedSuccessfully &&
                   state.recordedTrack != null &&
                   state.recordedTrack!.points.length >= 2) {
                 _hasShownCompletionScreen = true;
