@@ -514,5 +514,38 @@
             }
         }
     },
-    "trophyWonMessage": "Aquí està el trofeu que acabes de guanyar per aquest repte!"
+    "trophyWonMessage": "Aquí està el trofeu que acabes de guanyar per aquest repte!",
+    "stationAlertsTitle": "Alertes d'Estacions",
+    "noAlertsConfigured": "No tens alertes configurades",
+    "createAlertMessage": "Crea una alerta per rebre notificacions sobre les teves estacions favorites",
+    "newAlert": "Nova Alerta",
+    "deleteAlert": "Eliminar alerta",
+    "deleteAlertConfirmation": "Estàs segur que vols eliminar aquesta alerta?",
+    "stationPrefix": "Estació",
+    "editAlert": "Editar Alerta",
+    "errorLoadingStations": "Error en carregar estacions: {error}",
+    "@errorLoadingStations": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "pleaseSelectStation": "Si us plau, selecciona una estació",
+    "pleaseSelectAtLeastOneHour": "Si us plau, selecciona almenys una hora",
+    "pleaseSelectAtLeastOneDay": "Si us plau, selecciona almenys un dia",
+    "station": "Estació",
+    "noFavoriteBikeStations": "No tens estacions de bici favorites. Afegeix estacions favorites primer.",
+    "selectStation": "Selecciona una estació",
+    "hours": "Hores",
+    "addHour": "Afegir hora",
+    "weekDays": "Dies de la setmana",
+    "monday": "Dilluns",
+    "tuesday": "Dimarts",
+    "wednesday": "Dimecres",
+    "thursday": "Dijous",
+    "friday": "Divendres",
+    "saturday": "Dissabte",
+    "sunday": "Diumenge",
+    "createAlert": "Crear alerta"
 }

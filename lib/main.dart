@@ -34,6 +34,8 @@ import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket
 import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
 import 'package:nextmove_app/config/socket_config.dart';
 import 'package:nextmove_app/src/services/notification_service.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -405,6 +407,34 @@ class _MainScreenState extends State<MainScreen> {
 
   final Set<int> _visitedIndices = {0};
   final GlobalKey<_ChatsPlaceholderState> _chatsPlaceholderKey = GlobalKey<_ChatsPlaceholderState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Configurar el callback para cuando se hace click en una notificación de alerta
+    NotificationService().setOnNotificationTap((stationId) {
+      _navigateToStationDetails(stationId);
+    });
+  }
+
+  /// Navega a la página de detalles de una estación cuando se hace click en una notificación
+  void _navigateToStationDetails(String stationId) {
+    // Las alertas son solo para estaciones de bicicletas
+    final stationType = StationType.bicycle;
+    
+    // Usar el navigatorKey global para poder navegar desde cualquier contexto
+    final navigator = navigatorKey.currentState;
+    if (navigator != null) {
+      navigator.push(
+        MaterialPageRoute(
+          builder: (context) => StationDetailsPage(
+            stationID: stationId,
+            stationType: stationType,
+          ),
+        ),
+      );
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {

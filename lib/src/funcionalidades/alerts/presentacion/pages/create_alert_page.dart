@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/bloc/alert_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
@@ -50,9 +51,10 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
 
       if (result.hasException) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error al cargar estaciones: ${result.exception}'),
+              content: Text(l10n.errorLoadingStations(result.exception.toString())),
               backgroundColor: Colors.red,
             ),
           );
@@ -73,9 +75,10 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorLoadingStations(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -124,10 +127,12 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
+    
     if (_selectedStationId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor selecciona una estación'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectStation),
           backgroundColor: Colors.red,
         ),
       );
@@ -136,8 +141,8 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
 
     if (_selectedHoras.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor selecciona al menos una hora'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectAtLeastOneHour),
           backgroundColor: Colors.red,
         ),
       );
@@ -146,8 +151,8 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
 
     if (_selectedDias.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor selecciona al menos un día'),
+        SnackBar(
+          content: Text(l10n.pleaseSelectAtLeastOneDay),
           backgroundColor: Colors.red,
         ),
       );
@@ -180,7 +185,16 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    final l10n = AppLocalizations.of(context)!;
+    final diasSemana = [
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+      l10n.sunday,
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -192,7 +206,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
           iconSize: 22,
         ),
         title: Text(
-          widget.alert != null ? 'Editar Alerta' : 'Nueva Alerta',
+          widget.alert != null ? l10n.editAlert : l10n.newAlert,
           style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.w600,
@@ -209,7 +223,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
               children: [
                 // Selección de estación
                 Text(
-                  'Estación',
+                  l10n.station,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -231,7 +245,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'No tienes estaciones de bici favoritas. Añade estaciones favoritas primero.',
+                            l10n.noFavoriteBikeStations,
                             style: TextStyle(color: Colors.orange[900]),
                           ),
                         ),
@@ -242,7 +256,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                   DropdownButtonFormField<String>(
                     initialValue: _selectedStationId,
                     decoration: InputDecoration(
-                      labelText: 'Selecciona una estación',
+                      labelText: l10n.selectStation,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -251,23 +265,9 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                     items: _favoriteStations.map((station) {
                       return DropdownMenuItem<String>(
                         value: station['station_id'] as String,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              station['nombre'] as String? ?? 'Estación',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            if (station['direccion'] != null)
-                              Text(
-                                station['direccion'] as String,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                          ],
+                        child: Text(
+                          station['nombre'] as String? ?? l10n.station,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       );
                     }).toList(),
@@ -278,7 +278,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                     },
                     validator: (value) {
                       if (value == null) {
-                        return 'Por favor selecciona una estación';
+                        return l10n.pleaseSelectStation;
                       }
                       return null;
                     },
@@ -287,7 +287,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
 
                 // Selección de horas
                 Text(
-                  'Horas',
+                  l10n.hours,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -296,7 +296,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                 OutlinedButton.icon(
                   onPressed: _selectTime,
                   icon: const Icon(Icons.access_time),
-                  label: const Text('Añadir hora'),
+                  label: Text(l10n.addHour),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
@@ -319,7 +319,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
 
                 // Selección de días
                 Text(
-                  'Días de la semana',
+                  l10n.weekDays,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -353,7 +353,7 @@ class _CreateAlertPageState extends State<CreateAlertPage> {
                       ),
                     ),
                     child: Text(
-                      widget.alert != null ? 'Guardar cambios' : 'Crear alerta',
+                      widget.alert != null ? l10n.saveChanges : l10n.createAlert,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
