@@ -102,20 +102,19 @@ jobs:
       - name: Generate LCOV report
         run: lcov --ignore-errors unused,deprecated --remove coverage/lcov.info \
           '*.g.dart' \
-          '*/generated_plugin_registrant.dart' \
           '*_state.dart' \
           '*_event.dart' \
-          '*/main.dart' \
-          '*/firebase_options.dart' \
-          '*/app_localizations*.dart' \
-          '*/queries.dart' \
-          '*/mutations.dart' \
-          '*/l10n/*' \
-          '*/config/*' \
-          '*/graphql/*' \
-          '*/enums/*' \
-          '*/theme/*' \
-          '*_*data_provider.dart' \
+          'lib/main.dart' \
+          'lib/firebase_options.dart' \
+          'lib/l10n/*' \
+          'lib/config/*' \
+          'lib/graphql/*' \
+          'lib/enums/*' \
+          'lib/theme/*' \
+          'lib/data/dataProviders/*' \
+          '*_widget.dart' \
+          '*_page.dart' \
+          '*data_provider.dart' \
           -o coverage/lcov.info
 
       - name: Report code coverage
