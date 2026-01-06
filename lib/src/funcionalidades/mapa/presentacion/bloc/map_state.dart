@@ -53,6 +53,7 @@ class MapLoadedState extends MapState {
   final ClusterManager? bikeClusterManager;
   final ClusterManager? evClusterManager;
   final bool shouldShowStatistics;
+  final bool routeSavedSuccessfully;
   final ClusterManager? companyClusterManager;
   final String? challengeNotificationMessage;
   final String? challengeNotificationTitle;
@@ -93,6 +94,7 @@ class MapLoadedState extends MapState {
     this.bikeClusterManager,
     this.evClusterManager,
     this.shouldShowStatistics = false,
+    this.routeSavedSuccessfully = false,
     this.companyClusterManager,
     this.challengeNotificationTitle,
     this.challengeNotificationMessage,
@@ -134,6 +136,7 @@ class MapLoadedState extends MapState {
         bikeClusterManager,
         evClusterManager,
         shouldShowStatistics,
+        routeSavedSuccessfully,
         companyClusterManager,
         challengeNotificationTitle,
         challengeNotificationMessage,
@@ -177,6 +180,7 @@ class MapLoadedState extends MapState {
     ClusterManager? bikeClusterManager,
     ClusterManager? evClusterManager,
     bool? shouldShowStatistics,
+    bool? routeSavedSuccessfully,
     ClusterManager? companyClusterManager,
     String? challengeNotificationTitle,
     String? challengeNotificationMessage,
@@ -216,6 +220,7 @@ class MapLoadedState extends MapState {
       bikeClusterManager: bikeClusterManager ?? this.bikeClusterManager,
       evClusterManager: evClusterManager ?? this.evClusterManager,
       shouldShowStatistics: shouldShowStatistics ?? this.shouldShowStatistics,
+      routeSavedSuccessfully: routeSavedSuccessfully ?? this.routeSavedSuccessfully,
       companyClusterManager: companyClusterManager ?? this.companyClusterManager,
       challengeNotificationTitle: challengeNotificationTitle ?? this.challengeNotificationTitle,
       challengeNotificationMessage: challengeNotificationMessage ?? this.challengeNotificationMessage,

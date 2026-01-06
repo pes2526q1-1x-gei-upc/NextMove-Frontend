@@ -13,6 +13,7 @@ import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/navigati
 import 'package:nextmove_app/src/funcionalidades/mapa/data/repositories/track_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/domain/recorded_track.dart';
+import 'package:nextmove_app/src/funcionalidades/mapa/domain/track_validator.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/data/services/search_history_service.dart';
 import 'package:nextmove_app/src/shared/domain/route_input.dart';
 import 'package:nextmove_app/src/shared/enums/route_input_enums.dart';
@@ -756,6 +757,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
           routePolyline: defaultPolyline,
           snackbarError: null,
           recordingElapsedTime: Duration.zero,
+          routeSavedSuccessfully: false,
+          shouldShowStatistics: false,
         ),
       );
 
@@ -809,12 +812,40 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
-      // No guardar automáticamente, solo detener la grabación y mostrar la pantalla
+      // Validar la ruta antes de mostrar la pantalla de foto
+      // No guardamos aún, solo validamos que sea válida
+      final validator = TrackValidator(event.l10n);
+      final validationResult = validator.validate(currentState.recordedTrack!);
+
+      if (!validationResult.isValid) {
+        // Si la validación falla, mostrar error y NO mostrar pantalla de éxito
+        if (kDebugMode) {
+          print('Error validating recorded track: ${validationResult.reason}');
+        }
+        emit(
+          currentState.copyWith(
+            isRecordingRoute: false,
+            routePolyline: defaultPolyline,
+            snackbarError: validationResult.reason ?? 'Error validando la ruta',
+          ),
+        );
+        emit(
+          currentState.copyWith(
+            isRecordingRoute: false,
+            routePolyline: defaultPolyline,
+            snackbarError: null,
+          ),
+        );
+        return;
+      }
+
+      // Si la validación es exitosa, mostrar la pantalla de foto
+      // La ruta se guardará cuando el usuario cierre la pantalla
       emit(
         currentState.copyWith(
           isRecordingRoute: false,
           routePolyline: defaultPolyline,
-          shouldShowStatistics: true,
+          routeSavedSuccessfully: true, // Indica que la ruta es válida y puede mostrarse la pantalla
         ),
       );
     }
@@ -1180,17 +1211,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                 challengeNotificationMessage: null,
                 challengeNotificationPercentage: null,
                 challengeNotificationName: null,
+                shouldShowStatistics: true,
               ),
             );
           } else {
-            // No progress milestone crossed, just reset recording state
+            // No progress milestone crossed, just reset recording state and show statistics
             if (kDebugMode) {
-              print('No milestone crossed, resetting recording state');
+              print('No milestone crossed, resetting recording state and showing statistics');
             }
             emit(
               currentState.copyWith(
                 isRecordingRoute: false,
                 routePolyline: defaultPolyline,
+                shouldShowStatistics: true,
               ),
             );
           }
@@ -1220,17 +1253,19 @@ class MapBloc extends Bloc<MapEvent, MapState> {
                 challengeNotificationMessage: null,
                 challengeNotificationPercentage: null,
                 challengeNotificationName: null,
+                shouldShowStatistics: true,
               ),
             );
           } else {
             if (kDebugMode) {
               print('No enrolled challenge found');
             }
-            // No enrolled challenge, just reset recording state
+            // No enrolled challenge, just reset recording state and show statistics
             emit(
               currentState.copyWith(
                 isRecordingRoute: false,
                 routePolyline: defaultPolyline,
+                shouldShowStatistics: true,
               ),
             );
           }
