@@ -112,23 +112,23 @@ jobs:
           echo "ignore_errors = deprecated" > ~/.lcovrc
 
       - name: Generate LCOV report
-        run:
+        run: |
           lcov --ignore-errors unused,deprecated --remove coverage/lcov.info \
-          '*.g.dart' \
-          '*_state.dart' \
-          '*_event.dart' \
-          'lib/main.dart' \
-          'lib/firebase_options.dart' \
-          'lib/l10n/*' \
-          'lib/config/*' \
-          'lib/graphql/*' \
-          'lib/enums/*' \
-          'lib/theme/*' \
-          'lib/data/dataProviders/*' \
-          '*_widget.dart' \
-          '*_page.dart' \
-          '*data_provider.dart' \
-          -o coverage/lcov.info
+            '*.g.dart' \
+            '*_state.dart' \
+            '*_event.dart' \
+            '*/main.dart' \
+            '*/firebase_options.dart' \
+            '*/l10n/*' \
+            '*/config/*' \
+            '*/graphql/*' \
+            '*/enums/*' \
+            '*/theme/*' \
+            '*/data/dataProviders/*' \
+            '*_widget.dart' \
+            '*_page.dart' \
+            '*data_provider.dart' \
+            -o coverage/lcov.info
 
       - name: Report code coverage
         uses: zgosalvez/github-actions-report-lcov@v4
