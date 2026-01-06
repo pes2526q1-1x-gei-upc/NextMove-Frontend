@@ -33,6 +33,8 @@ jobs:
           cache: true
       - name: Generate test file with all imports to include untested files in coverage
         run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Print generated test file
+        run: cat test/coverage_test.dart
       - name: Create .env file from ENV_FILE secret
         run: echo "$ENV_FILE" > .env
       - name: Generate localization files
@@ -117,6 +119,10 @@ jobs:
           '*_event.dart' \
           'lib/main.dart' \
           'lib/firebase_options.dart' \
+          'lib/l10n/app_localizations.dart' \
+          'lib/l10n/app_localizations_en.dart' \
+          'lib/l10n/app_localizations_es.dart' \
+          'lib/l10n/app_localizations_ca.dart' \
           'lib/l10n/*' \
           'lib/config/*' \
           'lib/graphql/*' \
