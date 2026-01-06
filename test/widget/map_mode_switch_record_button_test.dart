@@ -94,7 +94,6 @@ void main() {
 
     expect(find.byIcon(Icons.play_arrow), findsOneWidget);
     expect(find.byIcon(Icons.bar_chart), findsNothing);
-    expect(true, false); // Intentional failure for testing
   });
 
   testWidgets('hides record buttons in car mode', (WidgetTester tester) async {
