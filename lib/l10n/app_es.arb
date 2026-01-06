@@ -529,5 +529,38 @@
             }
         }
     },
-    "trophyWonMessage": "¡Aquí está el trofeo que acabas de ganar por este reto!"
+    "trophyWonMessage": "¡Aquí está el trofeo que acabas de ganar por este reto!",
+    "stationAlertsTitle": "Alertas de Estaciones",
+    "noAlertsConfigured": "No tienes alertas configuradas",
+    "createAlertMessage": "Crea una alerta para recibir notificaciones sobre tus estaciones favoritas",
+    "newAlert": "Nueva Alerta",
+    "deleteAlert": "Eliminar alerta",
+    "deleteAlertConfirmation": "¿Estás seguro de que quieres eliminar esta alerta?",
+    "stationPrefix": "Estación",
+    "editAlert": "Editar Alerta",
+    "errorLoadingStations": "Error al cargar estaciones: {error}",
+    "@errorLoadingStations": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "pleaseSelectStation": "Por favor selecciona una estación",
+    "pleaseSelectAtLeastOneHour": "Por favor selecciona al menos una hora",
+    "pleaseSelectAtLeastOneDay": "Por favor selecciona al menos un día",
+    "station": "Estación",
+    "noFavoriteBikeStations": "No tienes estaciones de bici favoritas. Añade estaciones favoritas primero.",
+    "selectStation": "Selecciona una estación",
+    "hours": "Horas",
+    "addHour": "Añadir hora",
+    "weekDays": "Días de la semana",
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo",
+    "createAlert": "Crear alerta"
 }

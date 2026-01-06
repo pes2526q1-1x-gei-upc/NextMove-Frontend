@@ -527,5 +527,38 @@
             }
         }
     },
-    "trophyWonMessage": "Here is the trophy you have just won for this challenge!"
+    "trophyWonMessage": "Here is the trophy you have just won for this challenge!",
+    "stationAlertsTitle": "Station Alerts",
+    "noAlertsConfigured": "You have no alerts configured",
+    "createAlertMessage": "Create an alert to receive notifications about your favorite stations",
+    "newAlert": "New Alert",
+    "deleteAlert": "Delete alert",
+    "deleteAlertConfirmation": "Are you sure you want to delete this alert?",
+    "stationPrefix": "Station",
+    "editAlert": "Edit Alert",
+    "errorLoadingStations": "Error loading stations: {error}",
+    "@errorLoadingStations": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "pleaseSelectStation": "Please select a station",
+    "pleaseSelectAtLeastOneHour": "Please select at least one hour",
+    "pleaseSelectAtLeastOneDay": "Please select at least one day",
+    "station": "Station",
+    "noFavoriteBikeStations": "You have no favorite bike stations. Add favorite stations first.",
+    "selectStation": "Select a station",
+    "hours": "Hours",
+    "addHour": "Add hour",
+    "weekDays": "Days of the week",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "createAlert": "Create alert"
 }

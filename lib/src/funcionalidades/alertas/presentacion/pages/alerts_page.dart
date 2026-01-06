@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/bloc/alert_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/pages/create_alert_page.dart';
 
@@ -20,6 +21,7 @@ class _AlertsPageState extends State<AlertsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +33,7 @@ class _AlertsPageState extends State<AlertsPage> {
           iconSize: 22,
         ),
         title: Text(
-          'Alertas de Estaciones',
+          l10n.stationAlertsTitle,
           style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.w600,
@@ -68,7 +70,7 @@ class _AlertsPageState extends State<AlertsPage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No tienes alertas configuradas',
+                        l10n.noAlertsConfigured,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey[500],
@@ -77,7 +79,7 @@ class _AlertsPageState extends State<AlertsPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Crea una alerta para recibir notificaciones sobre tus estaciones favoritas',
+                        l10n.createAlertMessage,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey[400],
@@ -120,7 +122,8 @@ class _AlertsPageState extends State<AlertsPage> {
                             });
                           },
                           onDelete: () {
-                            _showDeleteDialog(context, alert.id);
+                            final alertBloc = context.read<AlertBloc>();
+                            _showDeleteDialog(context, alert.id, alertBloc);
                           },
                         );
                       },
@@ -154,7 +157,7 @@ class _AlertsPageState extends State<AlertsPage> {
                       onPressed: () {
                         context.read<AlertBloc>().add(LoadAlertsEvent());
                       },
-                      child: const Text('Reintentar'),
+                      child: Text(l10n.retry),
                     ),
                   ],
                 ),
@@ -167,6 +170,7 @@ class _AlertsPageState extends State<AlertsPage> {
       ),
       floatingActionButton: Builder(
         builder: (context) {
+          final l10nBuilder = AppLocalizations.of(context)!;
           return FloatingActionButton.extended(
             onPressed: () {
               final alertBloc = context.read<AlertBloc>();
@@ -183,30 +187,31 @@ class _AlertsPageState extends State<AlertsPage> {
               });
             },
             icon: const Icon(Icons.add),
-            label: const Text('Nueva Alerta'),
+            label: Text(l10nBuilder.newAlert),
           );
         },
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, String alertId) {
+  void _showDeleteDialog(BuildContext context, String alertId, AlertBloc alertBloc) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar alerta'),
-        content: const Text('¿Estás seguro de que quieres eliminar esta alerta?'),
+        title: Text(l10n.deleteAlert),
+        content: Text(l10n.deleteAlertConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
-              context.read<AlertBloc>().add(DeleteAlertEvent(id: alertId));
+              alertBloc.add(DeleteAlertEvent(id: alertId));
               Navigator.pop(context);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -228,7 +233,7 @@ class _AlertCard extends StatelessWidget {
   });
 
   /// Obtiene el nombre de la estación para mostrar, con fallback si no está disponible
-  String _getStationDisplayName(dynamic alert) {
+  String _getStationDisplayName(dynamic alert, AppLocalizations l10n) {
     // Si hay un nombre de estación válido y no es solo el ID, usarlo
     if (alert.stationNombre != null && 
         alert.stationNombre!.isNotEmpty && 
@@ -249,13 +254,41 @@ class _AlertCard extends StatelessWidget {
     }
     
     // Fallback: mostrar "Estación" seguido del ID
-    return 'Estación ${alert.stationId}';
+    return '${l10n.stationPrefix} ${alert.stationId}';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final diasNombres = alert.diasSemanaNombres.join(', ');
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Mapear los números de días (0=Lunes, 6=Domingo) a los nombres traducidos
+    final diasSemanaList = (alert.diasSemana as List).map<int>((dia) {
+      if (dia is int) return dia;
+      return int.parse(dia.toString());
+    }).toList();
+    
+    final diasNombresList = diasSemanaList.map<String>((dia) {
+      switch (dia) {
+        case 0:
+          return l10n.monday;
+        case 1:
+          return l10n.tuesday;
+        case 2:
+          return l10n.wednesday;
+        case 3:
+          return l10n.thursday;
+        case 4:
+          return l10n.friday;
+        case 5:
+          return l10n.saturday;
+        case 6:
+          return l10n.sunday;
+        default:
+          return '';
+      }
+    }).toList();
+    final diasNombres = diasNombresList.where((nombre) => nombre.isNotEmpty).join(', ');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -280,25 +313,11 @@ class _AlertCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getStationDisplayName(alert),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (alert.stationDireccion != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          alert.stationDireccion!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ],
+                  child: Text(
+                    _getStationDisplayName(alert, l10n),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Switch(
@@ -338,13 +357,13 @@ class _AlertCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('Editar'),
+                  label: Text(l10n.edit),
                 ),
                 const SizedBox(width: 8),
                 TextButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete, size: 18),
-                  label: const Text('Eliminar'),
+                  label: Text(l10n.delete),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.red,
                   ),
