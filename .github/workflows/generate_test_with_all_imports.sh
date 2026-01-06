@@ -8,21 +8,7 @@ if [ "$packageName" = "" ]; then
 fi
 
 echo "// ignore_for_file: unused_import" > "$outputFile"
-find lib -name '*.dart' \
-    -not -name '*.g.dart' \
-    -not -name '*_state.dart' \
-    -not -name '*_event.dart' \
-    -not -path 'lib/main.dart' \
-    -not -path 'lib/firebase_options.dart' \
-    -not -path 'lib/l10n/*' \
-    -not -path 'lib/config/*' \
-    -not -path 'lib/graphql/*' \
-    -not -path 'lib/enums/*' \
-    -not -path 'lib/theme/*' \
-    -not -path 'lib/data/dataProviders/*' \
-    -not -name '*_widget.dart' \
-    -not -name '*_page.dart' \
-    -not -name '*data_provider.dart' \
+grep -r --include="*.dart" -l "^" lib/ | grep -v -E "(\.g\.dart$|_state\.dart$|_event\.dart$|lib/main\.dart$|lib/firebase_options\.dart$|lib/l10n/|lib/config/|lib/graphql/|lib/enums/|lib/theme/|lib/data/dataProviders/|_widget\.dart$|_page\.dart$|data_provider\.dart$)" \
 | awk -v package=$packageName '{gsub("^lib", "", $1); printf("import '\''package:%s%s'\'';\n", package, $1);}' >> "$outputFile"
 
 echo "" >> "$outputFile"
