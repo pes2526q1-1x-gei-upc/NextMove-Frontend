@@ -67,16 +67,6 @@ jobs:
       - name: Check out the repository to the runner
         uses: actions/checkout@v6
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.38.3"
-          channel: "stable"
-          cache: true
-
-      - name: Generate localization files
-        run: flutter gen-l10n
-
       - name: Download coverage reports from test job
         uses: actions/download-artifact@v5
         with:
