@@ -7,7 +7,10 @@ import 'package:nextmove_app/src/funcionalidades/competition/ranking/domain/rank
 
 class RankingRepository {
   final RankingRemoteDataProvider rankingRemoteDataProvider;
-  RankingRepository() : rankingRemoteDataProvider = RankingRemoteDataProvider();
+
+  RankingRepository({RankingRemoteDataProvider? rankingRemoteDataProvider})
+      : rankingRemoteDataProvider =
+            rankingRemoteDataProvider ?? RankingRemoteDataProvider();
 
   Future<Either<Failure, List<RankingEntry>?>> getRankingData(
     String metric,
