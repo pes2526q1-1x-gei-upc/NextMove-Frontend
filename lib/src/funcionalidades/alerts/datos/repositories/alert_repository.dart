@@ -2,13 +2,14 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/datos/dataproviders/alert_remote_data_provider.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/dominio/alert_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/datos/dataproviders/alert_remote_data_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dart';
 
 class AlertRepository {
   final AlertRemoteDataProvider alertRemoteDataProvider;
   
-  AlertRepository() : alertRemoteDataProvider = AlertRemoteDataProvider();
+  AlertRepository({AlertRemoteDataProvider? alertRemoteDataProvider})
+      : alertRemoteDataProvider = alertRemoteDataProvider ?? AlertRemoteDataProvider();
 
   Future<Either<Failure, List<StationAlert>>> getStationAlerts() async {
     try {

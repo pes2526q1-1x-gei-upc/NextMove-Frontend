@@ -9,8 +9,8 @@ import 'package:nextmove_app/src/shared/domain/route_input.dart';
 class NavigationRouteRepository {
   final NavigationRouteDataProvider navigationRouteProvider;
 
-  NavigationRouteRepository()
-      : navigationRouteProvider = NavigationRouteDataProvider();
+  NavigationRouteRepository({NavigationRouteDataProvider? navigationRouteProvider})
+      : navigationRouteProvider = navigationRouteProvider ?? NavigationRouteDataProvider();
 
   Future<Either<Failure, NavigationRoute>> fetchNavigationRoute(
       RouteInput routeInput) async {

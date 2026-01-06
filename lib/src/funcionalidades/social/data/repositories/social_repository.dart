@@ -8,7 +8,8 @@ import 'package:nextmove_app/src/funcionalidades/social/data/dataproviders/socia
 class SocialRepository {
   final SocialRemoteDataProvider remoteDataProvider;
 
-  SocialRepository() : remoteDataProvider = SocialRemoteDataProvider();
+  SocialRepository({SocialRemoteDataProvider? remoteDataProvider})
+      : remoteDataProvider = remoteDataProvider ?? SocialRemoteDataProvider();
 
   Future<Either<Failure, List<UserEntity>>> getFriends() async {
     try {
