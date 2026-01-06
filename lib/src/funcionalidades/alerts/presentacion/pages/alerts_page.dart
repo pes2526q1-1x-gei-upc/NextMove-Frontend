@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/bloc/alert_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/pages/create_alert_page.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/bloc/alert_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/pages/create_alert_page.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});

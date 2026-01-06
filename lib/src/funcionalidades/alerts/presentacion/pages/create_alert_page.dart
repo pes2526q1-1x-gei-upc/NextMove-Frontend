@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/dominio/alert_entity.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/presentacion/bloc/alert_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/presentacion/bloc/alert_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 
 class CreateAlertPage extends StatefulWidget {

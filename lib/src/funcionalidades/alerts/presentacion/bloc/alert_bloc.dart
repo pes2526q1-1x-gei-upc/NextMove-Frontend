@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/src/core/errors/failure.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/datos/repositories/alert_repository.dart';
-import 'package:nextmove_app/src/funcionalidades/alertas/dominio/alert_entity.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/datos/repositories/alert_repository.dart';
+import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dart';
 
 part 'alert_event.dart';
 part 'alert_state.dart';
