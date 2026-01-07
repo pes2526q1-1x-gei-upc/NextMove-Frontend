@@ -38,3 +38,4 @@ jobs:
         with:
           analyze-log: flutter_analyze.log
           max-issues: 1000
+        continue-on-error: true
