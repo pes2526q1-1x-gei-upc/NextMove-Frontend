@@ -282,13 +282,25 @@ class _ChatListPageState extends State<ChatListPage> {
       }
 
       final chat = chatResult.data!['getOrCreateDirectChat'];
-      final chatId = chat['id'] as String;
+      if (chat == null) {
+        throw Exception('No se pudo crear el chat');
+      }
+      
+      final chatId = chat['id'] as String?;
+      if (chatId == null || chatId.isEmpty) {
+        throw Exception('Chat ID no válido');
+      }
 
-      _navigateToRoom(
+      debugPrint('[ChatListPage] Chat creado/obtenido: $chatId, navegando...');
+      
+      // Llamar a _navigateToRoom pero sin resetear el flag _isNavigating
+      // porque lo estamos gestionando aquí
+      await _navigateToRoom(
         chatId,
         friendNickname,
         otherUserPhoto: photo,
         shouldRefreshOnReturn: true,
+        skipNavigationFlag: true,
       );
     } catch (e) {
       if (mounted) {
@@ -314,15 +326,20 @@ class _ChatListPageState extends State<ChatListPage> {
     String? otherUserPhoto,
     bool shouldRefreshOnReturn = false,
     bool isGroup = false,
+    bool skipNavigationFlag = false,
   }) async {
     // Prevenir múltiples navegaciones simultáneas
-    if (_isNavigating) {
-      return;
-    }
+    // Si skipNavigationFlag es true, significa que el flag ya está gestionado por el llamador
+    if (!skipNavigationFlag) {
+      if (_isNavigating) {
+        debugPrint('[ChatListPage] Ya se está navegando, ignorando llamada a _navigateToRoom');
+        return;
+      }
 
-    setState(() {
-      _isNavigating = true;
-    });
+      setState(() {
+        _isNavigating = true;
+      });
+    }
 
     try {
       final chatBloc = context.read<ChatBloc>();
@@ -357,8 +374,13 @@ class _ChatListPageState extends State<ChatListPage> {
           refreshChatList();
         }
       }
+    } catch (e) {
+      debugPrint('[ChatListPage] Error en _navigateToRoom: $e');
+      // No resetear el flag aquí si skipNavigationFlag es true, 
+      // el llamador lo gestionará
     } finally {
-      if (mounted) {
+      // Solo resetear el flag si lo gestionamos aquí
+      if (mounted && !skipNavigationFlag) {
         setState(() {
           _isNavigating = false;
         });
