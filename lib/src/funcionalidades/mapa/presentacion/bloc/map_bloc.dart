@@ -448,6 +448,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     RequestLocationPermissionEvent event,
     Emitter<MapState> emit,
   ) async {
+    final currentState = state;
+    
+    // Solo actualizar permisos si el mapa ya está cargado
+    if (currentState is! MapLoadedState) {
+      return;
+    }
+
     try {
       LocationPermission permission = await Geolocator.checkPermission();
 
@@ -456,25 +463,47 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        emit(const MapLocationPermissionDeniedState(isPermanentlyDenied: true));
-        return;
-      }
-
-      if (permission == LocationPermission.denied) {
+        // Actualizar el estado cargado con información de permisos denegados permanentemente
         emit(
-          const MapLocationPermissionDeniedState(isPermanentlyDenied: false),
+          currentState.copyWith(
+            isLocationPermissionDenied: true,
+            isLocationPermissionPermanentlyDenied: true,
+          ),
         );
         return;
       }
 
-      // Permisos concedidos, iniciar stream de ubicación
+      if (permission == LocationPermission.denied) {
+        // Actualizar el estado cargado con información de permisos denegados
+        emit(
+          currentState.copyWith(
+            isLocationPermissionDenied: true,
+            isLocationPermissionPermanentlyDenied: false,
+          ),
+        );
+        return;
+      }
+
+      // Permisos concedidos, iniciar stream de ubicación y limpiar flags de permisos denegados
       if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
+        emit(
+          currentState.copyWith(
+            isLocationPermissionDenied: false,
+            isLocationPermissionPermanentlyDenied: false,
+          ),
+        );
         _startLocationUpdates();
       }
     } catch (e) {
-      // Si falla la solicitud de permisos, continuar sin ubicación
-      return;
+      // Si falla la solicitud de permisos, actualizar el estado para indicar que hay un problema
+      // pero mantener el mapa cargado
+      emit(
+        currentState.copyWith(
+          isLocationPermissionDenied: true,
+          isLocationPermissionPermanentlyDenied: false,
+        ),
+      );
     }
   }
 

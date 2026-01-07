@@ -64,6 +64,9 @@ class MapLoadedState extends MapState {
   final int? currentStepIndex;
   final int? distanceToNextStepMeters;
   final double? userHeading; // Orientación del usuario para rotar el mapa (0-360)
+  // Location permission fields
+  final bool isLocationPermissionDenied;
+  final bool isLocationPermissionPermanentlyDenied;
 
   const MapLoadedState({
     required this.bikeStations,
@@ -104,6 +107,8 @@ class MapLoadedState extends MapState {
     this.currentStepIndex,
     this.distanceToNextStepMeters,
     this.userHeading,
+    this.isLocationPermissionDenied = false,
+    this.isLocationPermissionPermanentlyDenied = false,
   });
 
   @override
@@ -146,6 +151,8 @@ class MapLoadedState extends MapState {
         currentStepIndex,
         distanceToNextStepMeters,
         userHeading,
+        isLocationPermissionDenied,
+        isLocationPermissionPermanentlyDenied,
       ];
 
   /// Método copyWith para actualizar el estado inmutablemente
@@ -190,6 +197,8 @@ class MapLoadedState extends MapState {
     int? currentStepIndex,
     int? distanceToNextStepMeters,
     double? userHeading,
+    bool? isLocationPermissionDenied,
+    bool? isLocationPermissionPermanentlyDenied,
   }) {
     return MapLoadedState(
       bikeStations: bikeStations ?? this.bikeStations,
@@ -230,6 +239,8 @@ class MapLoadedState extends MapState {
       currentStepIndex: currentStepIndex ?? this.currentStepIndex,
       distanceToNextStepMeters: distanceToNextStepMeters ?? this.distanceToNextStepMeters,
       userHeading: userHeading ?? this.userHeading,
+      isLocationPermissionDenied: isLocationPermissionDenied ?? this.isLocationPermissionDenied,
+      isLocationPermissionPermanentlyDenied: isLocationPermissionPermanentlyDenied ?? this.isLocationPermissionPermanentlyDenied,
     );
   }
 
