@@ -305,7 +305,7 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
         );
 
         if (kDebugMode) {
-          print("Firebase token: $firebaseToken");
+          //print("Firebase token: $firebaseToken");
         }
         
         final preferredLanguage = meData['preferredLanguage'] as String?;
@@ -314,8 +314,8 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
         }
         final fireBaseUser = FirebaseAuth.instance.currentUser;
         if (fireBaseUser != null) {
-          final token = await fireBaseUser.getIdToken();
-          debugPrint('Bearer $token') ;
+          //final token = await fireBaseUser.getIdToken();
+          //debugPrint('Bearer $token') ;
         }
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");

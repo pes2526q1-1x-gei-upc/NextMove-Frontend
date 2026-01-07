@@ -65,6 +65,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final isEditing = widget.existingAssessment != null;
 
@@ -109,9 +110,9 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
         }
       },
       child: Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(24, 12, 24, 24 + bottomInset),
       child: Column(
@@ -123,7 +124,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: theme.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -137,9 +138,10 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
               if (isEditing) const SizedBox(width: 48), 
               Text(
                 isEditing ? l10n.editReview : l10n.reviewStation, 
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
 
@@ -157,7 +159,10 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx), 
-                            child: Text(l10n.cancel, style: const TextStyle(color: Colors.grey))
+                            child: Text(
+                              l10n.cancel, 
+                              style: TextStyle(color: Theme.of(ctx).colorScheme.onSurface.withOpacity(0.6))
+                            )
                           ),
                           TextButton(
                             onPressed: () {
@@ -187,7 +192,10 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           const SizedBox(height: 8),
           Text(
             widget.stationName,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withOpacity(0.6), 
+              fontSize: 14
+            ),
             textAlign: TextAlign.center,
           ),
 
@@ -212,7 +220,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                         : Icons.star_outline_rounded,
                     color: starIndex <= _selectedScore
                         ? Colors.amber
-                        : Colors.grey[300],
+                        : theme.colorScheme.onSurface.withOpacity(0.3),
                     size: 40,
                   ),
                 ),
@@ -237,13 +245,14 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F7), 
+                  color: theme.scaffoldBackgroundColor, 
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: TextField(
                   controller: _commentController,
                   maxLines: 3,
+                  style: TextStyle(color: theme.colorScheme.onSurface),
                   onChanged: (_) {
                     if (_errorMessage != null) {
                       setState(() {
@@ -254,7 +263,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: l10n.writeYourOpinion, 
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.5)),
                     errorText: null,
                     errorBorder: InputBorder.none,
                     errorStyle: const TextStyle(height: 0),

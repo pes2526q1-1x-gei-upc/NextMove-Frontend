@@ -43,7 +43,7 @@ class SearchResultsList extends StatelessWidget {
         
         if(!state.isSearching) {
           if (kDebugMode) {
-            print('📋 Not searching, hiding');
+            //print('Not searching, hiding');
           }
           return const SizedBox.shrink();
         }
