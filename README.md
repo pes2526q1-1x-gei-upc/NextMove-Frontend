@@ -1,16 +1,16 @@
-# nextmove_app
+# NextMove
 
-A new Flutter project.
+A Flutter application for sustainable mobility, promoting eco-friendly transportation and active lifestyles.
 
-## Getting Started
+## Description
 
-This project is a starting point for a Flutter application.
+NextMove is a mobile application designed to encourage sustainable mobility through features like route planning, bicycle/EV station management, social challenges, and community engagement.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 🗺️ **Interactive Maps**: Navigate and discover sustainable routes
+- 🚴 **Station Management**: Find and manage bicycle and EV charging stations
+- 🏆 **Challenges & Competitions**: Participate in mobility challenges and track achievements
+- 💬 **Social Features**: Connect with other users and share experiences
+- 👤 **User Profiles**: Track personal statistics and progress
+- 🏃 **Route Tracking**: Record and analyze your mobility activities
