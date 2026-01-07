@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
@@ -8,7 +7,6 @@ import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_pro
 import '../bloc/chat_bloc.dart';
 import '../bloc/chat_state.dart';
 import '../bloc/chat_event.dart';
-import '../../../../../graphql/queries.dart';
 import '../utils/chat_list_data_handler.dart';
 import 'chat_list_widgets.dart';
 import 'chat_connection_status_views.dart';
@@ -18,6 +16,7 @@ class ChatListBody extends StatelessWidget {
   final bool showFriends;
   final String searchQuery;
   final int refreshKey;
+  final Future<List<dynamic>>? chatsFuture;
   final Future<List<dynamic>>? friendsFuture;
   final Future<List<dynamic>>? friendsForFilterFuture;
   final VoidCallback onRefresh;
@@ -37,6 +36,7 @@ class ChatListBody extends StatelessWidget {
     required this.showFriends,
     required this.searchQuery,
     required this.refreshKey,
+    required this.chatsFuture,
     required this.friendsFuture,
     required this.friendsForFilterFuture,
     required this.onRefresh,
@@ -61,32 +61,27 @@ class ChatListBody extends StatelessWidget {
 
         final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
 
-        return Query(
-          key: ValueKey('chats_query_$refreshKey'),
-          options: QueryOptions(
-            document: gql(GraphQLQueries.myChatsQuery),
-            fetchPolicy: FetchPolicy.networkOnly,
-          ),
-          builder: (chatsResult, {fetchMore, refetch}) {
+        return FutureBuilder<List<dynamic>>(
+          future: chatsFuture,
+          builder: (context, chatsSnapshot) {
             return FutureBuilder<List<dynamic>>(
               future: searchQuery.isNotEmpty
                   ? friendsFuture
                   : friendsForFilterFuture,
               builder: (context, friendsSnapshot) {
-                if (chatsResult.isLoading ||
+                if (chatsSnapshot.connectionState == ConnectionState.waiting ||
                     (searchQuery.isNotEmpty &&
                         friendsSnapshot.connectionState ==
                             ConnectionState.waiting)) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (chatsResult.hasException) {
+                if (chatsSnapshot.hasError) {
                   return ChatLoadingErrorView(onRetry: onRefresh);
                 }
 
                 final filteredItems = ChatListDataHandler.getProcessedChatItems(
-                  allChats:
-                      chatsResult.data?['myChats'] as List<dynamic>? ?? [],
+                  allChats: chatsSnapshot.data ?? [],
                   friendsData: friendsSnapshot.data,
                   currentUserEmail: currentUserEmail,
                   showFriends: showFriends,

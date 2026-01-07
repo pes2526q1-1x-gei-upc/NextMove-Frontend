@@ -24,8 +24,8 @@ class _BannedUserPageState extends State<BannedUserPage> {
   @override
   void initState() {
     super.initState();
-    // Verificar cada 2 segundos si el usuario sigue baneado
-    _checkTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+    // Verificar cada 1 minuto si el usuario sigue baneado
+    _checkTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       _checkBanStatus();
     });
   }

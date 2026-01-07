@@ -14,7 +14,6 @@ import '../widgets/chat_list_body.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'create_group_page.dart';
 import 'package:nextmove_app/config/socket_config.dart';
-import '../utils/chat_list_data_handler.dart';
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});
@@ -37,16 +36,13 @@ class _ChatListPageState extends State<ChatListPage> {
   int _refreshKey = 0;
   Future<List<dynamic>>? _friendsFuture;
   Future<List<dynamic>>? _friendsForFilterFuture;
-  Timer? _autoRefreshTimer;
-  Set<String> _lastKnownGroupIds =
-      {}; // IDs de grupos conocidos para detectar cambios
+  Future<List<dynamic>>? _chatsFuture;
   StreamSubscription<Map<String, dynamic>>? _directChatCreatedSubscription;
   bool _isNavigating = false; // Flag para prevenir múltiples navegaciones
 
   @override
   void dispose() {
     _searchController.dispose();
-    _autoRefreshTimer?.cancel();
     _directChatCreatedSubscription?.cancel();
     // Eliminar listener del socket
     final socket = SocketConfig.socket;
@@ -62,7 +58,7 @@ class _ChatListPageState extends State<ChatListPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeChat();
       _loadFriendsForFilter();
-      _startAutoRefresh();
+      _loadChats();
       _setupDirectChatCreatedListener();
     });
   }
@@ -100,44 +96,21 @@ class _ChatListPageState extends State<ChatListPage> {
     }
   }
 
-  void _startAutoRefresh() {
-    // Verificar si hay grupos nuevos cada 1 segundos y solo refrescar si hay cambios
-    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 1), (
-      timer,
-    ) async {
-      if (!mounted) return;
-
-      try {
-        final client = GraphQLProvider.of(context).value;
-        final result = await client.query(
+  void _loadChats() {
+    final client = GraphQLProvider.of(context).value;
+    _chatsFuture = client
+        .query(
           QueryOptions(
             document: gql(GraphQLQueries.myChatsQuery),
             fetchPolicy: FetchPolicy.networkOnly,
           ),
-        );
-
-        if (result.hasException || !mounted) return;
-
-        final chats = result.data?['myChats'] as List<dynamic>? ?? [];
-
-        // Obtener IDs de grupos actuales usando la utilidad
-        final currentGroupIds = ChatListDataHandler.getGroupIds(chats);
-
-        // Comparar con los IDs conocidos
-        if (currentGroupIds.length != _lastKnownGroupIds.length ||
-            !currentGroupIds.containsAll(_lastKnownGroupIds) ||
-            !_lastKnownGroupIds.containsAll(currentGroupIds)) {
-          // Hay cambios, refrescar la lista
-          debugPrint(
-            '[ChatListPage] Detectados cambios en grupos, refrescando lista...',
-          );
-          _lastKnownGroupIds = currentGroupIds;
-          refreshChatList();
-        }
-      } catch (e) {
-        debugPrint('[ChatListPage] Error verificando cambios en grupos: $e');
-      }
-    });
+        )
+        .then((result) {
+          if (result.hasException) {
+            return <dynamic>[];
+          }
+          return result.data?['myChats'] as List<dynamic>? ?? <dynamic>[];
+        });
   }
 
   void _onSearchChanged(String query) {
@@ -215,6 +188,7 @@ class _ChatListPageState extends State<ChatListPage> {
       setState(() {
         _refreshKey++;
         _loadFriendsForFilter();
+        _loadChats();
       });
     }
   }
@@ -437,6 +411,7 @@ class _ChatListPageState extends State<ChatListPage> {
                     showFriends: _showFriends,
                     searchQuery: _searchQuery,
                     refreshKey: _refreshKey,
+                    chatsFuture: _chatsFuture,
                     friendsFuture: _friendsFuture,
                     friendsForFilterFuture: _friendsForFilterFuture,
                     onRefresh: refreshChatList,
