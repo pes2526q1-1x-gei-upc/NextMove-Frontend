@@ -267,31 +267,42 @@ class StationBottomSheet extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueGrey,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),  
-                                onPressed: () {
-                                    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-                                    context.read<MapBloc>().add(
-                                      ShowRouteToStationEvent(
-                                        station: station,
-                                        languageCode: localeProvider.locale?.languageCode,
-                                      ),
-                                    );
-                                    Navigator.of(context).pop();
-                                },
-                                icon: const Icon(Icons.directions),
-                                label: Text(
-                                  l10n.howToGetThere,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                              child: Tooltip(
+                                message: state.userLocation == null
+                                    ? l10n.locationRequiredForDirections
+                                    : '',
+                                preferBelow: false,
+                                waitDuration: const Duration(milliseconds: 500),
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: state.userLocation != null
+                                        ? Colors.blueGrey
+                                        : Colors.grey,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),  
+                                  onPressed: state.userLocation != null
+                                      ? () {
+                                          final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+                                          context.read<MapBloc>().add(
+                                            ShowRouteToStationEvent(
+                                              station: station,
+                                              languageCode: localeProvider.locale?.languageCode,
+                                            ),
+                                          );
+                                          Navigator.of(context).pop();
+                                        }
+                                      : null, // Deshabilitar el botón cuando no hay ubicación
+                                  icon: const Icon(Icons.directions),
+                                  label: Text(
+                                    l10n.howToGetThere,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),

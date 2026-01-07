@@ -70,8 +70,8 @@ class StationList extends StatelessWidget {
                   elevation: 0,
                 ),
                 body: allStationDetails.isEmpty
-                    ? const Center(
-                        child: Text('No se encontraron estaciones'),
+                    ? Center(
+                        child: Text(l10n.noStationsFound),
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
