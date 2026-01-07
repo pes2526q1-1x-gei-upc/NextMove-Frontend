@@ -318,7 +318,7 @@ class _ChatListPageState extends State<ChatListPage> {
     try {
       final chatBloc = context.read<ChatBloc>();
 
-      final result = await Navigator.of(context).push<Map<String, dynamic>?>(
+      await Navigator.of(context).push<Map<String, dynamic>?>(
         MaterialPageRoute(
           builder: (_) => BlocProvider.value(
             value: chatBloc,
@@ -333,20 +333,9 @@ class _ChatListPageState extends State<ChatListPage> {
       );
 
       if (mounted) {
-        // Si se eliminó el grupo, se salió del grupo, o hay que refrescar, actualizar la lista
-        bool shouldRefresh = shouldRefreshOnReturn;
-
-        if (result is Map<String, dynamic>) {
-          final resultMap = result;
-          shouldRefresh =
-              shouldRefresh ||
-              resultMap['groupDeleted'] == true ||
-              resultMap['leftGroup'] == true;
-        }
-
-        if (shouldRefresh) {
-          refreshChatList();
-        }
+        // Siempre refrescar la lista de chats al volver del chat
+        // para actualizar el último mensaje y cualquier cambio
+        refreshChatList();
       }
     } catch (e) {
       debugPrint('[ChatListPage] Error en _navigateToRoom: $e');

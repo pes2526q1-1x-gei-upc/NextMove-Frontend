@@ -113,6 +113,96 @@ class _ChatRoomPageState extends State<ChatRoomPage>
   }
 
   @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currentUserEmail =
+        FirebaseAuth.instance.currentUser?.email ??
+        Provider.of<UserProvider>(context, listen: false).email ??
+        Provider.of<UserProvider>(context, listen: false).user?['email']
+            as String? ??
+        '';
+    final l10n = AppLocalizations.of(context)!;
+
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && !_isNavigatingAway) {
+          // Cuando se sale del chat (con botón de retroceso o gesto),
+          // asegurarse de dejar la sala correctamente
+          try {
+            if (!_chatBloc.isClosed) {
+              _chatBloc.add(LeaveChatRoom(widget.roomId));
+            }
+          } catch (e) {
+            debugPrint('[ChatRoomPage] Error al salir de la sala: $e');
+          }
+        }
+      },
+      child: BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          return Scaffold(
+            resizeToAvoidBottomInset: true,
+            appBar: ChatRoomAppBar(
+              isGroup: widget.isGroup,
+              roomId: widget.roomId,
+              roomName: widget.roomName,
+              currentRoomName: _currentRoomName,
+              otherUserPhoto: widget.otherUserPhoto,
+              currentGroupPhoto: _currentGroupPhoto,
+              state: state,
+              currentUserEmail: currentUserEmail,
+              onNavigateToDetails: _navigateToDetails,
+            ),
+            body: BlocConsumer<ChatBloc, ChatState>(
+              listener: (context, state) {
+                if (state is ChatRoomError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: theme.colorScheme.error,
+                    ),
+                  );
+                }
+                if (state is ChatRoomActive) {
+                  Future.delayed(
+                    const Duration(milliseconds: 100),
+                    _scrollToBottom,
+                  );
+                }
+                // Si el usuario fue expulsado del grupo, el grupo fue eliminado, o la amistad fue eliminada, cerrar la pantalla
+                if ((state is ChatDisconnected ||
+                        state is GroupDeletedState ||
+                        state is FriendshipDeletedState) &&
+                    !_isNavigatingAway) {
+                  _handleExitStates(state, l10n, theme);
+                }
+              },
+              builder: (context, state) {
+                return ChatRoomBody(
+                  state: state,
+                  roomId: widget.roomId,
+                  isGroup: widget.isGroup,
+                  currentUserEmail: currentUserEmail,
+                  scrollController: _scrollController,
+                  messageController: _messageController,
+                  isEditing: _isEditing,
+                  onEditMessage: _startEditingMessage,
+                  onDeleteMessage: (msg) => _chatBloc.add(
+                    DeleteMessage(messageId: msg.id, roomId: msg.roomId),
+                  ),
+                  onSendMessage: _sendMessage,
+                  onCancelEdit: _cancelEdit,
+                  onTextChanged: _handleTyping,
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     // Solo intentar salir de la sala si no estamos navegando debido a una expulsión o eliminación
@@ -232,80 +322,6 @@ class _ChatRoomPageState extends State<ChatRoomPage>
       _editingMessage = null;
       _messageController.clear();
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final currentUserEmail =
-        FirebaseAuth.instance.currentUser?.email ??
-        Provider.of<UserProvider>(context, listen: false).email ??
-        Provider.of<UserProvider>(context, listen: false).user?['email']
-            as String? ??
-        '';
-    final l10n = AppLocalizations.of(context)!;
-
-    return BlocBuilder<ChatBloc, ChatState>(
-      builder: (context, state) {
-        return Scaffold(
-          resizeToAvoidBottomInset: true,
-          appBar: ChatRoomAppBar(
-            isGroup: widget.isGroup,
-            roomId: widget.roomId,
-            roomName: widget.roomName,
-            currentRoomName: _currentRoomName,
-            otherUserPhoto: widget.otherUserPhoto,
-            currentGroupPhoto: _currentGroupPhoto,
-            state: state,
-            currentUserEmail: currentUserEmail,
-            onNavigateToDetails: _navigateToDetails,
-          ),
-          body: BlocConsumer<ChatBloc, ChatState>(
-            listener: (context, state) {
-              if (state is ChatRoomError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: theme.colorScheme.error,
-                  ),
-                );
-              }
-              if (state is ChatRoomActive) {
-                Future.delayed(
-                  const Duration(milliseconds: 100),
-                  _scrollToBottom,
-                );
-              }
-              // Si el usuario fue expulsado del grupo, el grupo fue eliminado, o la amistad fue eliminada, cerrar la pantalla
-              if ((state is ChatDisconnected ||
-                      state is GroupDeletedState ||
-                      state is FriendshipDeletedState) &&
-                  !_isNavigatingAway) {
-                _handleExitStates(state, l10n, theme);
-              }
-            },
-            builder: (context, state) {
-              return ChatRoomBody(
-                state: state,
-                roomId: widget.roomId,
-                isGroup: widget.isGroup,
-                currentUserEmail: currentUserEmail,
-                scrollController: _scrollController,
-                messageController: _messageController,
-                isEditing: _isEditing,
-                onEditMessage: _startEditingMessage,
-                onDeleteMessage: (msg) => _chatBloc.add(
-                  DeleteMessage(messageId: msg.id, roomId: msg.roomId),
-                ),
-                onSendMessage: _sendMessage,
-                onCancelEdit: _cancelEdit,
-                onTextChanged: _handleTyping,
-              );
-            },
-          ),
-        );
-      },
-    );
   }
 
   void _handleExitStates(

@@ -19,35 +19,81 @@ class MessageModel extends Message {
   });
 
   /// Helper para parsear fechas desde diferentes formatos
+
   static DateTime _parseTimestamp(dynamic value) {
     if (value == null) {
-      return DateTime.now();
+      return DateTime.now().toLocal();
     }
     
-    // Si es un número (timestamp en milisegundos)
+    DateTime parsedDate;
+    
     if (value is int || value is num) {
-      return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+      parsedDate = DateTime.fromMillisecondsSinceEpoch(value.toInt(), isUtc: true);
     }
-    
-    // Si es un String, intentar parsearlo
-    if (value is String) {
+    else if (value is String) {
       try {
-        return DateTime.parse(value);
+        final trimmedValue = value.trim();
+        
+        if (trimmedValue.endsWith('Z') || 
+            trimmedValue.contains(RegExp(r'[+-]\d{2}:\d{2}')) ||
+            trimmedValue.contains(RegExp(r'[+-]\d{4}'))) {
+          parsedDate = DateTime.parse(trimmedValue);
+        }
+        else if (trimmedValue.contains('T') && 
+                 RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}').hasMatch(trimmedValue)) {
+          // Agregar 'Z' para indicar UTC y parsear
+          final utcString = trimmedValue.endsWith('Z') 
+              ? trimmedValue 
+              : trimmedValue + 'Z';
+          parsedDate = DateTime.parse(utcString);
+          if (kDebugMode) {
+            debugPrint('[MessageModel] Timestamp sin Z detectado, tratado como UTC: $trimmedValue -> $utcString');
+          }
+        }
+        else {
+          parsedDate = DateTime.parse(trimmedValue);
+          if (!parsedDate.isUtc && trimmedValue.length >= 19) {
+            try {
+              final utcString = trimmedValue + 'Z';
+              parsedDate = DateTime.parse(utcString);
+              if (kDebugMode) {
+                debugPrint('[MessageModel] Timestamp local convertido a UTC: $trimmedValue -> $utcString');
+              }
+            } catch (_) {
+              // Si falla, mantener el parseado original
+            }
+          }
+        }
       } catch (e) {
         // Si falla, intentar como timestamp numérico en string
         try {
           final timestamp = int.parse(value);
-          return DateTime.fromMillisecondsSinceEpoch(timestamp);
+          parsedDate = DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+          if (kDebugMode) {
+            debugPrint('[MessageModel] Timestamp parseado como número: $timestamp');
+          }
         } catch (e2) {
           if (kDebugMode) {
-            debugPrint('[MessageModel] No se pudo parsear fecha: $value');
+            debugPrint('[MessageModel] No se pudo parsear fecha: $value (error: $e, $e2)');
           }
-          return DateTime.now();
+          return DateTime.now().toLocal();
         }
       }
+    } else {
+      if (kDebugMode) {
+        debugPrint('[MessageModel] Tipo de timestamp no reconocido: ${value.runtimeType}');
+      }
+      return DateTime.now().toLocal();
     }
     
-    return DateTime.now();
+
+    final localDate = parsedDate.isUtc ? parsedDate.toLocal() : parsedDate;
+    
+    if (kDebugMode) {
+      debugPrint('[MessageModel] Timestamp parseado: $value -> UTC: ${parsedDate.isUtc}, Local: $localDate');
+    }
+    
+    return localDate;
   }
 
   /// Crear desde JSON 
