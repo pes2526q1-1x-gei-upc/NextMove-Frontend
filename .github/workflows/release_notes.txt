@@ -1,4 +1,4 @@
 This is the pre-release version of NextMove before tomorrow's official launch. Expect bug fixes prior to the final release.
 This version contains all functionalitites that will be offered to our users. Hop on that bike and ride the sustainable mobility transformation with us!
 
-- This fix corrects the server URL to keep the app working for you!
+- This fix corrects chats!
