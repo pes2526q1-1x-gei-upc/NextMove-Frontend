@@ -19,7 +19,6 @@ class FriendDetailsPage extends StatelessWidget {
 
   final bool showSocialButtons;
 
-  // --- Lógica para Bloquear Usuario ---
   Future<void> _onBlockPressed(BuildContext context, String userToBlock) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -224,7 +223,6 @@ class FriendDetailsPage extends StatelessWidget {
   }
 }
 
-// === Widget Privado: Botón Eliminar ===
 class _DeleteFriendButton extends StatelessWidget {
   final String friendNickname;
 
@@ -335,7 +333,6 @@ class _DeleteFriendButton extends StatelessWidget {
   }
 }
 
-// === Widget Privado: Botón Añadir ===
 class _AddFriendButton extends StatelessWidget {
   final String friendNickname;
 

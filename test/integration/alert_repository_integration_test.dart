@@ -8,8 +8,6 @@ import 'package:nextmove_app/src/funcionalidades/alerts/dominio/alert_entity.dar
 
 class MockAlertRemoteDataProvider extends Mock implements AlertRemoteDataProvider {}
 
-/// Test de integración que prueba cómo AlertRepository y AlertRemoteDataProvider
-/// trabajan juntos para manejar el flujo completo de operaciones.
 void main() {
   group('AlertRepository Integration Tests', () {
     late AlertRepository repository;
@@ -21,7 +19,6 @@ void main() {
     });
 
     test('should integrate repository and data provider for getStationAlerts flow', () async {
-      // Arrange: Configurar el mock del data provider
       final mockAlerts = [
         StationAlert(
           id: 'alert-1',
@@ -38,10 +35,8 @@ void main() {
       when(() => mockDataProvider.getStationAlerts())
           .thenAnswer((_) async => mockAlerts);
 
-      // Act: Ejecutar el método del repositorio (que internamente usa el data provider)
       final result = await repository.getStationAlerts();
 
-      // Assert: Verificar que el flujo completo funciona correctamente
       expect(result.isRight(), true);
       result.fold(
         (failure) => fail('Expected Right, got Left: $failure'),
@@ -52,20 +47,15 @@ void main() {
         },
       );
 
-      // Verificar que el repositorio llamó al data provider correctamente
       verify(() => mockDataProvider.getStationAlerts()).called(1);
     });
 
     test('should integrate error handling between repository and data provider', () async {
-      // Arrange: Configurar el data provider para lanzar una excepción
       when(() => mockDataProvider.getStationAlerts())
           .thenThrow(ServerException('Error del servidor'));
 
-      // Act: Ejecutar el método del repositorio
       final result = await repository.getStationAlerts();
 
-      // Assert: Verificar que el repositorio maneja correctamente la excepción
-      // y la convierte en un Failure
       expect(result.isLeft(), true);
       result.fold(
         (failure) {
@@ -75,12 +65,10 @@ void main() {
         (_) => fail('Expected Left (Failure), got Right'),
       );
 
-      // Verificar que el repositorio llamó al data provider
       verify(() => mockDataProvider.getStationAlerts()).called(1);
     });
 
     test('should integrate create and get flow together', () async {
-      // Arrange: Configurar mocks para crear y luego obtener una alerta
       final createdAlert = StationAlert(
         id: 'alert-new',
         userEmail: 'user@example.com',
@@ -101,7 +89,6 @@ void main() {
       when(() => mockDataProvider.getStationAlert('alert-new'))
           .thenAnswer((_) async => createdAlert);
 
-      // Act: Crear una alerta y luego obtenerla
       final createResult = await repository.createStationAlert(
         stationId: 'station-1',
         horas: ['09:00'],
@@ -110,7 +97,6 @@ void main() {
 
       final getResult = await repository.getStationAlert('alert-new');
 
-      // Assert: Verificar que ambos flujos funcionan correctamente juntos
       expect(createResult.isRight(), true);
       createResult.fold(
         (failure) => fail('Create should succeed'),
@@ -126,7 +112,6 @@ void main() {
         },
       );
 
-      // Verificar que ambos métodos fueron llamados
       verify(() => mockDataProvider.createStationAlert(
         stationId: 'station-1',
         horas: ['09:00'],

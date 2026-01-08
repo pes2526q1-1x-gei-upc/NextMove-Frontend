@@ -44,7 +44,7 @@ class MessageModel extends Message {
           // Agregar 'Z' para indicar UTC y parsear
           final utcString = trimmedValue.endsWith('Z') 
               ? trimmedValue 
-              : trimmedValue + 'Z';
+              : '${trimmedValue}Z';
           parsedDate = DateTime.parse(utcString);
           if (kDebugMode) {
             debugPrint('[MessageModel] Timestamp sin Z detectado, tratado como UTC: $trimmedValue -> $utcString');
@@ -107,21 +107,16 @@ class MessageModel extends Message {
       debugPrint('[MessageModel]   - Full JSON: $json');
     }
     
-    // Parsear timestamp desde diferentes campos y formatos
     final timestampValue = json['timestamp'] ?? json['createdAt'] ?? json['created_at'];
     final timestamp = _parseTimestamp(timestampValue);
     
-    // Priorizar senderEmail sobre senderId porque senderId puede ser el UID de Firebase
-    // pero necesitamos el email para comparar correctamente
     final senderEmail = json['senderEmail'] as String? ?? json['sender_email'] as String?;
     final senderId = senderEmail ?? json['senderId'] as String? ?? '';
     
-    // Parsear deleted y deletedAt
     final deleted = json['deleted'] as bool? ?? false;
     final deletedAtValue = json['deletedAt'] as String? ?? json['deleted_at'] as String?;
     final deletedAt = deletedAtValue != null ? _parseTimestamp(deletedAtValue) : null;
     
-    // Parsear edited y editedAt
     final edited = json['edited'] as bool? ?? false;
     final editedAtValue = json['editedAt'] as String? ?? json['edited_at'] as String?;
     final editedAt = editedAtValue != null ? _parseTimestamp(editedAtValue) : null;
@@ -129,7 +124,7 @@ class MessageModel extends Message {
     return MessageModel(
       id: json['id'] as String,
       roomId: json['roomId'] as String? ?? json['chatId'] as String? ?? json['chat_id'] as String? ?? '',
-      senderId: senderId, // Siempre usar el email como senderId para comparaciones
+      senderId: senderId,
       senderName: json['senderName'] as String? ?? json['senderNickname'] as String? ?? json['sender_nickname'] as String? ?? senderEmail ?? '',
       senderPhoto: senderPhoto,
       content: json['content'] as String,

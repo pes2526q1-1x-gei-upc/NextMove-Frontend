@@ -181,7 +181,6 @@ class StationHeaderWidget extends StatelessWidget {
                   "Current assessments count: ${assessmentState.assessments.length}",
                 );
 
-                // If user has assessed but we don't have the assessments loaded yet, fetch them first
                 if (userHasAssessed && assessmentState.assessments.isEmpty) {
                   debugPrint(
                     "Fetching assessments for station ${station.id}...",
@@ -192,7 +191,6 @@ class StationHeaderWidget extends StatelessWidget {
                     ),
                   );
 
-                  // Wait a bit for the assessments to load
                   await Future.delayed(const Duration(milliseconds: 800));
                 }
 

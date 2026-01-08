@@ -35,7 +35,6 @@ class BadWordsService {
         if (kDebugMode) {
           debugPrint('Error validando texto ofensivo: ${result.exception}');
         }
-        // En caso de error, por seguridad no permitimos el texto
         return true;
       }
 
@@ -45,7 +44,6 @@ class BadWordsService {
       if (kDebugMode) {
         debugPrint('Excepción validando texto ofensivo: $e');
       }
-      // En caso de excepción, por seguridad no permitimos el texto
       return true;
     }
   }

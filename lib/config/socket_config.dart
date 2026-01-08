@@ -9,10 +9,7 @@ class SocketConfig {
   static io.Socket? get socket => _socket;
   static bool get isConnected => _socket?.connected ?? false;
 
-  /// Inicializar conexión Socket.IO
-  /// Requiere el token de Firebase para autenticación
   static Future<void> connect(String firebaseToken, String userId) async {
-    // Si ya hay una conexión pero con un usuario diferente, desconectar primero
     if (_socket != null && _socket!.connected) {
       if (_currentUserId != userId) {
         debugPrint(
@@ -41,7 +38,7 @@ class SocketConfig {
           .enableReconnection()
           .setReconnectionDelay(1000)
           .setReconnectionDelayMax(5000)
-          .setReconnectionAttempts(999) // Intentos ilimitados
+          .setReconnectionAttempts(999)
           .setTimeout(20000)
           .setAuth({'token': firebaseToken})
           .build(),
@@ -50,15 +47,12 @@ class SocketConfig {
     _setupEventHandlers();
   }
 
-  // Callback para notificar reconexión
   static Function()? _onReconnectCallback;
 
-  /// Configurar callback para reconexión
   static void setReconnectCallback(Function() callback) {
     _onReconnectCallback = callback;
   }
 
-  /// Configurar listeners básicos de conexión
   static void _setupEventHandlers() {
     _socket?.onConnect((_) {
       debugPrint('[SocketIO] Conectado exitosamente');
@@ -80,7 +74,6 @@ class SocketConfig {
 
     _socket?.onReconnect((attempt) {
       debugPrint('[SocketIO] Reconectado exitosamente (intento $attempt)');
-      // Notificar reconexión
       if (_onReconnectCallback != null) {
         _onReconnectCallback!();
       }
@@ -95,7 +88,6 @@ class SocketConfig {
     });
   }
 
-  /// Desconectar y limpiar recursos
   static void disconnect() {
     debugPrint('[SocketIO] Desconectando...');
     _socket?.disconnect();
@@ -104,6 +96,5 @@ class SocketConfig {
     _currentUserId = null;
   }
 
-  /// Obtener el ID del usuario actual
   static String? get currentUserId => _currentUserId;
 }

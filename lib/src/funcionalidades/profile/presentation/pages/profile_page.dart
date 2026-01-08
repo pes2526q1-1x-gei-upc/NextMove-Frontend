@@ -10,8 +10,8 @@ import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/pr
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/widgets/appearance_selector_widget.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
-import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart'; // Import LoadUserProfile
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/edit_user_data_preferences.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/blocked_users_page.dart';
@@ -73,7 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
             } else if (state is UserError) {
               displayName = l10n.ops;
               subText = l10n.errorLoadingProfile;
-              // Attempt to recover potentially?
             } else if (state is UserNeedsToSignUp) {
               displayName = "Perfil incompleto";
               subText = "Necesitas completar tu registro";
@@ -105,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 30),
 
-                    // --- SECCIÓN 1: CUENTA ---
+                    // --- CUENTA ---
                     ProfileSectionLabel(text: l10n.account),
                     ProfileStyledCard(
                       children: [
@@ -145,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
 
                     const SizedBox(height: 20),
-                    // --- SECCIÓN 2: SOCIAL ---
+                    // --- SOCIAL ---
                     ProfileSectionLabel(text: l10n.social),
                     ProfileStyledCard(
                       children: [
@@ -183,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // --- SECCIÓN 3: PREFERENCIAS ---
+                    // --- PREFERENCIAS ---
                     ProfileSectionLabel(text: l10n.settings),
                     ProfileStyledCard(
                       children: [
@@ -192,7 +191,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           text: l10n.appLanguage,
                           onTap: () {
                             if (currentUser != null) {
-                              // Usamos el widget refactorizado para mostrar el selector
                               ProfileLanguageSelector.show(
                                 context,
                                 currentUser,

@@ -73,7 +73,6 @@ class _EditGroupPageState extends State<EditGroupPage> {
     try {
       String? finalPhotoUrl = widget.currentPhotoUrl;
 
-      // 1. Si hay una nueva imagen, subirla primero
       if (_selectedImageFile != null) {
         debugPrint('[EditGroupPage] Subiendo imagen...');
         final userProvider = UserRemoteDataProvider();
@@ -81,7 +80,6 @@ class _EditGroupPageState extends State<EditGroupPage> {
         debugPrint('[EditGroupPage] Imagen subida: $finalPhotoUrl');
       }
 
-      // 2. Ejecutar mutación GraphQL mediante el DataProvider
       debugPrint('[EditGroupPage] Ejecutando mutación...');
       final chatProvider = ChatRemoteDataProvider();
       final updatedData = await chatProvider.updateGroupChat(

@@ -10,12 +10,9 @@ class RankingEntry {
   final int? challengesCompleted;
   final int? points;
 
-  // final int? score;
-
   RankingEntry({
     required this.email,
     required this.nickname,
-    // this.score,
     this.numberOfRoutes,
     this.distance,
     this.elevationGain,

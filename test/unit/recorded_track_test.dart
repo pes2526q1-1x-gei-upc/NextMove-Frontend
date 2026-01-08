@@ -323,16 +323,15 @@ void main() {
         track.addPoint(point);
       }
 
-      expect(track.maxSpeedKmH, points.last.speed); // last point should have highest speed
+      expect(track.maxSpeedKmH, points.last.speed);
     });
 
     test('co2 and kcal calculations', () {
       final track = RecordedTrack();
       final baseTime = DateTime.now();
-      // Add points to cover 1 km
       final point1 = TrackPoint(location: LatLng(0.0, 0.0), altitude: 100.0, timestamp: baseTime);
       track.addPoint(point1);
-      final point2 = TrackPoint(location: LatLng(0.00899, 0.0), altitude: 100.0, timestamp: baseTime.add(Duration(seconds: 1))); // approx 1km
+      final point2 = TrackPoint(location: LatLng(0.00899, 0.0), altitude: 100.0, timestamp: baseTime.add(Duration(seconds: 1)));
       track.addPoint(point2);
 
       expect(track.totalDistanceMeters, closeTo(1000, 10));

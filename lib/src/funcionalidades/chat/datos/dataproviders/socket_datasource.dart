@@ -78,9 +78,6 @@ class SocketDataSource {
       return;
     }
 
-    // Escuchar nuevos mensajes
-    debugPrint('[SocketDataSource] 🔧 Configurando listeners...');
-
     socket.on('message:new', (data) {
       debugPrint('[SocketDataSource]  RAW DATA: $data');
       try {

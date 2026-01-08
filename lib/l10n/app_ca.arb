@@ -130,7 +130,7 @@
     "lightMode": "Mode clar",
     "darkMode": "Mode fosc",
     "systemMode": "Utilitza el mode del sistema",
-    "preliminarVersion": "Versió 0.3.0",
+    "preliminarVersion": "Versió 1.0.0",
     "searchByNickname": "Cerca per sobrenom",
     "noUsersFound": "No s'ha trobat cap usuari amb aquest sobrenom.",
     "noFriendsAdded": "Encara no tens amics afegits.",

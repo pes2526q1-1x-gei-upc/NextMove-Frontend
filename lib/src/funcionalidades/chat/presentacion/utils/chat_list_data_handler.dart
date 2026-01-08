@@ -1,5 +1,3 @@
-// lib/src/funcionalidades/chat/presentacion/utils/chat_list_data_handler.dart
-
 class ChatListDataHandler {
   /// Procesa los datos de chats y amigos para obtener la lista final a mostrar
   static List<Map<String, dynamic>> getProcessedChatItems({

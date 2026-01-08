@@ -55,17 +55,14 @@ class ProfileLanguageSelector {
                           )
                         : null,
                     onTap: () {
-                      // 1. Actualizar UI inmediatamente (LocaleProvider)
                       Provider.of<LocaleProvider>(context, listen: false)
                           .setLocaleFromLanguage(lang);
 
-                      // 2. Guardar en Backend (UserBloc)
                       if (currentUser.idiomaPreferido != lang) {
                         final updatedUser = currentUser.copyWith(idiomaPreferido: lang);
                         context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
                       }
 
-                      // 3. Cerrar el modal
                       Navigator.pop(modalContext);
                     },
                   );

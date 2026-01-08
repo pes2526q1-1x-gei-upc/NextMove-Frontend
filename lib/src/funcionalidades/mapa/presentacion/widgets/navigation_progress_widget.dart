@@ -33,7 +33,6 @@ class NavigationProgressWidget extends StatelessWidget {
     }
   }
   
-  // Optional: Arrival time calculation if "tiempo de llegada" strictly means ETA
   String _formatArrivalTime() {
      final now = DateTime.now();
      final arrival = now.add(Duration(seconds: remainingSeconds));
@@ -68,7 +67,7 @@ class NavigationProgressWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Time remaining (Replaces Step Progress)
+              // Time remaining
               Row(
                 children: [
                    Icon(

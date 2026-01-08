@@ -129,7 +129,6 @@ class SocialBloc extends Bloc<SocialEvent, SocialState> {
         debugPrint("[SocialBloc] Amigo añadido con éxito");
         // Recargamos la lista de amigos para que aparezca el nuevo
         add(LoadFriendsEvent(_currentNickname!));
-        // Limpiamos la búsqueda para volver a la lista principal
         add(ClearSearchEvent());
       },
     );

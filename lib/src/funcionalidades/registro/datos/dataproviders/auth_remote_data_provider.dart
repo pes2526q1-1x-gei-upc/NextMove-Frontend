@@ -30,18 +30,14 @@ class AuthRemoteDataProvider {
       throw AuthException(message: 'no-user');
     }
 
-    // Store email before deletion
     final userEmail = user.email!;
 
-    // Check if user signed in with Google
     final isGoogleUser = user.providerData.any(
       (info) => info.providerId == 'google.com',
     );
 
-    // Step 1: Re-authenticate user based on provider
     try {
       if (isGoogleUser) {
-        // Re-authenticate with Google
         final GoogleSignInAccount googleUser;
         try {
           googleUser = await GoogleSignIn.instance.authenticate();
@@ -57,7 +53,6 @@ class AuthRemoteDataProvider {
         );
         await user.reauthenticateWithCredential(credential);
       } else {
-        // Re-authenticate with email/password
         if (password.isEmpty) {
           throw AuthException(message: 'password-required');
         }
@@ -71,7 +66,6 @@ class AuthRemoteDataProvider {
       throw AuthException(message: e.code);
     }
 
-    // Step 2: Delete from GraphQL backend FIRST
     final MutationOptions options = MutationOptions(
       document: gql(GraphQLMutations.deleteUserMutation),
       variables: {'email': userEmail},
@@ -87,12 +81,9 @@ class AuthRemoteDataProvider {
       throw ServerException('Failed to delete user from backend');
     }
 
-    // Step 3: Delete from Firebase Auth LAST
     try {
       await user.delete();
     } on FirebaseAuthException catch (e) {
-      // User deleted from backend but not Firebase
-      // This is less critical - log and continue
       if (kDebugMode) {
         print(
           'Warning: User deleted from backend but Firebase deletion failed: ${e.code}',
@@ -100,7 +91,6 @@ class AuthRemoteDataProvider {
       }
     }
 
-    // Step 4: Clear user data properly
     userProvider.clearUser();
   }
 
@@ -155,7 +145,6 @@ class AuthRemoteDataProvider {
 
       final authService = AuthService(client);
 
-      // For sign in, user should already exist, so just fetch meData
       final meData = await authService.getCurrentUser();
 
       return {
@@ -202,7 +191,6 @@ class AuthRemoteDataProvider {
     try {
       debugPrint("Starting Google sign-in...");
       final GoogleSignInAccount googleUser;
-      // Trigger the authentication flow
       try {
         googleUser = await GoogleSignIn.instance.authenticate();
       } on GoogleSignInException catch (e) {
@@ -214,14 +202,11 @@ class AuthRemoteDataProvider {
       }
       debugPrint("Google user obtained: ${googleUser.email}");
 
-      // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      // Create a new credential
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
-      // Once signed in, return the UserCredential
       final userCredential = await FirebaseAuth.instance.signInWithCredential(
         credential,
       );

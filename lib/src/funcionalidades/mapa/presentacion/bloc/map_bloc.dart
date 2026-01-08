@@ -81,7 +81,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     StationType? initialMode,
   }) : _initialMode = initialMode,
        super(const MapInitialState()) {
-    // Registro de handlers para cada evento
     on<LoadMapDataEvent>(_onLoadMapData);
     on<ChangeModeEvent>(_onChangeMode);
     on<ToggleMapTypeEvent>(_onToggleMapType);
@@ -139,12 +138,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       final companyIcons = await _loadCompanyIcons(promotedCompanies);
 
-      // Crear ClusterManagerIds
       final bikeClusterManagerId = ClusterManagerId('bike_cluster_manager');
       final evClusterManagerId = ClusterManagerId('ev_cluster_manager');
       final companyClusterManagerId = ClusterManagerId('company_cluster_manager');
 
-      // Crear ClusterManagers
       final bikeClusterManager = ClusterManager(
         clusterManagerId: bikeClusterManagerId,
         onClusterTap: (Cluster cluster) {
@@ -206,7 +203,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       // Determinar el modo inicial: usar el modo preferido del usuario o bici por defecto
       final initialMode = _initialMode ?? StationType.bicycle;
 
-      // Emitir estado cargado
       emit(
         MapLoadedState(
           bikeStations: bikeStations,
@@ -400,7 +396,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               currentStep.endLocation!.longitude,
             ).round();
             
-            // Check if we should advance to next step (within 30 meters)
             if (distanceToStepEnd < 30 && currentStepIndex < route.steps.length - 1) {
               // Advance to next step
               if (kDebugMode) {
@@ -484,7 +479,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         return;
       }
 
-      // Permisos concedidos, iniciar stream de ubicación y limpiar flags de permisos denegados
       if (permission == LocationPermission.whileInUse ||
           permission == LocationPermission.always) {
         emit(
@@ -496,8 +490,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         _startLocationUpdates();
       }
     } catch (e) {
-      // Si falla la solicitud de permisos, actualizar el estado para indicar que hay un problema
-      // pero mantener el mapa cargado
       emit(
         currentState.copyWith(
           isLocationPermissionDenied: true,
@@ -1019,7 +1011,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
               .map((point) => LatLng(point.latitude, point.longitude))
               .toList();
 
-              // 3. Crear el objeto Polyline
               final Polyline navigationPolyline = Polyline(
                 polylineId: const PolylineId('navigation_route'),
                 points: polylinePointsCoordinates,

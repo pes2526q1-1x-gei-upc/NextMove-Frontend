@@ -28,7 +28,6 @@ void main() {
     mockL10n = MockAppLocalizations();
     repository = TrackRepository(trackDataProvider: mockDataProvider);
 
-    // Setup default return values for localization methods
     when(() => mockL10n.validationMinPoints(any())).thenReturn('Mínimo de puntos requerido');
     when(() => mockL10n.validationNoMovement).thenReturn('No hay movimiento');
     when(() => mockL10n.validationInconsistentTime).thenReturn('Tiempo inconsistente');
@@ -46,7 +45,6 @@ void main() {
   RecordedTrack createValidTrack() {
     final track = RecordedTrack();
     final baseTime = DateTime.now();
-    // Add 4+ points with reasonable distances and speeds
     track.addPoint(TrackPoint(
       location: LatLng(0.0, 0.0),
       altitude: 100.0,
@@ -95,7 +93,6 @@ void main() {
 
     test('should return ValidationFailure when track validation fails', () async {
       final track = RecordedTrack(); // Empty track (invalid)
-      // Don't set up mockDataProvider since it shouldn't be called
 
       final result = await repository.saveRecordedTrack(track, mockL10n);
 

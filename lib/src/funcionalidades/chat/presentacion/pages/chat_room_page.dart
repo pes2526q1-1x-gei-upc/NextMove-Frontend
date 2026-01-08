@@ -127,8 +127,6 @@ class _ChatRoomPageState extends State<ChatRoomPage>
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop && !_isNavigatingAway) {
-          // Cuando se sale del chat (con botón de retroceso o gesto),
-          // asegurarse de dejar la sala correctamente
           try {
             if (!_chatBloc.isClosed) {
               _chatBloc.add(LeaveChatRoom(widget.roomId));
@@ -169,7 +167,6 @@ class _ChatRoomPageState extends State<ChatRoomPage>
                     _scrollToBottom,
                   );
                 }
-                // Si el usuario fue expulsado del grupo, el grupo fue eliminado, o la amistad fue eliminada, cerrar la pantalla
                 if ((state is ChatDisconnected ||
                         state is GroupDeletedState ||
                         state is FriendshipDeletedState) &&
@@ -205,16 +202,12 @@ class _ChatRoomPageState extends State<ChatRoomPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // Solo intentar salir de la sala si no estamos navegando debido a una expulsión o eliminación
-    // y si el widget aún está montado
     if (!_isNavigatingAway) {
       try {
-        // Verificar si el BLoC aún está activo antes de agregar eventos
         if (!_chatBloc.isClosed) {
           _chatBloc.add(LeaveChatRoom(widget.roomId));
         }
       } catch (e) {
-        // Ignorar errores si el BLoC ya está cerrado
         debugPrint('[ChatRoomPage] Error al salir de la sala en dispose: $e');
       }
     }
@@ -268,7 +261,6 @@ class _ChatRoomPageState extends State<ChatRoomPage>
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final l10n = AppLocalizations.of(context)!;
     
-    // Validar palabras ofensivas
     final isOffensive = await _badWordsService.checkOffensiveText(content);
     
     if (!mounted) return;

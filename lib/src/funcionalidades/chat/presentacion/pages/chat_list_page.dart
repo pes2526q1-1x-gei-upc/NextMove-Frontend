@@ -267,8 +267,6 @@ class _ChatListPageState extends State<ChatListPage> {
 
       debugPrint('[ChatListPage] Chat creado/obtenido: $chatId, navegando...');
       
-      // Llamar a _navigateToRoom pero sin resetear el flag _isNavigating
-      // porque lo estamos gestionando aquí
       await _navigateToRoom(
         chatId,
         friendNickname,
@@ -303,7 +301,6 @@ class _ChatListPageState extends State<ChatListPage> {
     bool skipNavigationFlag = false,
   }) async {
     // Prevenir múltiples navegaciones simultáneas
-    // Si skipNavigationFlag es true, significa que el flag ya está gestionado por el llamador
     if (!skipNavigationFlag) {
       if (_isNavigating) {
         debugPrint('[ChatListPage] Ya se está navegando, ignorando llamada a _navigateToRoom');
@@ -333,16 +330,11 @@ class _ChatListPageState extends State<ChatListPage> {
       );
 
       if (mounted) {
-        // Siempre refrescar la lista de chats al volver del chat
-        // para actualizar el último mensaje y cualquier cambio
         refreshChatList();
       }
     } catch (e) {
       debugPrint('[ChatListPage] Error en _navigateToRoom: $e');
-      // No resetear el flag aquí si skipNavigationFlag es true, 
-      // el llamador lo gestionará
     } finally {
-      // Solo resetear el flag si lo gestionamos aquí
       if (mounted && !skipNavigationFlag) {
         setState(() {
           _isNavigating = false;

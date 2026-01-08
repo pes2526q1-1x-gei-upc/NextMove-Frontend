@@ -20,7 +20,6 @@ class EVStatsWidget extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 8),
-        // --- Card 1: Disponibilidad ---
         Expanded(
           child: InfoCard(
             icon: Icons.ev_station_rounded,
@@ -33,7 +32,6 @@ class EVStatsWidget extends StatelessWidget {
         ),
         const SizedBox(width: 12),
 
-        // --- Card 2: Velocidad de Carga ---
         Expanded(
           child: InfoCard(
             icon: Icons.bolt_rounded,

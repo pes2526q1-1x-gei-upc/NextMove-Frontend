@@ -26,7 +26,7 @@ class FavoriteStationsButtonWidget extends StatelessWidget {
     final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
 
     return Positioned(
-      top: 190, // 130 + 50 (altura del botón anterior) + 10 (espacio)
+      top: 190,
       right: 16,
       child: GestureDetector(
         onTap: () => _navigateToFavoriteStations(context),

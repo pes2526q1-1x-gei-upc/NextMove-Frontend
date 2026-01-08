@@ -17,11 +17,8 @@ class RecordedRoutesRepository {
     try {
       final routes =
           await recordedRouteDataProvider.getRecordedRoutes(userEmail);
-      // Una lista vacía es válida, no es un error
       return Right(routes);
     } on ServerException catch (e) {
-      // Verificar si el error es porque no hay recorridos (lista vacía es válida)
-      // Si el backend devuelve una excepción por no haber recorridos, tratamos como lista vacía
       final message = e.message?.toLowerCase() ?? '';
       if (message.contains('no hay') || 
           message.contains('no encontrado') ||
@@ -36,7 +33,6 @@ class RecordedRoutesRepository {
       if (kDebugMode) {
         print('UnknownFailure in getRecordedRoutes: $e');
       }
-      // Devolver Left en lugar de lanzar excepción
       return Left(UnknownFailure(message: 'Error desconocido al obtener recorridos'));
     }
   }

@@ -30,7 +30,6 @@ class UserEntity extends Equatable {
     this.statistics,
   });
 
-  // Factory: Convierte datos crudos (e.g., de API/GraphQL) a entidad
   factory UserEntity.fromRawData(Map<String, dynamic> data) {
     if (kDebugMode) {
       print('UserEntity.fromRawData: $data');
@@ -72,7 +71,6 @@ class UserEntity extends Equatable {
     );
   }
 
-  // Método para convertir a mapa (útil para enviar a API)
   Map<String, dynamic> toMap() {
     return {
       'email': email,
@@ -89,7 +87,6 @@ class UserEntity extends Equatable {
     };
   }
 
-  // Mapeo Modo API → Entidad (UI-friendly)
   static String mapPreferredModeFromAPI(String? apiMode) {
     switch (apiMode?.toUpperCase()) {
       case 'BIKE':
@@ -101,7 +98,6 @@ class UserEntity extends Equatable {
     }
   }
 
-  // Mapeo Modo Entidad → API
   static String mapPreferredModeToAPI(String localMode) {
     switch (localMode) {
       case 'Bicicleta':
@@ -115,7 +111,6 @@ class UserEntity extends Equatable {
     }
   }
 
-  // Mapeo Idioma API → Entidad (UI-friendly)
   static String mapLanguageFromAPI(String? apiLang) {
     switch (apiLang?.toLowerCase()) {
       case 'es':
@@ -132,7 +127,6 @@ class UserEntity extends Equatable {
     }
   }
 
-  // Mapeo Idioma Entidad → API
   static String mapLanguageToAPI(String uiLang) {
     switch (uiLang) {
       case 'Español':

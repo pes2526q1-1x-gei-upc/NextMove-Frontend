@@ -79,7 +79,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     );
     emit(UserLoading());
 
-    // 1. Upload photo if present
     if (event.profilePhoto != null) {
       debugPrint("UserBloc: Uploading profile photo...");
       final uploadResult = await userRepository.uploadProfilePhoto(
@@ -88,14 +87,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
       final failureOrUrl = uploadResult.fold((l) => l, (r) => r);
       if (failureOrUrl is Failure) {
-        // Check if it's a failure
         debugPrint("UserBloc: Photo upload failed: ${failureOrUrl.message}");
         emit(UserError(failureOrUrl.message ?? 'Error al subir foto'));
         return;
       }
       debugPrint("UserBloc: Photo uploaded successfully. URL: $failureOrUrl");
-      // We don't need to update event.updatedUser.photo because the backend handles it,
-      // and the subsequent updateProfile call will return the fresh user object.
     }
 
     debugPrint("UserBloc: Calling userRepository.updateUserProfile...");
@@ -137,13 +133,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onLogoutUser(LogoutUser event, Emitter<UserState> emit) async {
-    emit(UserLoading()); // Para mostrar spinner si es necesario
+    emit(UserLoading());
 
     final result = await userRepository.logoutUser();
 
     result.fold(
       (failure) => emit(UserError(failure.message ?? 'Error al cerrar sesión')),
-      (_) => emit(UserLoggedOut()), // Éxito
+      (_) => emit(UserLoggedOut()),
     );
   }
 }

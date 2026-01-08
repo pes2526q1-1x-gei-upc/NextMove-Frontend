@@ -45,7 +45,6 @@ class AssessmentRemoteDataProvider {
       if (result.hasException) {
         final exception = result.exception;
         debugPrint('Excepción devuelta por GraphQL: ${exception.toString()}');
-        // Extraer el mensaje de error de GraphQL
         String errorMessage = 'Error al crear valoración';
         if (exception != null && exception.graphqlErrors.isNotEmpty) {
           errorMessage = exception.graphqlErrors.first.message;
@@ -62,7 +61,6 @@ class AssessmentRemoteDataProvider {
       debugPrint("Valoración creada con éxito");
 
     } on ServerException {
-      // Re-lanzar ServerException sin modificar
       rethrow;
     } catch (e, stackTrace) {
       debugPrint("Error antes de enviar: $e");
@@ -202,7 +200,6 @@ class AssessmentRemoteDataProvider {
       debugPrint("Valoración editada con éxito. Nuevo promedio: ${result.data?['editAssessment']}");
 
     } on ServerException {
-      // Re-lanzar ServerException sin modificar
       rethrow;
     } catch (e) {
       debugPrint("Error crítico al editar: $e");

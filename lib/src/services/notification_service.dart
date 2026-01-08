@@ -281,13 +281,11 @@ class NotificationService {
     }
   }
 
-  /// Obtiene el token FCM actual
   Future<String?> getToken() async {
     if (!_initialized) {
       await initialize();
     }
     
-    // Si ya tenemos el token, retornarlo
     if (_fcmToken != null) {
       return _fcmToken;
     }
@@ -304,8 +302,6 @@ class NotificationService {
       if (kDebugMode) {
         print('Error obteniendo token FCM: $e');
       }
-      // Retornar null si no podemos obtener el token ahora
-      // El token se obtendrá automáticamente más tarde cuando esté disponible
       return null;
     }
   }

@@ -29,7 +29,6 @@ class SearchResultsList extends StatelessWidget {
           return const SizedBox.shrink();
         }
         
-        // CAMBIAR: Priorizar las búsquedas recientes cuando está enfocado y no hay búsqueda activa
         final hasActiveSearch = state.searchQuery != null && state.searchQuery!.length >= 3;
         
         if (isSearchBarFocused && !hasActiveSearch) {
@@ -42,9 +41,6 @@ class SearchResultsList extends StatelessWidget {
         }
         
         if(!state.isSearching) {
-          if (kDebugMode) {
-            //print('Not searching, hiding');
-          }
           return const SizedBox.shrink();
         }
 

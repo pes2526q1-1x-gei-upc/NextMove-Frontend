@@ -116,17 +116,14 @@ class StationDetailsPage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // 2. Stats Grid
               SectionLabel(text: l10n.state),
               StationStatsWidget(station: stationDetails, isBike: isBike),
               const SizedBox(height: 24),
 
-              // 3. Features List
               SectionLabel(text: l10n.accountDetails),
               StationFeaturesWidget(station: stationDetails, isBike: isBike),
               const SizedBox(height: 24),
 
-              // 4. Connectors (Only EV)
               if (!isBike && stationDetails is EVStationDetails)
                 StationConnectorsWidget(details: stationDetails),
 

@@ -71,10 +71,8 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
 
     return BlocListener<AssessmentBloc, AssessmentState>(
       listenWhen: (previous, current) {
-        // Solo escuchar cuando tenemos una operación pendiente y hay un cambio de estado relevante
         if (!_pendingOperation) return false;
         
-        // Escuchar cuando cambia de loading a success o failure
         if (previous.status == AssessmentStatus.loading && 
             (current.status == AssessmentStatus.success || current.status == AssessmentStatus.failure)) {
           return true;
@@ -92,7 +90,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
             _errorMessage = state.errorMessage;
           });
         } else if (state.status == AssessmentStatus.success && _isSubmitting) {
-          // Solo cerrar si acabamos de recibir éxito después de una operación pendiente
           setState(() {
             _isSubmitting = false;
             _pendingOperation = false;
@@ -131,7 +128,7 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
           ),
           const SizedBox(height: 24),
 
-          // --- HEADER CON BOTÓN ELIMINAR (Solo en edición) ---
+          // --- HEADER CON BOTÓN ELIMINAR EN EDICIÓN ---
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -310,7 +307,6 @@ class _RateStationBottomSheetState extends State<RateStationBottomSheet> {
                       final commentText = _commentController.text.trim();
                       final assessmentBloc = context.read<AssessmentBloc>();
                       
-                      // Validar palabras ofensivas
                       final isOffensive = await _badWordsService.checkOffensiveText(commentText);
                       
                       if (!mounted) return;

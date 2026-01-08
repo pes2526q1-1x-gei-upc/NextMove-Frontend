@@ -4,10 +4,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-
-// A diferencia de antes, ahora este widget recibe el tipo de mapa actual y una función de callback para alternar el tipo de mapa.
-// Lo que es la gestion del estado se hará en el bloc   
 class MapTypeToggleWidget extends StatelessWidget {
   final MapType currentMapType;
 

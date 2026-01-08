@@ -22,7 +22,7 @@ class RouteHistoryButtonWidget extends StatelessWidget {
     final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
 
     return Positioned(
-      top: 130, // 70 + 50 (altura del botón anterior) + 10 (espacio)
+      top: 130,
       right: 16,
       child: GestureDetector(
         onTap: () => _navigateToRouteHistory(context),

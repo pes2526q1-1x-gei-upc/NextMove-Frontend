@@ -54,12 +54,10 @@ class _ChatRoomDetailsPageState extends State<ChatRoomDetailsPage> {
               duration: const Duration(seconds: 2),
             ),
           );
-          // Cerrar ChatRoomDetailsPage y luego ChatRoomPage
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               final navigator = Navigator.of(context);
               navigator.pop({'leftGroup': true});
-              // Esperar un poco y cerrar también ChatRoomPage
               Future.delayed(const Duration(milliseconds: 100), () {
                 if (mounted && navigator.canPop()) {
                   navigator.pop({'leftGroup': true});

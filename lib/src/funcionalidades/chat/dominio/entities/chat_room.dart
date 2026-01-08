@@ -21,21 +21,16 @@ class ChatRoom extends Equatable {
     required this.createdAt,
   });
 
-  /// Verificar si es un chat directo 
   bool get isDirect => type == 'direct';
 
-  /// Verificar si es un chat grupal
   bool get isGroup => type == 'group';
 
-  /// Obtener número de participantes
   int get participantCount => participantIds.length;
 
-  /// Verificar si el usuario es participante
   bool isParticipant(String userId) {
     return participantIds.contains(userId);
   }
 
-  /// Copiar con nuevos valores
   ChatRoom copyWith({
     String? id,
     String? name,

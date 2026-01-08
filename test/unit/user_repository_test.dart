@@ -6,17 +6,12 @@ import 'dart:io';
 
 void main() {
   group('UserRepository', () {
-    // Nota: UserRepository requiere Firebase inicializado para crearse
-    // Estos tests verifican que los métodos existen y manejan errores correctamente
-    // cuando Firebase no está disponible
     
     test('should have getUserProfile method', () {
       try {
         final repository = UserRepository();
         expect(repository.getUserProfile, isA<Function>());
       } catch (e) {
-        // Si Firebase no está inicializado, el test pasa porque verificamos
-        // que el método existe cuando el repositorio se puede crear
         expect(e.toString(), contains('Firebase'));
       }
     });
@@ -77,8 +72,6 @@ void main() {
           (_) => fail('Expected Left (Failure), got Right'),
         );
       } catch (e) {
-        // Si Firebase no está inicializado, el test pasa porque verificamos
-        // que el repositorio requiere Firebase
         expect(e.toString(), contains('Firebase'));
       }
     });

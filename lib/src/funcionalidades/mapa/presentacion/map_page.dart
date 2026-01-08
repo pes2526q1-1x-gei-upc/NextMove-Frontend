@@ -21,7 +21,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/widgets/navig
 import 'package:nextmove_app/src/funcionalidades/competition/challenges/domain/trophy.dart';
 import 'package:nextmove_app/src/funcionalidades/recorridos/data/repositories/recorded_routes_repository.dart';
 
-// Imports del BLoC
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
@@ -53,9 +52,6 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  // -----------------------------------------------------------------------
-  // Controllers & state
-  // -----------------------------------------------------------------------
   GoogleMapController? _mapController;
   BuildContext? _blocContext;
   List<StationDetails> stations = [];
@@ -98,9 +94,6 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  // -----------------------------------------------------------------------
-  // Map callbacks
-  // -----------------------------------------------------------------------
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
     
@@ -111,12 +104,9 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  // =======================================================================
-
   Future<void> _updateViewportBounds() async {
     if (_mapController == null || !mounted) return;
     
-    // Evitar actualizaciones simultáneas
     if (_isViewportUpdatePending) return;
     
     _isViewportUpdatePending = true;
@@ -141,7 +131,6 @@ class _MapPageState extends State<MapPage> {
         ),
       );
       
-      // Actualizar ValueNotifier sin setState
       _viewportBoundsNotifier.value = newBounds;
     } catch (e) {
       if (kDebugMode) {
@@ -164,24 +153,17 @@ class _MapPageState extends State<MapPage> {
   }
   
   void _onCameraMoveThrottled(CameraPosition position) {
-    // Guardar la posición actual de la cámara
     _currentCameraPosition = position;
     
     final now = DateTime.now();
     
-    // Throttling real: solo ejecutar si ha pasado el tiempo mínimo desde la última actualización
     if (_lastViewportUpdate == null || 
         now.difference(_lastViewportUpdate!) >= _viewportUpdateThrottle) {
       _lastViewportUpdate = now;
       _updateViewportBounds();
     }
-    // Si no ha pasado el tiempo suficiente, simplemente ignoramos esta llamada
-    // El siguiente frame que cumpla el throttle ejecutará la actualización
   }
 
-  // -----------------------------------------------------------------------
-  // UI helpers
-  // -----------------------------------------------------------------------
 
   /// Convierte el modo preferido del usuario (string de la API) a StationType
   StationType? _getPreferredModeFromUser(BuildContext context) {
@@ -207,12 +189,10 @@ class _MapPageState extends State<MapPage> {
   int _calculateRemainingSeconds(NavigationRoute route, int currentStepIndex, int distanceToNextStepMeters) {
     int remainingSeconds = 0;
     
-    // Remaining time of current step
     if (currentStepIndex < route.steps.length) {
       final currentStep = route.steps[currentStepIndex];
       if (currentStep.distanceMeters > 0) {
         final progress = distanceToNextStepMeters / currentStep.distanceMeters;
-        // Clamp progress to 0.0 - 1.0 just in case
         final safeProgress = progress.clamp(0.0, 1.0);
         remainingSeconds += (currentStep.durationSeconds * safeProgress).round();
       } else {
@@ -242,9 +222,6 @@ class _MapPageState extends State<MapPage> {
     return remainingDistance;
   }
 
-  // -----------------------------------------------------------------------
-  // Build
-  // -----------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     // Obtener el modo preferido del usuario (o null si no tiene)
@@ -262,7 +239,7 @@ class _MapPageState extends State<MapPage> {
         challengesRepository: ChallengesRepository(),
         onMarkerTapped: _showStationBottomSheet,
         onCompanyMarkerTapped: _showCompanyBottomSheet,
-        initialMode: preferredMode, // Pasar el modo preferido (o null para usar bici por defecto)
+        initialMode: preferredMode,
       )..add(const LoadMapDataEvent()),
       child: Builder( 
         builder: (blocContext) {
@@ -275,14 +252,12 @@ class _MapPageState extends State<MapPage> {
 
   Widget _buildUI(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    // Main UI
     return GestureDetector(
       onTap: () {   
-        FocusScope.of(context).unfocus(); // Esto debe quitar el teclado
+        FocusScope.of(context).unfocus();
         setState(() {
-          _isSearchBarFocused = false; // Esto debe cerrar las búsquedas recientes
+          _isSearchBarFocused = false;
         });
-        // Limpiar la búsqueda si hay texto
         _searchBarKey.currentState?.clearSearch();
         context.read<MapBloc>().add(const ClearSearchEvent());
       },
@@ -357,7 +332,6 @@ class _MapPageState extends State<MapPage> {
               _setZoomToViewport(state.routeViewport!); 
             }
             
-            // Detectar cuando se guarda exitosamente una ruta grabada
             if (state is MapLoadedState) {
               // Solo mostrar NavigationCompletedScreen si el guardado fue exitoso
               if (_wasRecordingRoute && 
@@ -368,7 +342,6 @@ class _MapPageState extends State<MapPage> {
                   state.recordedTrack != null &&
                   state.recordedTrack!.points.length >= 2) {
                 _hasShownCompletionScreen = true;
-                // Esperar un momento antes de mostrar la pantalla para que la transición sea suave
                 Future.delayed(const Duration(milliseconds: 500), () {
                   if (mounted && context.mounted) {
                     showDialog(
@@ -403,7 +376,7 @@ class _MapPageState extends State<MapPage> {
               // Actualizar la posición inicial con la posición guardada
               setState(() {
                 _currentCameraPosition = _cameraPositionBeforeMapTypeChange!;
-                _cameraPositionBeforeMapTypeChange = null; // Limpiar
+                _cameraPositionBeforeMapTypeChange = null;
               });
             }
             
@@ -412,16 +385,15 @@ class _MapPageState extends State<MapPage> {
                 state.isTurnByTurnActive && 
                 state.userLocation != null && 
                 _mapController != null) {
-              // Usar el heading del GPS si está disponible, sino 0
               final bearing = state.userHeading ?? 0.0;
               
               _mapController!.animateCamera(
                 CameraUpdate.newCameraPosition(
                   CameraPosition(
                     target: state.userLocation!,
-                    zoom: 17.0, // Closer zoom for navigation
-                    bearing: bearing, // Rotar el mapa según la orientación (2D)
-                    tilt: 0.0, // Sin inclinación 3D, vista plana
+                    zoom: 17.0,
+                    bearing: bearing,
+                    tilt: 0.0,
                   ),
                 ),
               );
@@ -490,7 +462,7 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         // Widget del mapa 
                         MapWidget(
-                          key: ValueKey('map_${state.currentMapType}'), // Key que cambia con el tipo de mapa
+                          key: ValueKey('map_${state.currentMapType}'),
                           initialCameraPosition: _currentCameraPosition,
                           markers: markersToShow,
                           clusterManagers: {
@@ -570,9 +542,7 @@ class _MapPageState extends State<MapPage> {
                             builder: (context, scrollController) {
                               return NotificationListener<DraggableScrollableNotification>(
                                 onNotification: (notification) {
-                                  // Cuando el usuario suelta el drag y está en el mínimo o cerca
                                   if (notification.extent <= notification.minExtent + 0.05) {
-                                    // Solo cancelar si realmente está en el mínimo
                                     if (notification.extent <= notification.minExtent + 0.02) {
                                       Future.delayed(const Duration(milliseconds: 200), () {
                                         if (context.mounted && 
@@ -582,7 +552,7 @@ class _MapPageState extends State<MapPage> {
                                       });
                                     }
                                   }
-                                  return false; // Permitir que otros listeners también procesen
+                                  return false;
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -659,8 +629,6 @@ class _MapPageState extends State<MapPage> {
                         userLocation: state.userLocation,
                       ),
 
-                      // Avatar de perfil
-                      //ProfileAvatarWidget(context: context),
                       // Route history button
                       RouteHistoryButtonWidget(),
 
@@ -670,11 +638,11 @@ class _MapPageState extends State<MapPage> {
                       ),
                    
 
-                    // Botón de play/stop (solo en modo bici) - A la derecha del toggle con texto
+                    // Botón de play/stop (solo en modo bici)
                     if (state.currentMode == StationType.bicycle)
                       Positioned(
-                        bottom: 30, // Misma altura que el toggle
-                        right: 16, // A la derecha, con margen
+                        bottom: 30,
+                        right: 16,
                         child: GestureDetector(
                           onTap: () {
                             final bloc = context.read<MapBloc>();
@@ -772,7 +740,7 @@ class _MapPageState extends State<MapPage> {
                         ),
                       ),
 
-                    // Selector de modo (bici/coche) - Siempre fijo en la misma posición
+                    // Selector de modo (bici/coche)
                     ToggleMapModeWidget(currentMode: state.currentMode),
 
                     Positioned(
@@ -805,7 +773,6 @@ class _MapPageState extends State<MapPage> {
     northeast: viewport.high,
   );
   
-  // Opción A: Con padding fijo (relativo al area visible del mapa)
   _mapController!.animateCamera(
     CameraUpdate.newLatLngBounds(
       bounds,

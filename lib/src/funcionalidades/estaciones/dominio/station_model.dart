@@ -103,7 +103,6 @@ class BicycleStationDetails extends StationDetails {
   }
 
   factory BicycleStationDetails.fromJson(Map<String, dynamic> data) {
-    // print('Parsing station: id=${data['id']}, nombre=${data['nombre']}');
     if (kDebugMode) {
       if (data['id'] == null) print('id is null for bicycle station');
       if (data['nombre'] == null) print('nombre is null for bicycle station id: ${data['id']}');
@@ -231,7 +230,6 @@ class EVStationDetails extends StationDetails {
       if (data['isSuperFast'] == null) print('isSuperFast is null for EV station id: ${data['id']}');
       if (data['accessType'] == null) print('accessType is null for EV station id: ${data['id']}');
     }
-    // print('Parsing EV station: id=${data['id']}, name=${data['name']}');
     return EVStationDetails(
       id: data['id'],
       name: data['name'] as String?,

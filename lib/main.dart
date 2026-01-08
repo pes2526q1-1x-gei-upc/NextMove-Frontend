@@ -98,7 +98,6 @@ class NextMoveAppState extends State<NextMoveApp> {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: GraphQLConfig.client,
-      // UserBloc accesible para toda la app
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: userProvider),
@@ -187,7 +186,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
   }
 
   void _startBanCheckTimer() {
-    // Verificar estado de baneo cada 1 minuto mientras el usuario está logueado
     _banCheckTimer?.cancel();
     _banCheckTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       if (_isLoggedIn && !_isBanned) {
@@ -201,8 +199,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Verificar estado de baneo cuando la app vuelve al foreground
-    // Esto es especialmente útil para iOS donde no llegan notificaciones push
     if (state == AppLifecycleState.resumed && _isLoggedIn) {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -219,8 +215,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
     }
 
     // Registrar token FCM cuando el usuario inicia sesión
-    // Nota: En iOS puede que el token no esté disponible inmediatamente,
-    // por lo que se registrará automáticamente cuando esté disponible
     try {
       final notificationService = NotificationService();
       final token = await notificationService.getToken();
@@ -287,10 +281,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
         }
 
         if (isBanned) {
-          // Usuario baneado - actualizar estado para mostrar pantalla de baneo
-          if (kDebugMode) {
-            debugPrint("Usuario baneado detectado, mostrando pantalla de baneo");
-          }
           setState(() {
             _isBanned = true;
           _banInfo = meData['banInfo'] as Map<String, dynamic>?;
@@ -299,35 +289,21 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
           return;
         }
 
-        // Usuario no está baneado - cargar datos normalmente
-        if (kDebugMode && _isBanned) {
-          debugPrint("Usuario desbaneado detectado, redirigiendo a pantalla principal");
-        }
-
         userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
           firebaseToken: firebaseToken,
         );
 
-        if (kDebugMode) {
-          //print("Firebase token: $firebaseToken");
-        }
-        
         final preferredLanguage = meData['preferredLanguage'] as String?;
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
         final fireBaseUser = FirebaseAuth.instance.currentUser;
-        if (fireBaseUser != null) {
-          //final token = await fireBaseUser.getIdToken();
-          //debugPrint('Bearer $token') ;
-        }
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
         }
 
-        // Actualizar estado después de cargar todos los datos
         if (mounted) {
           setState(() {
             _isBanned = false;
@@ -370,8 +346,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
     }
 
     if (_isBanned) {
-      // Si el usuario está baneado, mostrar solo la página de baneo
-      // No permitir navegación a otras partes de la app
       return PopScope(
         canPop: false, // Prevenir que el usuario salga de la página de baneo
         child: BannedUserPage(
@@ -417,7 +391,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // Configurar el callback para cuando se hace click en una notificación de alerta
     NotificationService().setOnNotificationTap((stationId) {
       _navigateToStationDetails(stationId);
     });
@@ -428,7 +401,6 @@ class _MainScreenState extends State<MainScreen> {
     // Las alertas son solo para estaciones de bicicletas
     final stationType = StationType.bicycle;
     
-    // Usar el navigatorKey global para poder navegar desde cualquier contexto
     final navigator = navigatorKey.currentState;
     if (navigator != null) {
       navigator.push(
@@ -550,8 +522,6 @@ class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
     super.dispose();
   }
 
-  /// Método público para refrescar la lista de chats
-  /// Se llama desde MainScreen cuando se selecciona el índice de chat
   void refreshChatList() {
     ChatListPage.refresh(_chatListPageKey);
   }

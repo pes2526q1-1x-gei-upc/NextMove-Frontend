@@ -75,7 +75,6 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('No se encontró el usuario');
     }
 
-    // _fetchStatistics is now optional to prevent blocking profile load
     try {
       final statsData = await _fetchStatistics(data['email']);
       if (statsData != null) {
@@ -143,7 +142,6 @@ class UserRemoteDataProvider {
       if (kDebugMode) {
         print('Error GraphQL Raw (stats): ${result.exception.toString()}');
       }
-      // Return null instead of throwing to allow partial data loading
       return null;
     }
 
@@ -420,10 +418,6 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('GRAPHQL_ENDPOINT no definido');
     }
 
-    // Asumimos que el endpoint es .../graphql y lo cambiamos a .../api/upload-profile-photo
-    // O si el endpoint es solo el host, construimos la url.
-    // Dado el código del backend, la ruta es /api/upload-profile-photo
-    // Si GRAPHQL_ENDPOINT es http://localhost:3000/graphql
     final baseUrl = endpoint.replaceAll('/graphql', '');
     final uploadUrl = '$baseUrl/api/upload-profile-photo';
 
@@ -490,9 +484,8 @@ class UserRemoteDataProvider {
       throw custom_exceptions.ServerException('GRAPHQL_ENDPOINT no definido');
     }
 
-    // Construimos la URL hacia el nuevo endpoint genérico
     final baseUrl = endpoint.replaceAll('/graphql', '');
-    final uploadUrl = '$baseUrl/api/upload-photo'; // <--- NOMBRE ACTUALIZADO
+    final uploadUrl = '$baseUrl/api/upload-photo';
 
     if (kDebugMode) {
       print('Uploading photo to: $uploadUrl');
@@ -502,7 +495,6 @@ class UserRemoteDataProvider {
       final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
       request.headers['Authorization'] = 'Bearer $token';
 
-      // Determinar el tipo MIME para que S3 lo reconozca bien
       final mimeType = lookupMimeType(file.path);
       MediaType? mediaType;
       if (mimeType != null) {
@@ -525,7 +517,6 @@ class UserRemoteDataProvider {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        // El backend ahora solo devuelve la URL
         return jsonResponse['imageUrl'];
       } else {
         if (kDebugMode) {

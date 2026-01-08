@@ -15,7 +15,6 @@ class BicycleStatsWidget extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 8),
-        // --- Card 1: Mecánicas ---
         Expanded(
           child: InfoCard(
             icon: Icons.pedal_bike_rounded,
@@ -27,7 +26,6 @@ class BicycleStatsWidget extends StatelessWidget {
         ),
         const SizedBox(width: 12),
 
-        // --- Card 2: Eléctricas ---
         Expanded(
           child: InfoCard(
             icon: Icons.electric_bike_rounded,
@@ -39,7 +37,6 @@ class BicycleStatsWidget extends StatelessWidget {
         ),
         const SizedBox(width: 12),
 
-        // --- Card 3: Slots Libres ---
         Expanded(
           child: InfoCard(
             icon: Icons.local_parking_rounded,

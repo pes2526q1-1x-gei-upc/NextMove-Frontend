@@ -92,7 +92,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         photoUrl = await remoteProvider.uploadPhoto(_selectedImage!);
       }
 
-      // 2. Ejecutar mutación GraphQL mediante el DataProvider
       debugPrint('[CreateGroupPage] Ejecutando mutación...');
       final chatProvider = ChatRemoteDataProvider();
       await chatProvider.createGroupChat(
@@ -204,11 +203,10 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     result.data?['ListFriends'] as List<dynamic>? ?? [];
 
                 final List<UserEntity> friends = friendsData.map((f) {
-                  // Mapear los campos del GraphQL a los que espera fromRawData
                   final map = {
                     'email': f['email'],
                     'nickname':
-                        f['name'], // Usamos 'name' como nickname para la entidad
+                        f['name'],
                     'name': f['name'],
                     'photo': f['photo'],
                   };

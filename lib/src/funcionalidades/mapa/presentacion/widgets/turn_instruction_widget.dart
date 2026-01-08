@@ -31,10 +31,8 @@ class _TurnInstructionWidgetState extends State<TurnInstructionWidget> {
   @override
   void didUpdateWidget(TurnInstructionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Forzar reconstrucción cuando cambian las propiedades
     if (oldWidget.currentStep != widget.currentStep ||
         oldWidget.distanceToNextStepMeters != widget.distanceToNextStepMeters) {
-      // El widget se reconstruirá automáticamente
     }
   }
 

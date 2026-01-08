@@ -131,7 +131,7 @@
     "lightMode": "Modo claro",
     "darkMode": "Modo oscuro",
     "systemMode": "Usar configuración del sistema",
-    "preliminarVersion": "Versión 0.3.0",
+    "preliminarVersion": "Versión 1.0.0",
     "searchByNickname": "Buscar por apodo",
     "noUsersFound": "No se encontró ningún usuario con ese apodo.",
     "noFriendsAdded": "Aún no tienes amigos añadidos.",

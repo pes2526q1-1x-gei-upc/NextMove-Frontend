@@ -22,7 +22,6 @@ class RoutePreviewWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Handle bar (similar to StationBottomSheet)
         Center(
           child: Container(
             margin: const EdgeInsets.only(top: 12),
@@ -40,7 +39,6 @@ class RoutePreviewWidget extends StatelessWidget {
           child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Route Stats Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -132,11 +130,9 @@ class RoutePreviewWidget extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 16), // Reduced spacing
+                const SizedBox(height: 16),
 
-                // Start Navigation Button
-                // Buttons Column
-                Column( // Changed from Row to Column
+                Column(
                   children: [
                     // Start Navigation Button
                     SizedBox(
@@ -169,7 +165,7 @@ class RoutePreviewWidget extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 12), // Vertical spacing
+                    const SizedBox(height: 12),
 
                     // Cancel Navigation Button
                     SizedBox(

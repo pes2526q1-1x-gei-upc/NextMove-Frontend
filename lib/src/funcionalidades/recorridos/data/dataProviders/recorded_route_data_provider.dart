@@ -19,19 +19,13 @@ class RecordedRouteDataProvider {
 
     final QueryResult result = await client.query(options);
 
-    // Si hay excepción pero también hay datos, intentar procesar los datos primero
-    // Una lista vacía no debería ser una excepción
     final List<dynamic> recordedRoutes = result.data?['recorridosByUser'] ?? [];
     
-    // Si tenemos datos (incluso si es una lista vacía), devolverlos
-    // Solo lanzar excepción si realmente no hay datos Y hay una excepción
     if (result.hasException) {
-      // Verificar si la excepción es porque no hay recorridos (esto es válido)
       final exceptionMessage = result.exception?.graphqlErrors.isNotEmpty == true
           ? result.exception!.graphqlErrors.first.message.toLowerCase()
           : result.exception.toString().toLowerCase();
       
-      // Si el mensaje indica que no hay recorridos, devolver lista vacía en lugar de excepción
       if (exceptionMessage.contains('no hay') || 
           exceptionMessage.contains('no encontrado') ||
           exceptionMessage.contains('not found') ||
@@ -60,7 +54,6 @@ class RecordedRouteDataProvider {
       );
     }
 
-    // Si no hay excepción, devolver los datos (puede ser lista vacía)
     return recordedRoutes
         .map((routeJson) => RecordedRoute.fromJson(routeJson))
         .toList();

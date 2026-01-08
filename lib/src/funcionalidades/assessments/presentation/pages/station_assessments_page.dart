@@ -44,12 +44,10 @@ class StationReviewsPage extends StatelessWidget {
       ),
       body: BlocBuilder<AssessmentBloc, AssessmentState>(
         builder: (context, state) {
-          // --- LOADING ---
           if (state.status == AssessmentStatus.loading) {
             return Center(child: CircularProgressIndicator(color: themeColor));
           }
 
-          // --- FAILURE ---
           if (state.status == AssessmentStatus.failure) {
             return Center(
               child: Column(
@@ -87,7 +85,6 @@ class StationReviewsPage extends StatelessWidget {
             );
           }
 
-          // --- SUCCESS ---
           if (state.status == AssessmentStatus.success) {
             final reviews = state.assessments;
 
@@ -129,7 +126,6 @@ class StationReviewsPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final review = reviews[index];
 
-                // WIDGET INTELIGENTE DE PROPIEDAD
                 return _AsyncReviewItem(
                   review: review,
                   themeColor: themeColor,
@@ -147,7 +143,6 @@ class StationReviewsPage extends StatelessWidget {
   }
 }
 
-// --- WIDGET AUXILIAR PARA VERIFICAR PROPIEDAD ASÍNCRONAMENTE ---
 class _AsyncReviewItem extends StatefulWidget {
   final AssessmentEntity review;
   final Color themeColor;
@@ -168,7 +163,7 @@ class _AsyncReviewItem extends StatefulWidget {
 class _AsyncReviewItemState extends State<_AsyncReviewItem> {
   bool _isMine = false;
   bool _isLoadingOwnership = true;
-  String? _userPhotoUrl; // <--- NUEVA VARIABLE DE ESTADO
+  String? _userPhotoUrl;
 
   @override
   void initState() {
@@ -200,7 +195,6 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
         setState(() {
           _userPhotoUrl = photoUser; 
 
-          // Verificamos propiedad real
           if (currentUser != null && emailFromBackend != null) {
             _isMine = (emailFromBackend == currentUser.email);
           }
@@ -215,7 +209,6 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
 
   @override
   Widget build(BuildContext context) {
-    // Solo permitimos editar si la carga terminó y es mío
     final canEdit = !_isLoadingOwnership && _isMine;
 
     return ReviewCard(
@@ -227,7 +220,6 @@ class _AsyncReviewItemState extends State<_AsyncReviewItem> {
       themeColor: widget.themeColor,
       userPhotoUrl: _userPhotoUrl,
 
-      // Si canEdit es true, pasamos la función para abrir el modal
       onEditPressed: canEdit
           ? () {
               final assessmentBloc = context.read<AssessmentBloc>();

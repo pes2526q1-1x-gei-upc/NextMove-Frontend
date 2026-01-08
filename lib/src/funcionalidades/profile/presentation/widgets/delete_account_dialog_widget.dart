@@ -92,7 +92,6 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                           'You will be prompted to sign in with Google to confirm.',
                           style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                         ),
-                        // Si ocurre un error con Google, lo mostramos aquí texto plano
                         if (_errorMessage != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
@@ -177,14 +176,12 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                       final password = _passwordController.text;
 
                       if (!isGoogleUser && password.isEmpty) {
-                        // Validación local simple antes de enviar evento
                         setState(() {
-                          _errorMessage = l10n.password; // "Contraseña requerida"
+                          _errorMessage = l10n.password;
                         });
                         return;
                       }
 
-                      // Limpiamos error previo antes de enviar
                       setState(() {
                          _errorMessage = null;
                       });

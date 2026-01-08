@@ -74,7 +74,7 @@ class _EditUserDataPreferencesPageState
 
   void _goBack() => Navigator.pop(context);
 
-  // === Selector de Modo (Bottom Sheet) ===
+  // === Selector de Modo ===
   void _showModoSelector() {
     final l10n = AppLocalizations.of(context)!;
     final modos = [

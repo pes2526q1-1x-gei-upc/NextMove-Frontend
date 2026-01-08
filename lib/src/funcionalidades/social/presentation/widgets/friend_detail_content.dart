@@ -143,7 +143,6 @@ class _FriendDetailsContentState extends State<FriendDetailsContent> {
 
           const SizedBox(height: 20),
 
-          // --- CONTENIDO SEGÚN MODO SELECCIONADO ---
           if (_selectedMode == _ProfileViewMode.personal) ...[
             // --- SECCIÓN: INFORMACIÓN ---
             ProfileSectionLabel(text: l10n.information),

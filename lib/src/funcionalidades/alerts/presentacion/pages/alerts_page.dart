@@ -234,7 +234,6 @@ class _AlertCard extends StatelessWidget {
 
   /// Obtiene el nombre de la estación para mostrar, con fallback si no está disponible
   String _getStationDisplayName(dynamic alert, AppLocalizations l10n) {
-    // Si hay un nombre de estación válido y no es solo el ID, usarlo
     if (alert.stationNombre != null && 
         alert.stationNombre!.isNotEmpty && 
         alert.stationNombre != alert.stationId) {

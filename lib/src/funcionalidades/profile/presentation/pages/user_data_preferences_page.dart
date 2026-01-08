@@ -606,7 +606,6 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           ),
                           readOnly: true,
                           onTap: () => _selectDate(context),
-                          // Validator eliminado: fecha de nacimiento ahora es opcional
                         ),
                       ],
                     ),
@@ -670,7 +669,7 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                     // --- BOTÓN FINALIZAR ---
                     SizedBox(
                       width: double.infinity,
-                      height: 56, // Altura consistente
+                      height: 56,
                       child: ElevatedButton(
                         onPressed: _finalizarOnboarding,
                         style: ElevatedButton.styleFrom(
@@ -678,9 +677,9 @@ class _UserDataPreferencesPageState extends State<UserDataPreferencesPage> {
                           foregroundColor: theme.colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16), // Radio consistente
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 0, // Sin elevación para ser más "minimalista" flat, o 2 si se prefiere
+                          elevation: 0,
                         ),
                         child: Text(
                           l10n.finishRegistration,

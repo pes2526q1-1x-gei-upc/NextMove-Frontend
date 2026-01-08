@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
-// Imports de Blocs y Eventos
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
@@ -12,7 +11,6 @@ import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
 
-// Imports de Widgets y Páginas
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_user_card_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';

@@ -59,12 +59,10 @@ class MapLoadedState extends MapState {
   final String? challengeNotificationTitle;
   final int? challengeNotificationPercentage;
   final String? challengeNotificationName;  
-  // Turn-by-turn navigation fields
   final bool isTurnByTurnActive;
   final int? currentStepIndex;
   final int? distanceToNextStepMeters;
   final double? userHeading; // Orientación del usuario para rotar el mapa (0-360)
-  // Location permission fields
   final bool isLocationPermissionDenied;
   final bool isLocationPermissionPermanentlyDenied;
 
@@ -155,7 +153,6 @@ class MapLoadedState extends MapState {
         isLocationPermissionPermanentlyDenied,
       ];
 
-  /// Método copyWith para actualizar el estado inmutablemente
   MapLoadedState copyWith({
     List<StationDetails>? bikeStations,
     List<StationDetails>? evStations,

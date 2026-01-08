@@ -4,9 +4,6 @@ import 'package:nextmove_app/src/funcionalidades/registro/datos/repositories/aut
 
 void main() {
   group('AuthRepository', () {
-    // Nota: AuthRepository puede inicializarse sin Firebase, pero los métodos
-    // requieren Firebase para funcionar correctamente
-    
     test('should initialize correctly', () {
       final repository = AuthRepository();
       expect(repository, isNotNull);

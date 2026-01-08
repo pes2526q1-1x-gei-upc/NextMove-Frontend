@@ -91,7 +91,7 @@ class UserRepository {
   Future<Either<Failure, void>> logoutUser() async {
     try {
       await remoteDataProvider.logout();
-      return const Right(null); // Void return
+      return const Right(null);
     } catch (e) {
       return Left(AuthFailure(message: e.toString()));
     }

@@ -31,7 +31,6 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
   File? _selectedImage;
   bool _isValidating = false;
   bool? _isValidBike; // null = no validado, true = válido, false = inválido
-// Para saber si ya se validó una foto (aunque sea inválida)
 
   Future<void> _pickImageFromCamera() async {
     try {
@@ -131,10 +130,8 @@ class _NavigationCompletedScreenState extends State<NavigationCompletedScreen> {
       final isBikeMode = widget.currentMode == StationType.bicycle;
       final bikePhoto = isBikeMode && _isValidBike == true;
       
-      // Enviar evento para guardar la ruta (se ejecutará de forma asíncrona)
       widget.mapBloc.add(SaveRecordedTrackEvent(l10n, bikePhoto: bikePhoto));
     } catch (e) {
-      // Si hay un error, simplemente continuar para cerrar
       if (mounted) {
         debugPrint('Error al guardar recorrido: $e');
       }

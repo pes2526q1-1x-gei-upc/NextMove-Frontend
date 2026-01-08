@@ -94,7 +94,7 @@ class WelcomePage extends StatelessWidget {
                     Container(
                       width: buttonWidth,
                       constraints: BoxConstraints(
-                        maxWidth: size.width - 48, // 24 padding a cada lado
+                        maxWidth: size.width - 48,
                       ),
                       padding: EdgeInsets.all(size.width < 360 ? 16 : 24),
                       decoration: BoxDecoration(

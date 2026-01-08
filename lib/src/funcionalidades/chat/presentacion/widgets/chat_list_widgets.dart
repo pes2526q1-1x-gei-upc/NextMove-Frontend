@@ -1,4 +1,3 @@
-// lib/src/funcionalidades/chat/presentacion/widgets/chat_list_widgets.dart
 import 'package:flutter/material.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 

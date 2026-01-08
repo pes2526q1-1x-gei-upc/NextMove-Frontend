@@ -5,8 +5,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ToggleMapModeWidget extends StatelessWidget {
-  final StationType currentMode; // Viene del estado del BLoC
-  final double bottomOffset; // Offset desde abajo para ajustar posición
+  final StationType currentMode;
+  final double bottomOffset;
   
   const ToggleMapModeWidget({
     super.key,
@@ -34,7 +34,7 @@ class ToggleMapModeWidget extends StatelessWidget {
     return Positioned(
       bottom: bottomOffset,
       left: 150,
-      right: 130, // Más estrecho para dejar espacio al botón de play
+      right: 130,
       child: Container(
         height: 50,
         decoration: BoxDecoration(
