@@ -1,2 +1,1 @@
-This is the pre-release version of NextMove before tomorrow's official launch. Expect bug fixes prior to the final release.
-This version contains all functionalitites that will be offered to our users. Hop on that bike and ride the sustainable mobility transformation with us!
+Welcome to the first public version of NextMove! After our brief period of pre-launch testing, here is our final product. Hop on that bike and ride the sustainable mobility transformation with us!
