@@ -65,6 +65,7 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
           // Current Speed 
             Card(
               elevation: 2,
+              color: Theme.of(context).cardColor,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -90,7 +91,8 @@ class RecordingTrackStatisticsPage extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {
-                context.read<MapBloc>().add(const StopRouteRecordingEvent());
+                final l10n = AppLocalizations.of(context)!;
+                context.read<MapBloc>().add(StopRouteRecordingEvent(l10n));
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.stop),

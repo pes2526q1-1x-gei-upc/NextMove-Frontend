@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/competition/competition_page.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/locale_provider.dart';
@@ -12,6 +15,7 @@ import 'package:nextmove_app/src/funcionalidades/registro/presentacion/bloc/auth
 
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+import 'package:nextmove_app/src/core/theme/app_theme.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/map_page.dart';
 import 'l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -21,16 +25,33 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/profile_page.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_bloc.dart';
-import 'package:nextmove_app/src/funcionalidades/social/presentation/social_page.dart';
+import 'package:nextmove_app/src/funcionalidades/profile/presentation/pages/banned_user_page.dart';
+import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/theme_provider.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/stations_cache.dart';
+
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/pages/chat_list_page.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/presentacion/bloc/chat_bloc.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/dataproviders/socket_datasource.dart';
+import 'package:nextmove_app/src/funcionalidades/chat/datos/repositories/chat_repository.dart';
+import 'package:nextmove_app/config/socket_config.dart';
+import 'package:nextmove_app/src/services/notification_service.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/presentacion/station_details_page.dart';
+import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 
 final GlobalKey<NextMoveAppState> appKey = GlobalKey<NextMoveAppState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final UserProvider userProvider = UserProvider();
 final LocaleProvider localeProvider = LocaleProvider();
+final ThemeProvider themeProvider = ThemeProvider();
 
 void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
+  // Bloquear la orientación a vertical (portrait)
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GoogleSignIn.instance.initialize();
   runApp(NextMoveApp(key: appKey));
@@ -77,47 +98,47 @@ class NextMoveAppState extends State<NextMoveApp> {
   Widget build(BuildContext context) {
     return GraphQLProvider(
       client: GraphQLConfig.client,
-      // UserBloc accesible para toda la app
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: userProvider),
           ChangeNotifierProvider.value(value: localeProvider),
+          ChangeNotifierProvider.value(value: themeProvider),
+          ChangeNotifierProvider(create: (_) => StationsCache()),
           BlocProvider<UserBloc>(create: (_) => UserBloc()),
           BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
         ],
-        child: MaterialApp(
-          title: 'NextMove',
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          // Usamos el localeProvider para gestionar el idioma dinámico
-          locale: localeProvider.locale,
-          localeResolutionCallback: (locale, supportedLocales) {
-            for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale?.languageCode) {
-                return supportedLocale;
-              }
-            }
-            return const Locale('en');
+        child: Consumer<ThemeProvider>(
+          builder: (context, theme, _) {
+            return MaterialApp(
+              navigatorKey: navigatorKey,
+              title: 'NextMove',
+              debugShowCheckedModeBanner: false,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: localeProvider.locale,
+              localeResolutionCallback: (locale, supportedLocales) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale?.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+                return const Locale('en');
+              },
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: theme.themeMode,
+              routes: {
+                '/login': (context) => BlocProvider(
+                  create: (context) => AuthBloc(),
+                  child: const WelcomePage(),
+                ),
+              },
+              home: AuthStateHandler(
+                client: GraphQLConfig.client,
+                isLoggedIn: isLoggedIn,
+              ),
+            );
           },
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-            useMaterial3: true,
-          ),
-
-          // ruta de Login para el Logout
-          routes: {
-            '/login': (context) => BlocProvider(
-              create: (context) => AuthBloc(),
-              child: const WelcomePage(),
-            ),
-          },
-
-          // Widget que maneja la autenticación y decide qué pantalla mostrar
-          home: AuthStateHandler(
-            client: GraphQLConfig.client,
-            isLoggedIn: isLoggedIn,
-          ),
         ),
       ),
     );
@@ -138,15 +159,81 @@ class AuthStateHandler extends StatefulWidget {
   State<AuthStateHandler> createState() => _AuthStateHandlerState();
 }
 
-class _AuthStateHandlerState extends State<AuthStateHandler> {
+class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBindingObserver {
   bool _isLoadingUserData = true;
   bool _isLoggedIn = false;
+  bool _isBanned = false;
+  Map<String, dynamic>? _banInfo;
+  Timer? _banCheckTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _isLoggedIn = widget.isLoggedIn;
+    if (_isLoggedIn) {
+      _handleUserLogin(FirebaseAuth.instance.currentUser!);
+    }
     _setupAuthListener();
+    _startBanCheckTimer();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _banCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startBanCheckTimer() {
+    _banCheckTimer?.cancel();
+    _banCheckTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (_isLoggedIn && !_isBanned) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null && mounted) {
+          _loadUserData(user);
+        }
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _isLoggedIn) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        _loadUserData(user);
+      }
+    }
+  }
+
+  Future<void> _handleUserLogin(User user) async {
+    await _loadUserData(user);
+
+    if (mounted) {
+      context.read<UserBloc>().add(LoadUserProfile(user.uid));
+    }
+
+    // Registrar token FCM cuando el usuario inicia sesión
+    try {
+      final notificationService = NotificationService();
+      final token = await notificationService.getToken();
+      if (token != null) {
+        await notificationService.registerFCMToken(token);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error registrando token FCM al iniciar sesión: $e');
+        print('El token se registrará automáticamente cuando esté disponible');
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = true;
+        _isLoadingUserData = false;
+      });
+    }
   }
 
   void _setupAuthListener() {
@@ -156,25 +243,19 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       debugPrint("========================");
 
       if (user != null) {
-        await _loadUserData(user);
-
-        if (mounted) {
-          context.read<UserBloc>().add(LoadUserProfile(user.uid));
-        }
-
-        if (mounted) {
-          setState(() {
-            _isLoggedIn = true;
-            _isLoadingUserData = false;
-          });
-        }
+        await _handleUserLogin(user);
+        _startBanCheckTimer();
       } else {
         if (mounted) {
+          // Desconectar el socket cuando el usuario cierra sesión
+          SocketConfig.disconnect();
           userProvider.clearUser();
           localeProvider.clearLocale();
+          _banCheckTimer?.cancel();
           setState(() {
             _isLoggedIn = false;
             _isLoadingUserData = false;
+            _isBanned = false;
           });
         }
       }
@@ -182,12 +263,32 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
   }
 
   Future<void> _loadUserData(User user) async {
+    debugPrint("Loading user data for ${user.email}");
     try {
       final authService = AuthService(widget.client.value);
       final meData = await authService.getCurrentUser();
+      debugPrint("meData: $meData");
       final firebaseToken = await user.getIdToken();
 
       if (meData != null && mounted) {
+        final isBanned = meData['isBanned'] as bool? ?? false;
+
+        if (kDebugMode) {
+          debugPrint("=== Estado de baneo ===");
+          debugPrint("isBanned: $isBanned");
+          debugPrint("banInfo: ${meData['banInfo']}");
+          debugPrint("========================");
+        }
+
+        if (isBanned) {
+          setState(() {
+            _isBanned = true;
+          _banInfo = meData['banInfo'] as Map<String, dynamic>?;
+            _isLoadingUserData = false;
+          });
+          return;
+        }
+
         userProvider.setUser(
           meData,
           firebaseUserId: user.uid,
@@ -198,9 +299,16 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
-
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
+        }
+
+        if (mounted) {
+          setState(() {
+            _isBanned = false;
+            _banInfo = null;
+            _isLoadingUserData = false;
+          });
         }
       } else {
         if (kDebugMode) {
@@ -232,12 +340,33 @@ class _AuthStateHandlerState extends State<AuthStateHandler> {
       );
     }
 
-    return _isLoggedIn
-        ? const MainScreen()
-        : BlocProvider(
-            create: (context) => AuthBloc(),
-            child: const WelcomePage(),
-          );
+    if (kDebugMode) {
+      debugPrint("User banned?: $_isBanned");
+    }
+
+    if (_isBanned) {
+      return PopScope(
+        canPop: false, // Prevenir que el usuario salga de la página de baneo
+        child: BannedUserPage(
+          banInfo: _banInfo,
+          client: widget.client,
+          onUnbanned: () {
+            // Cuando el usuario es desbaneado, recargar datos
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              _loadUserData(user);
+            }
+          },
+        ),
+      );
+    } else {
+      return _isLoggedIn
+          ? const MainScreen()
+          : BlocProvider(
+              create: (context) => AuthBloc(),
+              child: const WelcomePage(),
+            );
+    }
   }
 }
 
@@ -256,20 +385,52 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final Set<int> _visitedIndices = {0};
-  int _socialReloadToken = 0;
+  final GlobalKey<_ChatsPlaceholderState> _chatsPlaceholderKey = GlobalKey<_ChatsPlaceholderState>();
+
+  @override
+  void initState() {
+    super.initState();
+    NotificationService().setOnNotificationTap((stationId) {
+      _navigateToStationDetails(stationId);
+    });
+  }
+
+  /// Navega a la página de detalles de una estación cuando se hace click en una notificación
+  void _navigateToStationDetails(String stationId) {
+    // Las alertas son solo para estaciones de bicicletas
+    final stationType = StationType.bicycle;
+    
+    final navigator = navigatorKey.currentState;
+    if (navigator != null) {
+      navigator.push(
+        MaterialPageRoute(
+          builder: (context) => StationDetailsPage(
+            stationID: stationId,
+            stationType: stationType,
+          ),
+        ),
+      );
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
-      if (index == 2) {
-        _socialReloadToken++;
-      }
       _selectedIndex = index;
       _visitedIndices.add(index);
     });
+    
+    // Si se selecciona la página de chats (índice 1), refrescar la lista
+    if (index == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _chatsPlaceholderKey.currentState?.refreshChatList();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final bottomNavTheme = theme.bottomNavigationBarTheme;
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -277,15 +438,11 @@ class _MainScreenState extends State<MainScreen> {
           const MapPage(),
 
           _visitedIndices.contains(1)
-              ? const ChatsPlaceholder()
+              ? ChatsPlaceholder(key: _chatsPlaceholderKey)
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(2)
-              ? BlocProvider(
-                  key: ValueKey<int>(_socialReloadToken),
-                  create: (context) => SocialBloc(),
-                  child: const SocialPage(),
-                )
+              ? const CompetitionPage()
               : const SizedBox.shrink(),
 
           _visitedIndices.contains(3)
@@ -300,9 +457,13 @@ class _MainScreenState extends State<MainScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Colors.grey,
+          backgroundColor:
+              bottomNavTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
+          selectedItemColor:
+              bottomNavTheme.selectedItemColor ?? theme.colorScheme.primary,
+          unselectedItemColor:
+              bottomNavTheme.unselectedItemColor ??
+              theme.colorScheme.onSurface.withValues(alpha: 0.6),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           currentIndex: _selectedIndex,
@@ -319,9 +480,9 @@ class _MainScreenState extends State<MainScreen> {
               label: 'Chats',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline),
-              activeIcon: Icon(Icons.people),
-              label: 'Social',
+              icon: Icon(Icons.emoji_events_outlined),
+              activeIcon: Icon(Icons.emoji_events),
+              label: 'Ranking',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
@@ -335,13 +496,51 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class ChatsPlaceholder extends StatelessWidget {
+class ChatsPlaceholder extends StatefulWidget {
   const ChatsPlaceholder({super.key});
+  
+  @override
+  State<ChatsPlaceholder> createState() => _ChatsPlaceholderState();
+}
+
+class _ChatsPlaceholderState extends State<ChatsPlaceholder> {
+  late final ChatBloc _chatBloc;
+  final GlobalKey<State<ChatListPage>> _chatListPageKey = GlobalKey<State<ChatListPage>>();
+
+  @override
+  void initState() {
+    super.initState();
+    _chatBloc = ChatBloc(
+      ChatRepository(SocketDataSource()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.close();
+    super.dispose();
+  }
+
+  void refreshChatList() {
+    ChatListPage.refresh(_chatListPageKey);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: _chatBloc,
+      child: ChatListPage(key: _chatListPageKey),
+    );
+  }
+}
+
+class RankingPlaceholder extends StatelessWidget {
+  const RankingPlaceholder({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Chats")),
-      body: const Center(child: Text("Pantalla de Chats")),
+      appBar: AppBar(title: const Text("Ranking")),
+      body: const Center(child: Text("Pantalla de Ranking")),
     );
   }
 }

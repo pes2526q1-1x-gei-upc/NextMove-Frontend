@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/l10n/app_localizations.dart';
 
-// Imports de Blocs y Eventos
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_event.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/presentation/bloc/user/user_state.dart';
@@ -12,7 +11,6 @@ import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social
 import 'package:nextmove_app/src/funcionalidades/social/presentation/bloc/social_state.dart';
 import 'package:nextmove_app/src/funcionalidades/social/presentation/friend_detail_page.dart';
 
-// Imports de Widgets y Páginas
 import 'package:nextmove_app/src/funcionalidades/social/presentation/widgets/social_user_card_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:nextmove_app/src/funcionalidades/auth/dominio/providers/user_provider.dart';
@@ -62,34 +60,43 @@ class _SocialPageState extends State<SocialPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          l10n.social,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Social",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-              const SizedBox(height: 20),
-
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: Theme.of(context).brightness == Brightness.dark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: TextField(
                   controller: _searchController,

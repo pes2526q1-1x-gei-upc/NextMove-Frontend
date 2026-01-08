@@ -22,16 +22,23 @@ class RecordedTrack implements TrackStatistics {
 
   // points are being added as the route is recorded; same for the calculation of statistics
   List<TrackPoint> points = [];
+  @override
   double totalDistanceMeters = 0.0;
+  @override
   double averageSpeedKmH = 0.0;
+  @override
   double maxSpeedKmH = 0.0;
   Duration totalTime = Duration.zero;
+  @override
   double elevationGainMeters = 0.0;
+  @override
   double elevationLossMeters = 0.0;
 
   bool suspectedFraud = false;
   
+  @override
   double co2SavedKG = 0.0;
+  @override
   double kcalBurned = 0.0;
 
   TrackPoint get startPoint => points.first;

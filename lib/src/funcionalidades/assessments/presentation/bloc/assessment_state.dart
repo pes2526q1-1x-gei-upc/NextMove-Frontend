@@ -6,9 +6,8 @@ enum AssessmentStatus { initial, loading, success, failure }
 class AssessmentState extends Equatable {
   final AssessmentStatus status;
   final String? errorMessage;
-  final List<AssessmentEntity> assessments; // Lista de opiniones
+  final List<AssessmentEntity> assessments;
 
-  // NUEVOS CAMPOS
   final double averageScore;
   final int totalAssessments;
   final bool userHasAssessed;

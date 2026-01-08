@@ -4,6 +4,7 @@ import 'package:nextmove_app/config/graphql_config.dart';
 import 'package:nextmove_app/graphql/queries.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 
 Future<QueryResult> getGraphQLQuery(String query, QueryOptions options) async {
   // OJO porque ahora coge el valor del notifier retornado, no el notifier!
@@ -32,6 +33,7 @@ class StationRemoteDataProvider {
           "coordinates": {"latitude": latitude, "longitude": longitude},
         },
       },
+      fetchPolicy: FetchPolicy.networkOnly,
     );
 
     final QueryResult result = await getGraphQLQuery(
@@ -261,6 +263,99 @@ class StationRemoteDataProvider {
           .toList();
     }
 
+    return [];
+  }
+
+  Future<void> setStationFavoriteStatus(
+    String stationId,
+    StationType stationType,
+    bool isFavorite,
+  ) async {
+    if (kDebugMode) {
+      print(
+        'setStationFavoriteStatus called for stationId: $stationId, isFavorite: $isFavorite',
+      );
+    }
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    if (kDebugMode) {
+      print('Auth Header: $authHeader');
+    }
+    final MutationOptions options = MutationOptions(
+      document: gql(
+        isFavorite
+            ? GraphQLQueries.addFavStation
+            : GraphQLQueries.deleteFavStation,
+      ),
+      variables: {
+        'stationId': stationId,
+        'stationType': stationType == StationType.bicycle ? 'BIKE' : 'CAR',
+      },
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': ?authHeader}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.mutate(options);
+
+    if (result.hasException) {
+      if (kDebugMode) {
+        print(
+          'GraphQL Exception in setStationFavoriteStatus for stationId $stationId: ${result.exception.toString()}',
+        );
+      }
+      throw ServerException(
+        'Error en mutation: ${result.exception.toString()}',
+      );
+    }
+  }
+  Future<List<String>> getFavCarStationIds() async {
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getFavCarStations),
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final data = result.data?['getFavCarStations'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => item['station_id'] as String)
+          .toList();
+    }
+    return [];
+  }
+
+  Future<List<String>> getFavBikeStationIds() async {
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
+    final QueryOptions options = QueryOptions(
+      document: gql(GraphQLQueries.getFavBikeStations),
+      context: Context().withEntry(
+        HttpLinkHeaders(headers: {'Authorization': authHeader ?? ''}),
+      ),
+      fetchPolicy: FetchPolicy.networkOnly,
+    );
+
+    final QueryResult result = await client.query(options);
+
+    if (result.hasException) {
+      throw ServerException('Error en query: ${result.exception.toString()}');
+    }
+
+    final data = result.data?['getFavBikeStations'];
+    if (data != null) {
+      return (data as List)
+          .map((item) => item['station_id'] as String)
+          .toList();
+    }
     return [];
   }
 }

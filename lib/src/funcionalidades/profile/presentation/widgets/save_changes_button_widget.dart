@@ -26,13 +26,11 @@ class ProfileSaveButton extends StatelessWidget {
     this.selectedImageFile,
   });
 
-  // --- LÓGICA DE GUARDADO  ---
   void _saveChanges(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
     debugPrint("ProfileSaveButton: _saveChanges called");
 
     try {
-      // 1. Validar el formulario usando la key que nos pasó el padre
       if (!formKey.currentState!.validate()) {
         debugPrint("ProfileSaveButton: Form validation failed");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +42,6 @@ class ProfileSaveButton extends StatelessWidget {
         "ProfileSaveButton: Form validation passed. Creating updated user...",
       );
 
-      // 2. Crear una copia del usuario con los datos actualizados
       final updatedUser = currentUser.copyWith(
         numeroTelefono: int.tryParse(telefonoController.text) ?? 0,
         descripcion: descripcionController.text.trim(),
@@ -55,7 +52,6 @@ class ProfileSaveButton extends StatelessWidget {
         "ProfileSaveButton: Updated user object created: $updatedUser",
       );
 
-      // 3. Enviar el evento al BLoC
       debugPrint("ProfileSaveButton: Dispatching UpdateUserProfile event...");
       context.read<UserBloc>().add(
         UpdateUserProfile(updatedUser, profilePhoto: selectedImageFile),
@@ -76,25 +72,28 @@ class ProfileSaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
 
     return SizedBox(
       width: double.infinity,
+      height: 56, 
       child: ElevatedButton(
         onPressed: () => _saveChanges(context),
         style: ElevatedButton.styleFrom(
-          elevation: 2,
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: primaryColor,
+          foregroundColor: theme.colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16), 
           ),
+          elevation: 0, 
         ),
         child: Text(
           l10n.saveChanges,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
       ),

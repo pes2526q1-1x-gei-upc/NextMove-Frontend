@@ -4,10 +4,6 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-
-// A diferencia de antes, ahora este widget recibe el tipo de mapa actual y una función de callback para alternar el tipo de mapa.
-// Lo que es la gestion del estado se hará en el bloc   
 class MapTypeToggleWidget extends StatelessWidget {
   final MapType currentMapType;
 
@@ -18,6 +14,10 @@ class MapTypeToggleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
+
     return Positioned(
       bottom: 160,
       right: 20,
@@ -27,13 +27,14 @@ class MapTypeToggleWidget extends StatelessWidget {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
+                color: shadowColor,
+                spreadRadius: 1,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -41,7 +42,7 @@ class MapTypeToggleWidget extends StatelessWidget {
             currentMapType == MapType.normal
                 ? Icons.satellite
                 : Icons.map,
-            color: Colors.grey[700],
+            color: theme.colorScheme.onSurface,
             size: 28,
           ),
         ),

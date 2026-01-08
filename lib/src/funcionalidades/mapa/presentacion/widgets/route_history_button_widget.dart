@@ -17,8 +17,12 @@ class RouteHistoryButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.45 : 0.18);
+
     return Positioned(
-      top: 130, // 70 + 50 (altura del botón anterior) + 10 (espacio)
+      top: 130,
       right: 16,
       child: GestureDetector(
         onTap: () => _navigateToRouteHistory(context),
@@ -26,17 +30,22 @@ class RouteHistoryButtonWidget extends StatelessWidget {
           height: 50,
           width: 50,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey,
-                spreadRadius: 2,
-                blurRadius: 5,
+                color: shadowColor,
+                spreadRadius: 1,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: Icon(Icons.history, color: Colors.grey[700], size: 28),
+          child: Icon(
+            Icons.history,
+            color: theme.colorScheme.onSurface,
+            size: 28,
+          ),
         ),
       ),
     );

@@ -19,7 +19,25 @@ class RecordedRouteDataProvider {
 
     final QueryResult result = await client.query(options);
 
+    final List<dynamic> recordedRoutes = result.data?['recorridosByUser'] ?? [];
+    
     if (result.hasException) {
+      final exceptionMessage = result.exception?.graphqlErrors.isNotEmpty == true
+          ? result.exception!.graphqlErrors.first.message.toLowerCase()
+          : result.exception.toString().toLowerCase();
+      
+      if (exceptionMessage.contains('no hay') || 
+          exceptionMessage.contains('no encontrado') ||
+          exceptionMessage.contains('not found') ||
+          exceptionMessage.contains('empty') ||
+          exceptionMessage.contains('ningún') ||
+          exceptionMessage.contains('ningun')) {
+        if (kDebugMode) {
+          print('Backend indica que no hay recorridos, devolviendo lista vacía');
+        }
+        return [];
+      }
+      
       if (kDebugMode) {
         print('Error GraphQL Raw: ${result.exception.toString()}');
       }
@@ -36,7 +54,6 @@ class RecordedRouteDataProvider {
       );
     }
 
-    final List<dynamic> recordedRoutes = result.data?['recorridosByUser'] ?? [];
     return recordedRoutes
         .map((routeJson) => RecordedRoute.fromJson(routeJson))
         .toList();

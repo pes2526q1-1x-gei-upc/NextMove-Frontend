@@ -91,15 +91,13 @@
     "availableElectricBikes": "Available electric bikes",
     "operational": "Operational",
     "closed": "Closed",
-    "available": "Available",
     "occupied": "Occupied",
     "unavailable": "Unavailable",
     "connectors": "Connectors",
     "accessType": "Access type",
     "error": "Error",
-    "unknownPower": "Unknown power",
     "unknown": "Unknown",
-    "stations": "Stations",
+    "stations": "Nearby stations",
     "saveChangesError": "Error saving changes.",
     "bicycle": "Bicycle",
     "car": "Car",
@@ -119,18 +117,20 @@
     "waitAMoment": "Please wait a moment",
     "hi": "Hi, ",
     "ops": "Oops!",
-    "account" : "Account",
-    "accountDetails" : "Account details",
+    "account": "Account",
+    "accountDetails": "Account details",
+    "myStatistics": "Statistics",
     "bloquedUsers": "Blocked users",
     "noBloquedUsers": "You have no blocked users.",
     "unblock": "Unblock",
     "settings": "Settings",
     "appLanguage": "App language",
     "notifications": "Notifications",
-    "appearance" : "Appearance",
-    "lightMode" : "Light mode",
-    "darkMode" : "Dark mode",
-    "preliminarVersion": "Preliminary version",
+    "appearance": "Appearance",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "systemMode": "Use system setting",
+    "preliminarVersion": "Version 1.0.0",
     "searchByNickname": "Search by nickname",
     "noUsersFound": "No user found with that nickname.",
     "noFriendsAdded": "You have no friends added yet.",
@@ -145,7 +145,6 @@
             }
         }
     },
-    "friends": "Friends",
     "memberSince": "Member since",
     "deleteFriendship": "Delete friendship",
     "deleteFriendConfirmation": "Are you sure you want to delete {nickname} from your friends?",
@@ -180,18 +179,20 @@
     },
     "block": "Block",
     "friends": "Friends",
-    "minCharsSearchHint" : "Please enter at least 3 characters to search.",
-    "anyStationsFound" : "No results were found for your search.",
+    "addFriend": "Add friend",
+    "minCharsSearchHint": "Please enter at least 3 characters to search.",
+    "anyStationsFound": "No results were found for your search.",
     "errorSavingRoute": "Error saving route",
     "notEnoughPointsToRecordTrack": "Not enough points were recorded to save the recorded route.",
+    "howToGetThere": "Directions",
     "routeHistory": "Recorded route history",
     "noRoutesFound": "No recorded routes were found.",
+    "noRecordedRoutesYet": "No recorded routes yet",
     "distance": "Distance",
     "avgSpeed": "Average speed",
     "routeStatistics": "Route statistics",
     "noRouteDataAvailable": "No route data available.",
     "routeRecording": "Route recording",
-    "distance": "Distance",
     "duration": "Duration",
     "averageSpeed": "Average speed",
     "maxSpeed": "Max speed",
@@ -202,9 +203,9 @@
     "co2Saved": "CO₂ saved",
     "caloriesBurned": "Calories burned",
     "currentSpeed": "Current speed",
-    "stopRecording": "Stop recording",
+    "stopRecording": "Stop",
+    "startRoute": "Start route",
     "opinions": "Reviews",
-    "unknown": "Unknown",
     "unknownPower": "Unknown power",
     "station": "Station",
     "seeOpinions": "See reviews",
@@ -212,7 +213,6 @@
     "rate": "Rate",
     "yes": "Yes",
     "no": "No",
-    "fast": "Fast",
     "normal": "Normal",
     "mechanical": "Mechanical",
     "electric": "Electric",
@@ -242,5 +242,325 @@
     "accountDeleted": "Your account has been successfully deleted.",
     "errorDeletingAccount": "Error deleting account.",
     "accountDeletedSuccessfully": "The account has been deleted successfully.",
-    "userMismatch": "The user does not match the current user."
+    "userMismatch": "The user does not match the current user.",
+    "start": "Start",
+    "estTime": "Travel time",
+    "uLoc": "Your location",
+    "locationRequiredForDirections": "Your location is required to show directions. Please enable location permissions in settings.",
+    "social": "Social",
+    "ranking": "Ranking",
+    "numberOfRoutes": "Number of routes",
+    "challengesParticipated": "Challenges participated",
+    "challengesCompleted": "Challenges completed",
+    "noStatisticsAvailable": "No statistics available for this user.",
+    "accountSuspendedMessage": "Your account has been suspended.",
+    "accountSuspended": "Account suspended",
+    "suspensionReason": "Suspension reason",
+    "communityGuidelinesViolation": "Community guidelines violation",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "reviewCommunityGuidelines": "Review our community guidelines to avoid future suspensions.",
+    "description": "Description",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "permanent": "Permanent",
+    "challenges": "Challenges",
+    "progress": "Progress",
+    "competition": "Competition",
+    "noChallengesAvailable": "No challenges available.",
+    "points": "{count, plural, =1{{count} point} other{{count} points}}",
+    "@points": {
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "totalPoints": "Total points",
+    "dates": "Dates",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "company": "Company",
+    "enroll": "Enroll",
+    "enrolled": "Enrolled",
+    "share": "Share",
+    "routeRecordedOn": "Route recorded on {date} at {time}",
+    "@routeRecordedOn": {
+        "placeholders": {
+            "date": {
+                "type": "String",
+                "example": "01/01/2024"
+            },
+            "time": {
+                "type": "String",
+                "example": "14:30"
+            }
+        }
+    },
+    "arrival": "Arrival",
+    "enxmet": "In",
+    "shareRouteStatisticsMessage": "I have recorded a route by bicycle using NextMove! Check out my statistics and download the app to compete with me and the rest of the community.",
+    "errorAddingToCalendar": "An error occurred while adding the challenge to the calendar.",
+    "chats": "Chats",
+    "connectingToServer": "Connecting to server...",
+    "connectionError": "Connection error",
+    "errorLoadingFriends": "Error loading friends",
+    "noFriendsYet": "You don't have friends yet",
+    "addFriendsToStartChatting": "Add friends to start chatting",
+    "noFriendsFound": "No friends found",
+    "tryAnotherSearchTerm": "Try another search term",
+    "groupResults": "Group results",
+    "tapToChat": "Tap to chat",
+    "searchChats": "Search chats...",
+    "searchGroups": "Search groups...",
+    "noGroupsAvailable": "You haven't joined any groups yet",
+    "groupsComingSoon": "Search groups to join one",
+    "noMessagesYet": "No messages yet.\nBe the first to send one!",
+    "typing": "typing...",
+    "back": "Back",
+    "loadingRoom": "Loading room...",
+    "writeAMessage": "Write a message...",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "groupDetails": "Group details",
+    "participants": "Participants",
+    "addParticipants": "Add participants",
+    "userWithoutValidEmail": "This user doesn't have a valid email",
+    "errorAddingParticipant": "Error adding {email}: {error}",
+    "@errorAddingParticipant": {
+        "placeholders": {
+            "email": {
+                "type": "String"
+            },
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "couldNotAddParticipants": "Could not add any participants",
+    "editGroup": "Edit Group",
+    "groupUpdatedSuccessfully": "Group updated successfully",
+    "youHaveBeenKickedFrom": "You have been kicked from {groupName}",
+    "@youHaveBeenKickedFrom": {
+        "placeholders": {
+            "groupName": {
+                "type": "String"
+            }
+        }
+    },
+    "youLeftTheGroup": "You left the group",
+    "errorLeavingGroup": "Error leaving group: {error}",
+    "@errorLeavingGroup": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "user": "User",
+    "admin": "Admin",
+    "you": "You",
+    "adminRoleRemoved": "Admin role removed from {nickname}",
+    "@adminRoleRemoved": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "adminRoleGranted": "Admin role granted to {nickname}",
+    "@adminRoleGranted": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "removeAdmin": "Remove admin",
+    "makeAdmin": "Make admin",
+    "participantKicked": "{nickname} was kicked from the group",
+    "@participantKicked": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "kick": "Kick",
+    "kickParticipant": "Kick participant",
+    "areYouSureKickParticipant": "Are you sure you want to kick {nickname} from the group?",
+    "@areYouSureKickParticipant": {
+        "placeholders": {
+            "nickname": {
+                "type": "String"
+            }
+        }
+    },
+    "add": "Add",
+    "leaveGroup": "Leave group",
+    "areYouSureLeaveGroup": "Are you sure you want to leave the group?",
+    "leave": "Leave",
+    "groupDeleted": "Group deleted",
+    "createGroup": "Create Group",
+    "createAGroupToStart": "Create a group to start",
+    "deleteMessage": "Delete message",
+    "messageDeleted": "Message deleted",
+    "friendshipDeleted": "Friendship has been deleted",
+    "groupHasBeenDeleted": "The group has been deleted",
+    "youHaveBeenKickedFromGroup": "You have been kicked from the group",
+    "editingMessage": "Editing message...",
+    "groupNameRequired": "Group name is required",
+    "selectAtLeastOneFriend": "Select at least one friend",
+    "groupCreatedSuccessfully": "Group created successfully",
+    "errorLoadingFriendsList": "Error loading friends",
+    "noFriendsFoundSearch": "No friends found",
+    "groupNotFound": "Group not found",
+    "noStationsFound": "No stations found nearby",
+    "editGroupTooltip": "Edit group",
+    "edit": "Edit",
+    "areYouSureDeleteMessage": "Are you sure you want to delete this message? This action cannot be undone.",
+    "confirmDeleteMessage": "Message deleted",
+    "noGroupsYet": "No groups yet",
+    "group": "Group",
+    "member": "Member",
+    "members": "Members",
+    "deleteGroup": "Delete group",
+    "areYouSureDeleteGroup": "Are you sure you want to delete this group? This action cannot be undone.",
+    "confirmDeleteGroup": "Group deleted",
+    "isWriting": "is writing...",
+    "areWriting": "are writing...",
+    "and": "and",
+    "more": "more",
+    "participantsAddedCorrectly": "Participant(s) added correctly",
+    "someParticipantsFailed": "Some participants could not be added",
+    "noUsersAvailableToAdd": "There are no users available to add",
+    "groupName": "Group name",
+    "nameIsRequired": "Name is required",
+    "editedLabel": "(edited)",
+    "create": "Create",
+    "descriptionOptional": "Description (optional)",
+    "noFriendsToAdd": "You don't have friends to add to the group",
+    "couldNotFindUserEmail": "Could not find user's email",
+    "deleteMessageConfirmation": "Are you sure you want to delete this message? This action cannot be undone.",
+    "routeCompleted": "Route completed",
+    "routeCompletedMessage": "You have arrived at your destination",
+    "close": "Close",
+    "uploadBikePhotoPoints": "Upload a photo of your bike and earn 50 extra points",
+    "tapToTakePhoto": "Tap to take a photo",
+    "validatingPhoto": "Validating photo...",
+    "bikePhotoAccepted": "Photo accepted! You have earned 50 extra points",
+    "bikePhotoRejected": "No valid bike detected in the image. Please try again.",
+    "bikeDetectionError": "Error validating image. Please try again.",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "recordCompleted": "Route recording completed",
+    "recordCompletedMessage": "Route recording successfully completed",
+    "routeSavedSuccessfully": "Route saved successfully",
+    "backToMap": "Back to map",
+    "noRouteDataAvailable": "No route data available",
+    "validationMinPoints": "The route must have at least {count} points",
+    "@validationMinPoints": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "validationNoMovement": "The route shows no significant movement",
+    "validationInconsistentTime": "Inconsistent time data",
+    "validationImpossibleSpeed": "Impossible speed detected: {speed} km/h",
+    "@validationImpossibleSpeed": {
+        "placeholders": {
+            "speed": {
+                "type": "String"
+            }
+        }
+    },
+    "validationSuspiciousGPS": "Suspicious GPS pattern detected",
+    "validationImpossibleMovements": "Impossible movements detected",
+    "validationMaxSpeedImpossible": "Maximum speed impossible",
+    "trophies": "Trophies",
+    "trophyAttribution": "Trophy images by Christopher Lielasus Morrow, licensed under CC BY 4.0",
+    "favoriteStations": "Favorite Stations",
+    "noFavoriteStationsYet": "No favorite stations yet",
+    "completed": "Completed",
+    "challengeCompletedTitle": "Challenge completed!",
+    "challengeCompletedMessage": "Congratulations! You have completed the challenge:",
+    "challengeProgressTitle": "Challenge progress!",
+    "challengeProgressMessage": "Great progress! You have reached {percentage}% of the challenge:",
+    "@challengeProgressMessage": {
+        "placeholders": {
+            "percentage": {
+                "type": "String",
+                "example": "50"
+            }
+        }
+    },
+    "ok": "OK",
+    "inactive": "Inactive",
+    "offensiveText": "The text contains offensive language",
+    "trophyLockedMessage": "You haven't completed this challenge yet!",
+    "trophyCongratulationsMessage": "Congratulations! You have earned this trophy for completing the challenge \"{challengeName}\".",
+    "@trophyCongratulationsMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "trophyOfChallenge": "Trophy of the challenge: {challengeName}",
+    "@trophyOfChallenge": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "shareTrophyMessage": "I have earned a trophy in NextMove for the challenge \"{challengeName}\"! Check out my trophy and download the app to compete with me and the rest of the community.",
+    "@shareTrophyMessage": {
+        "placeholders": {
+            "challengeName": {
+                "type": "String",
+                "example": "Urban Cyclist"
+            }
+        }
+    },
+    "trophyWonMessage": "Here is the trophy you have just won for this challenge!",
+    "stationAlertsTitle": "Station Alerts",
+    "noAlertsConfigured": "You have no alerts configured",
+    "createAlertMessage": "Create an alert to receive notifications about your favorite stations",
+    "newAlert": "New Alert",
+    "deleteAlert": "Delete alert",
+    "deleteAlertConfirmation": "Are you sure you want to delete this alert?",
+    "stationPrefix": "Station",
+    "editAlert": "Edit Alert",
+    "errorLoadingStations": "Error loading stations: {error}",
+    "@errorLoadingStations": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "pleaseSelectStation": "Please select a station",
+    "pleaseSelectAtLeastOneHour": "Please select at least one hour",
+    "pleaseSelectAtLeastOneDay": "Please select at least one day",
+    "station": "Station",
+    "noFavoriteBikeStations": "You have no favorite bike stations. Add favorite stations first.",
+    "selectStation": "Select a station",
+    "hours": "Hours",
+    "addHour": "Add hour",
+    "weekDays": "Days of the week",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "createAlert": "Create alert"
 }

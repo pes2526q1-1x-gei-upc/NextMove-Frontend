@@ -1,25 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide ServerException;
 import 'package:nextmove_app/config/graphql_config.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import 'package:nextmove_app/src/funcionalidades/profile/domain/entities/user_entity.dart';
 import 'package:nextmove_app/src/core/errors/exceptions.dart';
+import 'package:nextmove_app/src/funcionalidades/registro/datos/dataproviders/auth_remote_data_provider.dart';
 import '../../../../../../graphql/queries.dart';
 
 class SocialRemoteDataProvider {
   GraphQLClient get client => GraphQLConfig.client.value;
 
-  Future<String?> get _authHeader async {
-    final fireBaseUser = FirebaseAuth.instance.currentUser;
-    String? authHeader = '';  
-    if (fireBaseUser != null) {
-      final token = await fireBaseUser.getIdToken();
-      authHeader = 'Bearer $token';
-    }
-    return authHeader;
-  }
   Future<List<UserEntity>> getFriends() async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getFriends),
       context: Context().withEntry(HttpLinkHeaders(headers: {
@@ -39,7 +31,7 @@ class SocialRemoteDataProvider {
     return data.map((json) {
       final friendNick = json['name'] ?? 'Desconocido';
       return UserEntity(
-        email: "", 
+        email: json['email'] ?? "", 
         apodo: friendNick,
         nombreCompleto: friendNick, 
         fechaNacimiento: DateTime.now(),
@@ -55,7 +47,7 @@ class SocialRemoteDataProvider {
 
   Future<List<UserEntity>> searchUsers(String query) async {
     debugPrint("Buscando usuarios por nickname: '$query'");
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
 
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getUsersByNickname),
@@ -98,9 +90,9 @@ class SocialRemoteDataProvider {
   }
 
   Future<void> addFriend(String friendNickname) async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.newFriendship),
+      document: gql(GraphQLMutations.newFriendship),
       variables: {
         'nickname': friendNickname,
       },
@@ -118,9 +110,9 @@ class SocialRemoteDataProvider {
   }
 
   Future<void> removeFriend(String friendNickname) async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.deleteFriendship),
+      document: gql(GraphQLMutations.deleteFriendship),
       variables: {
         'nickname': friendNickname,
       },
@@ -145,12 +137,12 @@ class SocialRemoteDataProvider {
   }
 
   Future<void> blockUser(String userToBlockNickname) async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     debugPrint("Solicitando bloqueo de: $userToBlockNickname");
     debugPrint("header en blockUser: $authHeader");
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.blockUser),
+      document: gql(GraphQLMutations.blockUser),
       variables: {
         'nickname': userToBlockNickname,
       },
@@ -174,7 +166,7 @@ class SocialRemoteDataProvider {
   }
 
   Future<List<UserEntity>> getBlockedUsers() async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     final QueryOptions options = QueryOptions(
       document: gql(GraphQLQueries.getBlockList),
       context: Context().withEntry(HttpLinkHeaders(headers: {
@@ -210,11 +202,11 @@ class SocialRemoteDataProvider {
   }
 
   Future<void> unblockUser(String userToUnblockNickname) async {
-    String? authHeader = await _authHeader;
+    String? authHeader = await AuthRemoteDataProvider().authHeader;
     debugPrint("Solicitando desbloqueo de: $userToUnblockNickname");
 
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.unBlockUser),
+      document: gql(GraphQLMutations.unBlockUser),
       variables: {
         'nickname': userToUnblockNickname,
       },

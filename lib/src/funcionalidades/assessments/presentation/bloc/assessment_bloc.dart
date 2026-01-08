@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/assessments/data/repositories/assessment_repository.dart';
 import 'assessment_event.dart';
@@ -75,12 +76,13 @@ class AssessmentBloc extends Bloc<AssessmentEvent, AssessmentState> {
     );
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(
+      (failure) {
+        debugPrint('Error en createAssessment: ${failure.message}');
+        emit(state.copyWith(
           status: AssessmentStatus.failure,
           errorMessage: failure.message,
-        ),
-      ),
+        ));
+      },
       (_) {
         add(GetAssessmentsByStationEvent(stationId: event.stationId));
         add(GetStationAssessmentInfoEvent(stationId: event.stationId));
@@ -103,12 +105,13 @@ class AssessmentBloc extends Bloc<AssessmentEvent, AssessmentState> {
     );
 
     result.fold(
-      (failure) => emit(
-        state.copyWith(
+      (failure) {
+        debugPrint('Error en updateAssessment: ${failure.message}');
+        emit(state.copyWith(
           status: AssessmentStatus.failure,
           errorMessage: failure.message,
-        ),
-      ),
+        ));
+      },
       (_) {
         add(GetAssessmentsByStationEvent(stationId: event.stationId));
         add(GetStationAssessmentInfoEvent(stationId: event.stationId));

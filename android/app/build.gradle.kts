@@ -16,6 +16,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -23,7 +24,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.bemotion.nextmove"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
@@ -31,11 +31,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("beta") {
+            // This file is created by the CI workflow
+            storeFile = file("beta-keystore.jks")
+            // Read the secrets from the environment variables set in the workflow
+            storePassword = System.getenv("BETA_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("BETA_KEY_ALIAS")
+            keyPassword = System.getenv("BETA_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("beta")
         }
     }
 }
@@ -43,9 +52,11 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-messaging")
     implementation("androidx.credentials:credentials:1.3.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
 flutter {

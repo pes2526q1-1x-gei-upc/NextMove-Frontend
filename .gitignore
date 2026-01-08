@@ -83,3 +83,9 @@ lib/l10n/app_localizations_es.dart
 lib/l10n/app_localizations.dart
 .vscode/settings.json
 untranslated_messages.txt
+test/coverage_test.dart
+test/test_bundle/bundle.dart
+test/coverage_test.dart
+test/test_bundle/bundle2.dart
+test/test_bundle/bundle0.dart
+test/test_bundle/bundle1.dart

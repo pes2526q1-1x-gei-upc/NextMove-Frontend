@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:nextmove_app/graphql/mutations.dart';
 import '../../../../graphql/queries.dart';
 
 class AuthService {
@@ -9,7 +10,7 @@ class AuthService {
 
   Future<Map<String, dynamic>?> getCurrentUser() async {
     final QueryOptions options = QueryOptions(
-      document: gql(GraphQLQueries.getUserProfileQuery),
+      document: gql(GraphQLQueries.getMeQuery),
       fetchPolicy: FetchPolicy.networkOnly,
     );
 
@@ -50,7 +51,7 @@ class AuthService {
     bool regWithGoogle = false, // per defecte, false
   }) async {
     final MutationOptions options = MutationOptions(
-      document: gql(GraphQLQueries.updateUserMutation),
+      document: gql(GraphQLMutations.updateUserMutation),
       variables: {
         'id': firebaseUid,
         'email': email,

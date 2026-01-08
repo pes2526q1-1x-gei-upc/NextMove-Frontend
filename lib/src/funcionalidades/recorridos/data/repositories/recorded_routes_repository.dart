@@ -8,7 +8,10 @@ import 'package:nextmove_app/src/funcionalidades/recorridos/domain/recorded_rout
 
 class RecordedRoutesRepository {
   final RecordedRouteDataProvider recordedRouteDataProvider;
-  RecordedRoutesRepository() : recordedRouteDataProvider = RecordedRouteDataProvider();
+
+  RecordedRoutesRepository({RecordedRouteDataProvider? recordedRouteDataProvider})
+      : recordedRouteDataProvider =
+            recordedRouteDataProvider ?? RecordedRouteDataProvider();
 
   Future<Either<Failure, List<RecordedRoute>>> getRecordedRoutesByUser(String userEmail) async {
     try {
@@ -16,6 +19,13 @@ class RecordedRoutesRepository {
           await recordedRouteDataProvider.getRecordedRoutes(userEmail);
       return Right(routes);
     } on ServerException catch (e) {
+      final message = e.message?.toLowerCase() ?? '';
+      if (message.contains('no hay') || 
+          message.contains('no encontrado') ||
+          message.contains('not found') ||
+          message.contains('empty')) {
+        return Right([]);
+      }
       return Left(ServerFailure(message: e.message));
     } on ConnectionException {
       return Left(ConnectionFailure());
@@ -23,7 +33,7 @@ class RecordedRoutesRepository {
       if (kDebugMode) {
         print('UnknownFailure in getRecordedRoutes: $e');
       }
-      throw UnknownFailure();
+      return Left(UnknownFailure(message: 'Error desconocido al obtener recorridos'));
     }
   }
 }

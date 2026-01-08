@@ -1,0 +1,130 @@
+name: Flutter test
+on:
+  workflow_call:
+    inputs:
+      coverage:
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v6
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.3"
+          channel: "stable"
+          cache: true
+      - name: Generate test file with all imports to include untested files in coverage
+        run: ./.github/workflows/generate_test_with_all_imports.sh
+      - name: Print generated test file
+        run: cat test/coverage_test.dart
+      - name: Create .env file from ENV_FILE secret
+        run: echo "$ENV_FILE" > .env
+      - name: Generate localization files
+        run: flutter gen-l10n
+      - name: Setup testRocket
+        run: dart pub global activate test_rocket
+      - name: Run test with testRocket with coverage information
+        run: |
+          if testRocket run --coverage 2>&1 | tee | grep -q "❌Test Error"; then
+            echo "TestRocket detected test errors"
+            exit 1
+          fi
+      - name: Run tests with flutter test with coverage information (check for errors here if testRocket fails)
+        run: flutter test --coverage
+        if: failure()
+      - name: Upload coverage reports for coverage job
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage
+          path: coverage/lcov.info
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ inputs.coverage }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v6
+
+      - name: Download coverage reports from test job
+        uses: actions/download-artifact@v5
+        with:
+          name: coverage
+          path: coverage/
+
+      - name: Get latest LCOV version
+        id: get-version
+        run: |
+          LATEST_TAG=$(curl -s https://api.github.com/repos/linux-test-project/lcov/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Cache LCOV
+        id: cache-lcov
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/lcov
+          key: ${{ runner.os }}-lcov-${{ env.LATEST_TAG }}
+
+      - name: Install LCOV and Dependencies
+        if: steps.cache-lcov.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/lcov
+          curl -sL https://cpanmin.us | perl - --notest --local-lib=$HOME/.local/lcov Capture::Tiny DateTime
+          git clone --depth 1 --branch ${{ env.LATEST_TAG }} https://github.com/linux-test-project/lcov.git lcov-source
+          cd lcov-source
+          make install PREFIX=$HOME/.local/lcov
+
+      - name: Setup LCOV Environment
+        run: |
+          echo "$HOME/.local/lcov/bin" >> $GITHUB_PATH
+          echo "PERL5LIB=$HOME/.local/lcov/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
+          echo "ignore_errors = deprecated" > ~/.lcovrc
+
+      - name: Generate LCOV report
+        run: |
+          lcov --ignore-errors unused,deprecated --remove coverage/lcov.info \
+            '*.g.dart' \
+            '*_state.dart' \
+            '*_event.dart' \
+            '*/main.dart' \
+            '*/firebase_options.dart' \
+            '*/l10n/*' \
+            '*/config/*' \
+            '*/graphql/*' \
+            '*/enums/*' \
+            '*/theme/*' \
+            '*/data/dataProviders/*' \
+            '*_widget.dart' \
+            '*_page.dart' \
+            '*data_provider.dart' \
+            -o coverage/lcov.info
+
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v4
+        with:
+          coverage-files: coverage/lcov.info
+          minimum-coverage: 0
+          artifact-name: ""
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true

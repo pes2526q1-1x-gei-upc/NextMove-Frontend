@@ -14,7 +14,7 @@ class ProfileLanguageSelector {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -43,24 +43,26 @@ class ProfileLanguageSelector {
                       lang,
                       style: TextStyle(
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? Theme.of(context).primaryColor : Colors.black87,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                     trailing: isSelected
-                        ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                        ? Icon(
+                            Icons.check,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
                         : null,
                     onTap: () {
-                      // 1. Actualizar UI inmediatamente (LocaleProvider)
                       Provider.of<LocaleProvider>(context, listen: false)
                           .setLocaleFromLanguage(lang);
 
-                      // 2. Guardar en Backend (UserBloc)
                       if (currentUser.idiomaPreferido != lang) {
                         final updatedUser = currentUser.copyWith(idiomaPreferido: lang);
                         context.read<UserBloc>().add(UpdateUserProfile(updatedUser));
                       }
 
-                      // 3. Cerrar el modal
                       Navigator.pop(modalContext);
                     },
                   );
