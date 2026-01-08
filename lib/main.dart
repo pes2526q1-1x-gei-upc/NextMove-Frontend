@@ -299,7 +299,6 @@ class _AuthStateHandlerState extends State<AuthStateHandler> with WidgetsBinding
         if (preferredLanguage != null) {
           localeProvider.setLocaleFromAPILanguage(preferredLanguage);
         }
-        final fireBaseUser = FirebaseAuth.instance.currentUser;
         if (kDebugMode) {
           print("Datos guardados correctamente en Provider");
         }

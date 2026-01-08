@@ -9,6 +9,8 @@ import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_even
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_state.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 
 class MockMapBloc extends MockBloc<MapEvent, MapState> implements MapBloc {}
 
@@ -26,6 +28,16 @@ void main() {
   Widget buildWidget(MapLoadedState state) {
     when(() => mockBloc.state).thenReturn(state);
     return MaterialApp(
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('es'), // Spanish
+      ],
       home: Stack(
         children: [
           BlocProvider<MapBloc>.value(
@@ -36,38 +48,6 @@ void main() {
               currentMapType: MapType.normal,
             ),
           ),
-          if (state.currentMode == StationType.bicycle)
-            Positioned(
-              bottom: 30,
-              right: 16,
-              child: Container(
-                height: 50,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: state.isRecordingRoute ? Colors.red : Colors.green,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      state.isRecordingRoute ? Icons.stop : Icons.play_arrow,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      state.isRecordingRoute ? 'Stop' : 'Start',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nextmove_app/l10n/app_localizations.dart';
 import 'package:nextmove_app/src/funcionalidades/estaciones/dominio/station_model.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_bloc.dart';
 import 'package:nextmove_app/src/funcionalidades/mapa/presentacion/bloc/map_events.dart';
@@ -54,9 +55,7 @@ class MapControlsColumnWidget extends StatelessWidget {
         }
 
         final isRecording = state.isRecordingRoute;
-        // Si está en modo bici, los botones deben estar más arriba para dejar espacio al botón de play
-        // Si está en modo coche, los botones están en la parte inferior
-        final bottomOffset = (state.currentMode == StationType.bicycle) ? 90.0 : 30.0;
+        final bottomOffset = 30.0;
         
         return Positioned(
           bottom: bottomOffset,
@@ -146,7 +145,7 @@ class MapControlsColumnWidget extends StatelessWidget {
                   child: Container(
                     height: 50,
                     width: 50,
-                    margin: EdgeInsets.zero,
+                    margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
                       color: cardColor,
                       shape: BoxShape.circle,
@@ -160,6 +159,97 @@ class MapControlsColumnWidget extends StatelessWidget {
                   ),
                 ),
               ],
+
+              // Play/Stop recording button (only in bicycle mode)
+              if (state.currentMode == StationType.bicycle) ...[
+                GestureDetector(
+                  onTap: () {
+                    final bloc = context.read<MapBloc>();
+                    if (state.isRecordingRoute) {
+                      final l10n = AppLocalizations.of(context)!;
+                      bloc.add(StopRouteRecordingEvent(l10n));
+                    } else {
+                      bloc.add(const StartRouteRecordingEvent());
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: state.isRecordingRoute
+                          ? (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.red.shade700
+                              : Theme.of(context).colorScheme.error)
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.green.shade700
+                              : Theme.of(context).colorScheme.primary),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: commonShadow,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          state.isRecordingRoute ? Icons.stop : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Builder(
+                          builder: (context) {
+                            final l10n = AppLocalizations.of(context)!;
+                            final text = state.isRecordingRoute 
+                                ? l10n.stopRecording
+                                : l10n.startRoute;
+                            final words = text.split(' ');
+                            
+                            if (words.length == 1) {
+                              return Text(
+                                text,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.0,
+                                ),
+                              );
+                            } else {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    words[0],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    words.skip(1).join(' '),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
             ],
           ),
         );

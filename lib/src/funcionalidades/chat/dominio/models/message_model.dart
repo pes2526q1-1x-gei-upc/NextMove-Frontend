@@ -54,7 +54,7 @@ class MessageModel extends Message {
           parsedDate = DateTime.parse(trimmedValue);
           if (!parsedDate.isUtc && trimmedValue.length >= 19) {
             try {
-              final utcString = trimmedValue + 'Z';
+              final utcString = '${trimmedValue}Z';
               parsedDate = DateTime.parse(utcString);
               if (kDebugMode) {
                 debugPrint('[MessageModel] Timestamp local convertido a UTC: $trimmedValue -> $utcString');
